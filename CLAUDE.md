@@ -60,8 +60,11 @@ Opcional (fase 2): un script `bin/build.php` que pre-renderiza todas las rutas a
 │   │   ├── posts.php      # índice del blog (slug, título, categoría, minutos, extracto, fecha)
 │   │   ├── glossary.php   # términos del glosario
 │   │   └── equipment.php  # contenido de las páginas por equipo
+│   ├── sitemap.php        # genera /sitemap.xml desde routes.php (solo live + sitemap=true)
 │   └── forms/
-│       └── contact.php    # POST del formulario: validación, honeypot, límite por IP, PHPMailer
+│       ├── lib.php        # csrf_token() sin sesión, saneado, rate limit, log; se incluye siempre
+│       ├── contact.php    # POST /contact/: validación, honeypot, límite por IP, PHPMailer
+│       └── download.php   # POST de BOL y agreement: valida, avisa por correo y entrega el archivo
 ├── templates/
 │   ├── layout.php         # <html>, <head> (meta, OG, canonical, hreflang, JSON-LD, fuentes), nav, main, cta, footer, mbar
 │   ├── partials/
@@ -78,8 +81,9 @@ Opcional (fase 2): un script `bin/build.php` que pre-renderiza todas las rutas a
 │   │   ├── video.php        # fachada de video con capítulos
 │   │   ├── cta.php          # bloque final "Let's talk about your operation."
 │   │   ├── footer.php
-│   │   └── mbar.php         # barra fija móvil (WhatsApp + llamada)
-│   └── pages/               # una plantilla por página (ver §7)
+│   │   ├── mbar.php         # barra fija móvil (WhatsApp + llamada)
+│   │   └── kit.php          # funciones auxiliares de los partials (iconos SVG, logo, estrella, swoosh, imágenes)
+│   └── pages/               # una plantilla por página (ver §7); subcarpetas con contenido: legal/, posts/, company/
 ├── assets/
 │   ├── css/
 │   │   ├── tokens.css     # variables (§5)
@@ -399,9 +403,26 @@ Referencias y qué tomar de cada una:
 
 ### 8.4 Placeholders vigentes en el diseño
 
-`[YOUR FEE]` · `[hours · time zone]` · `MC# [—] · USDOT [—]` · `[Business address]` · `[Name] [Role] [One line on experience]` · `[TEAM PHOTO]` · `[0:00]` (tiempos de capítulos) · `[Publish date]` · `[NorthStar pricing model]` · `[confirm equipment types]` · `[confirm how Relay access is handled]` · `[confirm terms]` · `[Current minimum limits — verify on relay.amazon.com]` · `[Cookie and analytics tools]` · `[Limitation of liability clause]` · `[ID]` en el desk log de ejemplo.
+Medidos con la auditoría sobre las 22 rutas live (staging). Se pintan con `ph()`, que en `ENV=production` devuelve cadena vacía y descarta las FAQ que los llevan, para que nada con corchetes llegue a producción:
 
-Antes de publicar: `grep -rn "\[" templates/ app/data/` no debe devolver placeholders en páginas `live`.
+| Placeholder | Dónde |
+|---|---|
+| `MC# — · USDOT —` | footer de las 22 páginas |
+| `0:00` (×3) | home y Our desk (tiempos de capítulos del video) |
+| `Team photo`, `Name`, `Role`, `One line on experience` (×4 cada uno) | Our desk |
+| `YOUR FEE — % of gross or flat weekly` | home, Owner (FAQ de coste) |
+| `confirm equipment types` | home, Owner |
+| `confirm terms: weekly, monthly, cancel anytime` | home (FAQ del contrato) |
+| `confirm how account access is handled`, `confirm` | Relay |
+| `confirm load boards`, `confirm` | Dry van |
+| `ID` | home y Load tracking (desk log de ejemplo) |
+| `hours · time zone`, `other confirmed types` | Contact |
+| `date`, `Business address`, `Cookie and analytics tools…`, `Limitation of liability clause…` | Privacy y Terms (texto del abogado) |
+| `Publish date` | los 4 artículos del blog |
+| `NorthStar pricing model…` | artículo de costes |
+| `Current minimum limits — verify on relay.amazon.com…` | artículo de requisitos de Relay |
+
+Antes de publicar en producción: auditar las rutas con `ENV=production` y comprobar que no quedan huecos visibles; el sitio NO debe salir a producción mientras las páginas legales y el artículo de costes tengan huecos.
 
 ---
 
@@ -413,8 +434,8 @@ Antes de publicar: `grep -rn "\[" templates/ app/data/` no debe devolver placeho
 | **IFTA** (`calc-ifta.js`) | Filas por estado (estado, millas, galones comprados, tasa opcional) con agregar/quitar. MPG de flota = millas totales ÷ galones totales; galones gravables = millas del estado ÷ MPG; neto = gravables − comprados; impuesto = neto × tasa si hay tasa. Resumen: millas, galones, MPG, impuesto neto. Tabla con scroll horizontal propio en móvil. Las tasas no se precargan (cambian cada trimestre). |
 | **Filtro del blog** | Chips All / Dispatch / Amazon Relay / Paperwork & pay con `aria-pressed`. Sin JS se ven todas las tarjetas. |
 | **Capítulos del video** | Botones con estado activo; con el video real, saltan al minuto. |
-| **Formulario de contacto** | `POST /contact/` → `app/forms/contact.php`: token CSRF, honeypot, tiempo mínimo de envío, límite por IP en `storage/`, validación servidor, envío con PHPMailer por SMTP de Hostinger, respuesta en la misma página (PRG). Campos: name, company, MC#, number of trucks, equipment, message. |
-| **Descargas (BOL, agreement)** | Formulario nombre + correo + formato → entrega el archivo de `assets/downloads/` y avisa por correo al cliente. Sin muro si el cliente prefiere descarga directa (decidir). |
+| **Formulario de contacto** | `POST /contact/` → `app/forms/contact.php` (la ruta declara `'form' => 'contact'`). Token CSRF **sin sesión** (HMAC con `APP_SECRET`, válido 2 h; así no hay cookies que rompan la caché de LiteSpeed), honeypot `website`, tiempo mínimo 3 s, límite por IP (5/hora, hash en `storage/ratelimit/`), validación servidor, PHPMailer por SMTP con credenciales de `app/config.local.php`. Sin credenciales guarda el mensaje en `storage/mail.log` y responde éxito. Éxito → 303 a `/contact/?sent=1`; errores → 422 en la misma página. Campos: name, company, MC#, trucks, equipment, message. **Sin campo de email/teléfono de respuesta (así es la maqueta): pendiente de decidir con Carlos.** |
+| **Descargas (BOL, agreement)** | `'form' => 'download'` → `app/forms/download.php`: nombre + correo + formato → entrega `assets/downloads/<archivo>` con `Content-Disposition` y avisa por correo; si el archivo no existe devuelve 422 con mensaje claro (no 500) y registra la solicitud en `storage/downloads.log`. |
 | **Newsletter del blog** | Solo maquetado. Conectar cuando el cliente elija herramienta. |
 
 JavaScript: sin dependencias salvo GSAP, módulos pequeños, `defer`, cada uno se carga solo en la página que lo usa. El sitio funciona y se lee sin JS.
@@ -441,9 +462,20 @@ Decisiones de diseño/estrategia por cerrar:
 5. **Hero del home bajo el PDF:** cambiar los chips por "Coordinated loads · Organized information · Constant follow-up" si se elige la opción A.
 
 Pendientes técnicos conocidos:
-- Rehacer la tarjeta destacada del mega menú de Services sin texto sobre la foto.
-- Escribir `/blog/how-to-dispatch-a-truck/`.
-- Archivos reales del BOL (PDF y DOCX) y del agreement (DOCX revisado por abogado).
+- ~~Rehacer la tarjeta destacada del mega menú de Services sin texto sobre la foto.~~ Hecho (foto arriba, texto debajo).
+- Escribir `/blog/how-to-dispatch-a-truck/` (no está en la maqueta; no se registra hasta tenerlo).
+- Archivos reales del BOL (PDF y DOCX) y del agreement (DOCX revisado por abogado) en `assets/downloads/`. El agreement ofrece también "PDF — read only": decidir si se prepara o se quita la opción.
+- `title`/`meta`/`h1` de Resources, Blog, herramientas y páginas de equipo no están en el doc de copy: los redactó el andamiaje con la keyword (`// TODO verificar con doc de copy` en `app/routes.php`). Carlos debe validarlos.
+- Reemplazar todas las fotos (stock genérico): la del equipo con auriculares figura como "NorthStar team" en Our desk y es la primera. Dos fotos son de solo 490 px y se amplían en el hero. Algunas muestran marcas de terceros legibles (Trans Chicago, Penske, Wabash, Kreilkamp).
+- El video del equipo no existe: el play queda desactivado ("Video coming soon" solo para lector de pantalla). Cuando haya URL, el partial `video` recibe `data-video-src`.
+- Páginas de equipo (5) en `draft`. Sus migas llevan "Services", que apunta a `/dispatch-for-owner-operators/` porque no existe un hub de servicios.
+- Error visual en formularios: no hay token `--danger` (no se añadió color sin permiso); los errores usan navy con borde grueso.
+- Frase "Estimate only…" en las calculadoras (§8.2.6): no está en la maqueta; confirmar el texto.
+- Newsletter del blog: solo maquetado, `method="get"` y el input sin `name`.
+- `.htaccess` sin probar (el servidor de desarrollo `php -S` no lo lee): probar en staging de Hostinger (HTTPS, barra final, bloqueo de `app/`, caché, compresión).
+- Plantilla de correo y credenciales SMTP reales: crear `app/config.local.php` en el servidor desde `app/config.local.example.php` (`APP_SECRET`, `SMTP_*`, `MAIL_TO`, `PREVIEW_TOKEN`, `ENV`, `DOMAIN`).
+
+Estado de verificación (staging, `ENV=production` en Lighthouse móvil, 4 rutas): Performance 94–95, Accessibility 100, Best Practices 100, SEO 100, CLS 0. **LCP 2,8–3,0 s (objetivo < 2,5 s)** medido con `php -S` sin compresión ni caché; revisarlo en Hostinger con LiteSpeed y, si no baja, precargar la imagen del hero y sustituir las fotos de 490 px.
 
 ---
 
