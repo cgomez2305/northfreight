@@ -255,7 +255,7 @@ Breakpoints:
 
 | Componente | Comportamiento |
 |---|---|
-| **Ops bar** | "Dispatch desk · On shift" + relojes ET/CT/MT/PT (Intl, se actualizan cada 20 s) + correo (oculto ≤1024). ⚠️ "On shift" queda pendiente de que el cliente confirme horario (ver §10). |
+| **Ops bar** | Franja superior oscura: punto cian con pulso + "Dispatch desk · On shift" + relojes ET/CT/MT/PT (Intl, se actualizan cada 20 s) + correo (oculto ≤1024). **Decisión de Carlos: se replica tal cual la maqueta (visible).** ⚠️ "On shift" afirma que el desk está trabajando; el cliente aún debe confirmar horario (ver §10). Flag `SHOW_ON_SHIFT` en `app/config.php`. |
 | **Nav** | Logo · Services ▾ · Resources ▾ · How it works · Our desk · Contact · botón "WhatsApp us". Mega menú abre al hover y al clic, cierra al salir y con Esc; `aria-expanded` en los disparadores. |
 | **Mega Services** | Dispatch services (Owner-operators, Amazon Relay, Dry van) · Operations & back office (Load tracking, Back office) · chips "By equipment" (solo equipos confirmados) · tarjeta destacada de Amazon Relay. ⚠️ La tarjeta destacada tiene texto encima de la foto: rehacerla con el texto debajo o al lado. |
 | **Mega Resources** | Free tools (IFTA, Rate per mile) · Templates (BOL, Agreement) · Learn (Glossary, Blog) · tarjeta cian de descarga del BOL. |
@@ -298,7 +298,7 @@ Una URL por intención de búsqueda, rutas cortas a un nivel, sin `/services/`. 
 | `/contact/` | contact | truck dispatch company near me | 50 | 20 | Diseñada |
 | `/privacy-policy/` · `/terms/` | legal | — | — | — | Diseñadas (texto pendiente de abogado) |
 
-### 7.2 Recursos (fase 1 si el cliente aprueba la estructura completa)
+### 7.2 Recursos (fase 1 — decisión de Carlos: se construye la maqueta completa, Resources y Blog activos)
 
 | URL | Plantilla | Keyword | Vol. |
 |---|---|---|---|
@@ -312,6 +312,8 @@ Una URL por intención de búsqueda, rutas cortas a un nivel, sin `/services/`. 
 Fase 2 del glosario: una URL por término (`/resources/glossary/dry-van/`), como hace ntslogistics.
 
 ### 7.3 Blog
+
+**Decisión de Carlos: blog activo (`status=live`, en el sitemap) y con `index`.** Cuatro artículos de la maqueta; `how-to-dispatch-a-truck` no existe en la maqueta y no se registra hasta escribirlo.
 
 | URL | Keyword | Vol. | Enlaza a |
 |---|---|---|---|
@@ -426,7 +428,7 @@ Del cuestionario al cliente (las respuestas desbloquean la publicación):
 
 Decisiones de diseño/estrategia por cerrar:
 1. **Mensaje del hero:** A) "Incidents are handled with evidence. And operations, as a team." (PDF) · B) "Booked. Tracked. Documented." (actual).
-2. **Estructura de la v1:** breve (Inicio, Servicios, Cómo trabajamos, Equipo, Contacto) como pide el PDF · completa con Resources y Blog · breve ahora y recursos en fase 2.
+2. ~~**Estructura de la v1**~~ **Resuelto por Carlos: completa, tal cual la maqueta (con Resources y Blog).**
 3. **Selector ES / EN:** el PDF lo incluye; se quitó del diseño porque no había destino. Volver a ponerlo cuando exista `/es/`.
 4. **Porcentajes:** el artículo de costos menciona un rango de mercado (5–10%); el PDF pide no usar porcentajes ajenos. Decidir si se quita.
 5. **Hero del home bajo el PDF:** cambiar los chips por "Coordinated loads · Organized information · Constant follow-up" si se elige la opción A.
