@@ -1,5 +1,67 @@
 <?php
-/** STUB — lo reescribe el coder de páginas. Disponibles: $route, $cfg y los helpers. */
+/**
+ * /load-tracking/ — maqueta Tracking.html.
+ * Orden: hero (texto + "Desk log" de ejemplo) · What we log · Evidencia (texto + foto) · CTA final (lo imprime el layout).
+ */
+require_once NS_ROOT . '/templates/partials/kit.php';
+
+$log = [
+    ['06:12', 'Rate confirmation received & filed', ''],
+    ['08:05', 'ETA sent to broker', ''],
+    ['09:40', 'Driver checked in at shipper — photo attached', ''],
+    ['11:55', 'Delay logged with timestamps for detention claim', ' log__row--on'],
+    ['—', 'POD collected at delivery', ' sb-tr-end'],
+];
+$logs = ['Check calls & ETA updates', 'Arrival & departure times', 'Delays & detention clock', 'Incident photos & notes', 'BOL & POD'];
+
+ob_start(); ?>
+<div class="data-card sb-tr-card">
+  <div class="data-card__head">
+    <span class="data-card__label t-meta">Desk log · Example</span>
+    <span class="data-card__status"><span class="data-card__dot pulse" aria-hidden="true"></span>LOAD #<?= ph('ID') ?> · IN TRANSIT</span>
+  </div>
+  <ol class="log">
+    <?php foreach ($log as [$time, $text, $mod]): ?>
+    <li class="log__row<?= $mod ?>"><span class="log__time"><?= e($time) ?></span><span class="log__text"><?= e($text) ?></span></li>
+    <?php endforeach; ?>
+  </ol>
+</div>
+<?php $aside = ob_get_clean();
+
+partial('hero', [
+    'route' => $route,
+    'cls'   => 'sb-tr-hero',
+    'h1'    => 'Load tracking and check calls {hl}for your trucks{/hl}',
+    'lead'  => 'Every trip followed from pickup to POD. ETAs, arrivals and departures logged, incidents documented and brokers kept informed — without you on the phone.',
+    'ctas'  => [['label' => 'Talk to a dispatcher', 'href' => wa($route['wa']), 'wa' => true, 'arrow' => true]],
+    'aside' => $aside,
+]);
 ?>
-<h1><?= e($route['h1']) ?></h1>
-<p>STUB</p>
+
+<section class="section" aria-labelledby="tr-log">
+  <div class="container stack">
+    <?php partial('section-head', ['eyebrow' => 'On every load', 'title' => 'What we log', 'id' => 'tr-log']); ?>
+    <ul class="g5 gap-12 sb-cells">
+      <?php foreach ($logs as $i => $t): ?>
+      <li><?php partial('card', ['size' => 'tile', 'variant' => $i === 4 ? 'dark' : 'light', 'code' => 'LOG · ' . sprintf('%02d', $i + 1), 'title' => $t, 'cls' => 'sb-tile']); ?></li>
+      <?php endforeach; ?>
+    </ul>
+  </div>
+</section>
+
+<section class="section section--surface" aria-labelledby="tr-proof">
+  <div class="container sb-split">
+    <div class="sb-split__text">
+      <?php partial('section-head', ['eyebrow' => 'Proof, not promises', 'title' => 'Incidents are handled with evidence', 'id' => 'tr-proof']); ?>
+      <p class="t-body c-slate">When a broker questions a late arrival or detention, the record is already there: time, place and photos. Your claim starts with proof, not with a phone call.</p>
+      <?php if (route_is_live('/trucking-back-office/')): ?>
+      <a class="sb-link" href="<?= e(url('/trucking-back-office/')) ?>">How our back office uses this evidence <span class="arrow" aria-hidden="true">→</span></a>
+      <?php endif; ?>
+    </div>
+    <div class="sb-media">
+      <div class="sb-media__clip">
+        <?= ns_img(['base' => 'two-semis-hillside-highway', 'alt' => 'Two semi trucks on a highway through the hills', 'sizes' => '(min-width:1025px) 600px, 100vw']) ?>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,146 @@
+/* NorthStar — Glossary, calculadora de rate per mile e IFTA. Solo tokens; sin hex. Prefijo tools-. */
+
+/* ---- Heros ---- */
+.tools-hero .hero__eyebrow .star { display: none; }
+.tools-hero--gloss .hero__in { padding-bottom: clamp(28px, 4vw, 48px); }
+.tools-hero--short .hero__in { padding-bottom: clamp(40px, 5vw, 64px); }
+.tools-hero--rpm .hero__aside { flex-basis: 520px; }
+
+/* ---- Bandas oscuras que continúan el hero ---- */
+.tools-band { background: var(--navy); color: var(--white); }
+.tools-band--az .container { padding-bottom: clamp(48px, 6vw, 80px); }
+.tools-band__in { display: flex; flex-direction: column; gap: 16px; padding-bottom: clamp(56px, 8vw, 104px); }
+
+/* ---- Glosario: índice A–Z ---- */
+.tools-az { display: flex; flex-wrap: wrap; gap: 6px; }
+.tools-az a {
+  min-width: 44px; min-height: 44px; display: inline-flex; align-items: center; justify-content: center;
+  background: var(--tint-on-dark); color: var(--white); text-decoration: none;
+  font-family: var(--font-head); font-stretch: 125%; font-variation-settings: 'wdth' 125; font-weight: 800; font-size: 16px;
+  transition: background-color var(--t-fast), color var(--t-fast);
+}
+.tools-az a:hover { background: var(--cyan); color: var(--navy-deep); }
+.tools-az a:focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+.tools-az a:hover:focus-visible { outline-color: var(--white); }
+
+/* ---- Glosario: términos ---- */
+.tools-gloss { padding-block: clamp(56px, 8vw, 96px); }
+.tools-gloss__list { max-width: 960px; display: flex; flex-direction: column; gap: 28px; }
+.tools-letter, .tools-term { scroll-margin-top: 24px; }
+.tools-letter { display: flex; flex-wrap: wrap; gap: clamp(16px, 4vw, 56px); border-top: 2px solid var(--navy); }
+.tools-letter__mark {
+  flex: 0 0 auto; min-width: 72px; padding-top: 18px; line-height: 1; color: var(--cyan);
+  font-family: var(--font-head); font-stretch: 125%; font-variation-settings: 'wdth' 125; font-weight: 900; font-size: 48px;
+}
+.tools-letter__terms { flex: 1 1 480px; min-width: 0; display: flex; flex-direction: column; }
+.tools-term { display: flex; flex-direction: column; gap: 8px; padding: 22px 0; border-bottom: 1px solid var(--line-soft); }
+.tools-term__name {
+  margin: 0; font-family: var(--font-head); font-stretch: 125%; font-variation-settings: 'wdth' 125;
+  font-weight: 900; font-size: 20px; line-height: 1.1; text-transform: uppercase; color: var(--navy); text-wrap: balance;
+}
+.tools-term__def { margin: 0; color: var(--slate); line-height: 1.7; }
+.tools-term:target .tools-term__name { color: var(--cyan-ink); }
+
+/* ---- Pasos ---- */
+.tools-steps { margin: 0; padding: 0; list-style: none; }
+.tools-step { background: var(--surface); padding: var(--tile-pad); display: flex; flex-direction: column; gap: 10px; }
+.tools-step__n { font-size: 12px; font-weight: 600; color: var(--cyan-ink); }
+.tools-step__t { font-size: 16px; line-height: 1.55; color: var(--ink); }
+
+/* ---- Recursos relacionados ---- */
+.tools-related .card { min-height: 200px; }
+.tools-related .card:not(.card--dark) .card__code { color: var(--cyan-ink); }
+.tools-related .card__code { font-weight: 600; letter-spacing: .06em; }
+
+/* ---- Calculadora RPM ---- */
+.tools-calc { background: var(--white); color: var(--ink); display: flex; flex-wrap: wrap; }
+.tools-calc__form { flex: 1 1 300px; min-width: 0; padding: clamp(20px, 3vw, 32px); gap: 16px; align-content: start; }
+.tools-calc__label { margin: 0; grid-column: 1 / -1; color: var(--slate); }
+.tools-calc__label--cyan { color: var(--cyan-light); }
+.tools-calc__result {
+  flex: 1 1 260px; min-width: 0; padding: clamp(20px, 3vw, 32px);
+  background: var(--navy-deep); color: var(--white); display: flex; flex-direction: column;
+}
+.tools-calc__out { display: flex; flex-direction: column; }
+.tools-calc__big-label { margin: 18px 0 0; font-size: 12px; letter-spacing: .02em; text-transform: uppercase; color: var(--on-dark-muted); }
+.tools-calc__big {
+  margin: 0; line-height: 1; color: var(--cyan); overflow-wrap: anywhere;
+  font-family: var(--font-head); font-stretch: 125%; font-variation-settings: 'wdth' 125; font-weight: 900; font-size: clamp(44px, 5vw, 64px);
+}
+.tools-calc__note { margin: 0; padding-top: 14px; font-size: 12px; line-height: 1.5; color: var(--on-dark-muted); }
+.tools-calc__notes { margin-top: auto; }
+.tools-noscript { margin: 14px 0 0; font-size: 14px; line-height: 1.5; color: var(--on-dark); }
+.tools-sheet .tools-noscript { margin: 0; color: var(--ink); }
+
+.tools-field { min-width: 0; }
+.tools-field > label { color: var(--navy); }
+.tools-unit { position: relative; display: block; }
+.tools-unit__sym {
+  position: absolute; left: 14px; top: 50%; transform: translateY(-50%); pointer-events: none;
+  font-family: var(--font-mono); font-size: 14px; color: var(--slate);
+}
+.input--unit { padding-left: 34px; }
+.tools-field .input { font-variant-numeric: tabular-nums; }
+.tools-hint { font-weight: 400; font-size: 13px; line-height: 1.4; color: var(--slate); }
+.tools-msg { font-weight: 600; font-size: 13px; line-height: 1.4; color: var(--navy); }
+.input[aria-invalid="true"] { border-color: var(--navy); outline: 2px solid var(--navy); outline-offset: -1px; }
+.input[aria-invalid="true"]:focus { outline-color: var(--cyan-ink); }
+
+.tools-res { margin: 18px 0 0; display: flex; flex-direction: column; }
+.tools-res__row {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 16px;
+  padding: 16px 0; border-bottom: 1px solid var(--line-on-dark);
+}
+.tools-res__row:last-child { border-bottom: 0; }
+.tools-res dt { font-size: 14px; color: var(--on-dark-soft); }
+.tools-res dt { min-width: 0; }
+.tools-res dd { margin: 0; flex: none; font-weight: 600; text-align: right; white-space: nowrap; }
+.tools-res__accent { color: var(--cyan-light); }
+
+/* ---- Calculadora IFTA ---- */
+.tools-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.tools-tile { background: var(--navy-deep); padding: var(--tile-pad); display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.tools-tile__label { font-size: 11px; text-transform: uppercase; color: var(--on-dark-muted); }
+.tools-tile__val {
+  font-family: var(--font-head); font-stretch: 125%; font-variation-settings: 'wdth' 125; font-weight: 900;
+  font-size: 30px; line-height: 1.1; color: var(--white); overflow-wrap: anywhere; text-transform: uppercase;
+}
+.tools-tile--accent { background: var(--cyan); }
+.tools-tile--accent .tools-tile__label, .tools-tile--accent .tools-tile__val { color: var(--navy-deep); }
+
+.tools-sheet { background: var(--white); color: var(--ink); padding: clamp(16px, 3vw, 32px); display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+.tools-sheet__head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; }
+.tools-sheet__head .tools-calc__label { grid-column: auto; }
+.tools-sheet__note { margin: 0; font-size: 13px; line-height: 1.6; color: var(--slate); }
+.tools-sheet__note + .tools-sheet__note { margin-top: -12px; }
+.tools-sheet .btn:focus-visible { outline-color: var(--cyan); }
+
+/* Los controles que necesitan JS solo aparecen cuando el script los activa. */
+[data-calc="ifta"]:not(.is-ready) .tools-add,
+[data-calc="ifta"]:not(.is-ready) .tools-rm { visibility: hidden; }
+
+.tools-scroll { overflow-x: auto; max-width: 100%; }
+.tools-scroll:focus-visible { outline-offset: 2px; }
+.tools-tbl { width: 100%; border-collapse: collapse; min-width: 760px; }
+.tools-tbl th {
+  padding: 0 8px 10px; text-align: left; font-family: var(--font-head); font-stretch: 112%; font-variation-settings: 'wdth' 112;
+  font-weight: 600; font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: var(--slate);
+}
+.tools-tbl td { padding: 6px 8px; vertical-align: middle; border-top: 1px solid var(--line-soft); }
+.tools-tbl .input { min-height: 44px; padding: 10px; font-variant-numeric: tabular-nums; }
+.tools-tbl td:first-child { width: 90px; }
+.tools-state { text-transform: uppercase; }
+.tools-num { font-size: 14px; white-space: nowrap; color: var(--navy); }
+.tools-num--b { font-weight: 600; }
+.tools-num.is-credit { color: var(--cyan-ink); }
+.tools-rmcell { width: 52px; }
+.tools-rm {
+  width: 44px; height: 44px; border: 0; background: var(--surface); color: var(--slate); cursor: pointer;
+  display: inline-flex; align-items: center; justify-content: center; transition: background-color var(--t-fast), color var(--t-fast);
+}
+.tools-rm:hover { background: var(--line); color: var(--navy); }
+
+@media (max-width: 640px) {
+  .tools-tile__val { font-size: 26px; }
+  .tools-add { width: 100%; }
+}

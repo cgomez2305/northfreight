@@ -1,5 +1,50 @@
 <?php
-/** STUB — lo reescribe el coder de páginas. Disponibles: $route, $cfg y los helpers. */
+/**
+ * /how-it-works/ — maqueta How.html.
+ * Orden: hero · 4 pasos (lista ordenada con línea discontinua) · What you can expect from the desk · CTA final (layout).
+ */
+require_once NS_ROOT . '/templates/partials/kit.php';
+
+$steps = [
+    ['We learn your operation', 'Trucks, equipment, lanes, drivers, home time and the accounts you already run, including Amazon Relay.'],
+    ['We define scope & contacts', 'Who approves loads, how and when we report, and which tasks the desk owns from day one.'],
+    ['We run the day-to-day', 'Booking, tracking and documenting every load. You get updates on WhatsApp, where you already work.'],
+    ['We review & improve', 'Regular reviews of lanes, rates and incidents to keep your trucks earning.'],
+];
+$expect = ['One channel for every update', 'A record of every load', 'A team, not a single dispatcher'];
+
+partial('hero', [
+    'route' => $route,
+    'cls'   => 'sb-hw-hero',
+    'h1'    => 'How we plug into {hl}your operation{/hl}',
+    'lead'  => 'Hiring a dispatch company should not mean losing control of your trucks. Here is exactly how we start and how we work with you every day.',
+]);
 ?>
-<h1><?= e($route['h1']) ?></h1>
-<p>STUB</p>
+
+<section class="section">
+  <div class="container sb-hw-wrap">
+    <ol class="sb-hw-steps">
+      <?php foreach ($steps as $i => [$title, $text]): $last = $i === count($steps) - 1; ?>
+      <li class="sb-hw-step">
+        <?php if ($last): ?><span class="sb-hw-step__num sb-hw-step__num--end" aria-hidden="true"><?= ns_star(30, 'twinkle') ?></span>
+        <?php else: ?><span class="sb-hw-step__num" aria-hidden="true"><?= sprintf('%02d', $i + 1) ?></span><?php endif; ?>
+        <div class="sb-hw-step__body">
+          <h2 class="head sb-hw-step__title"><?= e($title) ?></h2>
+          <p class="t-body c-slate"><?= e($text) ?></p>
+        </div>
+      </li>
+      <?php endforeach; ?>
+    </ol>
+  </div>
+</section>
+
+<section class="section section--surface" aria-labelledby="hw-expect">
+  <div class="container stack sb-gap-32">
+    <?php partial('section-head', ['title' => 'What you can expect from the desk', 'id' => 'hw-expect']); ?>
+    <ul class="g3">
+      <?php foreach ($expect as $i => $t): ?>
+      <li class="card <?= $i === 2 ? 'card--dark' : 'card--white' ?> sb-hw-item"><?= ns_star(18) ?><span class="head sb-hw-item__text"><?= e($t) ?></span></li>
+      <?php endforeach; ?>
+    </ul>
+  </div>
+</section>

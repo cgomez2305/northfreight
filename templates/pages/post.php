@@ -1,5 +1,150 @@
 <?php
-/** STUB — lo reescribe el coder de páginas. Disponibles: $route, $cfg y los helpers. */
+/**
+ * Artículo del blog (PostDispatchCost / PostRelayRequirements / PostRelayLoadBoard / PostLumperDetention de la maqueta).
+ * Esta plantilla pone el hero, el layout de lectura (TOC lateral + columna), el FAQ y "Related"; el cuerpo de cada
+ * artículo vive en templates/pages/posts/{slug}.php, que define $hl, $takeaways, $toc, $faq, $related y escribe el HTML
+ * de la columna (puede llamar a $callout() para la caja "Talk to the desk").
+ */
+require_once NS_ROOT . '/templates/partials/kit.php';
+
+$slug = (string) ($route['slug'] ?? '');
+$post = [];
+foreach (data('posts') as $p) {
+    if (($p['slug'] ?? '') === $slug && ($p['type'] ?? '') === 'article') {
+        $post = $p;
+        break;
+    }
+}
+$bodyFile = NS_ROOT . '/templates/pages/posts/' . basename($slug) . '.php';
+
+$plus = static fn(int $size): string => '<span class="blog-plus" aria-hidden="true"><svg width="' . $size . '" height="' . $size
+    . '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span>';
+
+// Caja "Talk to the desk" dentro del artículo.
+$callout = static function () use ($route): void { ?>
+<aside class="blog-callout cut" aria-label="Talk to the desk">
+  <div class="blog-callout__text">
+    <span class="t-meta blog-callout__tag">Talk to the desk</span>
+    <p class="head blog-callout__title">Rather have a dispatcher handle this?</p>
+  </div>
+  <a class="btn btn--primary btn--card btn--block-m" href="<?= e(wa($route['wa'] ?? null)) ?>" rel="noopener">WhatsApp the desk <span class="arrow" aria-hidden="true">→</span></a>
+</aside>
+<?php };
+
+$hl = $takeaways = $toc = $faq = $related = null;
+$body = '';
+if ($post && is_file($bodyFile)) {
+    ob_start();
+    require $bodyFile;
+    $body = (string) ob_get_clean();
+}
+$toc = $toc ?? [];
+$faq = $faq ?? [];
+$related = array_values(array_filter($related ?? [], static fn(array $r): bool => route_is_live($r['href'])));
+if ($faq) {
+    $toc[] = ['faq', 'FAQ'];
+}
+
+$h1 = (string) ($route['h1'] ?? '');
+if ($hl && strpos($h1, $hl) !== false) {
+    $h1 = str_replace($hl, '{hl}' . $hl . '{/hl}', $h1);
+}
+
+// Fecha: {{ph:Publish date}} hasta que haya fecha real (YYYY-MM-DD).
+$dateRaw = (string) ($post['date'] ?? '');
+$dateHtml = '';
+if ($dateRaw !== '') {
+    if (has_ph($dateRaw)) {
+        $dateHtml = phtext($dateRaw);
+    } elseif (($ts = strtotime($dateRaw)) !== false) {
+        $dateHtml = '<time datetime="' . e(date('Y-m-d', $ts)) . '">' . e(date('M j, Y', $ts)) . '</time>';
+    }
+}
+
+ob_start(); ?>
+<p class="blog-byline mono">
+  <span class="blog-byline__by"><img src="<?= e(asset('img/isotype-white.svg')) ?>" alt="" width="22" height="22">By the NorthStar dispatch desk</span>
+  <?php if ($dateHtml !== ''): ?><span><?= $dateHtml ?></span><?php endif; ?>
+  <?php if (!empty($post['minutes'])): ?><span><?= e((int) $post['minutes']) ?> min read</span><?php endif; ?>
+</p>
+<?php $byline = (string) ob_get_clean();
+
+$tocNav = static function (array $toc, string $cls = ''): void { ?>
+<nav class="blog-toc<?= $cls !== '' ? ' ' . e($cls) : '' ?>" aria-label="On this page">
+  <?php foreach ($toc as [$id, $label]): ?><a href="#<?= e($id) ?>"><?= e($label) ?></a><?php endforeach; ?>
+</nav>
+<?php };
+
+partial('hero', [
+    'route'   => $route,
+    'h1'      => $h1,
+    'size'    => 'h1-long',
+    'eyebrow' => (string) ($post['category'] ?? ''),
+    'lead'    => (string) ($post['lead'] ?? ''),
+    'stack'   => true,
+    'aside'   => $byline,
+    'cls'     => 'blog-hero blog-hero--post',
+]);
 ?>
-<h1><?= e($route['h1']) ?></h1>
-<p>STUB</p>
+<section class="section blog-post" aria-label="Article">
+  <div class="container blog-post__in">
+    <aside class="blog-aside" aria-label="Article navigation">
+      <div class="blog-aside__toc">
+        <span class="t-meta blog-toc__label">On this page</span>
+        <?php $tocNav($toc); ?>
+      </div>
+      <a class="blog-aside__card cut-s" href="<?= e(url('/contact/')) ?>">
+        <span class="head blog-aside__title">Questions about your trucks?</span>
+        <span class="blog-aside__link">Talk to a dispatcher <span class="arrow" aria-hidden="true">→</span></span>
+      </a>
+    </aside>
+    <article class="blog-prose">
+      <details class="blog-tocm">
+        <summary class="blog-tocm__sum"><span>On this page</span><?= $plus(16) ?></summary>
+        <?php $tocNav($toc, 'blog-toc--m'); ?>
+      </details>
+      <?php if (!empty($takeaways)): ?>
+      <div class="blog-takeaways cut">
+        <span class="t-meta blog-takeaways__label">Key takeaways</span>
+        <ul>
+          <?php foreach ($takeaways as $t): ?><li><?= $t ?></li><?php endforeach; ?>
+        </ul>
+      </div>
+      <?php endif; ?>
+      <?= $body ?>
+      <?php if ($faq): ?>
+      <h2 class="t-prose-h2" id="faq">FAQ</h2>
+      <div class="blog-faq">
+        <?php foreach ($faq as $it): ?>
+        <details class="blog-faq__item">
+          <summary class="blog-faq__q"><span><?= e($it[0]) ?></span><?= $plus(18) ?></summary>
+          <p class="blog-faq__a"><?= e($it[1]) ?></p>
+        </details>
+        <?php endforeach; ?>
+      </div>
+      <?php endif; ?>
+    </article>
+  </div>
+</section>
+
+<?php if ($related): ?>
+<section class="section section--surface blog-related" aria-labelledby="related-title">
+  <div class="container stack">
+    <?php partial('section-head', ['eyebrow' => 'Keep reading', 'title' => 'Related from the desk', 'id' => 'related-title']); ?>
+    <div class="g3">
+      <?php foreach ($related as $r): ?>
+      <?php partial('card', [
+          'variant' => 'link',
+          'href'    => url($r['href']),
+          'code'    => $r['code'],
+          'title'   => $r['title'],
+          'text'    => $r['text'],
+          'cta'     => 'Open',
+          'bar'     => false,
+          'cls'     => !empty($r['dark']) ? 'card--dark' : '',
+      ]); ?>
+      <?php endforeach; ?>
+    </div>
+  </div>
+</section>
+<?php endif; ?>
