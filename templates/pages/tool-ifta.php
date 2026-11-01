@@ -19,17 +19,6 @@ $steps = [
     'Optional: add each state\'s current rate to see tax due. Positive net gallons are owed; negative are credits.',
 ];
 
-$faq = [
-    ['q' => 'How is fleet MPG calculated for IFTA?',
-     'a' => 'Total miles in all jurisdictions divided by total gallons bought in the quarter. That single MPG is applied to every state to get the taxable gallons.'],
-    ['q' => 'What are net taxable gallons?',
-     'a' => 'Taxable gallons (state miles ÷ fleet MPG) minus the gallons you bought in that state. If you bought more fuel than you burned there, the result is negative and becomes a credit.'],
-    ['q' => 'When are IFTA returns due?',
-     'a' => 'Quarterly — the last day of the month after each quarter ends: April 30, July 31, October 31 and January 31.'],
-    ['q' => 'Can the desk keep my IFTA records?',
-     'a' => 'Yes. Our back office keeps miles and fuel receipts organized per load so the quarterly numbers are ready when you or your accountant file.'],
-];
-
 $related = [
     ['code' => 'TOOL',    'title' => 'Rate per mile calculator', 'text' => 'Loaded and all-in rate per mile before you book.',     'path' => '/resources/rate-per-mile-calculator/', 'dark' => false],
     ['code' => 'GUIDE',   'title' => 'Trucking glossary',        'text' => 'IFTA, deadhead, TONU and the rest of the vocabulary.',   'path' => '/resources/glossary/', 'dark' => false],
@@ -112,7 +101,7 @@ partial('hero', [
   </div>
 </section>
 
-<?php partial('faq', ['items' => $faq, 'title' => 'Questions drivers ask', 'surface' => 'light', 'open_first' => false]); ?>
+<?php partial('faq', ['items' => route_faq_items($route), 'title' => 'Questions drivers ask', 'surface' => 'light', 'open_first' => false]); ?>
 
 <?php if ($related): ?>
 <section class="section tools-related" aria-labelledby="ifta-related-title">

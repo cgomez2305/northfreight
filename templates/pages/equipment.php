@@ -59,7 +59,6 @@ $sheet = (string) ob_get_clean();
 
 partial('hero', [
     'route'   => $route,
-    'crumbs'  => [['label' => 'Home', 'path' => '/'], ['label' => 'Services', 'path' => '/dispatch-for-owner-operators/'], ['label' => $eq['name'], 'path' => $eq['path']]],
     'h1'      => str_replace(' dispatch ', ' {hl}dispatch{/hl} ', $eq['h1']),
     'tagline' => $eq['tagline'],
     'lead'    => $eq['lead'],

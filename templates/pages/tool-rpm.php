@@ -20,17 +20,6 @@ $steps = [
     'Add your fuel price and MPG. The result updates as you type; compare the net per mile with your cost per mile.',
 ];
 
-$faq = [
-    ['q' => 'What is the difference between loaded and all-in rate per mile?',
-     'a' => 'Loaded RPM divides the pay by the miles with freight on the trailer — it is the number brokers quote. All-in RPM also counts the deadhead miles to reach the shipper, so it shows what the truck really earns for every mile it drives.'],
-    ['q' => 'What is a good rate per mile?',
-     'a' => 'It depends on your lane, equipment, season and, above all, your own cost per mile. A load is worth booking when the net per mile covers your fixed and variable costs plus what you want to earn. Our desk checks this on every load before booking.'],
-    ['q' => 'Should I include the fuel surcharge?',
-     'a' => 'Yes. Use the total you will be paid for the load. If the rate confirmation lists line haul and fuel surcharge separately, add both.'],
-    ['q' => 'Does a dispatcher fee change the math?',
-     'a' => 'Yes — if you pay a percentage of the gross, subtract it from the load pay before comparing loads. Ask us how NorthStar charges.'],
-];
-
 $related = [
     ['code' => 'TOOL',    'title' => 'IFTA calculator',                'text' => 'Net taxable gallons by state for your quarterly return.', 'path' => '/resources/ifta-calculator/', 'dark' => false],
     ['code' => 'ARTICLE', 'title' => 'How much does truck dispatch cost?', 'text' => 'Percentage vs flat fee, and what should be included.',  'path' => '/blog/how-much-does-truck-dispatch-cost/', 'dark' => false],
@@ -99,7 +88,7 @@ partial('hero', [
   </div>
 </section>
 
-<?php partial('faq', ['items' => $faq, 'title' => 'Questions drivers ask', 'surface' => 'light', 'open_first' => false]); ?>
+<?php partial('faq', ['items' => route_faq_items($route), 'title' => 'Questions drivers ask', 'surface' => 'light', 'open_first' => false]); ?>
 
 <?php if ($related): ?>
 <section class="section tools-related" aria-labelledby="rpm-related-title">

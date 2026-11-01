@@ -49,7 +49,6 @@ a.sa-chip:focus-visible { outline: 2px solid var(--cyan-ink); outline-offset: -3
 
 .sa-need { display: flex; flex-wrap: wrap; align-items: flex-start; gap: clamp(32px, 5vw, 72px); }
 .sa-need__main { flex: 1 1 460px; min-width: 0; display: flex; flex-direction: column; gap: 20px; }
-.sa-need .section-head .t-h2 { color: var(--white); } /* components.css pisa el blanco de .section-head--dark */
 .sa-checks { margin: 0; padding: 0; }
 .sa-checks li { display: flex; gap: 16px; align-items: flex-start; padding: 18px 0; border-bottom: 1px solid var(--line-on-dark); font-size: 17px; line-height: 1.5; color: var(--white); }
 .sa-checks__n { flex: none; font-size: 12px; font-weight: 600; color: var(--cyan); padding-top: 3px; }

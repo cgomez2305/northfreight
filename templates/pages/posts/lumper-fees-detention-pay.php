@@ -14,11 +14,6 @@ $toc = [
     ['proof', 'The evidence that gets detention paid'],
     ['settlement', 'Putting it on the settlement'],
 ];
-$faq = [
-    ['Who pays the lumper fee?', 'Usually the shipper or receiver, through the broker. The driver often pays first and is reimbursed with the receipt.'],
-    ['How long is detention free time?', 'It is set in each rate confirmation. Two hours is common, but always check the document for your load.'],
-    ['What if the broker refuses detention?', 'Send the signed times and messages you sent while waiting. Without that record, claims are hard to win.'],
-];
 $related = [
     ['code' => 'TEMPLATE', 'title' => 'Bill of lading template', 'text' => 'Signed times ready for detention proof.', 'href' => '/resources/bol-template/'],
     ['code' => 'GUIDE', 'title' => 'Trucking glossary', 'text' => 'Lumper, TONU, accessorials and more.', 'href' => '/resources/glossary/'],

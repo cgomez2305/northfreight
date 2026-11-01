@@ -26,11 +26,6 @@ $doc = [
         ['Confirm your control', 'No forced dispatch: the agreement should say you can refuse any load.'],
         ['Look at the exit', 'Short notice periods and no penalties keep the relationship honest.'],
     ],
-    'faq' => [
-        ['Is this template legal advice?', 'No. It is a starting point that shows what a fair dispatch agreement usually covers. Have it reviewed for your state and your business before you sign.'],
-        ['Should a dispatcher ever control my authority?', 'No. You keep your MC and USDOT authority. A dispatcher acts on your behalf with limited authorization for paperwork and broker communication only.'],
-        ['Can I see NorthStar\'s agreement before starting?', 'Yes. We send it before onboarding so you can read every clause and ask questions on WhatsApp.'],
-    ],
     'related' => [
         ['path' => '/blog/how-much-does-truck-dispatch-cost/', 'code' => 'ARTICLE', 'title' => 'How much does truck dispatch cost?', 'text' => 'Percentage vs flat fee and the red flags.'],
         ['path' => '/how-it-works/', 'code' => 'COMPANY', 'title' => 'How we work with you', 'text' => 'Scope, contacts and the day-to-day, step by step.'],

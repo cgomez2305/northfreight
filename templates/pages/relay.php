@@ -13,14 +13,6 @@ $manage = [
     ['D · Disputes', 'Disputes with evidence', 'Every claim filed with timestamps, photos and documents attached.'],
     ['E · Admin', 'Settlements & onboarding', 'Payments reconciled and new drivers set up in the account.'],
 ];
-// El partial faq lee el enlace como [label, path]; la data lo guarda como ['label','path']: se aportan ambas formas.
-$faq = array_map(static function (array $it): array {
-    if (!empty($it['link'])) {
-        $l = $it['link'];
-        $it['link'] = ['label' => $l['label'] ?? $l[0], 'path' => $l['path'] ?? $l[1], 0 => $l['label'] ?? $l[0], 1 => $l['path'] ?? $l[1]];
-    }
-    return $it;
-}, route_faq_items($route));
 $guides = array_filter([
     ['/blog/amazon-relay-requirements/', 'Amazon Relay requirements for carriers'],
     ['/blog/amazon-relay-load-board/', 'How the Amazon Relay load board works'],
@@ -29,7 +21,6 @@ $guides = array_filter([
 partial('hero', [
     'route' => $route,
     'cls'   => 'sa-hero--relay',
-    'crumbs' => [['label' => 'Home', 'path' => '/'], ['label' => 'Amazon Relay dispatch', 'path' => $route['path']]],
     'deco'  => 'lane',
     'stack' => true,
     'h1'    => 'Amazon Relay dispatch, {hl}handled end to end{/hl}',
@@ -79,6 +70,6 @@ partial('hero', [
 
 <section class="section sa-faq-after pre-cta" aria-labelledby="faq-title">
   <div class="container">
-    <?php partial('faq', ['items' => $faq, 'title' => 'Relay questions', 'section' => false]); ?>
+    <?php partial('faq', ['items' => route_faq_items($route), 'title' => 'Relay questions', 'section' => false]); ?>
   </div>
 </section>

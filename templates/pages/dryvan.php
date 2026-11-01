@@ -17,7 +17,6 @@ $steps = [
 partial('hero', [
     'route' => $route,
     'cls'   => 'sa-hero--dryvan sa-hero--lead560',
-    'crumbs' => [['label' => 'Home', 'path' => '/'], ['label' => 'Dry van dispatch', 'path' => $route['path']]],
     'h1'    => 'Dry van {hl}dispatch service{/hl}',
     'lead'  => 'Steady dry van freight, booked and followed by one desk. We search the boards, negotiate the rate, coordinate pickup and delivery and keep every document on file.',
     'ctas'  => [

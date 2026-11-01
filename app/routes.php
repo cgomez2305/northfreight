@@ -11,6 +11,8 @@
  *   wa         clave de WA_MESSAGES (mensaje de WhatsApp propio de la página)
  *   breadcrumb etiqueta corta de las migas
  *   parent     (opcional) ruta padre para las migas; sin parent: Home > esta página
+ *   crumbs     (opcional) migas completas [[label, path], …] (incluye Home); anula a 'parent' en la miga visible y en el JSON-LD
+ *   cta        (opcional) false => el layout no imprime el bloque CTA final
  *   faq        clave de app/data/faq.php (o null)
  *   motion     bool, true => la página carga GSAP/motion.js (home y servicios)
  *   extras     doc (legal), equip (equipment), slug (post)
@@ -63,6 +65,7 @@ return [
         'priority'   => 0.9,
         'wa'         => 'relay',
         'breadcrumb' => 'Amazon Relay',
+        'crumbs'     => [['Home', '/'], ['Amazon Relay dispatch', '/amazon-relay-dispatch/']],   // maqueta
         'faq'        => 'relay',
         'motion'     => true,
     ],
@@ -77,6 +80,7 @@ return [
         'priority'   => 0.8,
         'wa'         => 'dryvan',
         'breadcrumb' => 'Dry van',
+        'crumbs'     => [['Home', '/'], ['Dry van dispatch', '/dry-van-dispatch/']],   // maqueta
         'faq'        => 'dryvan',
         'motion'     => true,
     ],
@@ -149,6 +153,7 @@ return [
         'breadcrumb' => 'Contact',
         'faq'        => null,
         'motion'     => false,
+        'cta'        => false,   // la maqueta no tiene bloque CTA final
     ],
     // Legales: título/H1 del prototipo (no están en el doc de copy). Texto pendiente de abogado.
     '/privacy-policy/' => [
@@ -165,6 +170,7 @@ return [
         'breadcrumb' => 'Privacy policy',
         'faq'        => null,
         'motion'     => false,
+        'cta'        => false,   // la maqueta no tiene bloque CTA final
     ],
     '/terms/' => [
         'template'   => 'legal',
@@ -180,6 +186,7 @@ return [
         'breadcrumb' => 'Terms',
         'faq'        => null,
         'motion'     => false,
+        'cta'        => false,   // la maqueta no tiene bloque CTA final
     ],
 
     // ------------------------------------------------------------------
@@ -205,14 +212,14 @@ return [
         'title'      => 'Bill of Lading Template (PDF & Word) | NorthStar', // TODO verificar con doc de copy
         'meta'       => 'Free bill of lading (BOL) template in PDF and Word: every field brokers and receivers expect, ready to print. The same BOL our desk files on every load.', // TODO
         'h1'         => 'Bill of lading template',
-        'schema'     => ['Article', 'BreadcrumbList'],
+        'schema'     => ['Article', 'FAQPage', 'BreadcrumbList'],
         'status'     => 'live',
         'sitemap'    => true,
         'priority'   => 0.8,
         'wa'         => 'default',
         'breadcrumb' => 'Bill of lading template',
         'parent'     => '/resources/',
-        'faq'        => null,
+        'faq'        => 'doc-bol',
         'motion'     => false,
     ],
     '/resources/ifta-calculator/' => [
@@ -220,14 +227,14 @@ return [
         'title'      => 'IFTA Calculator for Owner-Operators | NorthStar', // TODO verificar con doc de copy
         'meta'       => 'Free IFTA calculator: enter miles and gallons by state to see fleet MPG, net taxable gallons and an estimated quarterly fuel tax. Estimates only.', // TODO
         'h1'         => 'IFTA calculator',
-        'schema'     => ['WebApplication', 'BreadcrumbList'],
+        'schema'     => ['WebApplication', 'FAQPage', 'BreadcrumbList'],
         'status'     => 'live',
         'sitemap'    => true,
         'priority'   => 0.8,
         'wa'         => 'default',
         'breadcrumb' => 'IFTA calculator',
         'parent'     => '/resources/',
-        'faq'        => null,
+        'faq'        => 'tool-ifta',
         'motion'     => false,
     ],
     '/resources/rate-per-mile-calculator/' => [
@@ -235,14 +242,14 @@ return [
         'title'      => 'Rate Per Mile Calculator for Truckers | NorthStar', // TODO verificar con doc de copy
         'meta'       => 'Free rate per mile calculator: loaded and all-in RPM, fuel cost and what is left after the trip. Know if a load pays before you book it.', // TODO
         'h1'         => 'Rate per mile calculator',
-        'schema'     => ['WebApplication', 'BreadcrumbList'],
+        'schema'     => ['WebApplication', 'FAQPage', 'BreadcrumbList'],
         'status'     => 'live',
         'sitemap'    => true,
         'priority'   => 0.7,
         'wa'         => 'default',
         'breadcrumb' => 'Rate per mile calculator',
         'parent'     => '/resources/',
-        'faq'        => null,
+        'faq'        => 'tool-rpm',
         'motion'     => false,
     ],
     '/resources/dispatcher-carrier-agreement/' => [
@@ -250,14 +257,14 @@ return [
         'title'      => 'Dispatcher-Carrier Agreement Template | NorthStar', // TODO verificar con doc de copy
         'meta'       => 'Dispatcher carrier agreement template: what a fair dispatch contract covers, from scope and fees to your right to refuse loads. Not legal advice.', // TODO
         'h1'         => 'Dispatcher-carrier agreement',
-        'schema'     => ['Article', 'BreadcrumbList'],
+        'schema'     => ['Article', 'FAQPage', 'BreadcrumbList'],
         'status'     => 'live',
         'sitemap'    => true,
         'priority'   => 0.6,
         'wa'         => 'default',
         'breadcrumb' => 'Dispatcher-carrier agreement',
         'parent'     => '/resources/',
-        'faq'        => null,
+        'faq'        => 'doc-agreement',
         'motion'     => false,
     ],
     '/resources/glossary/' => [
@@ -296,14 +303,14 @@ return [
         'title'      => 'How Much Does Truck Dispatch Service Cost? | NorthStar', // TODO verificar con doc de copy
         'meta'       => 'Dispatch fees explained: percentage of the gross, flat weekly or per load. See what each model costs an owner-operator and what should be included.', // TODO
         'h1'         => 'How much does truck dispatch service cost?',
-        'schema'     => ['Article', 'BreadcrumbList'],
+        'schema'     => ['Article', 'FAQPage', 'BreadcrumbList'],
         'status'     => 'live',
         'sitemap'    => true,
         'priority'   => 0.7,
         'wa'         => 'post',
         'breadcrumb' => 'How much does truck dispatch service cost?',
         'parent'     => '/blog/',
-        'faq'        => null,
+        'faq'        => 'post-how-much-does-truck-dispatch-cost',
         'motion'     => false,
     ],
     '/blog/amazon-relay-requirements/' => [
@@ -312,14 +319,14 @@ return [
         'title'      => 'Amazon Relay Requirements for Carriers | NorthStar', // TODO verificar con doc de copy
         'meta'       => 'Amazon Relay requirements for carriers: authority, SCAC code, insurance, equipment and the steps to get approved, explained in plain language.', // TODO
         'h1'         => 'Amazon Relay requirements for carriers',
-        'schema'     => ['Article', 'BreadcrumbList'],
+        'schema'     => ['Article', 'FAQPage', 'BreadcrumbList'],
         'status'     => 'live',
         'sitemap'    => true,
         'priority'   => 0.7,
         'wa'         => 'post',
         'breadcrumb' => 'Amazon Relay requirements',
         'parent'     => '/blog/',
-        'faq'        => null,
+        'faq'        => 'post-amazon-relay-requirements',
         'motion'     => false,
     ],
     '/blog/amazon-relay-load-board/' => [
@@ -328,14 +335,14 @@ return [
         'title'      => 'How the Amazon Relay Load Board Works | NorthStar', // TODO verificar con doc de copy
         'meta'       => 'How the Amazon Relay load board works: one-way loads, round trips and blocks, and how loads are posted, booked and tracked in the Relay app.', // TODO
         'h1'         => 'How the Amazon Relay load board works',
-        'schema'     => ['Article', 'BreadcrumbList'],
+        'schema'     => ['Article', 'FAQPage', 'BreadcrumbList'],
         'status'     => 'live',
         'sitemap'    => true,
         'priority'   => 0.7,
         'wa'         => 'post',
         'breadcrumb' => 'Amazon Relay load board',
         'parent'     => '/blog/',
-        'faq'        => null,
+        'faq'        => 'post-amazon-relay-load-board',
         'motion'     => false,
     ],
     '/blog/lumper-fees-detention-pay/' => [
@@ -344,14 +351,14 @@ return [
         'title'      => 'Lumper Fees & Detention Pay: Get Paid for Both | NorthStar', // TODO verificar con doc de copy
         'meta'       => 'Lumper fees and detention pay: what to document at the dock so lumper receipts and detention hours show up on your settlement.', // TODO
         'h1'         => 'Lumper fees and detention pay: how to get paid for both',
-        'schema'     => ['Article', 'BreadcrumbList'],
+        'schema'     => ['Article', 'FAQPage', 'BreadcrumbList'],
         'status'     => 'live',
         'sitemap'    => true,
         'priority'   => 0.7,
         'wa'         => 'post',
         'breadcrumb' => 'Lumper fees and detention pay',
         'parent'     => '/blog/',
-        'faq'        => null,
+        'faq'        => 'post-lumper-fees-detention-pay',
         'motion'     => false,
     ],
 
@@ -371,6 +378,7 @@ return [
         'priority'   => 0.7,
         'wa'         => 'equip-box',
         'breadcrumb' => 'Box truck',
+        'crumbs'     => [['Home', '/'], ['Services', '/dispatch-for-owner-operators/'], ['Box truck', '/box-truck-dispatch/']],   // maqueta: Home / Services / equipo
         'faq'        => null,   // las FAQ viven en app/data/equipment.php
         'motion'     => true,
     ],
@@ -386,6 +394,7 @@ return [
         'priority'   => 0.6,
         'wa'         => 'equip-hotshot',
         'breadcrumb' => 'Hotshot',
+        'crumbs'     => [['Home', '/'], ['Services', '/dispatch-for-owner-operators/'], ['Hotshot', '/hotshot-dispatch/']],   // maqueta: Home / Services / equipo
         'faq'        => null,
         'motion'     => true,
     ],
@@ -401,6 +410,7 @@ return [
         'priority'   => 0.6,
         'wa'         => 'equip-flatbed',
         'breadcrumb' => 'Flatbed',
+        'crumbs'     => [['Home', '/'], ['Services', '/dispatch-for-owner-operators/'], ['Flatbed', '/flatbed-dispatch/']],   // maqueta: Home / Services / equipo
         'faq'        => null,
         'motion'     => true,
     ],
@@ -416,6 +426,7 @@ return [
         'priority'   => 0.6,
         'wa'         => 'equip-power-only',
         'breadcrumb' => 'Power only',
+        'crumbs'     => [['Home', '/'], ['Services', '/dispatch-for-owner-operators/'], ['Power only', '/power-only-dispatch/']],   // maqueta: Home / Services / equipo
         'faq'        => null,
         'motion'     => true,
     ],
@@ -431,6 +442,7 @@ return [
         'priority'   => 0.6,
         'wa'         => 'equip-reefer',
         'breadcrumb' => 'Reefer',
+        'crumbs'     => [['Home', '/'], ['Services', '/dispatch-for-owner-operators/'], ['Reefer', '/reefer-dispatch/']],   // maqueta: Home / Services / equipo
         'faq'        => null,
         'motion'     => true,
     ],

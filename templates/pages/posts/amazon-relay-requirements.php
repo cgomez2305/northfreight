@@ -14,11 +14,6 @@ $toc = [
     ['approval', 'The approval steps'],
     ['after', 'After approval: keep the account healthy'],
 ];
-$faq = [
-    ['Do I need my own trailer for Amazon Relay?', 'Not always. Many Relay loads are power-only, using Amazon trailers. Some loads require your own 53\' dry van.'],
-    ['How long does Amazon Relay approval take?', 'It varies. Having consistent FMCSA, insurance and SCAC information ready speeds it up.'],
-    ['Can a dispatcher manage my Relay account?', 'Yes, with your authorization. NorthStar books and monitors Relay loads for carriers and follows up on scorecard issues.'],
-];
 $related = [
     ['code' => 'ARTICLE', 'title' => 'How the Relay load board works', 'text' => 'One-ways, round trips and blocks.', 'href' => '/blog/amazon-relay-load-board/'],
     ['code' => 'GUIDE', 'title' => 'Trucking glossary', 'text' => 'SCAC, power only and the rest of the terms.', 'href' => '/resources/glossary/'],

@@ -26,11 +26,6 @@ $doc = [
         ['Sign at pickup', 'Shipper and driver sign; write the seal number and in/out times.'],
         ['Get the POD', 'Receiver signs on delivery. Send a clear photo to the desk the same day.'],
     ],
-    'faq' => [
-        ['Is a bill of lading the same as a proof of delivery?', 'No. The BOL travels with the freight from pickup. Once the receiver signs it at delivery, that signed copy becomes the proof of delivery (POD) you need to get paid.'],
-        ['Who usually provides the BOL?', 'Most shippers print their own. Carry a blank template for the loads where they do not, and always check that the details match your rate confirmation.'],
-        ['Why write in and out times on the BOL?', 'Signed times on the BOL are the strongest evidence for a detention claim. Our desk logs them with photos on every load.'],
-    ],
     'related' => [
         ['path' => '/blog/lumper-fees-detention-pay/', 'code' => 'ARTICLE', 'title' => 'Lumper fees & detention pay', 'text' => 'How to document both and actually get reimbursed.'],
         ['path' => '/load-tracking/', 'code' => 'SERVICE', 'title' => 'Load tracking & check calls', 'text' => 'Times, photos and PODs logged by the desk.'],

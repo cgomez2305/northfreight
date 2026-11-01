@@ -2,7 +2,7 @@
 /**
  * Artículo del blog (PostDispatchCost / PostRelayRequirements / PostRelayLoadBoard / PostLumperDetention de la maqueta).
  * Esta plantilla pone el hero, el layout de lectura (TOC lateral + columna), el FAQ y "Related"; el cuerpo de cada
- * artículo vive en templates/pages/posts/{slug}.php, que define $hl, $takeaways, $toc, $faq, $related y escribe el HTML
+ * artículo vive en templates/pages/posts/{slug}.php, que define $hl, $takeaways, $toc, $related (el FAQ sale de app/data/faq.php, clave post-{slug}) y escribe el HTML
  * de la columna (puede llamar a $callout() para la caja "Talk to the desk").
  */
 require_once NS_ROOT . '/templates/partials/kit.php';
@@ -39,7 +39,7 @@ if ($post && is_file($bodyFile)) {
     $body = (string) ob_get_clean();
 }
 $toc = $toc ?? [];
-$faq = $faq ?? [];
+$faq = route_faq_items($route);
 $related = array_values(array_filter($related ?? [], static fn(array $r): bool => route_is_live($r['href'])));
 if ($faq) {
     $toc[] = ['faq', 'FAQ'];
@@ -117,8 +117,8 @@ partial('hero', [
       <div class="blog-faq">
         <?php foreach ($faq as $it): ?>
         <details class="blog-faq__item">
-          <summary class="blog-faq__q"><span><?= e($it[0]) ?></span><?= $plus(18) ?></summary>
-          <p class="blog-faq__a"><?= e($it[1]) ?></p>
+          <summary class="blog-faq__q"><span><?= phtext($it['q']) ?></span><?= $plus(18) ?></summary>
+          <p class="blog-faq__a"><?= phtext($it['a']) ?></p>
         </details>
         <?php endforeach; ?>
       </div>

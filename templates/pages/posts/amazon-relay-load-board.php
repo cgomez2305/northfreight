@@ -14,11 +14,6 @@ $toc = [
     ['scorecard', 'Why the scorecard matters'],
     ['desk', 'Where a dispatcher helps'],
 ];
-$faq = [
-    ['Can I negotiate Amazon Relay rates?', 'Most loads are booked at the posted rate. Some freight is offered at different prices over time, which is why monitoring the board matters.'],
-    ['What happens if I cancel a Relay load?', 'Cancellations count against your scorecard, especially close to pickup. Book only loads you can cover.'],
-    ['Do I need the Relay app?', 'Yes. Drivers use it for check-ins and tracking on every load.'],
-];
 $related = [
     ['code' => 'ARTICLE', 'title' => 'Amazon Relay requirements', 'text' => 'Authority, insurance and approval.', 'href' => '/blog/amazon-relay-requirements/'],
     ['code' => 'SERVICE', 'title' => 'Load tracking', 'text' => 'Every trip followed, every incident logged.', 'href' => '/load-tracking/'],

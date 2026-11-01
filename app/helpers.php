@@ -264,10 +264,25 @@ function noindex(?array $route = null): bool
 
 /**
  * Migas de la ruta: [['label'=>'Home','path'=>'/'], …, ['label'=>…,'path'=>ruta actual]].
- * Sigue la cadena opcional $route['parent']. El home devuelve solo [Home].
+ * Si la ruta trae 'crumbs' => [[label, path], …] (o ['label'=>,'path'=>]) se usan tal cual (override completo,
+ * incluida la miga Home); si no, sigue la cadena opcional $route['parent']. El home devuelve solo [Home].
+ * Es la única fuente de las migas visibles (partial breadcrumbs) y del JSON-LD (breadcrumb_schema).
  */
 function breadcrumbs(array $route): array
 {
+    if (!empty($route['crumbs']) && is_array($route['crumbs'])) {
+        $out = [];
+        foreach ($route['crumbs'] as $c) {
+            $label = $c['label'] ?? $c[0] ?? null;
+            $path = $c['path'] ?? $c[1] ?? null;
+            if (is_string($label) && is_string($path)) {
+                $out[] = ['label' => $label, 'path' => $path];
+            }
+        }
+        if ($out) {
+            return $out;
+        }
+    }
     $chain = [];
     $cur = $route;
     $guard = 0;

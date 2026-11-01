@@ -14,11 +14,6 @@ $toc = [
     ['flags', 'Red flags before you sign'],
     ['northstar', 'How NorthStar charges'],
 ];
-$faq = [
-    ['Is a cheaper dispatcher always better?', 'Not necessarily. Compare what is included and how the dispatcher chooses loads. A lower fee on loads that pay less per mile can cost you more than a higher fee on better lanes.'],
-    ['Do I need my own MC authority to use a dispatch service?', 'Yes. A dispatch service books loads under your carrier authority. If you lease on to another carrier, their dispatch usually handles your loads.'],
-    ['Can I try a dispatch service before committing?', 'Many services, including NorthStar, start with a conversation about your trucks and lanes. Ask for the agreement in advance and check the notice period.'],
-];
 $related = [
     ['code' => 'TOOL', 'title' => 'Rate per mile calculator', 'text' => 'See what a load leaves after fuel and fees.', 'href' => '/resources/rate-per-mile-calculator/'],
     ['code' => 'TEMPLATE', 'title' => 'Dispatcher-carrier agreement', 'text' => 'What a fair contract covers.', 'href' => '/resources/dispatcher-carrier-agreement/'],

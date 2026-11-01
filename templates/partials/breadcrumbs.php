@@ -1,7 +1,9 @@
 <?php
 /**
  * Migas visibles con aria-label="Breadcrumb" (lista ordenada; la última lleva aria-current="page").
- * Params: route(array) — usa breadcrumbs($route) —  o crumbs(array de ['label','path']). Con <2 migas no pinta nada.
+ * Params: route(array) — usa breadcrumbs($route), que respeta $route['crumbs'] y 'parent', igual que el JSON-LD — o
+ *         crumbs(array de ['label','path']) explícito. Con <2 migas no pinta nada.
+ * Los enlaces miden >=44px de alto táctil (components.css: min-height + margen negativo, sin cambio visual).
  * Se usa dentro de un fondo oscuro (hero). JSON-LD BreadcrumbList lo pone el layout.
  */
 require_once __DIR__ . '/kit.php';

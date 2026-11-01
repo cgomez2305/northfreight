@@ -183,7 +183,8 @@
 /* ---- Breadcrumbs ---- */
 .crumbs ol { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; color: var(--on-dark-muted); }
 .crumbs li { display: inline-flex; gap: 10px; align-items: center; }
-.crumbs a { color: var(--on-dark-muted); text-decoration: none; }
+/* Área táctil >=44px sin cambiar el aspecto: el enlace crece en vertical con padding y se compensa con margen negativo. */
+.crumbs a { color: var(--on-dark-muted); text-decoration: none; display: inline-flex; align-items: center; min-height: 44px; margin-block: -14.5px; }
 .crumbs a:hover { color: var(--cyan-light); }
 .crumbs [aria-current] { color: var(--cyan-light); }
 
@@ -221,9 +222,9 @@
 .section-head--split { max-width: none; flex-direction: row; flex-wrap: wrap; gap: 20px 64px; align-items: flex-end; justify-content: space-between; }
 .section-head__main { display: flex; flex-direction: column; gap: 16px; max-width: 760px; }
 .section-head__lead { max-width: 420px; color: var(--slate); }
-.section-head--dark .section-head__lead, .section-head--dark .t-h2 { color: var(--white); }
-.section-head--dark .section-head__lead { color: var(--on-dark); }
 .section-head .t-h2, .section-head .t-h2-s { color: var(--navy); }
+.section-head--dark .section-head__lead, .section-head--dark .t-h2, .section-head--dark .t-h2-s { color: var(--white); }
+.section-head--dark .section-head__lead { color: var(--on-dark); }
 .section-head--dark .t-eyebrow { color: var(--cyan-light); }
 .section-head--dark .hl { color: var(--cyan); }
 

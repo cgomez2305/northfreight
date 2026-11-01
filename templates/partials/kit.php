@@ -32,7 +32,7 @@ function ns_swoosh(int $w = 200, int $h = 12, string $class = ''): string
         . '" viewBox="0 0 220 14" aria-hidden="true" focusable="false"><polygon points="0,14 220,0 210,6 60,14"/></svg>';
 }
 
-/** Iconos de trazo (24x24, currentColor). Nombres: arrow whatsapp phone chevron close menu play calc trend doc doc-down check mail truck pin. */
+/** Iconos de trazo (24x24, currentColor). Nombres: arrow whatsapp phone chevron close menu play calc trend doc doc-down check mail truck pin plus book. */
 function ns_icon(string $name, int $size = 18, string $class = ''): string
 {
     static $paths = [
@@ -51,6 +51,8 @@ function ns_icon(string $name, int $size = 18, string $class = ''): string
         'mail'     => '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/>',
         'truck'    => '<path d="M2 7h11v9H2zM13 10h4l3 3v3h-7"/><circle cx="6" cy="17.5" r="1.8"/><circle cx="16.5" cy="17.5" r="1.8"/>',
         'pin'      => '<path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
+        'plus'     => '<path d="M12 5v14M5 12h14"/>',
+        'book'     => '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5M8 7h7"/>',
     ];
     if ($name === 'star') {
         return ns_star($size, $class);

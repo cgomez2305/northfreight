@@ -7,6 +7,7 @@
  *  route   array   ruta actual (migas automáticas y h1 por defecto = $route['h1'])
  *  crumbs  array   [['label','path'],…] si no se pasa route
  *  h1      string  "Dispatch services for {hl}owner-operators{/hl}"
+ *  h1_tag  string  'h1' (defecto) | 'p' => imprime el titular como <p> con la misma clase (para páginas cuyo H1 va en otro sitio)
  *  size    string  'h1' (defecto) | 'h1-long' (artículos y legales)
  *  eyebrow string  etiqueta sobre el H1 (con estrella)
  *  tagline string  frase corta Saira bajo el swoosh
@@ -22,6 +23,7 @@ require_once __DIR__ . '/kit.php';
 $h1 = $h1 ?? (string) ($route['h1'] ?? '');
 $h1html = ns_rich($h1);
 $size = ($size ?? 'h1') === 'h1-long' ? 't-h1-long' : 't-h1';
+$h1tag = ($h1_tag ?? 'h1') === 'p' ? 'p' : 'h1';
 $image = $image ?? null;
 $aside = $aside ?? '';
 $deco = $deco ?? null;
@@ -44,7 +46,7 @@ $ctas = $ctas ?? [];
     <div class="hero__main<?= $image || $aside !== '' ? ' anim-rise' : '' ?>">
       <?php if (isset($crumbs)): partial('breadcrumbs', ['crumbs' => $crumbs]); elseif (isset($route)): partial('breadcrumbs', ['route' => $route]); endif; ?>
       <?php if (!empty($eyebrow)): ?><p class="hero__eyebrow t-eyebrow"><?= ns_star(16) ?><span><?= ns_rich($eyebrow) ?></span></p><?php endif; ?>
-      <h1 class="hero__title <?= $size ?>"><?= $h1html ?></h1>
+      <<?= $h1tag ?> class="hero__title <?= $size ?>"><?= $h1html ?></<?= $h1tag ?>>
       <?= ns_swoosh(200, 12) ?>
       <?php if (!empty($tagline)): ?><p class="t-tagline"><?= ns_rich($tagline) ?></p><?php endif; ?>
       <?php if (!empty($lead)): ?><p class="hero__lead t-lead"><?= ns_rich($lead) ?></p><?php endif; ?>

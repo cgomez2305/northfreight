@@ -3,7 +3,7 @@
  * Cuerpo compartido de doc-bol y doc-agreement (tras el hero): What's inside + formulario de descarga,
  * How to use it (4 pasos), FAQ en líneas + tarjetas relacionadas.
  * Espera $doc = [inside[[strong,resto]], form_title, formats[[valor,etiqueta]], submit, notice, files[[etiqueta,archivo]],
- *                steps_title, steps[[título,texto]], faq[[q,a]], related[rc…]] y $route. Datos del cliente: nada inventado.
+ *                steps_title, steps[[título,texto]], (FAQ: route_faq_items($route), de app/data/faq.php), related[rc…]] y $route. Datos del cliente: nada inventado.
  */
 $action = url((string) $route['path']);
 $flashMsg = '';
@@ -82,10 +82,10 @@ $csrf = function_exists('csrf_token') ? (string) csrf_token() : '';
         <h2 class="t-h2 c-navy" id="doc-faq">Before you print it</h2>
       </div>
       <div class="co-faqlist">
-        <?php foreach ($doc['faq'] as $q): ?>
+        <?php foreach (route_faq_items($route) as $q): ?>
         <details class="co-faq">
-          <summary><?= e($q[0]) ?><span class="co-faq__plus" aria-hidden="true"><svg class="icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg></span></summary>
-          <p><?= e($q[1]) ?></p>
+          <summary><?= phtext($q['q']) ?><span class="co-faq__plus" aria-hidden="true"><svg class="icon" width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 5v14M5 12h14"/></svg></span></summary>
+          <p><?= phtext($q['a']) ?></p>
         </details>
         <?php endforeach; ?>
       </div>
