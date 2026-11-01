@@ -1,0 +1,75 @@
+/* NorthStar Freight Solutions — tokens (CLAUDE.md §5). Único archivo donde viven los hex. */
+:root {
+  /* Color §5.1 */
+  --navy: #071C35;
+  --navy-deep: #04132A;
+  --cyan: #06A6CC;
+  --cyan-ink: #04799A;
+  --cyan-light: #6FD3EC;
+  --ink: #0B1B2E;
+  --slate: #4A5B6E;
+  --on-dark: #C9D6E3;
+  --on-dark-muted: #8FA3B8;
+  --on-dark-soft: #B9C8D8;
+  --surface: #F3F6F9;
+  --line: #DCE4EC;
+  --line-soft: #E3EAF1;
+  --field: #C9D4DF;
+  --white: #FFFFFF;
+
+  /* Añadidos por la maqueta (ver §5.1) */
+  --on-dark-strong: #E6EEF6;   /* enlaces de nav sobre navy */
+  --ink-2: #24364A;            /* cuerpo de artículos */
+  --surface-hover: #EAF1F7;    /* hover de tarjetas */
+
+  /* Alfas sobre oscuro */
+  --line-on-dark: rgba(255, 255, 255, .1);
+  --line-on-dark-soft: rgba(255, 255, 255, .08);
+  --tint-on-dark: rgba(255, 255, 255, .06);
+  --fill-on-dark: rgba(255, 255, 255, .09);
+  --cyan-tint: rgba(6, 166, 204, .12);
+  --cyan-tint-2: rgba(6, 166, 204, .18);
+  --cyan-tint-3: rgba(6, 166, 204, .24);
+  --cyan-pulse: rgba(6, 166, 204, .55);
+  --cyan-pulse-0: rgba(6, 166, 204, 0);
+  --overlay: rgba(4, 19, 42, .72);
+  --overlay-bar: rgba(4, 19, 42, .96);
+  --shadow-deep: rgba(0, 0, 0, .6);
+  --shadow-navy: rgba(4, 19, 42, .6);
+  --ph-bg: #FFF3B0;            /* marca de placeholder (solo staging) */
+
+  /* Tipografía §5.2 */
+  --font-head: "Saira", "Arial Narrow", Arial, sans-serif;
+  --font-body: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  /* Layout §5.3 */
+  --max: 1280px;
+  --gutter: clamp(20px, 4vw, 48px);
+  --wrap: calc(var(--max) + 2 * var(--gutter));   /* ancho exterior: el contenido mide 1280px como en la maqueta */
+  --section-y: clamp(64px, 9vw, 120px);
+  --pre-cta-y: clamp(110px, 12vw, 160px);
+  --head-gap: 40px;
+  --card-gap: 14px;
+  --card-pad: 26px;
+  --tile-pad: 22px;
+  --btn-h: 56px;
+
+  /* Formas §5.5 */
+  --cut-card: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px));
+  --cut-tile: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  --cut-btn: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
+  --cut-img: polygon(18% 0, 100% 0, 100% 100%, 0 100%, 0 18%);
+  --cut-lg: polygon(0 0, calc(100% - 56px) 0, 100% 56px, 100% 100%, 56px 100%, 0 calc(100% - 56px));
+  --cut-cta: polygon(0 64px, 100% 0, 100% 100%, 0 100%);
+
+  /* Movimiento §5.7 */
+  --ease: cubic-bezier(.2, .7, .2, 1);
+  --t-fast: .2s;
+  --t-card: .35s;
+
+  /* Capas */
+  --z-header: 40;
+  --z-mbar: 50;
+  --z-modal: 100;
+}

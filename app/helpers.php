@@ -242,8 +242,9 @@ function og_image(array $route): string
 {
     $rel = $route['og'] ?? null;
     if ($rel === null) {
+        // Imagen OG por plantilla si existe (img/og/<plantilla>.jpg); si no, la genérica.
         $try = 'img/og/' . ($route['template'] ?? 'default') . '.jpg';
-        $rel = is_file(NS_ROOT . '/assets/' . $try) ? $try : 'img/og/default.jpg';
+        $rel = is_file(NS_ROOT . '/assets/' . $try) ? $try : 'img/og-default.jpg';
     }
     return 'https://' . DOMAIN . asset($rel);
 }
