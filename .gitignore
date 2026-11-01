@@ -1,0 +1,14 @@
+# Dependencias (se instalan con `composer install` en el servidor)
+/vendor/
+
+# Storage: logs y rate-limit del formulario; solo se versionan estos dos archivos
+/storage/*
+!/storage/.htaccess
+!/storage/.gitkeep
+
+# Configuración local con credenciales (usar app/config.local.example.php como plantilla)
+/app/config.local.php
+
+# Sistema / editores
+.DS_Store
+node_modules/
