@@ -2,7 +2,7 @@
 /**
  * Home (/) — replica de la maqueta index.html. Disponibles: $route, $cfg y los helpers.
  * Orden: hero · ticker · 01 Services · 02 Amazon Relay · 03 Onboarding · 04 Team + video · 05 Evidence · 06 FAQ (+ CTA del layout).
- * El <h1> es el eyebrow pequeño (como la maqueta); el titular grande es un <p>. Estilos en assets/css/pages/_home.css.
+ * El <h1> es el eyebrow pequeño (como la maqueta); el titular grande es un <p>. Estilos en assets/css/pages/home.css.
  */
 require_once NS_ROOT . '/templates/partials/kit.php';
 

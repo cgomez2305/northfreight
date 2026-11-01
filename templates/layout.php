@@ -3,7 +3,7 @@
  * Layout del sitio. Contrato: recibe $route, $cfg y $content (HTML de la página ya renderizado). No imprime H1
  * (lo pone cada página, normalmente con partial('hero')).
  *
- * Claves de ruta que lee: title, meta, path, template, status, schema, wa, og, motion, cta (false => sin bloque CTA final).
+ * Claves de ruta que lee: title, meta, path, template, status, schema, wa, og, motion, css (grupos de CSS; anula el mapa plantilla => grupo), cta (false => sin bloque CTA final).
  * Orden: head (SEO, OG, fuentes, CSS, JSON-LD) → skip link → opsbar + header (nav, megas, menú móvil) →
  *        <main id="main"> → cta → footer → mbar → scripts.
  */
@@ -20,10 +20,23 @@ $desc = (string) ($route['meta'] ?? '');
 $ogOwn = isset($route['og']) || is_file(NS_ROOT . '/assets/img/og/' . $template . '.jpg');
 $ogImage = $ogOwn ? og_image($route) : 'https://' . cfg('domain') . asset('img/og-default.jpg');
 
-// CSS: base + fragmentos de página (assets/css/pages/_*.css; D2 los fusiona luego en pages.css)
-$css = ['css/fonts.css', 'css/tokens.css', 'css/base.css', 'css/components.css', 'css/pages.css'];
-foreach (glob(NS_ROOT . '/assets/css/pages/_*.css') ?: [] as $f) {
-    $css[] = 'css/pages/' . basename($f);
+// CSS: núcleo común (fuentes, tokens, base, components) + el grupo de página de la plantilla (assets/css/pages/<grupo>.css).
+// Mapa plantilla => grupo en un solo sitio; la ruta puede anularlo con 'css' => ['grupo', …] (nombres sin .css; [] = sin grupo).
+$cssByTemplate = [
+    'home' => 'home',
+    'owner' => 'services-a', 'relay' => 'services-a', 'dryvan' => 'services-a', 'equipment' => 'services-a',
+    'tracking' => 'services-b', 'backoffice' => 'services-b', 'how' => 'services-b', 'desk' => 'services-b', 'contact' => 'services-b',
+    'legal' => 'company', '404' => 'company', 'resources' => 'company', 'doc-bol' => 'company', 'doc-agreement' => 'company',
+    'glossary' => 'tools', 'tool-rpm' => 'tools', 'tool-ifta' => 'tools',
+    'blog' => 'blog', 'post' => 'blog',
+];
+$cssGroups = isset($route['css']) ? (array) $route['css'] : (isset($cssByTemplate[$template]) ? [$cssByTemplate[$template]] : []);
+$css = ['css/fonts.css', 'css/tokens.css', 'css/base.css', 'css/components.css'];
+foreach ($cssGroups as $g) {
+    $g = basename((string) $g, '.css');
+    if (preg_match('/^[a-z0-9-]+$/', $g) === 1 && is_file(NS_ROOT . '/assets/css/pages/' . $g . '.css')) {
+        $css[] = 'css/pages/' . $g . '.css';
+    }
 }
 
 // JS (solo si el archivo existe). main.js en todo; módulos por plantilla; motion solo con $route['motion'].

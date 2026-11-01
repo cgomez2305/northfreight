@@ -85,7 +85,7 @@ Opcional (fase 2): un script `bin/build.php` que pre-renderiza todas las rutas a
 │   │   ├── tokens.css     # variables (§5)
 │   │   ├── base.css       # reset, tipografía, utilidades
 │   │   ├── components.css # nav, botones, tarjetas, FAQ, footer, mbar…
-│   │   └── pages.css      # lo específico de cada página
+│   │   └── pages/         # un grupo por familia de plantillas: home, services-a, services-b, company, tools, blog (el layout carga solo el de la plantilla)
 │   ├── js/
 │   │   ├── main.js        # nav, mega menús, pop-up móvil, relojes, formulario
 │   │   ├── calc-rpm.js
