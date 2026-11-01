@@ -142,6 +142,7 @@ return [
     ],
     '/contact/' => [
         'template'   => 'contact',
+        'form'       => 'contact',   // handler POST en app/forms/contact.php
         'title'      => 'Contact NorthStar Freight | Talk to a Dispatcher',
         'meta'       => 'Talk to a NorthStar dispatcher on WhatsApp at +1 863-651-3322 or email nfreightsolutionsllc@gmail.com. No forms first: tell us about your trucks.',
         'h1'         => 'Talk to a dispatcher',
@@ -209,6 +210,7 @@ return [
     ],
     '/resources/bol-template/' => [
         'template'   => 'doc-bol',
+        'form'       => 'download',   // handler POST en app/forms/download.php
         'title'      => 'Bill of Lading Template (PDF & Word) | NorthStar', // TODO verificar con doc de copy
         'meta'       => 'Free bill of lading (BOL) template in PDF and Word: every field brokers and receivers expect, ready to print. The same BOL our desk files on every load.', // TODO
         'h1'         => 'Bill of lading template',
@@ -254,6 +256,7 @@ return [
     ],
     '/resources/dispatcher-carrier-agreement/' => [
         'template'   => 'doc-agreement',
+        'form'       => 'download',   // handler POST en app/forms/download.php
         'title'      => 'Dispatcher-Carrier Agreement Template | NorthStar', // TODO verificar con doc de copy
         'meta'       => 'Dispatcher carrier agreement template: what a fair dispatch contract covers, from scope and fees to your right to refuse loads. Not legal advice.', // TODO
         'h1'         => 'Dispatcher-carrier agreement',
