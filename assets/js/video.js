@@ -69,7 +69,7 @@
         el.allowFullscreen = true;
         el.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
       }
-      el.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:0;background:#000';
+      el.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:0;background:var(--navy-deep)';
       $$('picture, img, [data-video-play]', frame).forEach(function (n) { n.remove(); });
       frame.appendChild(el);
       el.tabIndex = -1;
