@@ -102,7 +102,6 @@ details[open] > summary > .blog-plus { transform: rotate(45deg); }
 /* ---- Artículo: prosa ---- */
 .blog-prose { flex: 1 1 560px; min-width: 0; max-width: 760px; }
 .blog-prose h2 { color: var(--navy); margin: 56px 0 18px; scroll-margin-top: 24px; }
-.blog-prose > .blog-takeaways + h2, .blog-prose > .blog-tocm + h2 { margin-top: 36px; }
 .blog-prose p { font-size: 17px; line-height: 1.75; color: var(--ink-2); margin: 0 0 18px; }
 .blog-prose ul { margin: 0 0 20px; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
 .blog-prose li { position: relative; padding-left: 26px; font-size: 17px; line-height: 1.65; color: var(--ink-2); }

@@ -105,6 +105,7 @@
   background: var(--tint-on-dark); color: var(--on-dark-soft); clip-path: var(--cut-tile);
 }
 .sb-ct-stack { gap: 28px; }
+.sb-ct-stack .section-head { max-width: none; }
 .sb-ct-status:empty { display: none; }
 .sb-ct-msg {
   padding: 16px 20px; background: var(--surface-hover); border-left: 4px solid var(--cyan); color: var(--navy);

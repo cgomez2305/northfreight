@@ -27,7 +27,7 @@
 .co-prose strong { color: var(--navy); }
 .co-notice { background: var(--surface); padding: 18px 22px; font-size: 14px; line-height: 1.6; color: var(--slate); clip-path: var(--cut-tile); }
 .co-prose p.co-prose__more { margin-top: 40px; }
-.co-prose__more a { font-weight: 700; text-decoration: none; }
+.co-prose__more a { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-weight: 700; text-decoration: none; }
 @media (max-width: 1024px) { .co-legal__aside { display: none; } }
 
 /* =========================================================
@@ -156,3 +156,4 @@ a.card.card--dark.co-res:hover .card__code { color: var(--cyan-light); }
 .co-faq[open] .co-faq__plus { transform: rotate(45deg); }
 .co-faq p { margin: 0 0 22px; max-width: 720px; font-size: 17px; line-height: 1.7; color: var(--slate); }
 .co-related { margin-top: 24px; }
+@media (max-width: 760px) { .co-paper-star { top: -30px; right: 0; } }

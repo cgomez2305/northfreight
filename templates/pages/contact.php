@@ -40,7 +40,7 @@ partial('hero', [
 ]);
 ?>
 
-<section class="section" aria-labelledby="ct-title" id="write">
+<section class="section pre-cta" aria-labelledby="ct-title" id="write">
   <div class="container container--narrow stack sb-ct-stack">
     <?php partial('section-head', ['eyebrow' => 'Prefer to write?', 'title' => 'Tell us about your trucks', 'id' => 'ct-title']); ?>
 

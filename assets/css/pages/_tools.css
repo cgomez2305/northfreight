@@ -119,7 +119,7 @@
 [data-calc="ifta"]:not(.is-ready) .tools-add,
 [data-calc="ifta"]:not(.is-ready) .tools-rm { visibility: hidden; }
 
-.tools-scroll { overflow-x: auto; max-width: 100%; }
+.tools-scroll { position: relative; overflow-x: auto; max-width: 100%; }
 .tools-scroll:focus-visible { outline-offset: 2px; }
 .tools-tbl { width: 100%; border-collapse: collapse; min-width: 760px; }
 .tools-tbl th {
