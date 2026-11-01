@@ -4,7 +4,7 @@
  *
  * Flujo: normaliza la URI -> bloquea rutas internas -> sirve /robots.txt y /sitemap.xml ->
  * resuelve la ruta en app/routes.php (barra final 301, draft => 404 salvo ?preview=TOKEN) ->
- * POST /contact/ delega en app/forms/contact.php -> render (plantilla + layout).
+ * POST a una ruta con formulario (contact, descargas) delega en app/forms/<handler>.php -> render (plantilla + layout).
  *
  * Funciona como router de `php -S` (assets reales se sirven con `return false`) y bajo Apache/LiteSpeed
  * (.htaccess manda aquí todo lo que no sea un archivo real).
@@ -17,6 +17,7 @@ declare(strict_types=1);
 define('NS_ROOT', __DIR__);
 require NS_ROOT . '/app/helpers.php';   // carga también app/config.php
 require NS_ROOT . '/app/sitemap.php';
+require NS_ROOT . '/app/forms/lib.php';   // csrf_token() y utilidades de formularios: SIEMPRE antes de renderizar
 
 error_reporting(E_ALL);
 if (is_production()) {
@@ -141,15 +142,49 @@ header($isDraft ? 'Cache-Control: no-store' : (is_production() ? 'Cache-Control:
 header('X-Content-Type-Options: nosniff');
 header('Referrer-Policy: strict-origin-when-cross-origin');
 
-// --- POST: solo /contact/ -> app/forms/contact.php (lo escribe otro coder) ---
+// --- Formularios: lista blanca de handlers (app/forms/<handler>.php) ---
+// El handler sale de $route['form'] ('contact' | 'download'); si la ruta aun no lo declara, respaldo por ruta.
+$formHandlers = ['contact', 'download'];
+$formByPath = [
+    '/contact/'                                => 'contact',
+    '/resources/bol-template/'                 => 'download',
+    '/resources/dispatcher-carrier-agreement/' => 'download',
+];
+$form = $route['form'] ?? ($formByPath[$candidate] ?? null);
+if (!is_string($form) || !in_array($form, $formHandlers, true) || !is_file(NS_ROOT . '/app/forms/' . $form . '.php')) {
+    $form = null;
+}
+
 if ($method === 'POST') {
-    $handler = NS_ROOT . '/app/forms/contact.php';
-    if ($candidate !== '/contact/' || !is_file($handler)) {
+    if ($form === null) {
         ns_plain(405, 'Method not allowed', ['Allow: GET, HEAD']);
     }
+    ns_post_headers();   // no-store + noindex en toda respuesta a un POST
+    $length = (int) ($_SERVER['CONTENT_LENGTH'] ?? 0);
+    if ($length > NS_MAX_POST_BYTES || count($_POST) > 30) {
+        ns_plain(413, 'Request too large');
+    }
+    $origin = (string) ($_SERVER['HTTP_ORIGIN'] ?? '');
+    if ($origin !== '' && $origin !== 'null') {
+        $originHost = strtolower((string) parse_url($origin, PHP_URL_HOST) . (($p = parse_url($origin, PHP_URL_PORT)) ? ':' . $p : ''));
+        if ($originHost !== strtolower((string) ($_SERVER['HTTP_HOST'] ?? ''))) {
+            ns_plain(403, 'Forbidden');
+        }
+    }
     $cfg = cfg();
-    require $handler;   // recibe $route y $cfg; responde por sí mismo (PRG) y termina
+    try {
+        require NS_ROOT . '/app/forms/' . $form . '.php';   // recibe $route y $cfg; responde por si mismo y termina
+    } catch (Throwable $t) {
+        ns_log_error('form-' . $form . ' ' . get_class($t), $t->getMessage() . ' @' . basename($t->getFile()) . ':' . $t->getLine());
+        ns_render_page($route, ns_flash_error($form, [], [], 'Something went wrong on our side. Please message us on WhatsApp or email ' . ns_mail_to() . '.'), 500);
+    }
     exit;
+}
+
+// --- GET ?sent=1 en una ruta con formulario: mensaje de exito tras PRG (sin sesiones; cache-friendly) ---
+if ($form !== null && ($_GET['sent'] ?? null) === '1') {
+    header('X-Robots-Tag: noindex, nofollow');
+    ns_render_page($route, ns_flash_ok($form), 200);
 }
 
 render_route($route);

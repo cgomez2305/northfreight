@@ -5,6 +5,11 @@
 /storage/*
 !/storage/.htaccess
 !/storage/.gitkeep
+# (cubiertos por /storage/*, explícitos por claridad)
+/storage/ratelimit/
+/storage/*.log
+/storage/*.log.1
+/storage/app.key
 
 # Configuración local con credenciales (usar app/config.local.example.php como plantilla)
 /app/config.local.php

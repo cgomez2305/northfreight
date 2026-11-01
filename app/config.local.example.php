@@ -19,15 +19,26 @@ define('DOMAIN', 'staging.example.com');
 // (p. ej. `php -r "echo bin2hex(random_bytes(16));"`). Vacío = desactivado.
 define('PREVIEW_TOKEN', '');
 
-// SMTP de Hostinger para el formulario de contacto (PHPMailer).
+// Clave para firmar los tokens CSRF de los formularios (sin sesiones ni cookies).
+// Vacío = se genera sola en storage/app.key la primera vez (chmod 600). Para fijarla:
+// `php -r "echo bin2hex(random_bytes(32));"` (mínimo 32 caracteres). Cambiarla invalida los formularios abiertos.
+define('APP_SECRET', '');
+
+// SMTP de Hostinger para los formularios (contacto y descargas, vía PHPMailer).
+// Si SMTP_USER o SMTP_PASS están vacíos (o es "CHANGE-ME"), el sitio NO falla: cada mensaje se escribe
+// completo en storage/mail.log y el visitante ve el mensaje de éxito. Útil en local y staging.
 define('SMTP_HOST', 'smtp.hostinger.com');
 define('SMTP_PORT', 465);          // 465 con 'ssl'; 587 con 'tls'
-define('SMTP_USER', 'forms@example.com');
+define('SMTP_USER', 'forms@example.com');   // también es el remitente (From)
 define('SMTP_PASS', 'CHANGE-ME');
-define('SMTP_SECURE', 'ssl');
+define('SMTP_SECURE', 'ssl');      // 'ssl' | 'tls'
 
-// Destino de los mensajes del formulario.
+// Destino de los mensajes y avisos de descarga.
 define('MAIL_TO', 'nfreightsolutionsllc@gmail.com');
+
+// Límite de envíos por IP y ventana (segundos). Defecto: 5 por hora; el siguiente recibe 429.
+define('RATE_LIMIT', 5);
+// define('RATE_WINDOW', 3600);
 
 // Opcional: flags de contenido (ver app/config.php).
 // define('HERO_VARIANT', 'B');
