@@ -151,11 +151,18 @@ Cada ruta define:
 | `--ink` | `#0B1B2E` | Texto principal sobre claro |
 | `--slate` | `#4A5B6E` | Texto secundario sobre claro |
 | `--on-dark` | `#C9D6E3` | Párrafos sobre navy |
-| `--on-dark-muted` | `#8FA3B8` / `#B9C8D8` | Metadatos, migas y enlaces del footer sobre oscuro |
+| `--on-dark-muted` | `#8FA3B8` | Metadatos y migas sobre oscuro |
+| `--on-dark-soft` | `#B9C8D8` | Enlaces del footer y etiquetas sobre oscuro |
+| `--on-dark-strong` | `#E6EEF6` | Enlaces de la navegación sobre oscuro (en la maqueta) |
 | `--surface` | `#F3F6F9` | Fondos de sección claros y tarjetas |
-| `--line` | `#DCE4EC` / `#E3EAF1` | Divisores y bordes |
+| `--surface-hover` | `#EAF1F7` | Hover de tarjetas sobre `--surface` |
+| `--ink-2` | `#24364A` | Texto de apoyo sobre claro (en la maqueta) |
+| `--line` | `#DCE4EC` | Divisores y bordes |
+| `--line-soft` | `#E3EAF1` | Divisores suaves |
 | `--field` | `#C9D4DF` | Borde de inputs |
 | `--white` | `#FFFFFF` | Fondo base |
+
+También hay tokens alfa en `tokens.css` (`--line-on-dark`, `--tint-on-dark`, `--cyan-tint*`, overlays y sombras), `--ph-bg` (marca de placeholder), `--wrap` y las formas `--cut-*`. **Ningún hex ni rgba fuera de `tokens.css`.** Foco visible: `--cyan-ink` sobre fondo claro (el cian puro da 2,86:1 sobre blanco).
 
 Sobre cian, el texto va en `--navy-deep` (`#04132A`), nunca en blanco.
 
@@ -263,7 +270,7 @@ Breakpoints:
 | **Barra móvil (mbar)** | Fija abajo, de borde a borde, fondo `--navy-deep` 96% con desenfoque y línea superior. Botones alineados al gutter de 20px: "Talk to a dispatcher" (cian, flex 1) + llamada (cuadrado 56px). Respeta `env(safe-area-inset-bottom)`. Solo ≤760px. |
 | **Hero interno** | Migas → eyebrow opcional → H1 → swoosh → tagline opcional → lead → CTAs → columna derecha opcional (imagen, tarjeta de datos o vista previa de documento). |
 | **Tarjeta** | Chaflán `.cut`, fondo `--surface` (variante oscura en navy para la última o la destacada), número/etiqueta mono, H3, texto, enlace con flecha "→" en DM Sans. |
-| **FAQ** | `<details>/<summary>` con icono "+" que gira 45°. Genera JSON-LD FAQPage. |
+| **FAQ** | `<details>/<summary>` con la estrella NorthStar que gira 45° al abrir (así es en la maqueta). El layout genera el JSON-LD FAQPage. En producción se descartan las FAQ con placeholders. |
 | **Video del equipo** | Fachada (imagen + botón play centrado); el iframe/video se carga al hacer clic. Pie **debajo** del video ("Meet the desk · 3 chapters", "Video · 3–4 min"). Capítulos como botones que marcan el activo y saltan al minuto. |
 | **CTA final** | Isotipo 56px en flujo encima del titular "Let's talk about **your operation.**", texto "No forms first…", botón grande de WhatsApp con el número visible + botón de correo. |
 | **Footer** | Logo + descripción · Services · Company (How it works, Our desk, Resources, Blog, Contact) · Talk to the desk. Fila inferior: © año, MC#/USDOT (o eliminar si no aplica), Privacy, Terms. |
