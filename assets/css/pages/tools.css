@@ -26,7 +26,7 @@
 /* ---- Glosario: términos ---- */
 .tools-gloss { padding-block: clamp(56px, 8vw, 96px); }
 .tools-gloss__list { max-width: 960px; display: flex; flex-direction: column; gap: 28px; }
-.tools-letter, .tools-term { scroll-margin-top: 24px; }
+.tools-letter, .tools-term { scroll-margin-top: calc(var(--header-h) + 24px); }
 .tools-letter { display: flex; flex-wrap: wrap; gap: clamp(16px, 4vw, 56px); border-top: 2px solid var(--navy); }
 .tools-letter__mark {
   flex: 0 0 auto; min-width: 72px; padding-top: 18px; line-height: 1; color: var(--cyan);

@@ -12,7 +12,7 @@
 .co-legal-hero .hero__main { gap: 22px; }
 .co-legal { padding-top: clamp(48px, 7vw, 96px); padding-bottom: clamp(96px, 10vw, 140px); }
 .co-legal__in { display: flex; flex-wrap: wrap; gap: clamp(32px, 5vw, 72px); align-items: flex-start; }
-.co-legal__aside { flex: 0 0 240px; position: sticky; top: 24px; }
+.co-legal__aside { flex: 0 0 240px; position: sticky; top: calc(var(--header-h) + 24px); }
 .co-toc { display: flex; flex-direction: column; }
 .co-toc__label { padding-bottom: 12px; color: var(--cyan-ink); }
 .co-toc a {
@@ -22,7 +22,7 @@
 .co-toc a:hover { border-left-color: var(--cyan); color: var(--navy); }
 .co-toc a:focus-visible { outline-offset: -3px; }
 .co-prose { flex: 1 1 560px; min-width: 0; max-width: 760px; }
-.co-prose h2 { color: var(--navy); margin: 56px 0 18px; scroll-margin-top: 24px; }
+.co-prose h2 { color: var(--navy); margin: 56px 0 18px; scroll-margin-top: calc(var(--header-h) + 24px); }
 .co-prose p { font-size: 17px; line-height: 1.75; color: var(--ink-2); margin: 0 0 18px; }
 .co-prose strong { color: var(--navy); }
 .co-notice { background: var(--surface); padding: 18px 22px; font-size: 14px; line-height: 1.6; color: var(--slate); clip-path: var(--cut-tile); }

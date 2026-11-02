@@ -1,8 +1,11 @@
 /* NorthStar — base: reset, tipografía (§5.2), layout y utilidades (§5.3, §5.4). */
 *, *::before, *::after { box-sizing: border-box; }
-html { background: var(--navy); -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-padding-top: 16px; }
+html { background: var(--navy); -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-padding-top: calc(var(--header-h) + 16px); }
 body {
-  margin: 0; background: var(--white); color: var(--ink); color-scheme: light;
+  /* Banda navy tras la barra superior y el header: el cristal del header sticky se ve navy en la posición
+     inicial (sin ella el body blanco lo aclararía). La tapa el hero, que también es navy. */
+  margin: 0; color: var(--ink); color-scheme: light;
+  background: linear-gradient(var(--navy), var(--navy)) top / 100% 200px no-repeat, var(--white);
   font-family: var(--font-body); font-size: 16px; line-height: normal;
   -webkit-font-smoothing: antialiased; overflow-x: clip;
 }

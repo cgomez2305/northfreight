@@ -38,6 +38,13 @@
   --shadow-navy: rgba(4, 19, 42, .6);
   --ph-bg: #FFF3B0;            /* marca de placeholder (solo staging) */
 
+  /* Header glassmorphism (sticky) */
+  --glass-bg: rgba(7, 28, 53, .8);         /* navy a 80 %: legible sobre fondo claro y oscuro */
+  --glass-shine: rgba(255, 255, 255, .07); /* brillo superior del cristal */
+  --glass-line: rgba(255, 255, 255, .14);  /* borde inferior */
+  --glass-blur: 18px;
+  --header-h: 76px;                        /* alto del header sticky: offsets de anclas y bloques sticky */
+
   /* Tipografía §5.2 */
   --font-head: "Saira", "Arial Narrow", Arial, sans-serif;
   --font-body: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;

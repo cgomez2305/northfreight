@@ -36,7 +36,7 @@
 @media (max-width: 640px) { .btn--block-m, .hero__ctas .btn { width: 100%; } }
 
 /* ---- Logo (§5.6) ---- */
-.logo { display: flex; align-items: flex-end; text-decoration: none; flex: none; color: var(--white); }
+.logo { display: flex; align-items: center; text-decoration: none; flex: none; color: var(--white); }
 .logo:hover { color: var(--white); }
 .logo__mark { width: 46px; height: 46px; display: block; flex: none; }
 .logo__text { display: flex; flex-direction: column; gap: 4px; margin-left: 2px; }
@@ -51,7 +51,8 @@
 }
 
 /* ---- Opsbar ---- */
-.site-top { position: relative; z-index: var(--z-header); color: var(--white); }
+/* El contenedor no genera caja: así el .header es hijo directo del body y su sticky dura toda la página. */
+.site-top { display: contents; color: var(--white); }
 .opsbar { background: var(--navy-deep); color: var(--on-dark-soft); border-bottom: 1px solid var(--line-on-dark-soft); }
 .opsbar__in {
   max-width: var(--wrap); margin: 0 auto; padding: 8px var(--gutter); display: flex; flex-wrap: wrap; gap: 6px 24px;
@@ -65,7 +66,23 @@
 .opsbar__mail:hover { color: var(--cyan); }
 
 /* ---- Nav ---- */
-.header { position: relative; background: var(--navy); border-bottom: 1px solid var(--tint-on-dark); }
+/* Header sticky con glassmorphism. El desenfoque va en ::before (z-index -1) y no en el propio header:
+   un backdrop-filter en el header haría de bloque contenedor del menú móvil (position: fixed) y lo rompería. */
+.header {
+  position: sticky; top: 0; z-index: var(--z-header); color: var(--white);
+  border-bottom: 1px solid var(--glass-line); box-shadow: 0 12px 32px -22px var(--shadow-navy);
+}
+.header::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(180deg, var(--glass-shine), transparent 70%), var(--glass-bg);
+  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.4); backdrop-filter: blur(var(--glass-blur)) saturate(1.4);
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .header::before { background: var(--navy); }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .header::before { background: var(--navy); -webkit-backdrop-filter: none; backdrop-filter: none; }
+}
 .nav {
   max-width: var(--wrap); margin: 0 auto; padding: 14px var(--gutter); display: flex; gap: 16px 28px;
   align-items: center; justify-content: space-between;
