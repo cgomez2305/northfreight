@@ -92,7 +92,7 @@ partial('hero', [
 
 <section class="section" aria-labelledby="ifta-steps-title">
   <div class="container stack">
-    <?php partial('section-head', ['eyebrow' => 'How to use it', 'title' => 'Three steps, one minute', 'id' => 'ifta-steps-title']); ?>
+    <?php partial('section-head', ['eyebrow' => 'How to use it', 'title' => 'How to use the IFTA calculator in three steps', 'id' => 'ifta-steps-title']); ?>
     <ol class="g3 tools-steps">
       <?php foreach ($steps as $n => $text): ?>
       <li class="tools-step cut-s"><span class="tools-step__n mono">STEP <?= sprintf('%02d', $n + 1) ?></span><span class="tools-step__t"><?= e($text) ?></span></li>
@@ -101,7 +101,7 @@ partial('hero', [
   </div>
 </section>
 
-<?php partial('faq', ['items' => route_faq_items($route), 'title' => 'Questions drivers ask', 'surface' => 'light', 'open_first' => false]); ?>
+<?php partial('faq', ['items' => route_faq_items($route), 'title' => 'IFTA calculator questions', 'surface' => 'light', 'open_first' => false]); ?>
 
 <?php if ($related): ?>
 <section class="section tools-related" aria-labelledby="ifta-related-title">

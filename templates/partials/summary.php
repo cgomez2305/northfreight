@@ -19,7 +19,7 @@ $points = array_slice(array_values(array_filter(array_map('strval', (array) ($po
   <div class="container">
     <div class="summary__wrap">
       <div class="summary__box cut">
-        <h2 class="t-eyebrow summary__label" id="<?= e($id) ?>"><?= e($label) ?></h2>
+        <p class="t-eyebrow summary__label" id="<?= e($id) ?>"><?= e($label) ?></p>
         <p class="summary__text"><?= ns_rich($text) ?></p>
         <?php if ($points): ?>
         <ul class="summary__points">

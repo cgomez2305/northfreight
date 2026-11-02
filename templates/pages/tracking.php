@@ -50,7 +50,7 @@ partial('summary', [
 
 <section class="section" aria-labelledby="tr-log">
   <div class="container stack">
-    <?php partial('section-head', ['eyebrow' => 'On every load', 'title' => 'What we log', 'id' => 'tr-log']); ?>
+    <?php partial('section-head', ['eyebrow' => 'On every load', 'title' => 'What our load tracking logs', 'id' => 'tr-log']); ?>
     <ul class="g5 gap-12 sb-cells">
       <?php foreach ($logs as $i => $t): ?>
       <li><?php partial('card', ['size' => 'tile', 'variant' => $i === 4 ? 'dark' : 'light', 'code' => 'LOG · ' . sprintf('%02d', $i + 1), 'title' => $t, 'cls' => 'sb-tile']); ?></li>

@@ -42,7 +42,7 @@ partial('summary', [
 ?>
 <section class="section" aria-labelledby="relay-manage">
   <div class="container stack">
-    <?php partial('section-head', ['id' => 'relay-manage', 'eyebrow' => 'Inside your Relay account', 'title' => 'What we manage']); ?>
+    <?php partial('section-head', ['id' => 'relay-manage', 'eyebrow' => 'Inside your Relay account', 'title' => 'What we manage in your Amazon Relay account']); ?>
     <div class="g5">
       <?php foreach ($manage as $i => $m): ?>
         <?php partial('card', ['variant' => $i === 4 ? 'dark' : 'light', 'tag' => $m[0], 'title' => $m[1], 'text' => $m[2]]); ?>
@@ -80,6 +80,6 @@ partial('summary', [
 
 <section class="section sa-faq-after pre-cta" aria-labelledby="faq-title">
   <div class="container">
-    <?php partial('faq', ['items' => route_faq_items($route), 'title' => 'Relay questions', 'section' => false]); ?>
+    <?php partial('faq', ['items' => route_faq_items($route), 'title' => 'Amazon Relay dispatch questions', 'section' => false]); ?>
   </div>
 </section>

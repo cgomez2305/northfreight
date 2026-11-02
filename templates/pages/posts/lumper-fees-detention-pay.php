@@ -44,4 +44,4 @@ $related = [
 <p>Our desk logs these times on every load with timestamps and photos. That record is what turns waiting hours into a claim that gets paid. <a href="<?= e(url('/load-tracking/')) ?>">See how we track loads</a>.</p>
 
 <h2 class="t-prose-h2" id="settlement">Putting it on the settlement</h2>
-<p>Send lumper receipts and detention records with the POD, not weeks later. Late paperwork is the easiest claim for a broker to deny. A <a href="<?= e(url('/trucking-back-office/')) ?>">back office</a> that files everything per load keeps these claims from slipping.</p>
+<p>Send lumper receipts and detention records with the POD, not weeks later. Late paperwork is the easiest claim for a broker to deny. A <a href="<?= e(url('/trucking-back-office/')) ?>">trucking back office</a> that files everything per load keeps these claims from slipping.</p>

@@ -58,4 +58,4 @@ $pricing = ph('NorthStar pricing model: percentage, flat fee or plan details to 
 
 <h2 class="t-prose-h2" id="northstar">How NorthStar charges</h2>
 <?php if ($pricing !== ''): ?><p><?= $pricing ?></p><?php endif; ?>
-<p>Whatever the model, the fee covers booking, tracking and documenting every load, with updates on WhatsApp. <a href="<?= e(url('/how-it-works/')) ?>">See how we work with you</a>.</p>
+<p>Whatever the model, the fee covers booking, tracking and documenting every load, with updates on WhatsApp. <a href="<?= e(url('/how-it-works/')) ?>">See how truck dispatching works with us</a>, or explore our <a href="<?= e(url('/dispatch-for-owner-operators/')) ?>">dispatch services for owner-operators</a> and the rest of our <a href="<?= e(url('/')) ?>">truck dispatch services</a>.</p>

@@ -22,7 +22,7 @@ $csrf = function_exists('csrf_token') ? (string) csrf_token() : '';
   <div class="container stack">
     <div class="co-doc">
       <div class="co-doc__main">
-        <?php partial('section-head', ['eyebrow' => 'What\'s inside', 'title' => 'Every field, already in place', 'id' => 'doc-inside']); ?>
+        <?php partial('section-head', ['eyebrow' => 'What\'s inside', 'title' => (string) ($doc['inside_title'] ?? 'Every field, already in place'), 'id' => 'doc-inside']); ?>
         <ul class="co-list">
           <?php foreach ($doc['inside'] as $it): ?>
           <li><?= ns_star(16) ?><span><strong><?= e($it[0]) ?></strong>: <?= e($it[1]) ?></span></li>

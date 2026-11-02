@@ -46,4 +46,4 @@ partial('summary', [
   </div>
 </section>
 
-<?php partial('faq', ['items' => route_faq_items($route), 'title' => 'Dry van questions', 'surface' => 'light', 'pre_cta' => true]); ?>
+<?php partial('faq', ['items' => route_faq_items($route), 'title' => 'Dry van dispatch questions', 'surface' => 'light', 'pre_cta' => true]); ?>

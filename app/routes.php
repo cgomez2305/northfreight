@@ -28,8 +28,8 @@ return [
     // ------------------------------------------------------------------
     '/' => [
         'template'   => 'home',
-        'title'      => 'Truck Dispatch Services for Owner-Operators | NorthStar',
-        'meta'       => 'Truck dispatch for owner-operators and small fleets: Amazon Relay and dry van booking, load tracking and back office. Message a dispatcher on WhatsApp.',
+        'title'      => 'Truck Dispatch Services | Remote Dispatch Desk | NorthStar',
+        'meta'       => 'Truck dispatch services from a remote dispatch company: Amazon Relay and dry van booking, load tracking and back office. Message a dispatcher on WhatsApp.',
         'h1'         => 'Truck dispatch services for owner-operators & small fleets',
         'schema'     => ['Organization', 'ProfessionalService', 'FAQPage'],
         'status'     => 'live',
@@ -43,7 +43,7 @@ return [
     '/dispatch-for-owner-operators/' => [
         'template'   => 'owner',
         'title'      => 'Dispatch Services for Owner-Operators | NorthStar Freight',
-        'meta'       => 'Independent truck dispatcher for owner-operators: we book loads, handle brokers and paperwork, and track every trip. One desk, updates on WhatsApp.',
+        'meta'       => 'Dispatch services for owner-operators: an independent truck dispatcher books your loads, handles brokers and tracks every trip. Updates on WhatsApp.',
         'h1'         => 'Dispatch services for owner-operators',
         'schema'     => ['Service', 'FAQPage', 'BreadcrumbList'],
         'status'     => 'live',
@@ -87,7 +87,7 @@ return [
     '/load-tracking/' => [
         'template'   => 'tracking',
         'title'      => 'Truck Load Tracking & Check Calls | NorthStar Freight',
-        'meta'       => 'We follow every load from pickup to POD: check calls, ETAs, arrival timestamps and incident reports, so brokers stay informed and you get paid.',
+        'meta'       => 'Truck load tracking and check calls: we follow every load from pickup to POD with ETAs, arrival timestamps and incident reports, so brokers stay informed.',
         'h1'         => 'Load tracking and check calls for your trucks',
         'schema'     => ['Service', 'BreadcrumbList'],
         'status'     => 'live',
@@ -116,7 +116,7 @@ return [
         'template'   => 'how',
         'title'      => 'How Truck Dispatching Works With NorthStar',
         'meta'       => 'How we plug into your trucking operation in four steps: we learn your fleet, agree on scope and contacts, run the day-to-day and review together.',
-        'h1'         => 'How we plug into your operation',
+        'h1'         => 'How truck dispatching works with NorthStar',
         'schema'     => ['BreadcrumbList'],
         'status'     => 'live',
         'sitemap'    => true,
@@ -129,7 +129,7 @@ return [
     '/our-desk/' => [
         'template'   => 'desk',
         'title'      => 'About NorthStar Freight Solutions | Our Dispatch Desk',
-        'meta'       => 'Meet the NorthStar dispatch desk: the people who book, track and document your loads. Watch how we work and why we run operations as a team.',
+        'meta'       => 'Meet the NorthStar dispatch desk: the people who book, track and document your loads, and why we run operations as a team.',
         'h1'         => 'Built by dispatchers. Run as a team.',
         'schema'     => ['BreadcrumbList'],   // VideoObject se añade cuando exista el video (§7.6)
         'status'     => 'live',

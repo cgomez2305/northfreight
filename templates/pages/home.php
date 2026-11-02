@@ -182,7 +182,7 @@ $docs = ['Rate confirmation', 'Check-call log', 'Arrival timestamps', 'BOL & POD
   <div class="container home-relay__in">
     <div class="home-relay__main">
       <span class="t-eyebrow">02 · Specialty</span>
-      <h2 class="t-h2" id="relay-title">Amazon Relay dispatch, <span class="hl">handled end to end.</span></h2>
+      <h2 class="t-h2" id="relay-title">Amazon Relay dispatch for <span class="hl">carriers who move fast.</span></h2>
       <p class="t-body home-relay__lead">Relay rewards carriers who move fast and keep clean records. Our desk watches the load board for you, books the blocks that fit your trucks and follows performance and disputes inside your account.</p>
       <a class="btn btn--primary home-relay__btn" href="<?= e(url('/amazon-relay-dispatch/')) ?>"><span>Amazon Relay dispatch <span class="arrow" aria-hidden="true">→</span></span></a>
     </div>
@@ -243,4 +243,4 @@ $docs = ['Rate confirmation', 'Check-call log', 'Arrival timestamps', 'BOL & POD
 </section>
 
 <!-- 06 FAQ -->
-<?php partial('faq', ['items' => route_faq_items($route), 'eyebrow' => '06 · FAQ', 'title' => 'Questions carriers ask us.', 'surface' => 'light', 'pre_cta' => true]); ?>
+<?php partial('faq', ['items' => route_faq_items($route), 'eyebrow' => '06 · FAQ', 'title' => 'Truck dispatch questions carriers ask us.', 'surface' => 'light', 'pre_cta' => true]); ?>

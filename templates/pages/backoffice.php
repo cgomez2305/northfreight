@@ -36,7 +36,7 @@ partial('summary', [
 
 <section class="section" aria-labelledby="bo-included">
   <div class="container stack">
-    <?php partial('section-head', ['eyebrow' => 'Included', 'title' => 'Five jobs off your desk', 'id' => 'bo-included']); ?>
+    <?php partial('section-head', ['eyebrow' => 'Included', 'title' => 'Five back office jobs off your desk', 'id' => 'bo-included']); ?>
     <ul class="g5 sb-cells">
       <?php foreach ($jobs as $i => [$title, $text]): ?>
       <li><?php partial('card', ['variant' => $i === 4 ? 'dark' : 'light', 'num' => sprintf('%02d', $i + 1), 'title' => $title, 'text' => $text, 'cls' => 'sb-bo-job']); ?></li>

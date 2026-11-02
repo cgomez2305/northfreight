@@ -19,6 +19,7 @@ $doc = [
     'submit'  => 'Download the agreement',
     'notice'  => 'this template is not legal advice. Have it reviewed for your state and your business before you sign it.',
     'files'   => [['Word', 'dispatcher-carrier-agreement.docx']],
+    'inside_title' => 'Every clause of the agreement, already in place',
     'steps_title' => 'Review it in four steps',
     'steps' => [
         ['Read the scope', 'Every service you expect should be written down. If it is not listed, assume it is not included.'],
