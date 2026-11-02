@@ -78,7 +78,7 @@ declare(strict_types=1);
         . ' doc="' . $doc['label'] . '" format=' . $v['format']
         . ' email=' . $v['email'] . ' name="' . $v['name'] . '" ip=' . $ip);
 
-    $subject = 'Template download — ' . $doc['label'] . ' — ' . $v['email'];
+    $subject = 'Template download: ' . $doc['label'] . ' (' . $v['email'] . ')';
     $body = "Someone requested a template from the website.\n\n"
         . 'Document: ' . $doc['label'] . "\n"
         . 'Format: ' . strtoupper($v['format']) . "\n"

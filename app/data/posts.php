@@ -20,7 +20,7 @@ return [
         'title'    => 'How much does truck dispatch service cost?',
         'category' => 'Dispatch',
         'minutes'  => 7,
-        'excerpt'  => 'Percentage of the gross, flat weekly fee or per load — what each model really costs an owner-operator and what should be included.',
+        'excerpt'  => 'Percentage of the gross, flat weekly fee or per load: what each model really costs an owner-operator and what should be included.',
         'date'     => '{{ph:Publish date}}',
         'published' => '',            // PENDIENTE (cliente): YYYY-MM-DD
         'modified' => '2026-11-02',
@@ -89,7 +89,7 @@ return [
         'modified' => '2026-11-02',
         'featured' => false,
         'type'     => 'article',
-        'lead'     => 'Lumper fees and detention are money you are owed — but only if they are documented the right way. What to do at the dock so they show up on your settlement.',
+        'lead'     => 'Lumper fees and detention are money you are owed, but only if they are documented the right way. What to do at the dock so they show up on your settlement.',
         'toc'      => [
             'What a lumper fee is',
             'How to get the lumper reimbursed',
@@ -104,7 +104,7 @@ return [
         'title'    => 'Rate per mile: know if a load pays',
         'category' => 'Dispatch',
         'minutes'  => null,
-        'excerpt'  => 'Loaded vs all-in rate per mile, fuel and what is left — with a free calculator.',
+        'excerpt'  => 'Loaded vs all-in rate per mile, fuel and what is left, with a free calculator.',
         'date'     => null,
         'featured' => false,
         'type'     => 'link',

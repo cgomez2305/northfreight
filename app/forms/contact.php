@@ -65,7 +65,7 @@ declare(strict_types=1);
         . ns_mail_footer();
 
     ns_rate_hit();
-    if (!ns_send_mail('New dispatch inquiry — ' . $v['name'], $body)) {
+    if (!ns_send_mail('New dispatch inquiry: ' . $v['name'], $body)) {
         ns_render_page($route, ns_flash_error($form, [], $v, 'We could not send your message right now. Please message us on WhatsApp or email ' . ns_mail_to() . '.'), 503);
     }
 

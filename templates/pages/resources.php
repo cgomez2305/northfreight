@@ -15,13 +15,13 @@ $tools = [
 ];
 $templates = [
     ['path' => '/resources/bol-template/', 'icon' => 'doc-down', 'code' => 'TEMPLATE · PDF + WORD', 'title' => 'Bill of lading template', 'dark' => true,
-     'text' => 'A clean, printable BOL with every field brokers and receivers expect — the same one our desk files on every load.'],
+     'text' => 'A clean, printable BOL with every field brokers and receivers expect. It is the same one our desk files on every load.'],
     ['path' => '/resources/dispatcher-carrier-agreement/', 'icon' => 'doc', 'code' => 'TEMPLATE · WORD', 'title' => 'Dispatcher-carrier agreement',
      'text' => 'What a fair dispatch contract covers: scope, fees, your right to refuse loads and how to end it.'],
 ];
 $learn = [
     ['path' => '/resources/glossary/', 'icon_svg' => $bookSvg, 'code' => 'GUIDE', 'title' => 'Trucking glossary',
-     'text' => 'Deadhead, lumper, TONU, rate con — the terms you hear on every broker call.'],
+     'text' => 'Deadhead, lumper, TONU, rate con: the terms you hear on every broker call.'],
     ['path' => '/blog/amazon-relay-requirements/', 'code' => 'AMAZON RELAY', 'title' => 'Amazon Relay requirements',
      'text' => 'Authority, insurance, equipment and the steps to get approved.'],
     ['path' => '/blog/amazon-relay-load-board/', 'code' => 'AMAZON RELAY', 'title' => 'How the Relay load board works',
@@ -46,7 +46,7 @@ partial('hero', [
     'route'   => $route,
     'h1'      => 'Free trucking resources {hl}from the desk{/hl}',
     'eyebrow' => 'Tools · Templates · Guides',
-    'lead'    => 'The same calculators, templates and guides our dispatchers use every day. Free for owner-operators and small fleets — no sign-up for the tools.',
+    'lead'    => 'The same calculators, templates and guides our dispatchers use every day. Free for owner-operators and small fleets, with no sign-up for the tools.',
     'aside'   => $aside,
     'cls'     => 'co-hero co-res-hero',
 ]);

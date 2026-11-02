@@ -19,7 +19,7 @@ $related = [
     ['code' => 'TEMPLATE', 'title' => 'Dispatcher-carrier agreement', 'text' => 'What a fair contract covers.', 'href' => '/resources/dispatcher-carrier-agreement/'],
     ['code' => 'SERVICE', 'title' => 'Dispatch for owner-operators', 'text' => 'Let the desk run your loads.', 'href' => '/dispatch-for-owner-operators/', 'dark' => true],
 ];
-$pricing = ph('NorthStar pricing model — percentage, flat fee or plan details to be confirmed by the client.');
+$pricing = ph('NorthStar pricing model: percentage, flat fee or plan details to be confirmed by the client.');
 ?>
 <h2 class="t-prose-h2" id="models">The three ways dispatchers charge</h2>
 <p><strong>Percentage of the gross.</strong> The dispatcher takes a share of what each load pays. It is the most common model for owner-operators because the fee moves with your revenue: a slow week costs less. Rates for this model are commonly quoted somewhere between 5% and 10%, depending on what is included.</p>
@@ -49,10 +49,10 @@ $pricing = ph('NorthStar pricing model — percentage, flat fee or plan details 
 
 <h2 class="t-prose-h2" id="flags">Red flags before you sign</h2>
 <ul>
-  <li><strong>Forced dispatch</strong> — you should always be able to refuse a load.</li>
-  <li><strong>Control of your authority</strong> — the dispatcher works for you; your MC stays yours.</li>
-  <li><strong>Fees on everything</strong> — check whether the percentage applies to line haul only or to the full gross.</li>
-  <li><strong>Long contracts and exit penalties</strong> — good service keeps clients without lock-ins.</li>
+  <li><strong>Forced dispatch.</strong> You should always be able to refuse a load.</li>
+  <li><strong>Control of your authority.</strong> The dispatcher works for you; your MC stays yours.</li>
+  <li><strong>Fees on everything.</strong> Check whether the percentage applies to line haul only or to the full gross.</li>
+  <li><strong>Long contracts and exit penalties.</strong> Good service keeps clients without lock-ins.</li>
 </ul>
 <p>Our free <a href="<?= e(url('/resources/dispatcher-carrier-agreement/')) ?>">dispatcher-carrier agreement template</a> shows what a fair contract covers.</p>
 

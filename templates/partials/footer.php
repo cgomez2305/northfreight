@@ -19,7 +19,7 @@ if (cfg('show_resources')) {
     }
 }
 $email = (string) cfg('email');
-$legalId = ph('MC# — · USDOT —');
+$legalId = ph('MC# pending · USDOT pending');
 $addr = org_address();   // NAP: solo se imprime si ADDRESS está definida en config.local.php
 ?>
 <footer class="footer" id="footer-nav">

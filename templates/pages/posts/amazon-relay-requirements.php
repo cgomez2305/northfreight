@@ -5,7 +5,7 @@ $takeaways = [
     'Relay works with carriers that have their own active USDOT and MC authority.',
     'You need a SCAC code and insurance that meets Relay\'s current minimums.',
     'Drivers use the Relay app for tracking on every load.',
-    'Requirements change — confirm the current list on relay.amazon.com before applying.',
+    'Requirements change, so confirm the current list on relay.amazon.com before applying.',
 ];
 $toc = [
     ['who', 'Who can sign up'],
@@ -19,7 +19,7 @@ $related = [
     ['code' => 'GUIDE', 'title' => 'Trucking glossary', 'text' => 'SCAC, power only and the rest of the terms.', 'href' => '/resources/glossary/'],
     ['code' => 'SERVICE', 'title' => 'Amazon Relay dispatch', 'text' => 'The desk books and protects your Relay account.', 'href' => '/amazon-relay-dispatch/', 'dark' => true],
 ];
-$limits = ph('Current minimum limits — verify on relay.amazon.com before publishing.');
+$limits = ph('Current minimum limits: verify on relay.amazon.com before publishing.');
 ?>
 <h2 class="t-prose-h2" id="who">Who can sign up</h2>
 <p>Amazon Relay is for motor carriers operating under their own authority. Brokers and drivers leased on to another carrier cannot book Relay freight on their own.</p>
@@ -36,7 +36,7 @@ $limits = ph('Current minimum limits — verify on relay.amazon.com before publi
 
 <h2 class="t-prose-h2" id="equipment">Equipment and technology</h2>
 <ul>
-  <li><strong>Tractors</strong> able to pull 53' trailers — many Relay loads are power-only with Amazon trailers</li>
+  <li><strong>Tractors</strong> able to pull 53' trailers, since many Relay loads are power-only with Amazon trailers</li>
   <li><strong>Your own 53' dry vans</strong> for loads that require carrier trailers</li>
   <li><strong>ELD-compliant</strong> trucks and drivers with valid CDLs</li>
   <li><strong>The Amazon Relay app</strong> on each driver's phone for check-ins and tracking</li>

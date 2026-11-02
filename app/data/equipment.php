@@ -12,7 +12,7 @@ return [
         'h1'      => 'Box truck dispatch services',
         'tagline' => 'Loads that fit a straight truck',
         'lead'    => 'Straight-truck freight is its own market: smaller loads, tighter docks and more stops. We find the loads that fit your box truck and handle the brokers, tracking and paperwork.',
-        'sheet'   => ['equipment' => '16–26 ft straight truck', 'freight' => 'Palletized LTL, final mile, expedited', 'confirm' => 'Dock or liftgate, pallets, weight'],
+        'sheet'   => ['equipment' => '16 to 26 ft straight truck', 'freight' => 'Palletized LTL, final mile, expedited', 'confirm' => 'Dock or liftgate, pallets, weight'],
         'handles_title' => 'Built around your box truck',
         'handles' => [
             ['Load search for straight trucks', 'Boards and brokers filtered for box-truck size, weight and dock needs.'],
@@ -36,7 +36,7 @@ return [
         'faq_title' => 'Box truck dispatch questions',
         'faq'     => [
             ['q' => 'Do you dispatch box trucks under my own authority?', 'a' => 'Yes. We book loads under your MC and USDOT. You keep your authority and decide which loads to take.'],
-            ['q' => 'Can I refuse a load you find?', 'a' => 'Always. We send the details first — rate, miles, stops and requirements — and book only what you approve.'],
+            ['q' => 'Can I refuse a load you find?', 'a' => 'Always. We send the details first (rate, miles, stops and requirements) and book only what you approve.'],
             ['q' => 'How do you send updates?', 'a' => 'On WhatsApp, where you already work: load offers, confirmations, check calls and paperwork reminders.'],
         ],
     ],
@@ -70,7 +70,7 @@ return [
         'faq_title' => 'Hotshot dispatch questions',
         'faq'     => [
             ['q' => 'Do you dispatch hotshots under my own authority?', 'a' => 'Yes. We book loads under your MC and USDOT. You keep your authority and decide which loads to take.'],
-            ['q' => 'Can I refuse a load you find?', 'a' => 'Always. We send the details first — rate, miles, stops and requirements — and book only what you approve.'],
+            ['q' => 'Can I refuse a load you find?', 'a' => 'Always. We send the details first (rate, miles, stops and requirements) and book only what you approve.'],
             ['q' => 'How do you send updates?', 'a' => 'On WhatsApp, where you already work: load offers, confirmations, check calls and paperwork reminders.'],
         ],
     ],
@@ -104,7 +104,7 @@ return [
         'faq_title' => 'Flatbed dispatch questions',
         'faq'     => [
             ['q' => 'Do you dispatch flatbeds under my own authority?', 'a' => 'Yes. We book loads under your MC and USDOT. You keep your authority and decide which loads to take.'],
-            ['q' => 'Can I refuse a load you find?', 'a' => 'Always. We send the details first — rate, miles, stops and requirements — and book only what you approve.'],
+            ['q' => 'Can I refuse a load you find?', 'a' => 'Always. We send the details first (rate, miles, stops and requirements) and book only what you approve.'],
             ['q' => 'How do you send updates?', 'a' => 'On WhatsApp, where you already work: load offers, confirmations, check calls and paperwork reminders.'],
         ],
     ],
@@ -138,7 +138,7 @@ return [
         'faq_title' => 'Power only dispatch questions',
         'faq'     => [
             ['q' => 'Do you dispatch power onlys under my own authority?', 'a' => 'Yes. We book loads under your MC and USDOT. You keep your authority and decide which loads to take.'],
-            ['q' => 'Can I refuse a load you find?', 'a' => 'Always. We send the details first — rate, miles, stops and requirements — and book only what you approve.'],
+            ['q' => 'Can I refuse a load you find?', 'a' => 'Always. We send the details first (rate, miles, stops and requirements) and book only what you approve.'],
             ['q' => 'How do you send updates?', 'a' => 'On WhatsApp, where you already work: load offers, confirmations, check calls and paperwork reminders.'],
         ],
     ],
@@ -172,7 +172,7 @@ return [
         'faq_title' => 'Reefer dispatch questions',
         'faq'     => [
             ['q' => 'Do you dispatch reefers under my own authority?', 'a' => 'Yes. We book loads under your MC and USDOT. You keep your authority and decide which loads to take.'],
-            ['q' => 'Can I refuse a load you find?', 'a' => 'Always. We send the details first — rate, miles, stops and requirements — and book only what you approve.'],
+            ['q' => 'Can I refuse a load you find?', 'a' => 'Always. We send the details first (rate, miles, stops and requirements) and book only what you approve.'],
             ['q' => 'How do you send updates?', 'a' => 'On WhatsApp, where you already work: load offers, confirmations, check calls and paperwork reminders.'],
         ],
     ],

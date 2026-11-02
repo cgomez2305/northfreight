@@ -8,7 +8,7 @@ require_once NS_ROOT . '/templates/partials/kit.php';
 $log = [
     ['06:12', 'Rate confirmation received & filed', ''],
     ['08:05', 'ETA sent to broker', ''],
-    ['09:40', 'Driver checked in at shipper — photo attached', ''],
+    ['09:40', 'Driver checked in at shipper, photo attached', ''],
     ['11:55', 'Delay logged with timestamps for detention claim', ' log__row--on'],
     ['—', 'POD collected at delivery', ' sb-tr-end'],
 ];
@@ -32,7 +32,7 @@ partial('hero', [
     'route' => $route,
     'cls'   => 'sb-tr-hero',
     'h1'    => 'Load tracking and check calls {hl}for your trucks{/hl}',
-    'lead'  => 'Every trip followed from pickup to POD. ETAs, arrivals and departures logged, incidents documented and brokers kept informed — without you on the phone.',
+    'lead'  => 'Every trip followed from pickup to POD. ETAs, arrivals and departures logged, incidents documented and brokers kept informed, so you are not on the phone.',
     'ctas'  => [['label' => 'Talk to a dispatcher', 'href' => wa($route['wa']), 'wa' => true, 'arrow' => true]],
     'aside' => $aside,
 ]);

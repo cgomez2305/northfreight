@@ -33,15 +33,15 @@ $related = [
 <?php $callout(); ?>
 
 <h2 class="t-prose-h2" id="detention">How detention works</h2>
-<p>Detention is pay for the time your truck waits beyond the free time — the hours included in the rate before detention starts. Free time and the hourly rate are set in the rate confirmation, so read them before you book.</p>
+<p>Detention is pay for the time your truck waits beyond the free time, which is the hours included in the rate before detention starts. Free time and the hourly rate are set in the rate confirmation, so read them before you book.</p>
 
 <h2 class="t-prose-h2" id="proof">The evidence that gets detention paid</h2>
 <ul>
-  <li>Arrival time, check-in time and departure time — written and signed on the BOL</li>
+  <li>Arrival time, check-in time and departure time, all written and signed on the BOL</li>
   <li>A message to the broker when free time is about to end</li>
   <li>Photos of the BOL and, if needed, of the dock or the line</li>
 </ul>
-<p>Our desk logs these times on every load with timestamps and photos — that record is what turns waiting hours into a claim that gets paid. <a href="<?= e(url('/load-tracking/')) ?>">See how we track loads</a>.</p>
+<p>Our desk logs these times on every load with timestamps and photos. That record is what turns waiting hours into a claim that gets paid. <a href="<?= e(url('/load-tracking/')) ?>">See how we track loads</a>.</p>
 
 <h2 class="t-prose-h2" id="settlement">Putting it on the settlement</h2>
 <p>Send lumper receipts and detention records with the POD, not weeks later. Late paperwork is the easiest claim for a broker to deny. A <a href="<?= e(url('/trucking-back-office/')) ?>">back office</a> that files everything per load keeps these claims from slipping.</p>

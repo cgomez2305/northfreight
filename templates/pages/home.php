@@ -26,7 +26,7 @@ $services = [
      'text' => 'We search, negotiate and book freight on Amazon Relay and dry van lanes, plan routes around hours of service and coordinate every pickup with your drivers.',
      'href' => url('/dispatch-for-owner-operators/'), 'cta' => 'Dispatch for owner-operators'],
     ['icon' => 'pin', 'num' => '02', 'title' => 'Load tracking & check calls',
-     'text' => 'Every trip followed from pickup to POD: ETAs, arrivals and departures logged, incidents documented and brokers kept informed — without you on the phone.',
+     'text' => 'Every trip followed from pickup to POD: ETAs, arrivals and departures logged, incidents documented and brokers kept informed, so you are not on the phone.',
      'href' => url('/load-tracking/'), 'cta' => 'Load tracking'],
     ['icon_html' => $iconDocCheck, 'num' => '03', 'title' => 'Trucking back office',
      'text' => 'Paperwork organized, settlements prepared and disputes followed with evidence. We also help onboard new drivers so they are ready to roll on day one.',
@@ -41,7 +41,7 @@ $relay = [
 ];
 
 $steps = [
-    ['01', 'We learn your operation', 'Trucks, equipment, lanes, drivers and the accounts you already run — including Amazon Relay.'],
+    ['01', 'We learn your operation', 'Trucks, equipment, lanes, drivers and the accounts you already run, including Amazon Relay.'],
     ['02', 'We define scope & contacts', 'Who approves loads, how we report, and which tasks the desk owns from day one.'],
     ['03', 'We run the day-to-day', 'Booking, tracking and documenting every load, with updates where you already work: WhatsApp.'],
     ['04', 'We review & improve', 'Regular reviews of lanes, rates and incidents to keep your trucks earning.'],
@@ -69,7 +69,7 @@ $docs = ['Rate confirmation', 'Check-call log', 'Arrival timestamps', 'BOL & POD
       <p class="t-display home-hero__title"><span class="hw hw--1" data-w="Booked.">Booked.</span><br><span class="hw hw--2" data-w="Tracked.">Tracked.</span><br><span class="hw hw--3 hl" data-w="Documented.">Documented.</span></p>
       <?php endif; ?>
       <?= ns_swoosh(220, 14) ?>
-      <p class="hero__lead t-lead">NorthStar is your remote dispatch and back-office desk. We book Amazon Relay and dry van freight, follow every load to delivery, and keep the paperwork that protects your pay — so incidents are handled with evidence and operations run as a team.</p>
+      <p class="hero__lead t-lead">NorthStar is your remote dispatch and back-office desk. We book Amazon Relay and dry van freight, follow every load to delivery, and keep the paperwork that protects your pay. That is how incidents get handled with evidence and operations run as a team.</p>
       <div class="hero__ctas">
         <a class="btn btn--primary btn--lg" href="<?= e($waHref) ?>" rel="noopener">Talk to a dispatcher <?= ns_icon('arrow', 18) ?></a>
         <a class="btn btn--ghost btn--lg" href="<?= e(url('/how-it-works/')) ?>">See how we onboard</a>
@@ -114,7 +114,7 @@ $docs = ['Rate confirmation', 'Check-call log', 'Arrival timestamps', 'BOL & POD
           <p class="sr-only">Example lane: rate confirmation filed, truck tracked with check calls, POD signed and filed on arrival.</p>
           <ul class="log">
             <li class="log__row"><span class="log__time">06:12</span><span class="log__text">Rate confirmation received &amp; filed</span></li>
-            <li class="log__row"><span class="log__time">09:40</span><span class="log__text">Driver checked in at shipper — photo attached</span></li>
+            <li class="log__row"><span class="log__time">09:40</span><span class="log__text">Driver checked in at shipper, photo attached</span></li>
             <li class="log__row log__row--on"><span class="log__time">11:55</span><span class="log__text">Delay logged with timestamps for detention claim</span></li>
           </ul>
         </figcaption>
@@ -155,8 +155,8 @@ $docs = ['Rate confirmation', 'Check-call log', 'Arrival timestamps', 'BOL & POD
 <!-- 01 SERVICES -->
 <section class="section home-services" id="services" aria-labelledby="services-title">
   <div class="container stack">
-    <?php partial('section-head', ['eyebrow' => '01 — What we manage', 'title' => 'Three fronts.{br}One dispatch desk.', 'id' => 'services-title', 'swoosh' => true, 'split' => true,
-        'lead' => 'Most truck dispatch companies stop at the booking. We stay on the load until the money is in — the same team that books it tracks it and closes it out.']); ?>
+    <?php partial('section-head', ['eyebrow' => '01 · What we manage', 'title' => 'Three fronts.{br}One dispatch desk.', 'id' => 'services-title', 'swoosh' => true, 'split' => true,
+        'lead' => 'Most truck dispatch companies stop at the booking. We stay on the load until the money is in. The same team that books it tracks it and closes it out.']); ?>
     <div class="g3 gap-16">
       <?php foreach ($services as $s): partial('card', $s + ['size' => 'lg', 'hover' => true, 'bar' => true, 'min_title' => true]); endforeach; ?>
     </div>
@@ -172,7 +172,7 @@ $docs = ['Rate confirmation', 'Check-call log', 'Arrival timestamps', 'BOL & POD
   <?= ns_star(440, 'home-relay__star') ?>
   <div class="container home-relay__in">
     <div class="home-relay__main">
-      <span class="t-eyebrow">02 — Specialty</span>
+      <span class="t-eyebrow">02 · Specialty</span>
       <h2 class="t-h2" id="relay-title">Amazon Relay dispatch, <span class="hl">handled end to end.</span></h2>
       <p class="t-body home-relay__lead">Relay rewards carriers who move fast and keep clean records. Our desk watches the load board for you, books the blocks that fit your trucks and follows performance and disputes inside your account.</p>
       <a class="btn btn--primary home-relay__btn" href="<?= e(url('/amazon-relay-dispatch/')) ?>"><span>Amazon Relay dispatch <span class="arrow" aria-hidden="true">→</span></span></a>
@@ -186,7 +186,7 @@ $docs = ['Rate confirmation', 'Check-call log', 'Arrival timestamps', 'BOL & POD
 <!-- 03 ONBOARDING -->
 <section class="section home-onboarding" aria-labelledby="onboarding-title">
   <div class="container stack">
-    <?php partial('section-head', ['eyebrow' => '03 — Onboarding', 'title' => 'How we plug into your operation.', 'id' => 'onboarding-title', 'swoosh' => true]); ?>
+    <?php partial('section-head', ['eyebrow' => '03 · Onboarding', 'title' => 'How we plug into your operation.', 'id' => 'onboarding-title', 'swoosh' => true]); ?>
     <ol class="g4 home-steps" data-motion="steps">
       <?php foreach ($steps as $i => [$n, $title, $text]): ?>
       <li class="home-step">
@@ -207,7 +207,7 @@ $docs = ['Rate confirmation', 'Check-call log', 'Arrival timestamps', 'BOL & POD
 <section class="section section--surface home-team" aria-labelledby="team-title">
   <div class="container split">
     <div class="home-team__text">
-      <span class="t-eyebrow">04 — The desk behind the load</span>
+      <span class="t-eyebrow">04 · The desk behind the load</span>
       <h2 class="t-h2 c-navy" id="team-title">Built by dispatchers.<br><span class="hl">Run as a team.</span></h2>
       <p class="t-body c-slate">Behind every trip there are people coordinating information, decisions and follow-up. Meet the team, hear how we work, and jump straight to the topic you care about.</p>
       <?php partial('video', ['part' => 'chapters', 'id' => 'desk', 'theme' => 'light', 'chapters' => $chapters, 'chapters_label' => 'Jump to a chapter']); ?>
@@ -215,7 +215,7 @@ $docs = ['Rate confirmation', 'Check-call log', 'Arrival timestamps', 'BOL & POD
     <div class="home-team__video">
       <?php partial('video', ['part' => 'player', 'id' => 'desk', 'theme' => 'light',
           'image' => ['base' => 'truck-oncoming-dusk-mirror', 'alt' => 'Semi truck approaching at dusk, seen from a car’s side mirror'],
-          'title' => 'A load doesn’t dispatch itself. {hl}There’s a team behind it.{/hl}', 'meta' => 'Video · 3–4 min']); ?>
+          'title' => 'A load doesn’t dispatch itself. {hl}There’s a team behind it.{/hl}', 'meta' => 'Video · 3 to 4 min']); ?>
     </div>
   </div>
 </section>
@@ -223,7 +223,7 @@ $docs = ['Rate confirmation', 'Check-call log', 'Arrival timestamps', 'BOL & POD
 <!-- 05 EVIDENCE -->
 <section class="section" aria-labelledby="evidence-title">
   <div class="container split">
-    <?php partial('section-head', ['eyebrow' => '05 — Proof, not promises', 'title' => 'Incidents are handled with evidence.', 'id' => 'evidence-title', 'cls' => 'home-evidence__head',
+    <?php partial('section-head', ['eyebrow' => '05 · Proof, not promises', 'title' => 'Incidents are handled with evidence.', 'id' => 'evidence-title', 'cls' => 'home-evidence__head',
         'lead' => 'When a broker questions detention, a lumper fee or a late arrival, the answer is already on file. Here is what our desk keeps for every load.']); ?>
     <ul class="g3h gap-10 home-docs">
       <?php foreach ($docs as $i => $d): ?>
@@ -234,4 +234,4 @@ $docs = ['Rate confirmation', 'Check-call log', 'Arrival timestamps', 'BOL & POD
 </section>
 
 <!-- 06 FAQ -->
-<?php partial('faq', ['items' => route_faq_items($route), 'eyebrow' => '06 — FAQ', 'title' => 'Questions carriers ask us.', 'surface' => 'light', 'pre_cta' => true]); ?>
+<?php partial('faq', ['items' => route_faq_items($route), 'eyebrow' => '06 · FAQ', 'title' => 'Questions carriers ask us.', 'surface' => 'light', 'pre_cta' => true]); ?>

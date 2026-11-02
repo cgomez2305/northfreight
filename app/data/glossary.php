@@ -9,7 +9,7 @@ return [
     [
         'id'   => 'accessorial',
         'term' => 'Accessorial',
-        'def'  => 'Any charge on top of the line haul — detention, lumper, layover, TONU or extra stops. Agree on them in the rate confirmation.',
+        'def'  => 'Any charge on top of the line haul, such as detention, lumper, layover, TONU or extra stops. Agree on them in the rate confirmation.',
     ],
     [
         'id'   => 'bill',
@@ -30,7 +30,7 @@ return [
     [
         'id'   => 'check',
         'term' => 'Check call',
-        'def'  => 'A status update to the broker during the trip — location, ETA and any problem.',
+        'def'  => 'A status update to the broker during the trip with your location, ETA and any problem.',
     ],
     [
         'id'   => 'deadhead',
@@ -46,7 +46,7 @@ return [
     [
         'id'   => 'dry',
         'term' => 'Dry van',
-        'def'  => 'An enclosed, non-refrigerated trailer — usually 53\' — for general freight.',
+        'def'  => 'An enclosed, non-refrigerated trailer, usually 53\', for general freight.',
         'link' => ['label' => 'Dry van dispatch', 'path' => '/dry-van-dispatch/'],
     ],
     [
@@ -62,7 +62,7 @@ return [
     [
         'id'   => 'fmcsa',
         'term' => 'FMCSA',
-        'def'  => 'Federal Motor Carrier Safety Administration — the agency that issues USDOT numbers and operating authority.',
+        'def'  => 'Federal Motor Carrier Safety Administration, the agency that issues USDOT numbers and operating authority.',
     ],
     [
         'id'   => 'hotshot',
@@ -95,7 +95,7 @@ return [
     [
         'id'   => 'pod',
         'term' => 'POD',
-        'def'  => 'Proof of delivery — the BOL signed by the receiver. You need it to invoice.',
+        'def'  => 'Proof of delivery. It is the BOL signed by the receiver, and you need it to invoice.',
     ],
     [
         'id'   => 'power',
@@ -123,12 +123,12 @@ return [
     [
         'id'   => 'scac',
         'term' => 'SCAC',
-        'def'  => 'Standard Carrier Alpha Code — a two-to-four-letter code that identifies your company. Required by Amazon Relay and many shippers.',
+        'def'  => 'Standard Carrier Alpha Code, a two-to-four-letter code that identifies your company. Required by Amazon Relay and many shippers.',
     ],
     [
         'id'   => 'tonu',
         'term' => 'TONU',
-        'def'  => 'Truck ordered, not used — a fee paid when a load is cancelled after the truck was dispatched.',
+        'def'  => 'Truck ordered, not used. It is a fee paid when a load is cancelled after the truck was dispatched.',
     ],
     [
         'id'   => 'usdot',

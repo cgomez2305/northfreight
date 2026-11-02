@@ -16,11 +16,11 @@ return [
     'home' => [
         [
             'q' => 'How much does a truck dispatch service cost?',
-            'a' => 'Our dispatch fee is {{ph:YOUR FEE — % of gross or flat weekly}}. Scope is agreed before we start, so you always know what the desk handles and what it costs.',
+            'a' => 'Our dispatch fee is {{ph:YOUR FEE: % of gross or flat weekly}}. Scope is agreed before we start, so you always know what the desk handles and what it costs.',
         ],
         [
             'q' => 'Do you dispatch Amazon Relay loads?',
-            'a' => 'Yes. Operational and administrative management of Amazon Relay accounts is a core part of what we do — booking, trip records, performance follow-up and disputes.',
+            'a' => 'Yes. Operational and administrative management of Amazon Relay accounts is a core part of what we do: booking, trip records, performance follow-up and disputes.',
         ],
         [
             'q' => 'Do you only book loads?',
@@ -32,7 +32,7 @@ return [
         ],
         [
             'q' => 'Do you work with owner-operators?',
-            'a' => 'Yes — owner-operators and small fleets with {{ph:confirm equipment types}}. Tell us about your trucks and we will tell you honestly if we are a fit.',
+            'a' => 'Yes. We work with owner-operators and small fleets that run {{ph:confirm equipment types}}. Tell us about your trucks and we will tell you honestly if we are a fit.',
         ],
         [
             'q' => 'Do I need a contract?',
@@ -44,7 +44,7 @@ return [
     'owner' => [
         [
             'q' => 'How much does a dispatcher charge an owner-operator?',
-            'a' => '{{ph:YOUR FEE — % of gross or flat weekly}}. Scope is agreed before we start.',
+            'a' => '{{ph:YOUR FEE: % of gross or flat weekly}}. Scope is agreed before we start.',
         ],
         [
             'q' => 'Do I have to take every load you find?',
@@ -68,7 +68,7 @@ return [
         ],
         [
             'q' => 'Do you also dispatch non-Relay loads?',
-            'a' => 'Yes — dry van freight through brokers.',
+            'a' => 'Yes. We book dry van freight through brokers.',
             'link' => ['label' => 'Dry van dispatch', 'path' => '/dry-van-dispatch/'],
         ],
     ],
@@ -93,7 +93,7 @@ return [
     'tool-rpm' => [
         [
             'q' => 'What is the difference between loaded and all-in rate per mile?',
-            'a' => 'Loaded RPM divides the pay by the miles with freight on the trailer — it is the number brokers quote. All-in RPM also counts the deadhead miles to reach the shipper, so it shows what the truck really earns for every mile it drives.',
+            'a' => 'Loaded RPM divides the pay by the miles with freight on the trailer, and it is the number brokers quote. All-in RPM also counts the deadhead miles to reach the shipper, so it shows what the truck really earns for every mile it drives.',
         ],
         [
             'q' => 'What is a good rate per mile?',
@@ -105,7 +105,7 @@ return [
         ],
         [
             'q' => 'Does a dispatcher fee change the math?',
-            'a' => 'Yes — if you pay a percentage of the gross, subtract it from the load pay before comparing loads. Ask us how NorthStar charges.',
+            'a' => 'Yes. If you pay a percentage of the gross, subtract it from the load pay before comparing loads. Ask us how NorthStar charges.',
         ],
     ],
     'tool-ifta' => [
@@ -119,7 +119,7 @@ return [
         ],
         [
             'q' => 'When are IFTA returns due?',
-            'a' => 'Quarterly — the last day of the month after each quarter ends: April 30, July 31, October 31 and January 31.',
+            'a' => 'Quarterly, on the last day of the month after each quarter ends: April 30, July 31, October 31 and January 31.',
         ],
         [
             'q' => 'Can the desk keep my IFTA records?',

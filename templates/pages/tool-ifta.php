@@ -15,7 +15,7 @@ $exampleRows = [
 
 $steps = [
     'Add one row per state you drove in this quarter, with the miles from your ELD or trip sheets.',
-    'Enter the gallons you bought in each state from your fuel receipts — states with no purchases stay at 0.',
+    'Enter the gallons you bought in each state from your fuel receipts. States with no purchases stay at 0.',
     'Optional: add each state\'s current rate to see tax due. Positive net gallons are owed; negative are credits.',
 ];
 
@@ -83,7 +83,7 @@ partial('hero', [
         </table>
       </div>
       <template data-row-template><?= $iftaRow(['', '', '', ''], '{n}') ?></template>
-      <p class="tools-sheet__note">Rates change every quarter — copy each state&#39;s current rate from the IFTA tax matrix. Positive net gallons = tax you owe that state; negative = a credit.</p>
+      <p class="tools-sheet__note">Rates change every quarter, so copy each state&#39;s current rate from the IFTA tax matrix. Positive net gallons = tax you owe that state; negative = a credit.</p>
       <p class="tools-sheet__note">Estimate only. Check the figures against your own records and your base jurisdiction&#39;s rules before you file.</p>
       <p class="sr-only" role="status" data-status></p>
     </div>

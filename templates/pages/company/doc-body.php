@@ -25,7 +25,7 @@ $csrf = function_exists('csrf_token') ? (string) csrf_token() : '';
         <?php partial('section-head', ['eyebrow' => 'What\'s inside', 'title' => 'Every field, already in place', 'id' => 'doc-inside']); ?>
         <ul class="co-list">
           <?php foreach ($doc['inside'] as $it): ?>
-          <li><?= ns_star(16) ?><span><strong><?= e($it[0]) ?></strong> — <?= e($it[1]) ?></span></li>
+          <li><?= ns_star(16) ?><span><strong><?= e($it[0]) ?></strong>: <?= e($it[1]) ?></span></li>
           <?php endforeach; ?>
         </ul>
       </div>

@@ -2,10 +2,10 @@
 /** Cuerpo de /blog/amazon-relay-load-board/ (PostRelayLoadBoard.html). Ver post.php para el contrato. */
 $hl = 'load board';
 $takeaways = [
-    'Relay posts loads with the rate already set — no negotiation on most loads.',
+    'Relay posts loads with the rate already set, so there is no negotiation on most loads.',
     'You will see one-way loads, round trips and longer multi-stop work.',
     'Booking is fast, so good loads go quickly.',
-    'Every booked load counts on your scorecard — cancellations hurt.',
+    'Every booked load counts on your scorecard, and cancellations hurt.',
 ];
 $toc = [
     ['types', 'What you will find on the board'],
@@ -22,9 +22,9 @@ $related = [
 ?>
 <h2 class="t-prose-h2" id="types">What you will find on the board</h2>
 <ul>
-  <li><strong>One-way loads</strong> — a single trip from an Amazon facility to another location</li>
-  <li><strong>Round trips</strong> — out and back, often returning the truck close to where it started</li>
-  <li><strong>Multi-stop and longer work</strong> — several stops or a sequence of trips planned together</li>
+  <li><strong>One-way loads.</strong> A single trip from an Amazon facility to another location</li>
+  <li><strong>Round trips.</strong> Out and back, often returning the truck close to where it started</li>
+  <li><strong>Multi-stop and longer work.</strong> Several stops or a sequence of trips planned together</li>
 </ul>
 <p>Each listing shows the facilities, the times, the equipment and the payout, so you can decide in seconds.</p>
 

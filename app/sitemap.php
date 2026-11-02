@@ -46,7 +46,7 @@ function robots_txt(): string
     $trainingBots = ['GPTBot', 'ClaudeBot', 'Google-Extended', 'Applebot-Extended', 'CCBot'];
     $blockTraining = defined('AI_TRAINING_BOTS') && strtolower((string) AI_TRAINING_BOTS) === 'block';
 
-    return '# ' . BRAND . " — robots.txt\n"
+    return '# ' . BRAND . " robots.txt\n"
          . '# Machine-readable summary of this site for AI assistants: ' . abs_url('/llms.txt') . "\n\n"
          . $group(['*'], "Allow: /\n" . $internal) . "\n"
          . "# AI search and answer engines: allowed (they cite and link to the site)\n"

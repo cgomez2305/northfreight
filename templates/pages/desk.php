@@ -33,7 +33,7 @@ $values = [
           'id'    => 'desk',
           'image' => ['base' => 'dispatch-team-headsets-office', 'alt' => 'Dispatchers wearing headsets at their workstations'],
           'title' => 'Meet the desk {hl}· 3 chapters{/hl}',
-          'meta'  => 'Video · 3–4 min',
+          'meta'  => 'Video · 3 to 4 min',
       ]); ?>
     </div>
   </div>

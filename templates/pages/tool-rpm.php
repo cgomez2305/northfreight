@@ -16,7 +16,7 @@ $fields = [
 
 $steps = [
     'Enter the total the broker pays for the load, including fuel surcharge if it is listed separately.',
-    'Add loaded and deadhead miles. Deadhead is the empty run to the shipper — it costs fuel and time too.',
+    'Add loaded and deadhead miles. Deadhead is the empty run to the shipper, and it costs fuel and time too.',
     'Add your fuel price and MPG. The result updates as you type; compare the net per mile with your cost per mile.',
 ];
 
@@ -71,7 +71,7 @@ partial('hero', [
     'route'   => $route,
     'h1'      => 'Rate per mile {hl}calculator{/hl}',
     'eyebrow' => 'Free tool',
-    'lead'    => 'Put in the load pay, the miles and your fuel. See the real rate per mile — counting deadhead — and what is left before you book.',
+    'lead'    => 'Put in the load pay, the miles and your fuel. See the real rate per mile, counting deadhead, and what is left before you book.',
     'aside'   => $aside,
     'cls'     => 'tools-hero tools-hero--rpm',
 ]);

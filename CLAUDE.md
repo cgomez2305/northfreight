@@ -408,6 +408,7 @@ Referencias y qué tomar de cada una:
 4. El contacto principal es WhatsApp **sin formulario previo**. El formulario es secundario, en `/contact/`.
 5. Voz: directa, de operador a operador, en segunda persona, frases cortas. Términos del oficio (rate con, POD, detention, deadhead, scorecard) usados con naturalidad.
 6. Las herramientas y plantillas llevan aviso: los resultados son estimaciones, y el agreement no es asesoría legal.
+7. **Sin guiones largos (— ni –) en el texto visible** (decisión de Carlos: el copy debe sonar natural). Se usan punto, coma, dos puntos, paréntesis o "to" en rangos ("3 to 4 min"). Los eyebrows numerados llevan "·" ("01 · What we manage"). Única excepción: el "—" de las calculadoras y del desk log como valor vacío. Comprobar con `grep -rnE '—|–' templates app --include=*.php` (ignorar comentarios).
 
 ### 8.3 Contacto
 
@@ -422,7 +423,7 @@ Medidos con la auditoría sobre las 22 rutas live (staging). Se pintan con `ph()
 
 | Placeholder | Dónde |
 |---|---|
-| `MC# — · USDOT —` | footer de las 22 páginas |
+| `MC# pending · USDOT pending` | footer de las 22 páginas |
 | `0:00` (×3) | home y Our desk (tiempos de capítulos del video) |
 | `Team photo`, `Name`, `Role`, `One line on experience` (×4 cada uno) | Our desk |
 | `YOUR FEE — % of gross or flat weekly` | home, Owner (FAQ de coste) |

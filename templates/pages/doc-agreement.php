@@ -8,21 +8,21 @@ require_once NS_ROOT . '/templates/partials/kit.php';
 
 $doc = [
     'inside' => [
-        ['Scope of services', 'load search, rate negotiation, broker setup, tracking and paperwork — listed one by one'],
+        ['Scope of services', 'load search, rate negotiation, broker setup, tracking and paperwork, listed one by one'],
         ['Your rights as the carrier', 'you keep your authority and can accept or refuse any load'],
         ['Dispatch fee', 'percentage or flat fee, and exactly what it is calculated on'],
         ['Payment terms', 'when and how the fee is invoiced and paid'],
         ['Limited authorization', 'what the dispatcher can sign or send on your behalf, and what it cannot'],
         ['Term & termination', 'notice period and what happens to loads in transit'],
     ],
-    'formats' => [['docx', 'Word — editable (.docx)'], ['pdf', 'PDF — read only']],
+    'formats' => [['docx', 'Word (editable .docx)'], ['pdf', 'PDF (read only)']],
     'submit'  => 'Download the agreement',
     'notice'  => 'this template is not legal advice. Have it reviewed for your state and your business before you sign it.',
     'files'   => [['Word', 'dispatcher-carrier-agreement.docx']],
     'steps_title' => 'Review it in four steps',
     'steps' => [
         ['Read the scope', 'Every service you expect should be written down. If it is not listed, assume it is not included.'],
-        ['Check the fee base', 'A percentage of what — line haul only, or the full gross with fuel surcharge?'],
+        ['Check the fee base', 'A percentage of what? Line haul only, or the full gross with fuel surcharge?'],
         ['Confirm your control', 'No forced dispatch: the agreement should say you can refuse any load.'],
         ['Look at the exit', 'Short notice periods and no penalties keep the relationship honest.'],
     ],
