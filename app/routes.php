@@ -124,7 +124,7 @@ return [
         'wa'         => 'default',
         'breadcrumb' => 'How it works',
         'faq'        => null,
-        'motion'     => false,
+        'motion'     => true,
     ],
     '/our-desk/' => [
         'template'   => 'desk',
@@ -138,7 +138,7 @@ return [
         'wa'         => 'default',
         'breadcrumb' => 'Our desk',
         'faq'        => null,
-        'motion'     => false,
+        'motion'     => true,
     ],
     '/contact/' => [
         'template'   => 'contact',
@@ -170,7 +170,7 @@ return [
         'wa'         => 'default',
         'breadcrumb' => 'Privacy policy',
         'faq'        => null,
-        'motion'     => false,
+        'motion'     => true,
         'cta'        => false,   // la maqueta no tiene bloque CTA final
     ],
     '/terms/' => [
@@ -186,7 +186,7 @@ return [
         'wa'         => 'default',
         'breadcrumb' => 'Terms',
         'faq'        => null,
-        'motion'     => false,
+        'motion'     => true,
         'cta'        => false,   // la maqueta no tiene bloque CTA final
     ],
 
@@ -206,7 +206,7 @@ return [
         'wa'         => 'default',
         'breadcrumb' => 'Resources',
         'faq'        => null,
-        'motion'     => false,
+        'motion'     => true,
     ],
     '/resources/bol-template/' => [
         'template'   => 'doc-bol',
@@ -222,7 +222,7 @@ return [
         'breadcrumb' => 'Bill of lading template',
         'parent'     => '/resources/',
         'faq'        => 'doc-bol',
-        'motion'     => false,
+        'motion'     => true,
     ],
     '/resources/ifta-calculator/' => [
         'template'   => 'tool-ifta',
@@ -237,7 +237,7 @@ return [
         'breadcrumb' => 'IFTA calculator',
         'parent'     => '/resources/',
         'faq'        => 'tool-ifta',
-        'motion'     => false,
+        'motion'     => true,
     ],
     '/resources/rate-per-mile-calculator/' => [
         'template'   => 'tool-rpm',
@@ -252,7 +252,7 @@ return [
         'breadcrumb' => 'Rate per mile calculator',
         'parent'     => '/resources/',
         'faq'        => 'tool-rpm',
-        'motion'     => false,
+        'motion'     => true,
     ],
     '/resources/dispatcher-carrier-agreement/' => [
         'template'   => 'doc-agreement',
@@ -268,7 +268,7 @@ return [
         'breadcrumb' => 'Dispatcher-carrier agreement',
         'parent'     => '/resources/',
         'faq'        => 'doc-agreement',
-        'motion'     => false,
+        'motion'     => true,
     ],
     '/resources/glossary/' => [
         'template'   => 'glossary',
@@ -283,7 +283,7 @@ return [
         'breadcrumb' => 'Trucking glossary',
         'parent'     => '/resources/',
         'faq'        => null,
-        'motion'     => false,
+        'motion'     => true,
     ],
     '/blog/' => [
         'template'   => 'blog',
@@ -298,7 +298,7 @@ return [
         'breadcrumb' => 'Blog',
         'parent'     => '/resources/',
         'faq'        => null,
-        'motion'     => false,
+        'motion'     => true,
     ],
     '/blog/how-much-does-truck-dispatch-cost/' => [
         'template'   => 'post',
@@ -314,7 +314,7 @@ return [
         'breadcrumb' => 'How much does truck dispatch service cost?',
         'parent'     => '/blog/',
         'faq'        => 'post-how-much-does-truck-dispatch-cost',
-        'motion'     => false,
+        'motion'     => true,
     ],
     '/blog/amazon-relay-requirements/' => [
         'template'   => 'post',
@@ -330,7 +330,7 @@ return [
         'breadcrumb' => 'Amazon Relay requirements',
         'parent'     => '/blog/',
         'faq'        => 'post-amazon-relay-requirements',
-        'motion'     => false,
+        'motion'     => true,
     ],
     '/blog/amazon-relay-load-board/' => [
         'template'   => 'post',
@@ -346,7 +346,7 @@ return [
         'breadcrumb' => 'Amazon Relay load board',
         'parent'     => '/blog/',
         'faq'        => 'post-amazon-relay-load-board',
-        'motion'     => false,
+        'motion'     => true,
     ],
     '/blog/lumper-fees-detention-pay/' => [
         'template'   => 'post',
@@ -362,7 +362,7 @@ return [
         'breadcrumb' => 'Lumper fees and detention pay',
         'parent'     => '/blog/',
         'faq'        => 'post-lumper-fees-detention-pay',
-        'motion'     => false,
+        'motion'     => true,
     ],
 
     // ------------------------------------------------------------------
@@ -465,7 +465,7 @@ return [
         'wa'         => 'default',
         'breadcrumb' => 'Page not found',
         'faq'        => null,
-        'motion'     => false,
+        'motion'     => true,
     ],
 ];
 

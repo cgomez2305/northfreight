@@ -12,7 +12,7 @@ $dark = ($theme ?? 'light') === 'dark';
 $split = !empty($split) && !empty($lead);
 $cls = 'section-head' . ($dark ? ' section-head--dark' : '') . ($split ? ' section-head--split' : '') . (!empty($cls) ? ' ' . $cls : '');
 ?>
-<div class="<?= e($cls) ?>">
+<div class="<?= e($cls) ?>" data-motion="head">
   <?php if ($split): ?><div class="section-head__main"><?php endif; ?>
   <?php if (!empty($eyebrow)): ?><span class="t-eyebrow"><?= ns_rich($eyebrow) ?></span><?php endif; ?>
   <<?= $tag ?> class="<?= $size ?>"<?= !empty($id) ? ' id="' . e($id) . '"' : '' ?>><?= ns_rich($title) ?></<?= $tag ?>>

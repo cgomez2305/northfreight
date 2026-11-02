@@ -55,7 +55,7 @@ $chapters = [
 $docs = ['Rate confirmation', 'Check-call log', 'Arrival timestamps', 'BOL & POD', 'Incident photos', 'Settlement summary'];
 ?>
 <!-- HERO -->
-<section class="hero hero--home on-dark" id="top">
+<section class="hero hero--home on-dark" id="top" data-motion="hero">
   <svg class="hero__deco" aria-hidden="true" focusable="false" viewBox="0 0 1440 800" preserveAspectRatio="none">
     <defs><pattern id="hero-grid" width="48" height="48" patternUnits="userSpaceOnUse"><path class="hero__gridline" d="M48 0H0V48"/></pattern></defs>
     <rect width="1440" height="800" fill="url(#hero-grid)"/>
@@ -93,7 +93,7 @@ $docs = ['Rate confirmation', 'Check-call log', 'Arrival timestamps', 'BOL & POD
           <span class="eyebrow data-card__label home-log__label">Desk log · Example</span>
           <span class="data-card__status"><span class="data-card__dot" aria-hidden="true"></span>IN TRANSIT · LOAD #<?= ph('ID') ?></span>
         </div>
-        <ul class="log">
+        <ul class="log" data-motion="log">
           <li class="log__row"><span class="log__time">06:12</span><span class="log__text">Rate confirmation received &amp; filed</span></li>
           <li class="log__row"><span class="log__time">09:40</span><span class="log__text">Driver checked in at shipper — photo attached</span></li>
           <li class="log__row log__row--on"><span class="log__time">11:55</span><span class="log__text">Delay logged with timestamps for detention claim</span></li>
@@ -104,7 +104,7 @@ $docs = ['Rate confirmation', 'Check-call log', 'Arrival timestamps', 'BOL & POD
 </section>
 
 <!-- TICKER -->
-<div class="ticker home-ticker">
+<div class="ticker home-ticker" data-motion="ticker">
   <div class="ticker__track home-ticker__track">
     <ul class="home-ticker__set">
       <?php foreach ($ticker as $t): ?><li><span><?= e($t) ?></span><?= ns_star(13) ?></li><?php endforeach; ?>
@@ -131,7 +131,7 @@ $docs = ['Rate confirmation', 'Check-call log', 'Arrival timestamps', 'BOL & POD
 </section>
 
 <!-- 02 AMAZON RELAY -->
-<section class="home-relay on-dark" aria-labelledby="relay-title">
+<section class="home-relay on-dark" data-motion="band" aria-labelledby="relay-title">
   <?= ns_star(440, 'home-relay__star') ?>
   <div class="container home-relay__in">
     <div class="home-relay__main">
@@ -150,7 +150,7 @@ $docs = ['Rate confirmation', 'Check-call log', 'Arrival timestamps', 'BOL & POD
 <section class="section home-onboarding" aria-labelledby="onboarding-title">
   <div class="container stack">
     <?php partial('section-head', ['eyebrow' => '03 — Onboarding', 'title' => 'How we plug into your operation.', 'id' => 'onboarding-title', 'swoosh' => true]); ?>
-    <ol class="g4 home-steps">
+    <ol class="g4 home-steps" data-motion="steps">
       <?php foreach ($steps as $i => [$n, $title, $text]): ?>
       <li class="home-step">
         <?php if ($i < 3): ?>

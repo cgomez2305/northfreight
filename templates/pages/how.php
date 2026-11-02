@@ -23,7 +23,7 @@ partial('hero', [
 
 <section class="section">
   <div class="container sb-hw-wrap">
-    <ol class="sb-hw-steps">
+    <ol class="sb-hw-steps" data-motion="steps">
       <?php foreach ($steps as $i => [$title, $text]): $last = $i === count($steps) - 1; ?>
       <li class="sb-hw-step">
         <?php if ($last): ?><span class="sb-hw-step__num sb-hw-step__num--end" aria-hidden="true"><?= ns_star(30, 'twinkle') ?></span>

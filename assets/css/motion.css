@@ -1,0 +1,45 @@
+/* NorthStar Freight — motion.css: solo lo que necesita assets/js/motion.js. Todo oculta/estiliza únicamente bajo html.js-motion
+   (la clase la pone motion.js tras comprobar GSAP). Sin esa clase el sitio se ve completo. Colores solo por tokens. */
+
+/* Líneas de titular (split.js): máscara por línea. Relleno y margen negativo = sin cambio de maquetación ni recortes de trazos. */
+html.js-motion .ln { display: block; overflow: hidden; padding: .12em .06em; margin: -.12em -.06em; }
+html.js-motion .ln__i { display: block; white-space: nowrap; }
+
+/* GSAP sustituye las animaciones CSS equivalentes (misma velocidad base en el ticker) */
+html.js-motion .hero .anim-rise { animation: none; }
+html.js-motion .ticker__track { animation: none; }
+
+/* Estrella del hero: giro por scroll y entrada a través de propiedades independientes (componen con el twinkle CSS) */
+html.js-motion .hero__star,
+html.js-motion .hero__bigstar,
+html.js-motion .star-hero { scale: var(--sc, 1); rotate: var(--sr, 0deg); }
+
+/* c) Pasos: el trazo discontinuo se dibuja con --p (0-1) y el número se enciende al cruzarlo */
+html.js-motion .sb-hw-steps.has-line { border-left-color: transparent; position: relative; isolation: isolate; }
+html.js-motion .sb-hw-steps.has-line::before {
+  content: ""; position: absolute; z-index: -1; left: -2px; top: 0; bottom: 0; border-left: 2px dashed var(--cyan);
+  clip-path: inset(0 0 calc((1 - var(--p, 0)) * 100%) 0);
+}
+html.js-motion .home-steps.has-line .home-step { border-top-color: transparent; position: relative; }
+html.js-motion .home-steps.has-line .home-step::before {
+  content: ""; position: absolute; left: 0; right: 0; top: -2px; border-top: 2px dashed var(--cyan);
+  clip-path: inset(0 calc((1 - var(--p, 0)) * 100%) 0 0);
+}
+html.js-motion .home-step__badge,
+html.js-motion .sb-hw-step__num { transition: background-color .35s ease, color .35s ease; }
+html.js-motion .home-step.is-on .home-step__badge:not(.home-step__badge--star),
+html.js-motion .sb-hw-step.is-on .sb-hw-step__num:not(.sb-hw-step__num--end) { background: var(--cyan); color: var(--navy-deep); }
+
+/* h) Botones magnéticos: usan transform (el hover/active del botón usa las propiedades independientes translate/scale, no se pisan) */
+html.js-motion .is-mag { transform: translate(calc(var(--tx, 0) * 1px), calc(var(--ty, 0) * 1px)); }
+
+/* e) Progreso de lectura (artículos): barra cian de 2 px bajo el header. Con animation-timeline la mueve el navegador. */
+.read-progress {
+  position: absolute; left: 0; right: 0; top: 100%; height: 2px; background: var(--cyan); pointer-events: none;
+  transform-origin: 0 50%; transform: scaleX(var(--p, 0));
+}
+@keyframes nsRead { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@supports (animation-timeline: scroll()) {
+  .read-progress[data-native] { transform: none; animation: nsRead linear both; animation-timeline: scroll(root block); }
+}
+@media (prefers-reduced-motion: reduce) { .read-progress { display: none; } }

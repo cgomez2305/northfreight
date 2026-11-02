@@ -83,9 +83,9 @@ summary::-webkit-details-marker { display: none; }
 /* Layout */
 .container { width: 100%; max-width: var(--wrap); margin-inline: auto; padding-inline: var(--gutter); }
 .section { padding-block: var(--section-y); }
-.section--surface { background: var(--surface); }
-.section--dark { background: var(--navy); }
-.section--deep { background: var(--navy-deep); }
+.section--surface { background: var(--bg-surface-tech); }
+.section--dark { background: var(--grain), var(--bg-band); }
+.section--deep { background: var(--grain), var(--navy-deep); }
 .section--dark, .section--deep { color: var(--white); }
 .section--dark .hl, .section--deep .hl { color: var(--cyan); }
 .pre-cta, .has-cta > .section:last-child { padding-bottom: var(--pre-cta-y); }

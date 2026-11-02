@@ -18,7 +18,7 @@ $values = [
     ['Clear communication', 'Updates you can follow, in one channel.'],
 ];
 ?>
-<section class="hero on-dark sb-dk-hero">
+<section class="hero on-dark sb-dk-hero" data-motion="hero">
   <div class="container hero__in">
     <div class="hero__main">
       <?php partial('breadcrumbs', ['route' => $route]); ?>

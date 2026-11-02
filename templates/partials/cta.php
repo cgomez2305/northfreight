@@ -8,7 +8,7 @@ require_once __DIR__ . '/kit.php';
 $wa = $wa ?? null;
 $email = (string) cfg('email');
 ?>
-<section class="cta on-dark" aria-labelledby="cta-title">
+<section class="cta on-dark" data-motion="band" aria-labelledby="cta-title">
   <div class="container cta__in">
     <div class="cta__main">
       <img class="cta__mark" src="<?= e(asset('img/isotype-white.svg')) ?>" alt="" width="56" height="56">

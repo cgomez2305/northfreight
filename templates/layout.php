@@ -44,6 +44,9 @@ $scripts = [];
 $jsByTemplate = ['tool-rpm' => 'calc-rpm.js', 'tool-ifta' => 'calc-ifta.js', 'blog' => 'blog-filter.js', 'home' => 'video.js', 'desk' => 'video.js'];
 $jsFile = static fn(string $f): bool => is_file(NS_ROOT . '/assets/js/' . $f);
 $gsap = !empty($route['motion']) && $jsFile('motion.js');
+if ($gsap && is_file(NS_ROOT . '/assets/css/motion.css')) {
+    $css[] = 'css/motion.css'; // reglas que necesitan las animaciones (solo bajo html.js-motion)
+}
 ?><!doctype html>
 <html lang="en-US">
 <head>
@@ -109,6 +112,9 @@ $gsap = !empty($route['motion']) && $jsFile('motion.js');
 <?php if ($gsap): ?>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+<?php if ($jsFile('split.js')): ?>
+<script src="<?= e(asset('js/split.js')) ?>" defer></script>
+<?php endif; ?>
 <script src="<?= e(asset('js/motion.js')) ?>" defer></script>
 <?php endif; ?>
 </body>

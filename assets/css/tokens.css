@@ -45,6 +45,36 @@
   --glass-blur: 18px;
   --header-h: 76px;                        /* alto del header sticky: offsets de anclas y bloques sticky */
 
+  /* Profundidad: bordes, luz, elevación, fondos y grano. Solo alfas/gradientes de la paleta (sin colores nuevos). */
+  --edge-light: rgba(255, 255, 255, .14);
+  --edge-hi: rgba(255, 255, 255, .32);
+  --edge-cyan: rgba(6, 166, 204, .5);
+  --edge-ink: rgba(7, 28, 53, .09);
+  --edge-ink-2: rgba(7, 28, 53, .18);
+  --sheen-light: linear-gradient(180deg, rgba(255, 255, 255, .6), rgba(255, 255, 255, 0) 55%);
+  --hi-line: rgba(255, 255, 255, .85);
+  --glow-soft: drop-shadow(0 10px 22px rgba(6, 166, 204, .22));
+  --mask-fade: radial-gradient(60% 80% at 85% 55%, #000, transparent 75%);
+  --glass-bg-strong: rgba(7, 28, 53, .94);
+  --sheen: linear-gradient(180deg, rgba(255, 255, 255, .07), rgba(255, 255, 255, 0) 45%);
+  --sheen-btn: linear-gradient(180deg, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0) 58%);
+  --sweep: linear-gradient(105deg, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, .4) 50%, rgba(255, 255, 255, 0) 70%);
+  --btn-inset: inset 0 1px 0 rgba(255, 255, 255, .38), inset 0 -2px 0 rgba(4, 19, 42, .16);
+  --elev-1: drop-shadow(0 1px 0 rgba(7, 28, 53, .07)) drop-shadow(0 10px 16px rgba(7, 28, 53, .08));
+  --elev-dark: drop-shadow(0 22px 30px rgba(0, 0, 0, .38));
+  --glow-cyan: drop-shadow(0 10px 26px rgba(6, 166, 204, .42));
+  --lift: 0 24px 34px -16px rgba(4, 19, 42, .3);
+  --lift-dark: 0 24px 34px -14px rgba(0, 0, 0, .55);
+  --grid-dark: rgba(255, 255, 255, .035);
+  --grid-light: rgba(7, 28, 53, .05);
+  --grid: linear-gradient(var(--grid-dark) 1px, transparent 1px) 0 0 / 48px 48px, linear-gradient(90deg, var(--grid-dark) 1px, transparent 1px) 0 0 / 48px 48px;
+  --grid-l: linear-gradient(var(--grid-light) 1px, transparent 1px) 0 0 / 48px 48px, linear-gradient(90deg, var(--grid-light) 1px, transparent 1px) 0 0 / 48px 48px;
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.09'/%3E%3C/svg%3E");
+  --bg-hero: radial-gradient(60% 80% at 78% 12%, rgba(6, 166, 204, .2), transparent 62%), radial-gradient(45% 55% at 0% 100%, rgba(6, 166, 204, .09), transparent 70%), linear-gradient(180deg, var(--navy), var(--navy-deep));
+  --bg-band: radial-gradient(55% 90% at 10% 0%, rgba(6, 166, 204, .17), transparent 62%), radial-gradient(50% 70% at 100% 100%, rgba(6, 166, 204, .08), transparent 70%), linear-gradient(180deg, var(--navy), var(--navy-deep));
+  --bg-surface-tech: radial-gradient(75% 100% at 50% 45%, transparent, var(--surface) 92%), var(--grid-l), var(--surface);
+  --mask-star: url("../img/star-outline.svg");
+
   /* Tipografía §5.2 */
   --font-head: "Saira", "Arial Narrow", Arial, sans-serif;
   --font-body: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;

@@ -10,6 +10,7 @@
  *  bar     bool    barra superior animada (defecto: true en link, false en el resto)
  *  hover   bool    elevación al pasar el ratón sin ser enlace
  *  h       string  etiqueta del título ('h3' defecto)    cls string clase extra   min_title bool (min-height 2 líneas)
+ *  wrap    bool    envoltorio .card-wrap (defecto true): lleva la sombra (el clip-path de la tarjeta recorta box-shadow) y el levantamiento al hover
  * Nota: dentro de variant link no hay enlaces anidados (el texto cta se pinta como span).
  */
 require_once __DIR__ . '/kit.php';
@@ -21,8 +22,10 @@ $el = $isLink ? 'a' : 'article';
 $h = in_array($h ?? 'h3', ['h2', 'h3', 'h4', 'p'], true) ? ($h ?? 'h3') : 'h3';
 $cls = 'card' . ($variant === 'dark' ? ' card--dark' : '') . ($size === 'lg' ? ' card--lg' : '') . ($size === 'tile' ? ' card--tile' : '')
     . (!empty($hover) ? ' card--hover' : '') . (!empty($cls) ? ' ' . $cls : '');
+$wrap = $wrap ?? true;
 $hasTop = !empty($icon) || !empty($icon_html) || !empty($num);
 ?>
+<?php if ($wrap): ?><div class="card-wrap"><?php endif; ?>
 <<?= $el ?> class="<?= e($cls) ?>"<?= $isLink ? ' href="' . e($href) . '"' : '' ?>>
   <?php if ($bar): ?><span class="card__bar" aria-hidden="true"></span><?php endif; ?>
   <?php if ($hasTop && (!empty($icon) || !empty($icon_html))): ?>
@@ -41,3 +44,4 @@ $hasTop = !empty($icon) || !empty($icon_html) || !empty($num);
     <?= e($cta) ?> <span class="arrow" aria-hidden="true">→</span><?= $isLink ? '</span>' : '</a>' ?>
   <?php endif; ?>
 </<?= $el ?>>
+<?php if ($wrap): ?></div><?php endif; ?>

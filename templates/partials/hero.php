@@ -30,7 +30,7 @@ $deco = $deco ?? null;
 $stack = !empty($stack) || (!$image && $aside === '');
 $ctas = $ctas ?? [];
 ?>
-<section class="hero on-dark<?= $stack ? ' hero--stack' : '' ?><?= !empty($cls) ? ' ' . e($cls) : '' ?>">
+<section data-motion="hero" class="hero on-dark<?= $stack ? ' hero--stack' : '' ?><?= !empty($cls) ? ' ' . e($cls) : '' ?>">
   <?php if ($deco === 'grid'): ?>
   <svg class="hero__deco" aria-hidden="true" focusable="false" viewBox="0 0 1440 800" preserveAspectRatio="none">
     <defs><pattern id="hero-grid" width="48" height="48" patternUnits="userSpaceOnUse"><path class="hero__gridline" d="M48 0H0V48"/></pattern></defs>
