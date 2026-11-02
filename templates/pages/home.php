@@ -85,7 +85,6 @@ $docs = ['Rate confirmation', 'Check-call log', 'Arrival timestamps', 'BOL & POD
             <span class="eyebrow bp__label" id="bp-lbl" aria-hidden="true">Example lane</span>
             <span class="bp__status"><span class="data-card__dot" aria-hidden="true"></span><span class="bp__st"><span class="bp__s bp__s--a" aria-hidden="true">IN TRANSIT</span><span class="bp__s bp__s--b">POD FILED<?= $loadId !== '' ? ' · LOAD #' . $loadId : '' ?></span></span></span>
           </div>
-          <button type="button" class="bp__replay" data-bp-replay>Replay lane <span class="arrow" aria-hidden="true">→</span></button>
         </div>
         <svg class="bp__svg" viewBox="0 0 520 300" width="520" height="300" aria-hidden="true" focusable="false">
           <defs><pattern id="bp-g" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20"/></pattern></defs>
@@ -121,15 +120,26 @@ $docs = ['Rate confirmation', 'Check-call log', 'Arrival timestamps', 'BOL & POD
         </figcaption>
       </figure>
       <script>
-      (function(){var h=document.querySelector('.hero--home'),p=document.getElementById('bp'),b=p&&p.querySelector('[data-bp-replay]');if(!b)return;
-      if(p.getBoundingClientRect().top>innerHeight*.85&&window.IntersectionObserver){p.classList.add('bp--wait');var o=new IntersectionObserver(function(e){if(e[0].isIntersecting){p.classList.remove('bp--wait');o.disconnect()}},{threshold:.35});o.observe(p)}
-      b.addEventListener('click',function(){p.classList.remove('bp--wait');h.classList.add('bp-off');void h.offsetWidth;h.classList.remove('bp-off')})})();
+      /* Animación automática: arranca sola al cargar (o al entrar en pantalla en móvil) y se repite en bucle con pausa; sin botones. */
+      (function(){var h=document.querySelector('.hero--home'),p=document.getElementById('bp');if(!h||!p)return;
+      if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+      var T=6600,HOLD=4500,OUT=520,ids=[],on=false;
+      function stop(){ids.forEach(clearTimeout);ids=[]}
+      function restart(){h.classList.add('bp-off');void h.offsetWidth;h.classList.remove('bp-off')}
+      function cycle(){stop();ids.push(setTimeout(function(){h.classList.add('bp-end');p.classList.add('bp-out');
+        ids.push(setTimeout(function(){restart();p.classList.remove('bp-out');h.classList.remove('bp-end');cycle()},OUT))},T+HOLD))}
+      function play(fresh){if(fresh){h.classList.remove('bp-end');p.classList.remove('bp-out','bp--wait');restart()}p.classList.remove('bp--wait');cycle()}
+      if(!window.IntersectionObserver){cycle();return}
+      if(p.getBoundingClientRect().top>innerHeight*.85)p.classList.add('bp--wait');else{on=true;cycle()}
+      new IntersectionObserver(function(e){var v=e[0].isIntersecting;if(v&&!on){on=true;play(!p.classList.contains('bp--wait'))}else if(!v&&on){on=false;stop()}},{threshold:.35}).observe(p);
+      document.addEventListener('visibilitychange',function(){if(document.hidden){stop()}else if(on){play(true)}});})();
       </script>
     </div>
   </div>
 </section>
 
 <!-- TICKER -->
+<div class="ticker-bleed">
 <div class="ticker home-ticker" data-motion="ticker">
   <div class="ticker__track home-ticker__track">
     <ul class="home-ticker__set">
@@ -139,6 +149,7 @@ $docs = ['Rate confirmation', 'Check-call log', 'Arrival timestamps', 'BOL & POD
       <?php foreach ($ticker as $t): ?><li><span><?= e($t) ?></span><?= ns_star(13) ?></li><?php endforeach; ?>
     </ul>
   </div>
+</div>
 </div>
 
 <!-- 01 SERVICES -->

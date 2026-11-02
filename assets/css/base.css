@@ -9,6 +9,9 @@ body {
   font-family: var(--font-body); font-size: 16px; line-height: normal;
   -webkit-font-smoothing: antialiased; overflow-x: clip;
 }
+/* Red de seguridad: Safari < 16 y algunos navegadores integrados no soportan overflow:clip y la página se desplazaría en horizontal
+   si algo sobresale. `hidden` en el body se propaga al viewport, así que no rompe el header sticky ni los bloques sticky. */
+@supports not (overflow-x: clip) { body { overflow-x: hidden; } }
 main { overflow-x: clip; }
 img, svg, picture, video { max-width: 100%; }
 img { height: auto; }
