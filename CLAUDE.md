@@ -493,7 +493,7 @@ Estado de verificación (staging, `ENV=production` en Lighthouse móvil, 4 rutas
 - **Presupuesto de CSS:** tras la capa de profundidad cada página carga 60–65 KB sin comprimir (~16–17 KB gzip). Se mide en gzip (lo que viaja): ≤ 18 KB.
 - Imágenes WebP con `srcset`/`sizes`, `width`/`height` explícitos, `loading="lazy"` salvo la imagen del hero (`fetchpriority="high"`).
 - Video con fachada: nada de iframe hasta el clic.
-- Objetivo Lighthouse móvil: Performance ≥ 90, Accessibility ≥ 95, Best Practices ≥ 95, SEO 100. LCP < 2.5 s, CLS < 0.1. **Medido tras profundidad + animaciones (ENV=production, `php -S` sin compresión ni caché):** home 96 (LCP 2,6 s), owner 96, calculadora IFTA 97, blog 97, our desk 98; TBT ≈ 0, CLS 0, Accessibility/Best Practices/SEO 100. Antes de cada cambio de estilo o movimiento, repetir esta medición: una primera versión dejó la home en 86.
+- Objetivo Lighthouse móvil: Performance ≥ 90, Accessibility ≥ 95, Best Practices ≥ 95, SEO 100. LCP < 2.5 s, CLS < 0.1. **Medido en el sitio publicado (2026-11-02, con JavaScript y GSAP funcionando):** home 91 (LCP 3,0 s, **TBT 190 ms**), how-it-works 92 (LCP 3,0 s), blog 93 (LCP 3,3 s), calculadora IFTA 100; CLS 0; Accessibility/Best Practices 100. Cumple Performance ≥ 90 pero **el LCP de 3,0–3,3 s está por encima de 2,5 s** y el TBT de la home es alto: pendiente de optimizar (candidatos: el bucle y el SVG del hero, `motion.js`, GSAP desde el CDN). Las cifras anteriores de 96–98 se midieron en `php -S` local sin compresión y, en parte, con una página rota sin JS: no son comparables. Antes de cada cambio de estilo o movimiento, repetir esta medición **sobre el sitio publicado o con un servidor completo**, y comprobar primero que la página está completa (ver §13).
 - HTML semántico: `header`, `nav`, `main`, `section` con encabezado, `footer`; `button` para acciones, `a` para navegación.
 - `aria-label` en botones de solo icono; `aria-expanded`/`aria-controls` en menús; `aria-live` en resultados de calculadoras.
 - Contraste AA en todo el texto; foco visible en cian.
@@ -534,6 +534,8 @@ Estado de verificación (staging, `ENV=production` en Lighthouse móvil, 4 rutas
 - [ ] WhatsApp con el mensaje correcto para esa página.
 - [ ] Funciona sin JS; teclado y lector de pantalla probados en menús y pop-up.
 - [ ] `prefers-reduced-motion` respetado.
+- [ ] **Página completa antes de medir o publicar:** el HTML termina en `</html>`, no contiene `Fatal error`, `Warning`, `Stack trace`, `/home/` ni `public_html`, e incluye `js/main.js`. Lighthouse NO detecta JS roto (una página sin JS puntúa más alto). Comprobar con las 22 rutas del sitemap.
+- [ ] Lo que depende de JS funciona de verdad, con emulación móvil táctil: menú móvil (abrir, Esc, cerrar), mega menús, calculadoras, filtro del blog, reloj, `html.js-motion`.
 - [ ] Lighthouse móvil dentro de los objetivos de §11.
 
 ---
@@ -543,6 +545,8 @@ Estado de verificación (staging, `ENV=production` en Lighthouse móvil, 4 rutas
 - Antes de maquetar una página, revisar su artboard en el lienzo y su sección en el documento de copy.
 - Reutilizar partials y clases existentes antes de crear otros nuevos; si hace falta uno nuevo, documentarlo en §6.
 - No inventar contenido ni datos del cliente. Si falta algo, usar `[PLACEHOLDER]` y anotarlo en §8.4.
+- **Nada de código de pruebas en el repo.** Los arneses de medición (parámetros `?x=`, variables `$X`, marcas `XHARNESS`/`XH`, rutas del scratchpad) no se versionan nunca: dos de ellos llegaron a `main` dentro de un commit WIP y uno dejó el sitio publicado con un error fatal visible y sin JS. Antes de commitear: `grep -rnE '\$X\b|XH|XHARNESS|\$_GET\[.x.\]|claude-0|scratchpad' templates app assets index.php` debe salir vacío. Los commits WIP van solo a la rama de desarrollo y se revisan (`git diff`) antes de fusionar a `main`.
+- Los errores de PHP nunca se muestran al visitante (`index.php` fija `display_errors=0` y escribe en `storage/error.log`, también en staging).
 - No añadir dependencias, fuentes ni colores fuera de este archivo sin preguntar.
 - Cambios de diseño que afecten a varias páginas: aplicarlos en tokens o componentes, no página por página.
 - Al cerrar una tarea: pasar el checklist de §13 y actualizar §10 si se resolvió un pendiente.
