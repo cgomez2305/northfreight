@@ -1,8 +1,10 @@
 /* NorthStar Freight — motion.css: solo lo que necesita assets/js/motion.js. Todo oculta/estiliza únicamente bajo html.js-motion
    (la clase la pone motion.js tras comprobar GSAP). Sin esa clase el sitio se ve completo. Colores solo por tokens. */
 
-/* Líneas de titular (split.js): máscara por línea. Relleno y margen negativo = sin cambio de maquetación ni recortes de trazos. */
-html.js-motion .ln { display: block; overflow: hidden; padding: .12em .06em; margin: -.12em -.06em; }
+/* Líneas de titular (split.js): máscara por línea. El relleno inferior se compensa con margen negativo (el titular es flow-root para que
+   los márgenes no colapsen): la altura es idéntica a la del texto sin dividir, así que dividir/restaurar no mueve nada (CLS). */
+html.js-motion .ns-split { display: flow-root; }
+html.js-motion .ln { display: block; overflow: hidden; padding: 0 .06em .2em; margin: 0 -.06em -.2em; }
 html.js-motion .ln__i { display: block; white-space: nowrap; }
 
 /* GSAP sustituye las animaciones CSS equivalentes (misma velocidad base en el ticker) */
