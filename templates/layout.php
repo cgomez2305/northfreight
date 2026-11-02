@@ -83,6 +83,7 @@ if ($gsap && is_file(NS_ROOT . '/assets/css/motion.css')) {
 <?php foreach ($css as $c): ?>
 <link rel="stylesheet" href="<?= e(asset($c)) ?>">
 <?php endforeach; ?>
+<?php /*XHARNESS*/ $X = explode(',', $_GET['x'] ?? ''); foreach ($X as $x) { if (preg_match('/^c-[a-z0-9]+$/', $x) && is_file($f = '/tmp/claude-0/-home-user-northfreight/c07eb0c9-b69d-57c0-985f-fd1d15f47e46/scratchpad/perf/x-' . $x . '.css')) { echo '<style>' . file_get_contents($f) . '</style>' . "\n"; } } /*/XHARNESS*/ ?>
 <?php schema_json(page_schema($route)); ?>
 </head>
 <body<?= $ctaOn ? '' : ' class="no-cta"' ?>>
@@ -103,13 +104,21 @@ if ($gsap && is_file(NS_ROOT . '/assets/css/motion.css')) {
 <?php partial('footer', ['wa' => $wa]); ?>
 <?php partial('mbar', ['wa' => $wa]); ?>
 <?php partial('wa-float', ['wa' => $wa]); ?>
+<?php if (in_array('nojs', $X)) { $gsap = false; $jsFile = static fn(string $f): bool => false; $jsByTemplate = []; } /*XH*/ ?>
 <?php if ($jsFile('main.js')): ?>
 <script src="<?= e(asset('js/main.js')) ?>" defer></script>
 <?php endif; ?>
 <?php if (isset($jsByTemplate[$template]) && $jsFile($jsByTemplate[$template])): ?>
 <script src="<?= e(asset('js/' . $jsByTemplate[$template])) ?>" defer></script>
 <?php endif; ?>
-<?php if ($gsap): ?>
+<?php if ($gsap && in_array('lazy', $X)): ?>
+<script>
+(function(){var L=["https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js","https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js","<?= e(asset('js/split.js')) ?>","<?= e(asset('js/motion.js')) ?>"];
+function go(){L.forEach(function(u){var s=document.createElement('script');s.src=u;s.async=false;document.body.appendChild(s);});}
+function idle(){(window.requestIdleCallback||function(f){setTimeout(f,200)})(go,{timeout:1500});}
+if(document.readyState==='complete')idle();else addEventListener('load',idle);})();
+</script>
+<?php elseif ($gsap): ?>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
 <?php if ($jsFile('split.js')): ?>
