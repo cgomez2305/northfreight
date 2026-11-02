@@ -29,6 +29,16 @@ partial('hero', [
         ['label' => 'Ask about Relay dispatch', 'href' => wa($route['wa']), 'wa' => true, 'arrow' => true],
     ],
 ]);
+
+// Resumen "In short" (SEO/GEO): editable aquí. Solo información que ya está en el copy de esta página; sin cifras, tarifas ni promesas nuevas.
+partial('summary', [
+    'text'   => 'Amazon Relay dispatch is hands-on management of your Relay account. Our desk watches the load board, books the work that fits your trucks and manages performance and disputes inside your account.',
+    'points' => [
+        'Block and load booking',
+        'Trip and arrival records',
+        'Scorecard follow-up and disputes filed with evidence',
+    ],
+]);
 ?>
 <section class="section" aria-labelledby="relay-manage">
   <div class="container stack">

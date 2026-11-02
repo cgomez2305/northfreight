@@ -400,6 +400,19 @@ a.card--dark:hover .card__code { color: var(--cyan-light); }
 .footer__head { color: var(--white); letter-spacing: .26em; }
 .foot__link { color: var(--on-dark-soft); text-decoration: none; align-self: flex-start; overflow-wrap: anywhere; background: linear-gradient(var(--cyan), var(--cyan)) 0 100% / 0 1px no-repeat; transition: background-size .3s var(--ease), color var(--t-fast); }
 .foot__link:hover { color: var(--cyan); background-size: 100% 1px; }
+/* Resumen "In short" (SEO/GEO): bloque citable tras el hero de las páginas de servicio. Solo tokens existentes. */
+.summary { padding-block: clamp(28px, 4vw, 48px) 0; }
+.summary__wrap { filter: var(--elev-1); max-width: 980px; }
+.summary__box { display: flex; flex-direction: column; gap: 14px; padding: clamp(20px, 3vw, 30px); background-color: var(--surface); background-image: var(--sheen-light); box-shadow: inset 3px 0 0 var(--cyan), inset 0 0 0 1px var(--edge-ink), inset 0 1px 0 var(--hi-line); }
+.summary__label { display: flex; align-items: center; gap: 12px; margin: 0; letter-spacing: .34em; }
+.summary__text { margin: 0; font-size: clamp(17px, 1.6vw, 19px); line-height: 1.6; font-weight: 500; color: var(--ink); text-wrap: pretty; }
+.summary__points { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.summary__points li { display: flex; align-items: flex-start; gap: 12px; font-size: 15px; line-height: 1.55; color: var(--ink-2); }
+.summary__points .star { flex: none; margin-top: .3em; color: var(--cyan-ink); }
+@media (min-width: 761px) { .summary__points { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; } .summary__points:has(> li:nth-child(2):last-child) { grid-template-columns: repeat(2, minmax(0, 1fr)); } .summary__points:has(> li:only-child) { grid-template-columns: minmax(0, 1fr); } }
+
+/* Dirección (NAP) opcional del footer: solo se imprime si ADDRESS está definida. */
+.foot__addr { display: flex; flex-direction: column; margin-top: 4px; font-style: normal; line-height: 1.6; color: var(--on-dark-soft); }
 .footer__bar { max-width: var(--wrap); margin: 0 auto; padding: 18px var(--gutter) 28px; border-top: 1px solid var(--line-on-dark-soft); display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; font-family: var(--font-mono); font-size: 12px; }
 .footer__legal { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; }
 @media (pointer: coarse) { .foot__link { display: inline-flex; align-items: center; min-height: 44px; } .footer__col { gap: 0; } }

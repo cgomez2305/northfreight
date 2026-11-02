@@ -50,21 +50,25 @@ if ($hl && strpos($h1, $hl) !== false) {
     $h1 = str_replace($hl, '{hl}' . $hl . '{/hl}', $h1);
 }
 
-// Fecha: {{ph:Publish date}} hasta que haya fecha real (YYYY-MM-DD).
-$dateRaw = (string) ($post['date'] ?? '');
+// Fecha: 'published' (ISO) cuando el cliente la confirme; mientras tanto el ph() de 'date' (vacío en producción).
+// 'modified' (ISO) se muestra como "Updated …" si no hay fecha publicada o si es distinta de ella.
+$dates = post_dates($post);
 $dateHtml = '';
-if ($dateRaw !== '') {
-    if (has_ph($dateRaw)) {
-        $dateHtml = phtext($dateRaw);
-    } elseif (($ts = strtotime($dateRaw)) !== false) {
-        $dateHtml = '<time datetime="' . e(date('Y-m-d', $ts)) . '">' . e(date('M j, Y', $ts)) . '</time>';
-    }
+if ($dates['published'] !== '') {
+    $dateHtml = '<time datetime="' . e($dates['published']) . '">' . e(fmt_date($dates['published'])) . '</time>';
+} elseif (!empty($post['date']) && has_ph((string) $post['date'])) {
+    $dateHtml = phtext((string) $post['date']);
+}
+$updatedHtml = '';
+if ($dates['modified'] !== '' && $dates['modified'] !== $dates['published']) {
+    $updatedHtml = 'Updated <time datetime="' . e($dates['modified']) . '">' . e(fmt_date($dates['modified'])) . '</time>';
 }
 
 ob_start(); ?>
 <p class="blog-byline mono">
   <span class="blog-byline__by"><img src="<?= e(asset('img/isotype-white.svg')) ?>" alt="" width="22" height="22">By the NorthStar dispatch desk</span>
   <?php if ($dateHtml !== ''): ?><span><?= $dateHtml ?></span><?php endif; ?>
+  <?php if ($updatedHtml !== ''): ?><span><?= $updatedHtml ?></span><?php endif; ?>
   <?php if (!empty($post['minutes'])): ?><span><?= e((int) $post['minutes']) ?> min read</span><?php endif; ?>
 </p>
 <?php $byline = (string) ob_get_clean();

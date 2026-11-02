@@ -45,6 +45,16 @@ ns_default('WA_BASE', 'https://wa.me/18636513322');
 // Elegir UNO (con o sin www) y reflejarlo en .htaccess.
 ns_default('DOMAIN', 'northstarfreight.example');
 
+// --- Entidad / SEO (todas OPCIONALES: vacías hasta que el cliente las confirme) -----------------------------------
+// Solo se emiten en JSON-LD (Organization) y en el footer cuando están definidas. Ver app/config.local.example.php.
+ns_default('LEGAL_NAME', '');      // nombre legal completo (p. ej. el de la LLC)
+ns_default('ADDRESS', []);         // ['street'=>'', 'city'=>'', 'region'=>'', 'postal'=>'', 'country'=>'US']
+ns_default('SAME_AS', []);         // URLs de perfiles oficiales (LinkedIn, Facebook, YouTube…)
+ns_default('FOUNDING_DATE', '');   // 'YYYY' o 'YYYY-MM-DD'
+// robots.txt de producción: bots de ENTRENAMIENTO de IA (GPTBot, ClaudeBot, Google-Extended, Applebot-Extended, CCBot).
+// 'allow' (defecto) | 'block'. Los bots de búsqueda/respuesta de IA (OAI-SearchBot, PerplexityBot…) siempre quedan permitidos.
+ns_default('AI_TRAINING_BOTS', 'allow');
+
 // Token de ?preview=TOKEN para ver rutas draft. Vacío = vista previa desactivada.
 ns_default('PREVIEW_TOKEN', '');
 
@@ -97,6 +107,10 @@ function cfg(?string $key = null): mixed
             'tel'                  => TEL,
             'email'                => EMAIL,
             'domain'               => DOMAIN,
+            'legal_name'           => LEGAL_NAME,
+            'address'              => ADDRESS,
+            'same_as'              => SAME_AS,
+            'founding_date'        => FOUNDING_DATE,
             'wa_base'              => WA_BASE,
             'env'                  => ENV,
             'is_production'        => ENV === 'production',

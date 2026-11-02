@@ -7,6 +7,9 @@
  *   type ('article' = página propia en /blog/SLUG/; 'link' = tarjeta del índice que apunta a un recurso),
  *   kind (etiqueta TOOL|GUIDE|TEMPLATE en las tarjetas 'link'), lead y toc (solo artículos).
  * date usa la convención {{ph:...}} (phtext()): '{{ph:Publish date}}' hasta que haya fecha real (YYYY-MM-DD).
+ * published / modified (solo artículos): fechas ISO YYYY-MM-DD. 'published' queda VACÍO hasta que el cliente confirme la fecha real
+ *   de publicación (no se inventa; mientras tanto la pantalla usa 'date' con ph()). 'modified' = última edición real del contenido.
+ *   Alimentan datePublished/dateModified del JSON-LD Article y el byline (<time datetime>) del artículo.
  * Orden = orden de aparición en la maqueta: destacado primero, luego el resto.
  */
 
@@ -19,6 +22,8 @@ return [
         'minutes'  => 7,
         'excerpt'  => 'Percentage of the gross, flat weekly fee or per load — what each model really costs an owner-operator and what should be included.',
         'date'     => '{{ph:Publish date}}',
+        'published' => '',            // PENDIENTE (cliente): YYYY-MM-DD
+        'modified' => '2026-11-02',
         'featured' => true,
         'type'     => 'article',
         'lead'     => 'Most dispatch services charge a percentage of each load, a flat weekly fee or a fee per load. Here is how each model works, what should be included and what to watch for before you sign.',
@@ -38,6 +43,8 @@ return [
         'minutes'  => 6,
         'excerpt'  => 'Authority, SCAC code, insurance, equipment and the steps to get approved on Amazon Relay.',
         'date'     => '{{ph:Publish date}}',
+        'published' => '',            // PENDIENTE (cliente): YYYY-MM-DD
+        'modified' => '2026-11-02',
         'featured' => false,
         'type'     => 'article',
         'lead'     => 'Before you can book a single Amazon Relay load, your company has to be approved. This is what Relay looks for, in plain language, and how to prepare your application.',
@@ -57,6 +64,8 @@ return [
         'minutes'  => 6,
         'excerpt'  => 'One-way loads, round trips and blocks: how Relay freight is posted, booked and tracked.',
         'date'     => '{{ph:Publish date}}',
+        'published' => '',            // PENDIENTE (cliente): YYYY-MM-DD
+        'modified' => '2026-11-02',
         'featured' => false,
         'type'     => 'article',
         'lead'     => 'Relay freight does not work like a regular broker load board. Loads are posted with a rate, booked in a click and tracked through the Relay app. Here is how it fits together.',
@@ -76,6 +85,8 @@ return [
         'minutes'  => 5,
         'excerpt'  => 'What to document at the dock so lumper receipts and detention hours turn into money on your settlement.',
         'date'     => '{{ph:Publish date}}',
+        'published' => '',            // PENDIENTE (cliente): YYYY-MM-DD
+        'modified' => '2026-11-02',
         'featured' => false,
         'type'     => 'article',
         'lead'     => 'Lumper fees and detention are money you are owed — but only if they are documented the right way. What to do at the dock so they show up on your settlement.',

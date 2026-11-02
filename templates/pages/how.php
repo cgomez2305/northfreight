@@ -19,6 +19,16 @@ partial('hero', [
     'h1'    => 'How we plug into {hl}your operation{/hl}',
     'lead'  => 'Hiring a dispatch company should not mean losing control of your trucks. Here is exactly how we start and how we work with you every day.',
 ]);
+
+// Resumen "In short" (SEO/GEO): editable aquí. Solo información que ya está en el copy de esta página; sin cifras, tarifas ni promesas nuevas.
+partial('summary', [
+    'text'   => 'NorthStar plugs into your operation in four steps: we learn your operation, define scope and contacts, run the day-to-day and review and improve together. You keep control of your trucks.',
+    'points' => [
+        'One channel for every update',
+        'A record of every load',
+        'A team, not a single dispatcher',
+    ],
+]);
 ?>
 
 <section class="section">

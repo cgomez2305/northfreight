@@ -22,6 +22,16 @@ partial('hero', [
     'lead'    => 'Paperwork organized, settlements prepared and disputes followed until they close.',
     'ctas'    => [['label' => 'Talk to the desk', 'href' => wa($route['wa']), 'wa' => true, 'arrow' => true]],
 ]);
+
+// Resumen "In short" (SEO/GEO): editable aquí. Solo información que ya está en el copy de esta página; sin cifras, tarifas ni promesas nuevas.
+partial('summary', [
+    'text'   => 'Trucking back office services cover the work behind the load: paperwork organized, settlements prepared and disputes followed until they close. The same NorthStar desk books and tracks the load, so it already has every document it needs.',
+    'points' => [
+        'Settlement preparation and dispute management',
+        'Rate cons, BOLs, PODs and receipts filed per load',
+        'Driver onboarding and Amazon Relay account follow-up',
+    ],
+]);
 ?>
 
 <section class="section" aria-labelledby="bo-included">

@@ -45,3 +45,24 @@ define('RATE_LIMIT', 5);
 // define('SHOW_RESOURCES', true);
 // define('SHOW_ON_SHIFT', true);
 // define('SHOW_EQUIPMENT_CHIPS', false);
+
+// --- Entidad y SEO (opcionales; no inventes datos: déjalos comentados hasta que el cliente los confirme) ---
+// Con valor, se emiten en el JSON-LD de Organization / ProfessionalService; ADDRESS además se imprime (NAP) en el footer.
+// define('LEGAL_NAME', 'NorthStar Freight Solutions LLC');
+// define('FOUNDING_DATE', '2024');   // 'YYYY' o 'YYYY-MM-DD'
+// define('ADDRESS', [
+//     'street'  => '123 Main St, Suite 4',
+//     'city'    => 'Lakeland',
+//     'region'  => 'FL',
+//     'postal'  => '33801',
+//     'country' => 'US',
+// ]);
+// define('SAME_AS', [
+//     'https://www.linkedin.com/company/example',
+//     'https://www.facebook.com/example',
+//     'https://www.youtube.com/@example',
+// ]);
+
+// robots.txt de producción: bots de entrenamiento de IA (GPTBot, ClaudeBot, Google-Extended, Applebot-Extended, CCBot).
+// 'allow' (defecto) | 'block'. Los bots de búsqueda/respuesta de IA siempre se permiten.
+// define('AI_TRAINING_BOTS', 'allow');

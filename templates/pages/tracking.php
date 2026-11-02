@@ -36,6 +36,16 @@ partial('hero', [
     'ctas'  => [['label' => 'Talk to a dispatcher', 'href' => wa($route['wa']), 'wa' => true, 'arrow' => true]],
     'aside' => $aside,
 ]);
+
+// Resumen "In short" (SEO/GEO): editable aquí. Solo información que ya está en el copy de esta página; sin cifras, tarifas ni promesas nuevas.
+partial('summary', [
+    'text'   => 'Load tracking means following each trip from pickup to POD: ETAs, arrivals and departures logged, incidents documented and brokers kept informed. NorthStar\'s desk does it so you are not on the phone.',
+    'points' => [
+        'Check calls and ETA updates',
+        'Arrival and departure times, delays and the detention clock',
+        'Incident photos and notes, BOL and POD',
+    ],
+]);
 ?>
 
 <section class="section" aria-labelledby="tr-log">

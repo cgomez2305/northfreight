@@ -40,7 +40,7 @@ $chips = ['all' => 'All', 'dispatch' => 'Dispatch', 'relay' => 'Amazon Relay', '
         <span class="blog-feat__meta">
           <span class="blog-feat__badge t-meta">Featured</span>
           <span class="blog-feat__cat t-meta"><?= e($featured['category']) ?></span>
-          <span class="mono blog-feat__min"><?= e((int) $featured['minutes']) ?> MIN READ</span>
+          <span class="mono blog-feat__min"><?= e((int) $featured['minutes']) ?> MIN READ<?php $fpub = post_dates($featured)['published']; if ($fpub !== '') { echo ' · ' . e(fmt_date($fpub)); } ?></span>
         </span>
         <h2 class="t-h2-s c-navy"><?= e($featured['title']) ?></h2>
         <span class="t-body c-slate"><?= e($featured['excerpt']) ?></span>
@@ -66,6 +66,8 @@ $chips = ['all' => 'All', 'dispatch' => 'Dispatch', 'relay' => 'Amazon Relay', '
       <?php foreach ($items as $p):
           $isLink = ($p['type'] ?? '') === 'link';
           $code = $isLink ? (string) ($p['kind'] ?? '') : (int) $p['minutes'] . ' MIN';
+          $pub = $isLink ? '' : post_dates($p)['published'];   // fecha solo cuando el cliente confirmó la publicación
+          if ($pub !== '') { $code .= ' · ' . fmt_date($pub); }
       ?>
       <li class="blog-item" data-cat="<?= e($catSlug[$p['category']] ?? 'dispatch') ?>">
         <?php partial('card', [

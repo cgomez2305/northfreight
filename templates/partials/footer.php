@@ -2,6 +2,7 @@
 /**
  * Footer: logo + descripción · Services · Company · Talk to the desk; fila inferior © año, MC#/USDOT (ph), Privacy, Terms.
  * WhatsApp, teléfono y correo siempre visibles como texto. Ancla #footer-nav (alternativa sin JS al menú móvil).
+ * Dirección (NAP) opcional: solo si ADDRESS está definida (org_address()).
  * Params: wa(string|null).
  */
 require_once __DIR__ . '/kit.php';
@@ -19,6 +20,7 @@ if (cfg('show_resources')) {
 }
 $email = (string) cfg('email');
 $legalId = ph('MC# — · USDOT —');
+$addr = org_address();   // NAP: solo se imprime si ADDRESS está definida en config.local.php
 ?>
 <footer class="footer" id="footer-nav">
   <div class="footer__grid g4">
@@ -45,6 +47,14 @@ $legalId = ph('MC# — · USDOT —');
       <span class="footer__head t-meta">Talk to the desk</span>
       <a class="foot__link" href="<?= e(wa($wa)) ?>" rel="noopener">WhatsApp <?= e(cfg('phone')) ?></a>
       <a class="foot__link" href="mailto:<?= e($email) ?>"><?= e($email) ?></a>
+      <?php if ($addr): ?>
+      <address class="foot__addr">
+        <?php if (isset($addr['street'])): ?><span><?= e($addr['street']) ?></span><?php endif; ?>
+        <?php $cityLine = trim(($addr['city'] ?? '') . (isset($addr['city'], $addr['region']) ? ', ' : '') . ($addr['region'] ?? '') . (isset($addr['postal']) ? ' ' . $addr['postal'] : '')); ?>
+        <?php if ($cityLine !== ''): ?><span><?= e($cityLine) ?></span><?php endif; ?>
+        <?php if (isset($addr['country'])): ?><span><?= e($addr['country']) ?></span><?php endif; ?>
+      </address>
+      <?php endif; ?>
     </div>
   </div>
   <div class="footer__bar">

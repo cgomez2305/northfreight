@@ -302,13 +302,43 @@ function breadcrumbs(array $route): array
 // ---------------------------------------------------------------------
 
 /**
+ * Limpia un nodo JSON-LD: quita null, cadenas vacías, arrays vacíos y cualquier cadena con un token {{ph:...}}
+ * o un placeholder entre corchetes. Garantía: el JSON-LD nunca lleva placeholders ni campos vacíos.
+ * Conserva las listas (reindexa) y los objetos; devuelve null si el nodo queda vacío.
+ */
+function schema_clean(mixed $node): mixed
+{
+    if (is_string($node)) {
+        $t = trim($node);
+        return ($t === '' || has_ph($t) || preg_match('/\[ [^\]]+ \]/u', $t) === 1) ? null : $node;
+    }
+    if (!is_array($node)) {
+        return $node;
+    }
+    $isList = array_is_list($node);
+    $out = [];
+    foreach ($node as $k => $v) {
+        $v = schema_clean($v);
+        if ($v === null || $v === []) {
+            continue;
+        }
+        $isList ? $out[] = $v : $out[$k] = $v;
+    }
+    // Un objeto con solo @type queda vacío de contenido: se descarta (una referencia {"@id": …} sí se conserva).
+    if (!$isList && array_diff(array_keys($out), ['@type']) === []) {
+        return null;
+    }
+    return $out === [] ? null : $out;
+}
+
+/**
  * Imprime <script type="application/ld+json">. $graph: un nodo (con '@type') o lista de nodos
  * (se envuelven en @graph). Salida con UNESCAPED_SLASHES|UNESCAPED_UNICODE y "</" escapado.
  */
 function schema_json(array $graph): void
 {
-    $graph = array_values(array_filter($graph, static fn($n) => $n !== null));
-    if ($graph === []) {
+    $graph = isset($graph['@type']) ? schema_clean($graph) : array_values(array_filter(array_map('schema_clean', array_filter($graph, static fn($n) => $n !== null))));
+    if ($graph === [] || $graph === null) {
         return;
     }
     $doc = isset($graph['@type'])
@@ -319,19 +349,123 @@ function schema_json(array $graph): void
     echo '<script type="application/ld+json">' . $json . '</script>' . "\n";
 }
 
-/** Nodo Organization (o ProfessionalService con $type). Sin dirección hasta que el cliente la confirme. */
+// ---------------------------------------------------------------------
+// Entidad (Organization): datos opcionales de config + servicios live
+// ---------------------------------------------------------------------
+
+/** Descripción corta de la empresa (la misma frase que el footer). */
+function org_description(): string
+{
+    return 'Remote truck dispatch and back-office desk for owner-operators and small fleets.';
+}
+
+/** Dirección de ADDRESS limpia (solo claves no vacías: street, city, region, postal, country); [] si no está definida. */
+function org_address(): array
+{
+    $raw = defined('ADDRESS') && is_array(ADDRESS) ? ADDRESS : [];
+    $out = [];
+    foreach (['street', 'city', 'region', 'postal', 'country'] as $k) {
+        $v = trim((string) ($raw[$k] ?? ''));
+        if ($v !== '' && !has_ph($v)) {
+            $out[$k] = $v;
+        }
+    }
+    // Para imprimir/publicar una dirección hace falta al menos calle o ciudad.
+    return (isset($out['street']) || isset($out['city'])) ? $out : [];
+}
+
+/** Servicios live de la empresa: [['name'=>…, 'path'=>…], …] (solo rutas en status live). */
+function org_services(): array
+{
+    $map = [
+        '/dispatch-for-owner-operators/' => 'Owner-operator dispatch',
+        '/amazon-relay-dispatch/'        => 'Amazon Relay dispatch',
+        '/dry-van-dispatch/'             => 'Dry van dispatch',
+        '/load-tracking/'                => 'Load tracking',
+        '/trucking-back-office/'         => 'Trucking back office',
+    ];
+    $out = [];
+    foreach ($map as $path => $name) {
+        if (route_is_live($path)) {
+            $out[] = ['name' => $name, 'path' => $path];
+        }
+    }
+    return $out;
+}
+
+/** Nodo Organization (o ProfessionalService con $type). Address/sameAs/foundingDate/legalName solo si están en config. */
 function organization_schema(string $type = 'Organization'): array
 {
+    $services = org_services();
+    $node = [
+        '@type'        => $type,
+        '@id'          => abs_url('/') . '#' . strtolower($type),
+        'name'         => BRAND,
+        'url'          => abs_url('/'),
+        'logo'         => 'https://' . DOMAIN . '/assets/img/isotype.svg',
+        'telephone'    => PHONE,
+        'email'        => EMAIL,
+        'areaServed'   => 'US',
+        'description'  => org_description(),
+        'contactPoint' => [
+            '@type'             => 'ContactPoint',
+            'contactType'       => 'customer service',
+            'telephone'         => PHONE,
+            'email'             => EMAIL,
+            'availableLanguage' => 'English',
+        ],
+    ];
+    if ($type === 'Organization' && $services) {
+        $node['knowsAbout'] = array_merge(['Truck dispatch'], array_column($services, 'name'));
+        $node['hasOfferCatalog'] = [
+            '@type'           => 'OfferCatalog',
+            'name'            => 'Dispatch and back-office services',
+            'itemListElement' => array_map(static fn(array $s): array => [
+                '@type'       => 'Offer',
+                'itemOffered' => ['@type' => 'Service', 'name' => $s['name'], 'url' => abs_url($s['path'])],
+            ], $services),
+        ];
+    }
+    // Opcionales: solo si el cliente los confirmó (config.local.php).
+    $legal = trim((string) (defined('LEGAL_NAME') ? LEGAL_NAME : ''));
+    if ($legal !== '') {
+        $node['legalName'] = $legal;
+    }
+    $founding = trim((string) (defined('FOUNDING_DATE') ? FOUNDING_DATE : ''));
+    if (preg_match('/^\d{4}(-\d{2}-\d{2})?$/', $founding) === 1) {
+        $node['foundingDate'] = $founding;
+    }
+    $addr = org_address();
+    if ($addr) {
+        $node['address'] = array_filter([
+            '@type'           => 'PostalAddress',
+            'streetAddress'   => $addr['street'] ?? null,
+            'addressLocality' => $addr['city'] ?? null,
+            'addressRegion'   => $addr['region'] ?? null,
+            'postalCode'      => $addr['postal'] ?? null,
+            'addressCountry'  => $addr['country'] ?? null,
+        ]);
+    }
+    $same = array_values(array_filter(
+        defined('SAME_AS') && is_array(SAME_AS) ? SAME_AS : [],
+        static fn($u): bool => is_string($u) && preg_match('#^https?://[^\s]+$#i', $u) === 1
+    ));
+    if ($same) {
+        $node['sameAs'] = $same;
+    }
+    return $node;
+}
+
+/** Nodo WebSite (se emite en el home): publisher = Organization. */
+function website_schema(): array
+{
     return [
-        '@type'       => $type,
-        '@id'         => abs_url('/') . '#' . strtolower($type),
-        'name'        => BRAND,
-        'url'         => abs_url('/'),
-        'logo'        => 'https://' . DOMAIN . '/assets/img/isotype.svg',
-        'telephone'   => PHONE,
-        'email'       => EMAIL,
-        'areaServed'  => 'US',
-        'description' => 'Remote truck dispatch and back-office desk for owner-operators and small fleets.',
+        '@type'      => 'WebSite',
+        '@id'        => abs_url('/') . '#website',
+        'name'       => BRAND,
+        'url'        => abs_url('/'),
+        'inLanguage' => 'en-US',
+        'publisher'  => ['@id' => abs_url('/') . '#organization'],
     ];
 }
 
@@ -352,6 +486,8 @@ function service_schema(array $route): array
 /** Nodo FAQPage a partir de ítems [['q','a'],…]; null si no hay ítems. */
 function faq_schema(array $items): ?array
 {
+    // El JSON-LD nunca lleva respuestas incompletas (placeholders), tampoco en staging.
+    $items = array_values(array_filter($items, static fn(array $i): bool => !has_ph(($i['q'] ?? '') . ($i['a'] ?? ''))));
     if ($items === []) {
         return null;
     }
@@ -383,9 +519,15 @@ function breadcrumb_schema(array $route): ?array
 function page_schema(array $route): array
 {
     $graph = [];
-    foreach ($route['schema'] ?? [] as $type) {
+    $types = $route['schema'] ?? [];
+    // El home siempre declara también el WebSite (publisher = Organization).
+    if (($route['path'] ?? '') === '/' && in_array('Organization', $types, true) && !in_array('WebSite', $types, true)) {
+        array_splice($types, array_search('Organization', $types, true) + 1, 0, ['WebSite']);
+    }
+    foreach ($types as $type) {
         $graph[] = match ($type) {
             'Organization'        => organization_schema(),
+            'WebSite'             => website_schema(),
             'ProfessionalService' => organization_schema('ProfessionalService'),
             'Service'             => service_schema($route),
             'FAQPage'             => faq_schema(route_faq_items($route)),
@@ -417,7 +559,57 @@ function page_schema(array $route): array
     return array_values(array_filter($graph));
 }
 
-/** Nodo Article (autor "NorthStar dispatch desk"). datePublished solo si hay fecha real en posts.php. */
+/** true si $s es una fecha ISO válida YYYY-MM-DD. */
+function iso_date_ok(string $s): bool
+{
+    $d = DateTimeImmutable::createFromFormat('!Y-m-d', $s);
+    return $d !== false && $d->format('Y-m-d') === $s;
+}
+
+/** Fecha ISO 'YYYY-MM-DD' => 'Nov 2, 2026'. */
+function fmt_date(string $iso): string
+{
+    $d = DateTimeImmutable::createFromFormat('!Y-m-d', $iso);
+    return $d === false ? '' : $d->format('M j, Y');
+}
+
+/**
+ * Fechas reales de un artículo de posts.php: ['published' => ISO|'', 'modified' => ISO|''].
+ * 'published' vacío = pendiente del cliente (no se inventa). Respaldo: 'date' si ya trae una fecha ISO.
+ */
+function post_dates(array $post): array
+{
+    $pick = static function (string ...$vals): string {
+        foreach ($vals as $v) {
+            if ($v !== '' && iso_date_ok($v)) {
+                return $v;
+            }
+        }
+        return '';
+    };
+    $published = $pick(trim((string) ($post['published'] ?? '')), trim((string) ($post['date'] ?? '')));
+    $modified = $pick(trim((string) ($post['modified'] ?? '')));
+    if ($published !== '' && $modified !== '' && $modified < $published) {
+        $modified = $published;
+    }
+    return ['published' => $published, 'modified' => $modified];
+}
+
+/** Artículo de posts.php por slug (type=article) o []. */
+function post_by_slug(string $slug): array
+{
+    foreach (data('posts') as $p) {
+        if (($p['slug'] ?? null) === $slug && ($p['type'] ?? '') === 'article') {
+            return $p;
+        }
+    }
+    return [];
+}
+
+/**
+ * Nodo Article (autor "NorthStar dispatch desk"). datePublished solo si hay 'published' real en posts.php;
+ * dateModified si hay 'modified'. image = OG de la ruta (o og-default.jpg), absoluta.
+ */
 function article_schema(array $route): array
 {
     $node = [
@@ -429,10 +621,12 @@ function article_schema(array $route): array
         'publisher'        => ['@id' => abs_url('/') . '#organization'],
         'image'            => og_image($route),
     ];
-    foreach (data('posts') as $p) {
-        if (($p['slug'] ?? null) === ($route['slug'] ?? '') && !empty($p['date']) && !has_ph($p['date'])) {
-            $node['datePublished'] = $p['date'];
-        }
+    $dates = post_dates(post_by_slug((string) ($route['slug'] ?? '')));
+    if ($dates['published'] !== '') {
+        $node['datePublished'] = $dates['published'];
+    }
+    if ($dates['modified'] !== '') {
+        $node['dateModified'] = $dates['modified'];
     }
     return $node;
 }

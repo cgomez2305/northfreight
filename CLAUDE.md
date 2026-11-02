@@ -60,7 +60,8 @@ Opcional (fase 2): un script `bin/build.php` que pre-renderiza todas las rutas a
 │   │   ├── posts.php      # índice del blog (slug, título, categoría, minutos, extracto, fecha)
 │   │   ├── glossary.php   # términos del glosario
 │   │   └── equipment.php  # contenido de las páginas por equipo
-│   ├── sitemap.php        # genera /sitemap.xml desde routes.php (solo live + sitemap=true)
+│   ├── sitemap.php        # genera /sitemap.xml desde routes.php (solo live + sitemap=true) y robots_txt() según ENV
+│   ├── llms.php           # genera /llms.txt y /llms-full.txt (formato llmstxt.org) desde routes.php + data; solo rutas live
 │   └── forms/
 │       ├── lib.php        # csrf_token() sin sesión, saneado, rate limit, log; se incluye siempre
 │       ├── contact.php    # POST /contact/: validación, honeypot, límite por IP, PHPMailer
@@ -77,6 +78,7 @@ Opcional (fase 2): un script `bin/build.php` que pre-renderiza todas las rutas a
 │   │   ├── section-head.php # eyebrow + H2 + lead
 │   │   ├── card.php         # tarjeta con chaflán (variantes: light, dark, link)
 │   │   ├── faq.php          # <details> + schema FAQPage
+│   │   ├── summary.php      # bloque "In short": respuesta de 2 frases + 3 puntos al inicio de las páginas de servicio (extraíble por buscadores e IA)
 │   │   ├── breadcrumbs.php  # migas + schema BreadcrumbList
 │   │   ├── video.php        # fachada de video con capítulos
 │   │   ├── cta.php          # bloque final "Let's talk about your operation."
@@ -376,6 +378,11 @@ Están diseñadas, pero se dejan con `status => 'draft'` hasta tener confirmaci�
 - **Enlazado interno:** el home enlaza a las 5 páginas de servicio; cada servicio enlaza al home, a `/how-it-works/` y a un artículo; cada artículo enlaza a su servicio con la keyword como anchor.
 - **hreflang** `en-us` / `es-us` cuando exista `/es/` (fase 2, keywords en español aún no investigadas).
 - `sitemap.xml` generado y `robots.txt` con la ruta al sitemap.
+- **GEO / visibilidad en IA (preparado, 2026-11-02):**
+  - `/llms.txt` y `/llms-full.txt` se generan desde `routes.php` + `app/data/` (solo `status=live`, sin placeholders). En staging llevan `X-Robots-Tag: noindex`.
+  - `robots.txt` en producción: grupo `*` + bots de **búsqueda/respuesta de IA** (OAI-SearchBot, ChatGPT-User, PerplexityBot, Claude-SearchBot, Claude-User) permitidos + bots de **entrenamiento** (GPTBot, ClaudeBot, Google-Extended, Applebot-Extended, CCBot) según `AI_TRAINING_BOTS` (`'allow'` por defecto | `'block'`). En staging: `Disallow: /` para todos.
+  - Bloque **"In short"** (`partial('summary')`) en owner, relay, dryvan, tracking, backoffice y how-it-works: definición directa + 3 puntos, solo con lo que la página ya afirma (§8.2). Los textos están en cada plantilla; Carlos debe validarlos.
+  - JSON-LD: `Organization` + `ProfessionalService` + `WebSite` (con `contactPoint`, `knowsAbout`, `hasOfferCatalog`) en el home; `Service`/`FAQPage`/`BreadcrumbList` en servicios; `Article` con `image` y `dateModified` en artículos; `DefinedTermSet` en el glosario. `legalName`, `address`, `sameAs` y `foundingDate` solo se emiten si existen `LEGAL_NAME`, `ADDRESS`, `SAME_AS`, `FOUNDING_DATE` en `app/config.local.php` (ver `config.local.example.php`); `ADDRESS` también se imprime (NAP) en el footer. `datePublished` solo sale cuando `app/data/posts.php` tiene `published` (YYYY-MM-DD real): no se inventan fechas.
 - Breadcrumbs visibles en todas las páginas internas.
 
 ---
@@ -468,6 +475,8 @@ Decisiones de diseño/estrategia por cerrar:
 3. **Selector ES / EN:** el PDF lo incluye; se quitó del diseño porque no había destino. Volver a ponerlo cuando exista `/es/`.
 4. **Porcentajes:** el artículo de costos menciona un rango de mercado (5–10%); el PDF pide no usar porcentajes ajenos. Decidir si se quita.
 5. **Hero del home bajo el PDF:** cambiar los chips por "Coordinated loads · Organized information · Constant follow-up" si se elige la opción A.
+
+Pendientes de SEO/GEO que dependen del cliente (la parte técnica ya está lista, ver §7.6): fechas reales de publicación de los 4 artículos (`published` en `posts.php`), `LEGAL_NAME`/`ADDRESS`/`FOUNDING_DATE`/`SAME_AS` (perfiles oficiales), ficha de Google Business Profile, decidir `AI_TRAINING_BOTS`, validar los textos "In short", enviar el sitemap a Search Console y pasar `ENV` a `production`. `/our-desk/` promete "Watch how we work" en su meta pero el video aún no existe.
 
 Pendientes técnicos conocidos:
 - ~~Rehacer la tarjeta destacada del mega menú de Services sin texto sobre la foto.~~ Hecho (foto arriba, texto debajo).

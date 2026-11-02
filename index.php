@@ -2,7 +2,7 @@
 /**
  * Front controller de NorthStar Freight Solutions.
  *
- * Flujo: normaliza la URI -> bloquea rutas internas -> sirve /robots.txt y /sitemap.xml ->
+ * Flujo: normaliza la URI -> bloquea rutas internas -> sirve /robots.txt, /sitemap.xml, /llms.txt y /llms-full.txt ->
  * resuelve la ruta en app/routes.php (barra final 301, draft => 404 salvo ?preview=TOKEN) ->
  * POST a una ruta con formulario (contact, descargas) delega en app/forms/<handler>.php -> render (plantilla + layout).
  *
@@ -17,6 +17,7 @@ declare(strict_types=1);
 define('NS_ROOT', __DIR__);
 require NS_ROOT . '/app/helpers.php';   // carga también app/config.php
 require NS_ROOT . '/app/sitemap.php';
+require NS_ROOT . '/app/llms.php';       // /llms.txt y /llms-full.txt (generados desde routes + data)
 require NS_ROOT . '/app/forms/lib.php';   // csrf_token() y utilidades de formularios: SIEMPRE antes de renderizar
 
 // Los errores NUNCA se muestran al visitante (revelarían rutas del servidor): van a storage/error.log, también en staging.
@@ -95,17 +96,30 @@ if (str_starts_with($collapsed, '/assets/')) {
 }
 
 // --- Archivos generados ---
-if ($collapsed === '/robots.txt' || $collapsed === '/sitemap.xml') {
+if (in_array($collapsed, ['/robots.txt', '/sitemap.xml', '/llms.txt', '/llms-full.txt'], true)) {
     if ($method === 'POST') {
         ns_plain(405, 'Method not allowed', ['Allow: GET, HEAD']);
     }
-    if ($collapsed === '/robots.txt') {
-        header('Content-Type: text/plain; charset=utf-8');
-        echo robots_txt();
-    } else {
+    if ($collapsed === '/sitemap.xml') {
         header('Content-Type: application/xml; charset=utf-8');
-        echo sitemap_xml();
+        $body = sitemap_xml();
+    } else {
+        header('Content-Type: text/plain; charset=utf-8');
+        $body = match ($collapsed) {
+            '/robots.txt'    => robots_txt(),
+            '/llms.txt'      => llms_txt(),
+            default          => llms_full_txt(),
+        };
+        if ($collapsed !== '/robots.txt') {
+            // Caché corta (el contenido sale de routes + data); en staging no se indexa ni se cita.
+            header(is_production() ? 'Cache-Control: public, max-age=300' : 'Cache-Control: no-cache');
+            if (!is_production()) {
+                header('X-Robots-Tag: noindex, nofollow');
+            }
+            header('X-Content-Type-Options: nosniff');
+        }
     }
+    echo $body;
     exit;
 }
 
