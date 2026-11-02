@@ -83,7 +83,6 @@ if ($gsap && is_file(NS_ROOT . '/assets/css/motion.css')) {
 <?php foreach ($css as $c): ?>
 <link rel="stylesheet" href="<?= e(asset($c)) ?>">
 <?php endforeach; ?>
-<?php /*XHARNESS*/ $X = explode(',', $_GET['x'] ?? ''); foreach ($X as $x) { if (preg_match('/^c-[a-z0-9]+$/', $x) && is_file($f = '/tmp/claude-0/-home-user-northfreight/c07eb0c9-b69d-57c0-985f-fd1d15f47e46/scratchpad/perf/x-' . $x . '.css')) { echo '<style>' . file_get_contents($f) . '</style>' . "\n"; } } /*/XHARNESS*/ ?>
 <?php schema_json(page_schema($route)); ?>
 </head>
 <body<?= $ctaOn ? '' : ' class="no-cta"' ?>>
