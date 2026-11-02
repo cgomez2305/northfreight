@@ -420,8 +420,8 @@ body:has(.mobile-menu:not([hidden])) .mbar, body.menu-open .mbar { display: none
 .wa-float__btn:hover { translate: 0 -2px; background: var(--sheen-btn), var(--cyan-light); color: var(--navy-deep); }
 .wa-float__btn:focus-visible { outline-offset: -5px; }
 .wa-float__label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-/* Móvil: visible (lo pidió Carlos), 16px por encima de la barra inferior. */
-@media (max-width: 760px) { .wa-float { right: max(20px, env(safe-area-inset-right)); bottom: calc(var(--mbar-h) + 16px + env(safe-area-inset-bottom)); } }
+/* Móvil (≤760px): oculto. La barra inferior (.mbar) ya trae WhatsApp y llamada: tener los dos era redundante (Carlos). */
+@media (max-width: 760px) { .wa-float { display: none; } }
 body:has(.mobile-menu:not([hidden])) .wa-float, body.menu-open .wa-float { display: none; }
 
 /* ---- Piezas compartidas por páginas (home, tracking, formularios) ---- */

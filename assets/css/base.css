@@ -1,6 +1,8 @@
 /* NorthStar — base: reset, tipografía (§5.2), layout y utilidades (§5.3, §5.4). */
 *, *::before, *::after { box-sizing: border-box; }
-html { background: var(--navy); -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-padding-top: calc(var(--header-h) + 16px); }
+/* overflow-x:hidden también en <html>: Safari de iPhone ignora el del <body> si el <html> no lo tiene y deja desplazar la página en horizontal.
+   Al propagarse al viewport no rompe el header sticky ni los bloques sticky. overscroll-behavior-x evita el rebote lateral. */
+html { background: var(--navy); -webkit-text-size-adjust: 100%; text-size-adjust: 100%; scroll-padding-top: calc(var(--header-h) + 16px); overflow-x: hidden; overscroll-behavior-x: none; }
 body {
   /* Banda navy tras la barra superior y el header: el cristal del header sticky se ve navy en la posición
      inicial (sin ella el body blanco lo aclararía). La tapa el hero, que también es navy. */
