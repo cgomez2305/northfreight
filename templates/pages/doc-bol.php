@@ -42,7 +42,7 @@ partial('hero', [
     'route'   => $route,
     'h1'      => 'Bill of lading {hl}template{/hl}',
     'eyebrow' => 'Free template',
-    'lead'    => 'A clean, printable straight bill of lading with every field brokers, shippers and receivers expect. Free in PDF and Word. It is the same layout our desk files on every load.',
+    'lead'    => 'A clean, printable BOL template (straight bill of lading) with every field brokers, shippers and receivers expect. Free in PDF and Word. It is the same layout our desk files on every load.',
     'aside'   => $aside,
     'cls'     => 'co-hero',
 ]);

@@ -211,7 +211,7 @@ return [
     '/resources/bol-template/' => [
         'template'   => 'doc-bol',
         'form'       => 'download',   // handler POST en app/forms/download.php
-        'title'      => 'Bill of Lading Template (PDF & Word) | NorthStar', // TODO verificar con doc de copy
+        'title'      => 'BOL Template (Bill of Lading) in PDF & Word | NorthStar', // TODO verificar con doc de copy
         'meta'       => 'Free bill of lading (BOL) template in PDF and Word: every field brokers and receivers expect, ready to print. The same BOL our desk files on every load.', // TODO
         'h1'         => 'Bill of lading template',
         'schema'     => ['Article', 'FAQPage', 'BreadcrumbList'],

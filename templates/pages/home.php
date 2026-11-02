@@ -152,6 +152,15 @@ $docs = ['Rate confirmation', 'Check-call log', 'Arrival timestamps', 'BOL & POD
 </div>
 </div>
 
+<?php partial('summary', [
+    'text'   => 'NorthStar is a remote truck dispatch company for owner-operators and small fleets. Our trucking dispatch services cover load booking on Amazon Relay and dry van, load tracking from pickup to POD and back-office work, all from one dispatch desk.',
+    'points' => [
+        'Amazon Relay and dry van booking',
+        'Load tracking and check calls',
+        'Settlements, disputes and paperwork',
+    ],
+]); ?>
+
 <!-- 01 SERVICES -->
 <section class="section home-services" id="services" aria-labelledby="services-title">
   <div class="container stack">

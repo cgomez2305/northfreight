@@ -22,7 +22,7 @@ partial('hero', [
 
 // Resumen "In short" (SEO/GEO): editable aquí. Solo información que ya está en el copy de esta página; sin cifras, tarifas ni promesas nuevas.
 partial('summary', [
-    'text'   => 'NorthStar plugs into your operation in four steps: we learn your operation, define scope and contacts, run the day-to-day and review and improve together. You keep control of your trucks.',
+    'text'   => 'Here is how truck dispatching works with NorthStar, in four steps: we learn your operation, define scope and contacts, run the day-to-day and review and improve together. You keep control of your trucks.',
     'points' => [
         'One channel for every update',
         'A record of every load',

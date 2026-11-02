@@ -39,7 +39,7 @@ partial('hero', [
 
 // Resumen "In short" (SEO/GEO): editable aquí. Solo información que ya está en el copy de esta página; sin cifras, tarifas ni promesas nuevas.
 partial('summary', [
-    'text'   => 'Load tracking means following each trip from pickup to POD: ETAs, arrivals and departures logged, incidents documented and brokers kept informed. NorthStar\'s desk does it so you are not on the phone.',
+    'text'   => 'Truck load tracking means following each trip from pickup to POD: ETAs, arrivals and departures logged, incidents documented and brokers kept informed. NorthStar\'s desk handles the check calls so you are not on the phone.',
     'points' => [
         'Check calls and ETA updates',
         'Arrival and departure times, delays and the detention clock',
