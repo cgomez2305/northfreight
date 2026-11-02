@@ -1,4 +1,4 @@
-/* NorthStar Freight — motion.js: coreografía GSAP 3.12 + ScrollTrigger (solo transform, opacity, clip-path y variables CSS).
+/* NorthStar Freight — motion.js: coreografía GSAP 3.12 + ScrollTrigger (solo transform, opacity, clip-path y variables CSS; sin parallax ni giros del hero).
    La entrada del hero es CSS puro (components.css): este archivo NO bloquea ni retrasa el primer pintado. Arranca tras `load`, en tareas
    cortas (idle), y prepara cada sección solo cuando se acerca a la pantalla (IntersectionObserver), de modo que el coste de la carga es casi cero.
    html.js-motion se añade solo con GSAP + ScrollTrigger y sin reduced-motion; ante un fallo se restaura todo. Líneas de titular: split.js. */
@@ -10,7 +10,7 @@
   try { g.registerPlugin(ST); } catch (e) { return; }
   root.classList.add('js-motion');
 
-  var A = Array.prototype, CP = 'opacity,transform,clipPath,visibility', GRID = /(^|\s)(g[2-6]h?|blog-grid|cards)(\s|$)/;
+  var A = Array.prototype, CP = 'opacity,transform,clipPath,visibility,--cota', GRID = /(^|\s)(g[2-6]h?|blog-grid|cards)(\s|$)/;
   var $ = function (s, r) { return A.slice.call((r || d).querySelectorAll(s)); };
   var show = function (e) { return e.getClientRects().length > 0; };
   var vh = function () { return window.innerHeight || root.clientHeight; };
@@ -63,7 +63,10 @@
       rest = rest.filter(function (c) { return c !== eb && c !== h && c !== sw && !c.contains(h) && show(c); });
       var ln = h ? lines(h, txs) : null;
       A.push.apply(clean, rest.concat(eb || [], sw || [], h && !ln ? [h] : []));
-      if (eb) up(tl, [eb], 10 * k, at, 0.6 * k);
+      if (eb) {
+        up(tl, [eb], 10 * k, at, 0.6 * k);
+        if (eb.closest('.section-head')) { g.set(eb, { '--cota': 0 }); tl.to(eb, { '--cota': 1, duration: 0.7 * k, ease: 'power3.inOut' }, at + 0.1); } // cota: la línea de dimensión crece (scaleX por variable)
+      }
       if (ln) { g.set(ln, { yPercent: 130 }); tl.to(ln, { yPercent: 0, duration: 0.8 * k, stagger: 0.07 }, at + 0.05); }
       else if (h) up(tl, [h], 20 * k, at + 0.05, 0.7 * k);
       if (sw) { g.set(sw, { clipPath: DRAW0 }); tl.to(sw, { clipPath: DRAW1, duration: 0.6 * k, ease: 'power3.inOut' }, at + 0.35 * k); }
@@ -124,24 +127,29 @@
     };
   }
 
-  /* c) Pasos: el trazo se dibuja con scrub (--p) y cada número se enciende (.is-on) */
-  function steps() {
-    var undo = [];
+  /* c) Pasos como ruta: cada tramo (de una parada numerada a la siguiente) se traza con scrub (--p por paso, 0-1) y un marcador (estrella) lo
+     recorre; el número de cada parada se enciende (.is-on) al llegar. La ruta es vertical en /how-it-works/ y horizontal en el home (≥1025);
+     en 2×2 y 1 columna cada paso conserva su trazo propio (--p = su cuarto del recorrido). Solo cambian variables CSS y clases. */
+  function steps(desk) {
+    var undo = [], clamp = function (v) { return Math.min(1, Math.max(0, v)); };
     $('[data-motion="steps"]').forEach(function (ol) {
-      var li = A.slice.call(ol.children), n = li.length, vert = ol.classList.contains('sb-hw-steps'), thr = [];
+      var li = A.slice.call(ol.children), n = li.length, vert = ol.classList.contains('sb-hw-steps'), route = vert || desk, st = [], tot = 1;
       ol.classList.add('has-line');
-      ol.style.setProperty('--p', '0');
-      undo.push(function () { ol.classList.remove('has-line'); ol.style.removeProperty('--p'); li.forEach(function (e) { e.classList.remove('is-on'); e.style.removeProperty('--p'); }); });
+      li.forEach(function (e) { e.style.setProperty('--p', '0'); });
+      undo.push(function () { ol.classList.remove('has-line'); li.forEach(function (e) { e.classList.remove('is-on'); e.style.removeProperty('--p'); }); });
       ST.create({
-        trigger: ol, start: 'top 62%', end: 'bottom 62%', scrub: true,
-        onRefresh: function () { thr = li.map(function (e, i) { return vert ? Math.min(0.98, (e.offsetTop + 32) / (ol.offsetHeight || 1)) : i / n; }); },
+        trigger: ol, start: vert ? 'top 62%' : 'top 80%', end: vert ? 'bottom 62%' : 'bottom 50%', scrub: true,
+        onRefresh: function () { // paradas: centro de cada número (px) en vertical, índice en horizontal
+          if (!route) return;
+          if (vert) { st = li.map(function (e) { return e.offsetTop + 32; }); tot = ol.offsetHeight || 1; }
+          else { st = li.map(function (e, i) { return i; }); tot = Math.max(1, n - 1); }
+        },
         onUpdate: function (s) {
-          var p = s.progress;
-          if (vert) ol.style.setProperty('--p', p.toFixed(3));
+          var p = s.progress, y = p * tot;
           li.forEach(function (e, i) {
-            var v = Math.min(1, Math.max(0, p * n - i));
-            if (!vert) e.style.setProperty('--p', v.toFixed(3));
-            e.classList.toggle('is-on', vert ? p > 0 && p >= (thr[i] || 0) : v > 0.02);
+            var v = !route ? clamp(p * n - i) : i < n - 1 && st.length ? clamp((y - st[i]) / ((st[i + 1] - st[i]) || 1)) : 0;
+            e.style.setProperty('--p', v.toFixed(3));
+            e.classList.toggle('is-on', !route ? v > 0.02 : i === 0 ? p > 0 : y >= (st[i] || 0));
           });
         }
       });
@@ -160,20 +168,6 @@
         if (v > an.playbackRate + 0.05) { an.playbackRate = v; g.to(an, { playbackRate: 1, duration: 1.2, ease: 'power2.out', overwrite: true }); }
       }
     });
-  }
-
-  /* g) Hero con scroll: estrella gira ~30°; rejilla 0.3× e imagen 6 % solo en escritorio */
-  function parallax(desk) {
-    var h = d.querySelector('[data-motion="hero"]') || d.querySelector('.hero');
-    if (!h) return;
-    var tr = { trigger: h, start: 'top top', end: 'bottom top', scrub: true }, stars = $('.hero__star, .hero__bigstar, .star-hero', h);
-    // --p solo en .hero--stack (su ::after gira con él); en otros heros recalcularía todo el subárbol
-    if (h.classList.contains('hero--stack')) g.fromTo(h, { '--p': 0 }, { '--p': 1, ease: 'none', scrollTrigger: tr });
-    if (stars.length) g.fromTo(stars, { '--sr': '0deg' }, { '--sr': '30deg', ease: 'none', scrollTrigger: tr });
-    if (!desk) return;
-    var deco = h.querySelector('.hero__deco'), pic = h.querySelector('.hero__clip picture');
-    if (deco) g.fromTo(deco, { y: 0 }, { y: function () { return h.offsetHeight * 0.3; }, ease: 'none', scrollTrigger: tr });
-    if (pic) g.fromTo(pic, { scale: 1, yPercent: 0 }, { scale: 1.06, yPercent: -2.5, ease: 'none', scrollTrigger: tr });
   }
 
   /* h) Spotlight (--mx/--my) en tarjetas oscuras y botones magnéticos (≤6 px, quickTo): solo puntero fino; se montan con el primer movimiento del ratón */
@@ -211,14 +205,14 @@
     return function () { off.forEach(function (f) { f(); }); };
   }
 
-  /* Contextos (gsap.matchMedia): escritorio completo; móvil sin parallax de imagen ni magnéticos. Cada pieza en su propia tarea. */
+  /* Contextos (gsap.matchMedia): escritorio completo; móvil sin magnéticos. Cada pieza en su propia tarea. */
   function build() {
     mm = g.matchMedia();
     mm.add({ desk: '(min-width: 1025px)', fine: '(hover: hover) and (pointer: fine)' }, function (ctx) {
       var c = ctx.conditions, undo = [], gone = false;
       // ctx.add: los ScrollTrigger creados después (en otra tarea) también se revierten con el contexto
-      later(function () { if (gone || dead) return; try { ctx.add(function () { undo.push.apply(undo, steps()); }); } catch (e) { fail(); } });
-      later(function () { if (gone || dead) return; try { ctx.add(function () { parallax(c.desk); ticker(); }); } catch (e) { fail(); } });
+      later(function () { if (gone || dead) return; try { ctx.add(function () { undo.push.apply(undo, steps(c.desk)); }); } catch (e) { fail(); } });
+      later(function () { if (gone || dead) return; try { ctx.add(function () { ticker(); }); } catch (e) { fail(); } });
       if (c.desk && c.fine) {
         var once = function (e) {
           if (e.pointerType !== 'mouse') return;

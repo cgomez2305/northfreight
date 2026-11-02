@@ -145,7 +145,6 @@ summary::-webkit-details-marker { display: none; }
 .anim-rise { animation: nsRise .9s var(--ease) both; }
 .pulse { animation: nsPulse 1.8s ease-out infinite; }
 .twinkle { animation: nsTwinkle 4.8s ease-in-out infinite; transform-origin: center; }
-.lane-dash { animation: nsDash 2.4s linear infinite; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }

@@ -12,7 +12,8 @@ $tags = $variantA
     ? ['Coordinated loads', 'Organized information', 'Constant follow-up']
     : ['Amazon Relay', 'Dry Van', 'Load Tracking', 'Back Office'];
 
-// Hero: mensaje de WhatsApp de la página.
+// Hero: mensaje de WhatsApp de la página. $loadId: marca de placeholder (vacío en producción: entonces no se imprime "LOAD #").
+$loadId = ph('ID');
 $waHref = wa($route['wa'] ?? null);
 
 // Icono de la tarjeta 03 (documento con check, como la maqueta; no existe en ns_icon).
@@ -56,12 +57,6 @@ $docs = ['Rate confirmation', 'Check-call log', 'Arrival timestamps', 'BOL & POD
 ?>
 <!-- HERO -->
 <section class="hero hero--home on-dark" id="top" data-motion="hero">
-  <svg class="hero__deco" aria-hidden="true" focusable="false" viewBox="0 0 1440 800" preserveAspectRatio="none">
-    <defs><pattern id="hero-grid" width="48" height="48" patternUnits="userSpaceOnUse"><path class="hero__gridline" d="M48 0H0V48"/></pattern></defs>
-    <rect width="1440" height="800" fill="url(#hero-grid)"/>
-    <polygon points="-40,800 820,140 860,140 120,800"/>
-    <path class="lane-dash" d="M-40 800 L840 130"/>
-  </svg>
   <div class="container hero__in">
     <div class="hero__main anim-rise">
       <div class="hero__eyebrow">
@@ -71,7 +66,7 @@ $docs = ['Rate confirmation', 'Check-call log', 'Arrival timestamps', 'BOL & POD
       <?php if ($variantA): ?>
       <p class="t-display home-hero__title home-hero__title--a"><?= e($headline) ?></p>
       <?php else: ?>
-      <p class="t-display home-hero__title">Booked.<br>Tracked.<br><span class="hl">Documented.</span></p>
+      <p class="t-display home-hero__title"><span class="hw hw--1" data-w="Booked.">Booked.</span><br><span class="hw hw--2" data-w="Tracked.">Tracked.</span><br><span class="hw hw--3 hl" data-w="Documented.">Documented.</span></p>
       <?php endif; ?>
       <?= ns_swoosh(220, 14) ?>
       <p class="hero__lead t-lead">NorthStar is your remote dispatch and back-office desk. We book Amazon Relay and dry van freight, follow every load to delivery, and keep the paperwork that protects your pay — so incidents are handled with evidence and operations run as a team.</p>
@@ -84,21 +79,52 @@ $docs = ['Rate confirmation', 'Check-call log', 'Arrival timestamps', 'BOL & POD
       </ul>
     </div>
     <div class="hero__aside">
-      <div class="hero__media hero__media--stripe">
-        <div class="hero__clip"><?= ns_img(['base' => 'white-semi-mountain-highway-sunrise', 'alt' => 'White semi truck with dry van trailer driving on a mountain highway at sunrise', 'eager' => true, 'sizes' => '(min-width:1025px) 540px, 100vw']) ?></div>
-        <?= ns_star(64, 'hero__star twinkle') ?>
-      </div>
-      <aside class="data-card anim-rise home-log" aria-label="Example desk log">
-        <div class="data-card__head">
-          <span class="eyebrow data-card__label home-log__label">Desk log · Example</span>
-          <span class="data-card__status"><span class="data-card__dot" aria-hidden="true"></span>IN TRANSIT · LOAD #<?= ph('ID') ?></span>
+      <figure class="bp" id="bp" aria-labelledby="bp-lbl">
+        <div class="bp__head">
+          <div class="bp__id">
+            <span class="eyebrow bp__label" id="bp-lbl" aria-hidden="true">Example lane</span>
+            <span class="bp__status"><span class="data-card__dot" aria-hidden="true"></span><span class="bp__st"><span class="bp__s bp__s--a" aria-hidden="true">IN TRANSIT</span><span class="bp__s bp__s--b">POD FILED<?= $loadId !== '' ? ' · LOAD #' . $loadId : '' ?></span></span></span>
+          </div>
+          <button type="button" class="bp__replay" data-bp-replay>Replay lane <span class="arrow" aria-hidden="true">→</span></button>
         </div>
-        <ul class="log" data-motion="log">
-          <li class="log__row"><span class="log__time">06:12</span><span class="log__text">Rate confirmation received &amp; filed</span></li>
-          <li class="log__row"><span class="log__time">09:40</span><span class="log__text">Driver checked in at shipper — photo attached</span></li>
-          <li class="log__row log__row--on"><span class="log__time">11:55</span><span class="log__text">Delay logged with timestamps for detention claim</span></li>
-        </ul>
-      </aside>
+        <svg class="bp__svg" viewBox="0 0 520 300" width="520" height="300" aria-hidden="true" focusable="false">
+          <defs><pattern id="bp-g" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20"/></pattern></defs>
+          <rect class="bp__g" x="8" y="8" width="504" height="284" fill="url(#bp-g)"/>
+          <path class="bp__gm" d="M100 8V292M200 8V292M300 8V292M400 8V292M8 100H512M8 200H512"/>
+          <rect class="bp__fr" x="8" y="8" width="504" height="284"/>
+          <path class="bp__cn" d="M8 22V8H22M498 8H512V22M512 278V292H498M22 292H8V278"/>
+          <g class="bp__ref"><path d="M60 8v6M160 8v6M260 8v6M360 8v6M460 8v6M8 80h6M8 160h6M8 240h6"/><text x="60" y="28">A</text><text x="160" y="28">B</text><text x="260" y="28">C</text><text x="360" y="28">D</text><text x="460" y="28">E</text><text x="26" y="84">1</text><text x="26" y="164">2</text><text x="26" y="244">3</text></g>
+          <path class="bp__plan" pathLength="1" d="M56 236H176L236 176H316L376 116H468"/>
+          <path class="bp__trail" pathLength="1" d="M56 236H176L236 176H316L376 116H468"/>
+          <g class="bp__cota"><path d="M56 272H176M320 272H440M56 266v12M440 266v12"/><path class="bp__arw" d="M56 272l8-3v6zM440 272l-8-3v6z"/><text x="248" y="275.5">SHIPPER TO RECEIVER</text></g>
+          <g class="bp__origin"><polygon class="bp__node" points="52,229 63,229 63,240 60,243 49,243 49,232"/><text class="bp__o1" x="40" y="203">ORIGIN · SHIPPER</text><text class="bp__o2 bp__hi" x="40" y="218">09:40</text></g>
+          <g class="bp__cp"><circle class="bp__ping" cx="276" cy="176" r="4"/><circle class="bp__dot" cx="276" cy="176" r="4"/><text class="bp__ck" x="276" y="200" text-anchor="middle">CHECK CALL</text></g>
+          <g class="bp__dest"><text class="bp__d1" x="500" y="80" text-anchor="end">DESTINATION · RECEIVER</text><g class="bp__ds"><g transform="translate(473 99) scale(.1365)"><path class="bp__star" d="M127 0L98 100L0 123L99 149L122 249L153 148L249 125L150 98Z"/></g></g><text class="bp__d2 bp__hi" x="500" y="152" text-anchor="end">11:55</text></g>
+          <g class="bp__truck"><g class="bp__rig">
+            <rect x="-22" y="-14" width="28" height="11"/>
+            <path class="bp__rib" d="M-15 -12.5V-4.5M-8 -12.5V-4.5M-1 -12.5V-4.5"/>
+            <path d="M7 -3V-12H12L17 -8V-3z"/>
+            <path class="bp__win" d="M9 -10.2H11.6L14.4 -8H9z"/>
+            <path class="bp__rib" d="M6 -5H7"/>
+            <circle cx="-18" cy="-2.2" r="2.2"/><circle cx="-13" cy="-2.2" r="2.2"/><circle cx="12" cy="-2.2" r="2.2"/>
+          </g></g>
+          <g transform="translate(92 92) rotate(-6)"><g class="bp__stamp bp__stamp--a"><polygon class="bp__sp" points="8,0 104,0 104,32 96,40 0,40 0,8"/><polygon class="bp__sp2" points="10,3 101,3 101,31 94,37 3,37 3,10"/><text class="bp__sh" x="52" y="20" text-anchor="middle">RATE CON</text><text class="bp__ss" x="52" y="31" text-anchor="middle">CONFIRMED</text></g></g>
+          <g transform="translate(372 186) rotate(4)"><g class="bp__stamp bp__stamp--b"><polygon class="bp__sp" points="8,0 96,0 96,32 88,40 0,40 0,8"/><polygon class="bp__sp2" points="10,3 93,3 93,31 86,37 3,37 3,10"/><text class="bp__sh bp__pod" x="48" y="23" text-anchor="middle">POD</text><text class="bp__ss" x="48" y="33" text-anchor="middle">SIGNED</text></g></g>
+        </svg>
+        <figcaption class="bp__cap">
+          <p class="sr-only">Example lane: rate confirmation filed, truck tracked with check calls, POD signed and filed on arrival.</p>
+          <ul class="log">
+            <li class="log__row"><span class="log__time">06:12</span><span class="log__text">Rate confirmation received &amp; filed</span></li>
+            <li class="log__row"><span class="log__time">09:40</span><span class="log__text">Driver checked in at shipper — photo attached</span></li>
+            <li class="log__row log__row--on"><span class="log__time">11:55</span><span class="log__text">Delay logged with timestamps for detention claim</span></li>
+          </ul>
+        </figcaption>
+      </figure>
+      <script>
+      (function(){var h=document.querySelector('.hero--home'),p=document.getElementById('bp'),b=p&&p.querySelector('[data-bp-replay]');if(!b)return;
+      if(p.getBoundingClientRect().top>innerHeight*.85&&window.IntersectionObserver){p.classList.add('bp--wait');var o=new IntersectionObserver(function(e){if(e[0].isIntersecting){p.classList.remove('bp--wait');o.disconnect()}},{threshold:.35});o.observe(p)}
+      b.addEventListener('click',function(){p.classList.remove('bp--wait');h.classList.add('bp-off');void h.offsetWidth;h.classList.remove('bp-off')})})();
+      </script>
     </div>
   </div>
 </section>

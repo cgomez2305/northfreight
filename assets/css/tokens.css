@@ -74,6 +74,10 @@
   --bg-band: radial-gradient(55% 90% at 10% 0%, rgba(6, 166, 204, .17), transparent 62%), radial-gradient(50% 70% at 100% 100%, rgba(6, 166, 204, .08), transparent 70%), linear-gradient(180deg, var(--navy), var(--navy-deep));
   --bg-surface-tech: radial-gradient(75% 100% at 50% 45%, transparent, var(--surface) 92%), var(--grid-l), var(--surface);
   --mask-star: url("../img/star-outline.svg");
+  --mask-star-solid: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 249 249'%3E%3Cpath d='M127 0L98 100L0 123L99 149L122 249L153 148L249 125L150 98Z'/%3E%3C/svg%3E");   /* estrella NorthStar maciza: marcador de la ruta de pasos */
+  --route-fill: linear-gradient(var(--cyan), var(--cyan));   /* trazo recorrido de la ruta (se dimensiona con --p) */
+  --reg-mark-bg: linear-gradient(var(--cyan), var(--cyan)) 0 0 / 10px 1.5px no-repeat, linear-gradient(var(--cyan), var(--cyan)) 0 0 / 1.5px 10px no-repeat, linear-gradient(var(--cyan), var(--cyan)) 100% 100% / 10px 1.5px no-repeat, linear-gradient(var(--cyan), var(--cyan)) 100% 100% / 1.5px 10px no-repeat;   /* marcas de registro (dos L de 10 px) de las tarjetas claras */
+  --ruler: repeating-linear-gradient(90deg, var(--edge-light) 0 1px, transparent 1px 48px) 0 100% / 100% 12px no-repeat, repeating-linear-gradient(90deg, var(--line-on-dark) 0 1px, transparent 1px 12px) 0 100% / 100% 6px no-repeat, linear-gradient(var(--line-on-dark), var(--line-on-dark)) 0 100% / 100% 1px no-repeat;   /* regla de referencias en el borde inferior de los heros internos (marcas cada 48 px, alineadas con --grid) */
 
   /* Tipografía §5.2 */
   --font-head: "Saira", "Arial Narrow", Arial, sans-serif;

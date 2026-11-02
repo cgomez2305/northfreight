@@ -9,21 +9,16 @@ html.js-motion .ln__i { display: block; white-space: nowrap; }
 
 /* La entrada del hero y la marquesina del ticker son animaciones CSS (components.css / home.css): GSAP solo ajusta su velocidad. */
 
-/* Estrella del hero: giro por scroll (--sr) con la propiedad independiente rotate (compone con el twinkle CSS, que usa transform) */
-html.js-motion .hero__star,
-html.js-motion .hero__bigstar,
-html.js-motion .star-hero { rotate: var(--sr, 0deg); }
+/* Cabeceras: la cota (línea de dimensión antes del eyebrow, components.css) crece con --cota (0-1) en la entrada */
 
-/* c) Pasos: el trazo discontinuo se dibuja con --p (0-1) y el número se enciende al cruzarlo */
-html.js-motion .sb-hw-steps.has-line { border-left-color: transparent; position: relative; isolation: isolate; }
-html.js-motion .sb-hw-steps.has-line::before {
-  content: ""; position: absolute; z-index: -1; left: -2px; top: 0; bottom: 0; border-left: 2px dashed var(--cyan);
-  clip-path: inset(0 0 calc((1 - var(--p, 0)) * 100%) 0);
-}
-html.js-motion .home-steps.has-line .home-step { border-top-color: transparent; position: relative; }
-html.js-motion .home-steps.has-line .home-step::before {
-  content: ""; position: absolute; left: 0; right: 0; top: -2px; border-top: 2px dashed var(--cyan);
-  clip-path: inset(0 calc((1 - var(--p, 0)) * 100%) 0 0);
+/* c) Ruta de pasos: el marcador solo existe con JS (.has-line); el trazo y los remates por paso están en services-b.css (vertical) y
+   components.css (horizontal ≥1025). Con --p sin definir (sin JS) el trazo se ve completo. El número se enciende al llegar el marcador. */
+@media (max-width: 1024px) { /* 2×2 y 1 columna: cada paso conserva su trazo discontinuo propio, que se dibuja con su --p */
+  html.js-motion .home-steps.has-line .home-step { border-top-color: transparent; position: relative; }
+  html.js-motion .home-steps.has-line .home-step::before {
+    content: ""; position: absolute; left: 0; right: 0; top: -2px; border-top: 2px dashed var(--cyan);
+    clip-path: inset(0 calc((1 - var(--p, 0)) * 100%) 0 0);
+  }
 }
 html.js-motion .home-step__badge,
 html.js-motion .sb-hw-step__num { transition: background-color .35s ease, color .35s ease; }

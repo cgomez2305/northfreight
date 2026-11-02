@@ -10,8 +10,156 @@
 .home-hero__title { font-weight: 900; line-height: .9; }
 .home-hero__title--a { font-size: clamp(34px, 4.4vw, 60px); line-height: .98; letter-spacing: -.02em; }
 .hero--home .hero__ctas { gap: 12px; }
-.home-log { align-self: flex-end; width: min(420px, 100%); animation-delay: .35s; }
-.home-log .home-log__label { font-size: 10px; letter-spacing: .2em; }
+
+/* ---- Hero: "Ruta de una carga en plano técnico" (panel .bp) ----
+   Guion en una sola pasada (~5 s): BOOKED 0.6-2.0 s · TRACKED 2.0-3.9 s · DOCUMENTED 3.9-5.0 s. El estado por defecto de cada pieza es el FINAL y
+   cada animación usa `backwards`: sin animación (reduced-motion) queda el plano completo; sin JS corre igual. Cambiar un tiempo aquí obliga a
+   revisar bpTruck/bpTrail (mismos % y mismas curvas) y las palabras .hw. */
+.hero--home .hero__aside { justify-content: center; }
+.bp { position: relative; margin: 0; width: 100%; max-width: 620px; display: flex; flex-direction: column; color: var(--on-dark); clip-path: var(--cut-card); background: var(--grain), var(--sheen), var(--bg-band); box-shadow: inset 0 0 0 1px var(--edge-light), inset 0 2px 0 var(--edge-cyan); }
+.bp::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(45deg, var(--cyan-tint-2) calc(50% - 1.5px), var(--edge-cyan) calc(50% - 1.5px) 50%, transparent 50%) right top / 22px 22px no-repeat, linear-gradient(225deg, transparent calc(50% - 1.5px), var(--edge-cyan) calc(50% - 1.5px) 50%, transparent 50%) left bottom / 22px 22px no-repeat; }
+.bp__head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 0 16px; padding: 12px 18px 0 22px; }
+.bp__id { display: flex; flex-direction: column; gap: 4px; padding-block: 6px; }
+.bp__label { font-size: 10px; letter-spacing: .24em; color: var(--cyan-light); }
+.bp__status { display: inline-flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--cyan-light); }
+.bp__st { display: grid; }
+.bp__s { grid-area: 1 / 1; white-space: nowrap; }
+.bp__s--a { opacity: 0; animation: bpOut .3s linear 4.7s backwards; }
+.bp__s--b { animation: bpFade .3s linear 4.7s backwards; }
+.bp__replay { min-height: 44px; padding: 0 8px; display: inline-flex; align-items: center; gap: 8px; border: 0; background: none; color: var(--cyan-light); cursor: pointer; font-family: var(--font-head); font-stretch: 112%; font-variation-settings: 'wdth' 112; font-weight: 600; font-size: 11px; letter-spacing: .2em; text-transform: uppercase; }
+.bp__replay .arrow { font-size: 14px; transition: translate var(--t-fast) var(--ease); }
+.bp__replay:hover { color: var(--white); }
+.bp__replay:hover .arrow { translate: 4px 0; }
+.bp__svg { display: block; width: 100%; height: auto; }
+.bp__cap { padding: 4px 22px 22px; }
+.bp .log { --log-pad: 14px; gap: 9px; border-left-color: var(--line-on-dark); }
+.bp .log__time { color: var(--on-dark-muted); }
+.bp .log__text { color: var(--on-dark); }
+.bp .log__row--on .log__time { color: var(--cyan-light); }
+.bp .log__row--on .log__text { color: var(--white); }
+
+/* Arte del SVG (colores solo por tokens) */
+.bp text { font-family: var(--font-mono); font-size: 12px; letter-spacing: .04em; fill: var(--on-dark-muted); }
+.bp text.bp__hi { fill: var(--cyan-light); font-weight: 600; }
+.bp pattern path { fill: none; stroke: var(--line-on-dark-soft); stroke-width: 1; }
+.bp__gm { fill: none; stroke: var(--line-on-dark); stroke-width: 1; }
+.bp__g { stroke: none; }
+.bp__fr { fill: none; stroke: var(--line-on-dark); stroke-width: 1; }
+.bp__cn { fill: none; stroke: var(--cyan-light); stroke-width: 1.5; stroke-linecap: square; stroke-linejoin: miter; }
+.bp__ref path { stroke: var(--on-dark-muted); stroke-width: 1; }
+.bp__ref text { text-anchor: middle; }
+.bp__plan, .bp__trail { fill: none; stroke-linejoin: miter; stroke-linecap: butt; stroke-dasharray: 1; }
+.bp__plan { stroke: var(--cyan-light); stroke-width: 1.25; stroke-opacity: .55; animation: bpDraw .8s cubic-bezier(.65, 0, .35, 1) .7s backwards; }
+.bp__trail { stroke: var(--cyan); stroke-width: 2.5; animation: bpTrail 1.95s 1.95s backwards; }
+.bp__cota path { fill: none; stroke: var(--on-dark-muted); stroke-width: 1; }
+.bp__cota .bp__arw { fill: var(--on-dark-muted); stroke: none; }
+.bp__cota text { text-anchor: middle; font-size: 10px; letter-spacing: .14em; }
+.bp__origin { animation: bpFade .4s linear .65s backwards; }
+.bp__node { fill: var(--navy-deep); stroke: var(--cyan); stroke-width: 1.5; transform-box: fill-box; transform-origin: center; animation: bpPop .45s var(--ease) .65s backwards; }
+.bp__o2 { animation: bpFade .3s linear 1.95s backwards; }
+.bp__dot { fill: var(--cyan); stroke: var(--navy-deep); stroke-width: 1.5; transform-box: fill-box; transform-origin: center; animation: bpPop .4s var(--ease) 1.5s backwards; }
+.bp__ping { fill: none; stroke: var(--cyan-light); stroke-width: 1.25; opacity: 0; transform-box: fill-box; transform-origin: center; animation: bpPing .7s ease-out 3s; }
+.bp__ck { animation: bpFade .4s linear 1.6s backwards; }
+.bp__d1 { animation: bpFade .4s linear 1.5s backwards; }
+.bp__ds, .bp__star { transform-box: fill-box; transform-origin: center; }
+.bp__star { fill: var(--cyan); animation: nsTwinkle 4.8s ease-in-out 4.8s infinite; }
+.bp__ds { animation: bpPop .6s var(--ease) 3.9s backwards; }
+.bp__d2 { animation: bpFade .3s linear 3.95s backwards; }
+.bp__truck { transform: translate(440px, 116px); animation: bpTruck 1.95s 1.95s backwards; }
+.bp__rig { scale: 1.7; }
+.bp__truck :is(rect, path, circle) { fill: var(--navy-deep); stroke: var(--white); stroke-width: .95; stroke-linejoin: miter; }
+.bp__truck .bp__win { fill: var(--cyan-tint-3); stroke-width: .6; }
+.bp__truck .bp__rib { fill: none; stroke-width: .5; stroke-opacity: .55; }
+.bp__stamp { transform-box: fill-box; transform-origin: center; }
+.bp__stamp--a { animation: bpStamp .4s cubic-bezier(.2, .7, .2, 1) 1.3s backwards; }
+.bp__stamp--b { animation: bpStamp .45s cubic-bezier(.2, .7, .2, 1) 4.25s backwards; }
+.bp__sp { fill: var(--cyan-tint-2); stroke: var(--cyan); stroke-width: 1.5; stroke-linejoin: miter; }
+.bp__sp2 { fill: none; stroke: var(--cyan); stroke-width: .75; stroke-opacity: .6; }
+.bp text.bp__sh { font-family: var(--font-head); font-stretch: 125%; font-variation-settings: 'wdth' 125; font-weight: 800; font-size: 12px; letter-spacing: .03em; fill: var(--cyan-light); }
+.bp text.bp__ss { font-size: 8px; letter-spacing: .16em; fill: var(--cyan-light); }
+.bp__stamp--b .bp__sp { fill: var(--cyan); }
+.bp__stamp--b .bp__sp2 { stroke: var(--navy-deep); stroke-opacity: .55; }
+.bp .bp__stamp--b text { fill: var(--navy-deep); }
+.bp text.bp__pod { font-size: 18px; font-weight: 900; }
+
+/* Log del panel: filas y horas se "teclean" al ritmo de la ruta (sustituye las de components.css, que siguen para Load tracking) */
+.hero--home .bp .log__row { animation: nsRise .4s var(--ease) backwards; }
+.hero--home .bp .log__time { animation: nsType .35s steps(5) backwards; }
+.hero--home .bp .log__row:nth-child(1), .hero--home .bp .log__row:nth-child(1) .log__time { animation-delay: 1.35s; }
+.hero--home .bp .log__row:nth-child(2), .hero--home .bp .log__row:nth-child(2) .log__time { animation-delay: 2.05s; }
+.hero--home .bp .log__row:nth-child(3), .hero--home .bp .log__row:nth-child(3) .log__time { animation-delay: 3.95s; }
+
+/* Titular: cada palabra recibe una capa (::after) que se barre con clip-path; el texto base no se toca (sin cambios de layout ni de text-wrap) */
+.hw { position: relative; display: inline-block; white-space: nowrap; }
+.hw::after { content: attr(data-w) / ""; position: absolute; inset: 0; color: var(--cyan); clip-path: inset(0 0 0 100%); pointer-events: none; }
+.hw--1::after { animation: bpWord1 1.75s cubic-bezier(.65, 0, .35, 1) .6s backwards; }
+.hw--2::after { animation: bpWord2 2.25s cubic-bezier(.65, 0, .35, 1) 2s backwards; }
+.hw--3::after { color: var(--white); animation: bpReveal .35s cubic-bezier(.65, 0, .35, 1) 3.9s backwards; }
+
+@keyframes bpDraw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes bpFade { from { opacity: 0; } }
+@keyframes bpOut { from { opacity: 1; } }
+@keyframes bpPop { 0% { opacity: 0; transform: scale(.4); } 60% { opacity: 1; transform: scale(1.12); } 100% { transform: scale(1); } }
+@keyframes bpStamp { 0% { opacity: 0; transform: scale(1.35); } 60% { opacity: 1; transform: scale(.96); } 100% { transform: scale(1); } }
+@keyframes bpPing { 0% { opacity: .6; transform: scale(1); } 100% { opacity: 0; transform: scale(2.8); } }
+@keyframes bpWord1 { 0% { clip-path: inset(0 100% 0 0); } 20% { clip-path: inset(0); } 80% { clip-path: inset(0); } 100% { clip-path: inset(0 0 0 100%); } }
+@keyframes bpWord2 { 0% { clip-path: inset(0 100% 0 0); } 15.56% { clip-path: inset(0); } 84.44% { clip-path: inset(0); } 100% { clip-path: inset(0 0 0 100%); } }
+@keyframes bpReveal { 0% { clip-path: inset(0); } 100% { clip-path: inset(0 0 0 100%); } }
+@keyframes bpTruck {
+  0% { opacity: 0; transform: translate(56px, 236px); }
+  10% { opacity: 1; }
+  12.82% { opacity: 1; transform: translate(56px, 236px); animation-timing-function: cubic-bezier(.4, 0, 1, 1); }
+  32.69% { transform: translate(176px, 236px); animation-timing-function: linear; }
+  46.73% { transform: translate(236px, 176px); animation-timing-function: cubic-bezier(0, 0, .4, 1); }
+  53.35% { transform: translate(276px, 176px); animation-timing-function: linear; }
+  68.74% { transform: translate(276px, 176px); animation-timing-function: cubic-bezier(.4, 0, 1, 1); }
+  75.36% { transform: translate(316px, 176px); animation-timing-function: linear; }
+  89.41% { transform: translate(376px, 116px); animation-timing-function: cubic-bezier(0, 0, .4, 1); }
+  100% { transform: translate(440px, 116px); }
+}
+@keyframes bpTrail {
+  0% { stroke-dashoffset: 1; }
+  12.82% { stroke-dashoffset: 1; animation-timing-function: cubic-bezier(.4, 0, 1, 1); }
+  32.69% { stroke-dashoffset: .7401; animation-timing-function: linear; }
+  46.73% { stroke-dashoffset: .5563; animation-timing-function: cubic-bezier(0, 0, .4, 1); }
+  53.35% { stroke-dashoffset: .4697; animation-timing-function: linear; }
+  68.74% { stroke-dashoffset: .4697; animation-timing-function: cubic-bezier(.4, 0, 1, 1); }
+  75.36% { stroke-dashoffset: .383; animation-timing-function: linear; }
+  89.41% { stroke-dashoffset: .1993; animation-timing-function: cubic-bezier(0, 0, .4, 1); }
+  100% { stroke-dashoffset: 0; }
+}
+
+/* Retención (el script de home.php la pone solo si el panel arranca bajo el pliegue) y replay (clase .bp-off un fotograma) */
+.bp--wait, .bp--wait * { animation-play-state: paused; }
+.bp-off .bp, .bp-off .bp *, .bp-off .hw::after { animation: none !important; }
+
+@media (max-width: 640px) {
+  .bp__head { flex-wrap: nowrap; gap: 8px; padding-left: 18px; }
+  .bp__id { min-width: 0; }
+  .bp__status { font-size: 10px; }
+  .bp__replay { flex: none; letter-spacing: .12em; }
+  .bp__cap { padding-inline: 18px; }
+  .bp text { font-size: 15px; }
+  .bp__ref, .bp__cota, .bp__ck { display: none; }
+  .bp__plan { stroke-width: 1.9; }
+  .bp__trail { stroke-width: 3.4; }
+  .bp__truck :is(rect, path, circle) { stroke-width: 1.2; }
+  .bp__rig { scale: 1.55; }
+  .bp__stamp { scale: 1.2; }
+  .bp text.bp__ss { font-size: 10px; }
+  .bp text.bp__sh { font-size: 13px; }
+  .bp__o1, .bp__o2 { translate: 0 -13px; }
+}
+@media (min-width: 1025px) and (max-width: 1250px) {
+  .bp text { font-size: 14px; }
+  .bp__rig { scale: 2; }
+  .bp .bp__cota text { font-size: 10px; }
+  .bp text.bp__ss { font-size: 10px; }
+  .bp__o1, .bp__o2 { translate: 0 -5px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bp__s--a, .bp__replay { display: none; }
+}
 
 /* Ticker base */
 .ticker { position: relative; z-index: 2; margin: -34px -5% 0; transform: rotate(-1.6deg); background: var(--sheen-btn), var(--cyan); color: var(--navy-deep); overflow: hidden; box-shadow: inset 0 1px 0 var(--edge-hi), inset 0 -2px 0 var(--edge-ink-2), 0 26px 44px -20px var(--shadow-deep); }

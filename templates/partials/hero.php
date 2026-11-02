@@ -15,7 +15,7 @@
  *  ctas    array   [['label','href','variant'=>'primary|ghost','icon'=>'arrow|whatsapp|null','arrow'=>bool (→ de texto)],…]
  *  image   array   ['base'=>'red-semi-dry-van-open-road','alt'=>'…','stripe'=>bool,'star'=>bool(true),'sizes'=>'…']
  *  aside   string  HTML ya renderizado (tarjeta de datos / vista previa de documento); va tras la imagen si hay ambas
- *  deco    string  null | 'lane' (línea discontinua + estrella grande) | 'grid' (rejilla + diagonal + línea, como el home)
+ *  deco    string  null | 'lane' (estrella grande estática de fondo; sin diagonales ni giros)
  *  stack   bool    true => sin columna derecha, H1 hasta 980px
  *  cls     string  clase extra en <section>
  */
@@ -30,17 +30,9 @@ $deco = $deco ?? null;
 $stack = !empty($stack) || (!$image && $aside === '');
 $ctas = $ctas ?? [];
 ?>
-<section data-motion="hero" class="hero on-dark<?= $stack ? ' hero--stack' : '' ?><?= !empty($cls) ? ' ' . e($cls) : '' ?>">
-  <?php if ($deco === 'grid'): ?>
-  <svg class="hero__deco" aria-hidden="true" focusable="false" viewBox="0 0 1440 800" preserveAspectRatio="none">
-    <defs><pattern id="hero-grid" width="48" height="48" patternUnits="userSpaceOnUse"><path class="hero__gridline" d="M48 0H0V48"/></pattern></defs>
-    <rect width="1440" height="800" fill="url(#hero-grid)"/>
-    <polygon points="-40,800 820,140 860,140 120,800"/>
-    <path class="lane-dash" d="M-40 800 L840 130"/>
-  </svg>
-  <?php elseif ($deco === 'lane'): ?>
+<section data-motion="hero" class="hero hero--int on-dark<?= $stack ? ' hero--stack' : '' ?><?= !empty($cls) ? ' ' . e($cls) : '' ?>">
+  <?php if ($deco === 'lane'): ?>
   <?= ns_star(400, 'hero__bigstar hide-m') ?>
-  <svg class="hero__deco" aria-hidden="true" focusable="false" viewBox="0 0 1440 700" preserveAspectRatio="none"><path class="lane-dash" d="M-40 700 L900 80"/></svg>
   <?php endif; ?>
   <div class="container hero__in">
     <div class="hero__main<?= $image || $aside !== '' ? ' anim-rise' : '' ?>">
