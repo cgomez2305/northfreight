@@ -501,6 +501,16 @@ Estado de verificación (staging, `ENV=production` en Lighthouse móvil, 4 rutas
 6. Google Search Console + sitemap enviado; analítica según respuesta del cliente.
 7. Entorno de staging en un subdominio con `noindex` antes del dominio final.
 
+### Estado del despliegue (2026-11-02)
+
+- **Sitio:** `https://northstarfreightsolutions.us` (dominio `.us` comprado el 2026-10-29), en el plan Business de la cuenta, usuario de hosting `u480515229`, raíz `public_html`.
+- **Primer despliegue:** paquete subido por archivo (archivos commiteados + `vendor/` de PHPMailer sin `.git`, sin `CLAUDE.md` ni `.claude/`).
+- **Git:** despliegue automático conectado a `cgomez2305/northfreight`, rama **`main`** (creada desde `claude/tender-brown-canrk9`). Cada push a `main` actualiza el sitio. Se trabaja en una rama de desarrollo y se fusiona a `main` para publicar. `vendor/` y `app/config.local.php` NO están en Git y viven solo en el servidor: tras un cambio de dependencias hay que resubir `vendor/` (o ejecutar `composer install` por SSH).
+- **`app/config.local.php` del servidor:** `ENV=staging` (noindex + `robots.txt` Disallow), `DOMAIN`, `PREVIEW_TOKEN` (para ver las rutas draft con `?preview=`) y `APP_SECRET`. **Sin SMTP:** el formulario guarda los mensajes en `storage/mail.log` hasta que se añadan `SMTP_*` y `MAIL_TO`.
+- **Pasar a producción:** cambiar `ENV` a `production` (quita noindex y abre robots), con los placeholders resueltos (§8.4) y los archivos de `assets/downloads/` subidos.
+- **Verificado en vivo:** 22 rutas live en 200, 404 propio, HTTPS y barra final con 301, `app/`, `vendor/`, `storage/`, `templates/` y `.git` con 403, draft solo con token, `.htaccess` funcionando.
+- **Sitio sobrante:** existe un sitio vacío en `wheat-lyrebird-274919.hostingersite.com`, creado por error antes de conocer el dominio. No tiene contenido y puede borrarse desde hPanel.
+
 ---
 
 ## 13. Checklist antes de dar una página por terminada
