@@ -19,10 +19,11 @@ require NS_ROOT . '/app/helpers.php';   // carga también app/config.php
 require NS_ROOT . '/app/sitemap.php';
 require NS_ROOT . '/app/forms/lib.php';   // csrf_token() y utilidades de formularios: SIEMPRE antes de renderizar
 
+// Los errores NUNCA se muestran al visitante (revelarían rutas del servidor): van a storage/error.log, también en staging.
 error_reporting(E_ALL);
-if (is_production()) {
-    ini_set('display_errors', '0');
-}
+ini_set('display_errors', '0');
+ini_set('log_errors', '1');
+ini_set('error_log', NS_ROOT . '/storage/error.log');
 
 /** Respuesta de error mínima en texto plano (assets inexistentes, 400, 405). */
 function ns_plain(int $status, string $message, array $headers = []): never

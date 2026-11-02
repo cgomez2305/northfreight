@@ -103,21 +103,13 @@ if ($gsap && is_file(NS_ROOT . '/assets/css/motion.css')) {
 <?php partial('footer', ['wa' => $wa]); ?>
 <?php partial('mbar', ['wa' => $wa]); ?>
 <?php partial('wa-float', ['wa' => $wa]); ?>
-<?php if (in_array('nojs', $X)) { $gsap = false; $jsFile = static fn(string $f): bool => false; $jsByTemplate = []; } /*XH*/ ?>
 <?php if ($jsFile('main.js')): ?>
 <script src="<?= e(asset('js/main.js')) ?>" defer></script>
 <?php endif; ?>
 <?php if (isset($jsByTemplate[$template]) && $jsFile($jsByTemplate[$template])): ?>
 <script src="<?= e(asset('js/' . $jsByTemplate[$template])) ?>" defer></script>
 <?php endif; ?>
-<?php if ($gsap && in_array('lazy', $X)): ?>
-<script>
-(function(){var L=["https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js","https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js","<?= e(asset('js/split.js')) ?>","<?= e(asset('js/motion.js')) ?>"];
-function go(){L.forEach(function(u){var s=document.createElement('script');s.src=u;s.async=false;document.body.appendChild(s);});}
-function idle(){(window.requestIdleCallback||function(f){setTimeout(f,200)})(go,{timeout:1500});}
-if(document.readyState==='complete')idle();else addEventListener('load',idle);})();
-</script>
-<?php elseif ($gsap): ?>
+<?php if ($gsap): ?>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
 <?php if ($jsFile('split.js')): ?>
