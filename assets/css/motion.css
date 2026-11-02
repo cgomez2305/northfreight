@@ -7,14 +7,12 @@ html.js-motion .ns-split { display: flow-root; }
 html.js-motion .ln { display: block; overflow: hidden; padding: 0 .06em .2em; margin: 0 -.06em -.2em; }
 html.js-motion .ln__i { display: block; white-space: nowrap; }
 
-/* GSAP sustituye las animaciones CSS equivalentes (misma velocidad base en el ticker) */
-html.js-motion .hero .anim-rise { animation: none; }
-html.js-motion .ticker__track { animation: none; }
+/* La entrada del hero y la marquesina del ticker son animaciones CSS (components.css / home.css): GSAP solo ajusta su velocidad. */
 
-/* Estrella del hero: giro por scroll y entrada a través de propiedades independientes (componen con el twinkle CSS) */
+/* Estrella del hero: giro por scroll (--sr) con la propiedad independiente rotate (compone con el twinkle CSS, que usa transform) */
 html.js-motion .hero__star,
 html.js-motion .hero__bigstar,
-html.js-motion .star-hero { scale: var(--sc, 1); rotate: var(--sr, 0deg); }
+html.js-motion .star-hero { rotate: var(--sr, 0deg); }
 
 /* c) Pasos: el trazo discontinuo se dibuja con --p (0-1) y el número se enciende al cruzarlo */
 html.js-motion .sb-hw-steps.has-line { border-left-color: transparent; position: relative; isolation: isolate; }

@@ -15,11 +15,6 @@
     if (!els.length || typeof Intl === 'undefined' || !Intl.DateTimeFormat) return;
     var zones = { et: 'America/New_York', ct: 'America/Chicago', mt: 'America/Denver', pt: 'America/Los_Angeles' };
     var fmt = {}, timer;
-    try {
-      Object.keys(zones).forEach(function (k) {
-        fmt[k] = new Intl.DateTimeFormat('en-US', { timeZone: zones[k], hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
-      });
-    } catch (e) { return; }
     function tick() {
       var now = new Date();
       els.forEach(function (el) {
@@ -33,8 +28,16 @@
       tick();
       timer = setTimeout(next, 20000 - (Date.now() % 20000) + 30); // alineado a múltiplos de 20 s (incluye inicio de minuto)
     }
-    d.addEventListener('visibilitychange', next);
-    next();
+    function init() { // crear los 4 Intl.DateTimeFormat es lo más caro de main.js: fuera del camino del primer pintado
+      try {
+        Object.keys(zones).forEach(function (k) {
+          fmt[k] = new Intl.DateTimeFormat('en-US', { timeZone: zones[k], hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
+        });
+      } catch (e) { return; }
+      d.addEventListener('visibilitychange', next);
+      next();
+    }
+    if (window.requestIdleCallback) window.requestIdleCallback(init, { timeout: 1000 }); else setTimeout(init, 200);
   })();
 
   /* ---- Mega menús ---- */
@@ -220,7 +223,7 @@
     function sched() { if (!raf) raf = requestAnimationFrame(upd); }
     window.addEventListener('scroll', sched, { passive: true });
     window.addEventListener('resize', sched);
-    upd();
+    sched();
   })();
 
   /* ---- Calculadoras: .is-tick ~400 ms en el resultado que cambia (observa las regiones aria-live) ---- */
@@ -259,7 +262,6 @@
     }
     if (window.MutationObserver) new MutationObserver(pos).observe(box, { attributes: true, attributeFilter: ['aria-pressed'], subtree: true });
     window.addEventListener('resize', pos);
-    if (d.fonts && d.fonts.ready) d.fonts.ready.then(pos);
-    pos();
+    if (d.fonts && d.fonts.ready) d.fonts.ready.then(pos); else setTimeout(pos, 0); // sin lectura de layout síncrona en la carga
   })();
 })();

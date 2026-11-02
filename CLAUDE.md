@@ -258,9 +258,11 @@ Breakpoints:
 ### 5.7 Movimiento
 
 - Existentes: `twinkle` de la estrella (4.8s), punto "live" con pulso, ticker en marquesina, aparición `rise` de la tarjeta del hero, pop-up móvil (fondo `fade` .25s + panel `slide` desde la derecha .35s), hover de tarjetas (`translateY(-3px)`) y botones (`-2px`).
-- GSAP ScrollTrigger: entradas de sección y escalonado de tarjetas, sutil (≤ 24px de desplazamiento, ≤ .6s). Una sola animación orquestada por sección, no efectos en cada elemento.
-- Todo el contenido es visible sin JavaScript y sin scroll (nada queda en `opacity:0` esperando un observer).
-- `prefers-reduced-motion: reduce` desactiva todas las animaciones y transformaciones de hover.
+- **Ampliado por Carlos ("se ve muy plano"):** GSAP 3.12.5 + ScrollTrigger (sin más librerías) con entradas de hasta 32px y .9s (×0.7 en móvil), ease `expo.out`/`power3.out`, escalonado .06–.09s. Regla: **una orquestación por sección**, distinta según el tipo de bloque. Hay: cabeceras de sección con máscara por líneas y swoosh que se dibuja; rejillas de tarjetas escalonadas; pasos de "How it works" con línea que se dibuja con el scroll (`--p`) y números que se encienden (`.is-on`); ticker que acelera con la velocidad de scroll; estrella del hero que gira ~30° y rejilla/imagen con parallax (solo ≥1025px); spotlight en tarjetas oscuras y botones magnéticos (máx. 6px) solo con `(hover:hover) and (pointer:fine)`; horas del desk log "tecleadas"; barra de progreso de lectura en artículos; header que cambia con `.is-scrolled`. Descartado: tilt 3D, View Transitions, scroll suave (Lenis), pin de secciones largas, parallax en móvil, SplitText (la división en líneas es `assets/js/split.js`).
+- **La entrada del hero es CSS puro** (`.anim-rise` y escalonado en `components.css`, con `animation-fill-mode: backwards`): titular y lead son visibles desde el primer pintado y solo se desplazan 18px. Animar el hero con GSAP desde el CDN retrasaba el LCP ~0,2–0,6 s. El resto de entradas (`motion.js`) arrancan tras `load` + idle y preparan cada sección solo cuando está a ≤1,8 pantallas.
+- Todo el contenido es visible sin JavaScript y sin scroll: `html.js-motion` la añade `motion.js` solo cuando GSAP y ScrollTrigger existen, y el CSS **nunca** oculta nada si falta esa clase. Si GSAP falla se restaura todo. Las bandas oscuras y las rejillas entran con opacity+translate (nunca con `clip-path` + `filter` sobre secciones grandes: 3 → 45 fotogramas lentos).
+- `prefers-reduced-motion: reduce` desactiva todas las animaciones y transformaciones de hover y no crea `html.js-motion`.
+- **Profundidad (CSS):** bordes de luz, sombras `drop-shadow` en el padre sin `clip-path` (`.card-wrap`), fondos de hero y bandas en capas (`--bg-hero`, `--bg-band`) con rejilla técnica, grano, botones con brillo y glow. Todo con alfas y gradientes de los colores existentes, definidos en `tokens.css`.
 
 ---
 
@@ -484,10 +486,11 @@ Estado de verificación (staging, `ENV=production` en Lighthouse móvil, 4 rutas
 
 ## 11. Rendimiento y accesibilidad
 
-- Fuentes en local (`woff2`, subset latino), `font-display: swap`, `preload` de Saira 900 y DM Sans 400.
+- Fuentes en local (`woff2`, subset latino), `font-display: swap`, `preload` de Saira 900 y DM Sans 400. **Fuentes recortadas a los ejes que usa el sitio (202 KB → 79 KB, quitó ~0,6 s de LCP):** Saira peso 600–900 con `wdth` 112–125; DM Sans peso 400–700 con `opsz` 9–24; JetBrains Mono peso 400–600 solo ASCII/Latin-1. Un peso, ancho o carácter fuera de esos rangos se recorta al extremo más cercano: si se necesita, regenerar la fuente (ver comentario en `assets/css/fonts.css`; las originales están en el historial de git).
+- **Presupuesto de CSS:** tras la capa de profundidad cada página carga 60–65 KB sin comprimir (~16–17 KB gzip). Se mide en gzip (lo que viaja): ≤ 18 KB.
 - Imágenes WebP con `srcset`/`sizes`, `width`/`height` explícitos, `loading="lazy"` salvo la imagen del hero (`fetchpriority="high"`).
 - Video con fachada: nada de iframe hasta el clic.
-- Objetivo Lighthouse móvil: Performance ≥ 90, Accessibility ≥ 95, Best Practices ≥ 95, SEO 100. LCP < 2.5 s, CLS < 0.1.
+- Objetivo Lighthouse móvil: Performance ≥ 90, Accessibility ≥ 95, Best Practices ≥ 95, SEO 100. LCP < 2.5 s, CLS < 0.1. **Medido tras profundidad + animaciones (ENV=production, `php -S` sin compresión ni caché):** home 96 (LCP 2,6 s), owner 96, calculadora IFTA 97, blog 97, our desk 98; TBT ≈ 0, CLS 0, Accessibility/Best Practices/SEO 100. Antes de cada cambio de estilo o movimiento, repetir esta medición: una primera versión dejó la home en 86.
 - HTML semántico: `header`, `nav`, `main`, `section` con encabezado, `footer`; `button` para acciones, `a` para navegación.
 - `aria-label` en botones de solo icono; `aria-expanded`/`aria-controls` en menús; `aria-live` en resultados de calculadoras.
 - Contraste AA en todo el texto; foco visible en cian.
