@@ -82,6 +82,7 @@ Opcional (fase 2): un script `bin/build.php` que pre-renderiza todas las rutas a
 │   │   ├── cta.php          # bloque final "Let's talk about your operation."
 │   │   ├── footer.php
 │   │   ├── mbar.php         # barra fija móvil (WhatsApp + llamada)
+│   │   ├── wa-float.php     # botón flotante de WhatsApp (todas las pantallas)
 │   │   └── kit.php          # funciones auxiliares de los partials (iconos SVG, logo, estrella, swoosh, imágenes)
 │   └── pages/               # una plantilla por página (ver §7); subcarpetas con contenido: legal/, posts/, company/
 ├── assets/
@@ -251,6 +252,7 @@ Breakpoints:
 - "FREIGHT SOLUTIONS": Saira wdth 112, peso 600, `8px`, `line-height: 5.76px`, `letter-spacing: .49em`, color `#B9C8D8`.
 - Separación vertical entre las dos líneas: `4px`. Los dos renglones miden lo mismo de ancho.
 - Proporciones verificadas contra el logo original; no cambiarlas a ojo.
+- **Centrado óptico del isotipo:** el SVG está bien recortado (2 unidades de margen por cada lado del viewBox, centrado geométrico). Lo que no está centrado es su **peso visual**: la N blanca pesa abajo a la izquierda y la estrella ligera queda arriba a la derecha, así que el centro de masa cae ~5 px por debajo y ~3 px a la izquierda del centro de la caja (a 46 px). Corrección a la mitad: `.logo__mark { transform: translateY(-5%) }` en el header/footer y, en `favicon.svg`/`favicon.png`, el isotipo al 92 % desplazado arriba-derecha. No se desplaza en horizontal en el logo para no romper la alineación con el gutter.
 - Isotipo en SVG (`assets/img/isotype-white.svg` y `isotype.svg`), sin recortes.
 
 ### 5.7 Movimiento
@@ -272,6 +274,7 @@ Breakpoints:
 | **Mega Resources** | Free tools (IFTA, Rate per mile) · Templates (BOL, Agreement) · Learn (Glossary, Blog) · tarjeta cian de descarga del BOL. |
 | **Pop-up móvil** | `role="dialog" aria-modal="true"`, fondo navy translúcido con desenfoque, panel desde la derecha (ancho completo en móvil, 440px en tablet), cabecera con logo + botón cerrar, acordeones Services/Resources, enlaces principales, bloque fijo inferior con WhatsApp y llamada. Bloquea el scroll del body, cierra con Esc, clic en el fondo o en un enlace, y devuelve el foco al botón que lo abrió. **Mientras está abierto, la barra móvil se oculta.** |
 | **Barra móvil (mbar)** | Fija abajo, de borde a borde, fondo `--navy-deep` 96% con desenfoque y línea superior. Botones alineados al gutter de 20px: "Talk to a dispatcher" (cian, flex 1) + llamada (cuadrado 56px). Respeta `env(safe-area-inset-bottom)`. Solo ≤760px. |
+| **Botón flotante de WhatsApp** | Fijo abajo a la derecha en todas las pantallas (decisión de Carlos), con el mensaje de WhatsApp de la ruta. Chaflán de botón (14px), cian con texto navy-deep. Escritorio: icono + "WhatsApp"; ≤760px: solo icono (56px), 16px por encima de la barra móvil (`--mbar-h`). Se oculta con el pop-up del menú abierto. La sombra va en el contenedor (`drop-shadow`): un `clip-path` recortaría la sombra del propio enlace. En móvil convive con el botón "Talk to a dispatcher" de la barra: ambos abren WhatsApp. |
 | **Hero interno** | Migas → eyebrow opcional → H1 → swoosh → tagline opcional → lead → CTAs → columna derecha opcional (imagen, tarjeta de datos o vista previa de documento). |
 | **Tarjeta** | Chaflán `.cut`, fondo `--surface` (variante oscura en navy para la última o la destacada), número/etiqueta mono, H3, texto, enlace con flecha "→" en DM Sans. |
 | **FAQ** | `<details>/<summary>` con la estrella NorthStar que gira 45° al abrir (así es en la maqueta). El layout genera el JSON-LD FAQPage. En producción se descartan las FAQ con placeholders. |

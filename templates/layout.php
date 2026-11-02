@@ -99,6 +99,7 @@ $gsap = !empty($route['motion']) && $jsFile('motion.js');
 <?php if ($ctaOn): partial('cta', ['wa' => $wa]); endif; ?>
 <?php partial('footer', ['wa' => $wa]); ?>
 <?php partial('mbar', ['wa' => $wa]); ?>
+<?php partial('wa-float', ['wa' => $wa]); ?>
 <?php if ($jsFile('main.js')): ?>
 <script src="<?= e(asset('js/main.js')) ?>" defer></script>
 <?php endif; ?>

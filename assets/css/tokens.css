@@ -77,6 +77,8 @@
 
   /* Capas */
   --z-header: 40;
+  --z-float: 45;
   --z-mbar: 50;
+  --mbar-h: 81px;                          /* alto de la barra móvil (12 + 56 + 12 + borde); sube el botón flotante */
   --z-modal: 100;
 }
