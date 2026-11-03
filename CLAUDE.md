@@ -35,7 +35,7 @@ Por qué:
 
 Dependencias permitidas:
 - **PHPMailer** (vía Composer) para enviar el formulario por SMTP de Hostinger.
-- **GSAP 3.12.5 + ScrollTrigger** desde cdnjs (versión fija, con SRI), cargados solo en las rutas con `'motion' => true`.
+- **GSAP 3.12.5 + ScrollTrigger** desde cdnjs (versión fija, con SRI), cargados en todas las rutas (`'motion' => true`).
 - Nada más sin acordarlo antes.
 
 Opcional (fase 2): un script `bin/build.php` que pre-renderiza todas las rutas a `dist/*.html` para servirlas como estáticas puras. No es necesario para la primera versión.
@@ -99,7 +99,7 @@ Opcional (fase 2): un script `bin/build.php` que pre-renderiza todas las rutas a
 │   │   ├── calc-ifta.js
 │   │   ├── blog-filter.js
 │   │   ├── video.js       # fachada + capítulos
-│   │   └── motion.js      # GSAP ScrollTrigger: escenas de scroll (solo en rutas con 'motion' => true)
+│   │   └── motion.js      # GSAP ScrollTrigger: escenas de scroll (todas las rutas)
 │   ├── fonts/             # woff2 locales (Barlow, Barlow Condensed, JetBrains Mono)
 │   ├── img/               # WebP + fallback JPG, nombres descriptivos en inglés
 │   └── downloads/         # bol-template.pdf, bol-template.docx, dispatcher-carrier-agreement.docx
@@ -206,16 +206,18 @@ Isotipo (`assets/img/isotype-white.svg`, 40 px) + texto "NORTHSTAR" (Barlow Cond
 
 ### 5.7 Movimiento
 
-**Decisión de Carlos (2026-11-03):** fuera las animaciones PLANAS 2D (plano de ruta, ticker, máscara de titulares por líneas, swoosh, estrella que gira, pulso, cotas, marcas de registro, spotlight, botones magnéticos, barra de lectura): **no reintroducirlas**. SÍ quiere el movimiento de https://fourlines.framer.website/: **GSAP + ScrollTrigger con escenas de scroll con profundidad y parallax** (`assets/js/motion.js` + `assets/css/motion.css`, solo en las rutas con `'motion' => true`: home, owner, relay, dryvan, tracking, backoffice, how, desk, blog y artículos).
+**Decisión de Carlos (2026-11-03):** fuera las animaciones PLANAS 2D (plano de ruta, ticker, máscara de titulares por líneas, swoosh, estrella que gira, pulso, cotas, marcas de registro, spotlight, botones magnéticos, barra de lectura): **no reintroducirlas**. SÍ quiere el movimiento de https://fourlines.framer.website/: **GSAP + ScrollTrigger con escenas de scroll con profundidad y parallax, en TODA la web** (`assets/js/motion.js` ~5,5 KB gzip + `assets/css/motion.css`; `'motion' => true` en las 22 rutas, el 404 y las 5 páginas de equipo en draft).
 
-Escenas (todas ligadas al scroll con `scrub`, solo `transform` y `opacity`; nunca animar `filter`, `clip-path`, `box-shadow`, tamaño ni `border-radius` en bloques grandes):
-1. **Hero del home** (≥1025 px): fijado ~100 % del alto de la ventana (`scrub .6`); la foto se encoge (scale 1 → .86, radio fijo 32) con parallax interno, el texto sube y se desvanece, y las dos líneas del titular se separan (x ∓48).
-2. **Carril de servicios** (≥1025 px y ≥700 px de alto): la sección se fija y las 3 tarjetas con foto se desplazan en horizontal (`scrub 1`), con rotación ±2° alternada, desfase vertical escalonado, escala .92 → 1 (`containerAnimation`) y parallax horizontal de la foto. La opacidad .6 → 1 va en la foto, no en la tarjeta, para que el texto conserve contraste AA. El foco de teclado en una tarjeta hace scroll al punto del pin que la muestra. Por debajo de 1025 px o con poco alto: rejilla (o carril nativo), sin pin.
-3. **Parallax de fotos** (`.px`, también en móvil): imagen al 120 % del marco con `overflow: hidden`, yPercent ≈ ±8. La geometría de `.px` va SIN depender de `html.js-motion` (con esa condición la foto daba un salto de zoom al activarse el JS).
-4. **Bandas** (≥1025 px): CTA final y banda de Relay entran con scale .94 → 1 y y 60 → 0.
-5. **Entradas** del onboarding y de la fila 4/1/0: y 40 → 0 + opacidad, una vez, .7 s, `power3.out`.
+Escenas (todas ligadas al scroll con `scrub`, solo `transform` y `opacity`; nunca animar `filter`, `clip-path`, `box-shadow`, tamaño ni `border-radius` en bloques grandes). Comunes a todas las páginas:
+1. **Hero interno** (≥1025 px, sin pin): al salir de pantalla el panel escala 1 → .95 y baja 40 px, el texto sube 60 px y baja a opacidad .15, la foto sigue en parallax (en `/our-desk/` el video escala a .92). En la calculadora de rate per mile los inputs viven en el hero: ahí el panel no escala, solo sube y se atenúa el texto.
+2. **Bandas y paneles grandes** (`.section--surface`, `.section--dark`, `.co-band`, `.home-relay`, `.cta`, `.footer`): escala .94 → 1 y y 60 → 0 (`scrub .5`, de `top 90%` a `top 45%`). En móvil solo y 40 → 0 y opacidad, sin escala.
+3. **Rejillas 3D** (`.g2`..`.g6`, `.blog-grid`, ≥1025 px): contenedor con `perspective: 1200px`; un trigger por fila; cada tarjeta `rotateX` 10° → 0, y 48 → 0, escalonado .12, `scrub: true`. La opacidad inicial es .95 (no .5): con .5 el contraste del cian pequeño sobre los paneles hacía bajar Accessibility de 100 a 96. Se excluyen el carril del home y cualquier rejilla con form, input, select, textarea o calculadora.
+4. **Titulares de sección** (≥1025 px): sube la cabecera entera (`.section-head`) y 40 → 0 (no solo el h2, que se pisaría con el lead).
+5. **Parallax de fotos** (`.px`, también en móvil): imagen al 120 % del marco con `overflow: hidden`, yPercent ≈ ±8; los marcos `.px` grandes sueltos además escalan .92 → 1. La geometría de `.px` NO depende de `html.js-motion` (con esa condición la foto daba un salto de zoom al activarse el JS).
+6. **Cifras** (`.home-steps`, `.home-figures`, `.sb-hw-steps`; escritorio y móvil): entrada una vez, .7 s, `power3.out`, escalonada .08 s.
+Solo en el home: **hero fijado** (pin ~100 % del alto, `scrub .6`: la foto se encoge a .86 con parallax, el texto sube y se desvanece, las dos líneas del titular se separan ∓48 px), **carril horizontal de servicios** (≥1025 px y ≥700 px de alto; las 3 tarjetas con foto se desplazan con rotación ±2°, desfase vertical y parallax horizontal; el foco de teclado en una tarjeta hace scroll al punto del pin; la opacidad .6 → 1 va en la foto, no en la tarjeta) y la **banda de Relay**.
 
-Reglas: `motion.js` descarga GSAP y ScrollTrigger (versión fija con SRI, en los `data-*` de su `<script>`) tras `load` + idle para no competir con el LCP; `html.js-motion` la añade `motion.js` solo tras `load` + idle, cuando existen `gsap` y `ScrollTrigger` y no hay `prefers-reduced-motion: reduce`; **el CSS nunca oculta contenido sin esa clase** (sin JS, con GSAP bloqueado o con movimiento reducido todo se ve completo y estático). `gsap.matchMedia()` separa escritorio (pines y carril) de móvil (solo parallax); cualquier excepción revierte todo. El `<img>` del hero conserva `fetchpriority="high"` (LCP). Hover/focus: transiciones CSS de 150-250 ms. Pendiente: medir los fotogramas del carril y del hero en un navegador con GPU real (en Chromium con rasterizado por software ~20 % de fotogramas > 33 ms; el carril combina rotación y esquinas redondeadas).
+Reglas: `motion.js` descarga GSAP y ScrollTrigger (3.12.5, versión fija con SRI en los `data-*` de su `<script>`) tras `load` + idle para no competir con el LCP; `html.js-motion` la añade `motion.js` solo cuando existen `gsap` y `ScrollTrigger` y no hay `prefers-reduced-motion: reduce`; **el CSS nunca oculta contenido sin esa clase** (sin JS, con GSAP bloqueado o con movimiento reducido todo se ve completo y estático). `gsap.matchMedia()` separa escritorio (pines, 3D) de móvil (parallax, cifras, bandas ligeras; sin pines ni 3D); en móvil el `matchMedia` necesita una condición siempre verdadera para que el callback corra. Máx. ~26 ScrollTriggers (home) y 2-13 en el resto; `will-change` solo mientras la escena está activa; `ScrollTrigger.refresh` con debounce si cambia la altura (FAQ, filas del IFTA, filtro del blog); `.js-motion body { overflow-y: clip }` para que el `y` inicial del footer no alargue la página. No se animan inputs, selects, textareas ni los resultados `aria-live`. Hover/focus: transiciones CSS de 150-250 ms. Pendiente: medir fotogramas en un navegador con GPU real (en Chromium con rasterizado por software el home da ~19 % de fotogramas > 33 ms por el hero fijado y el carril; el resto de páginas ≤ 1,5 %).
 
 ---
 
@@ -414,7 +416,7 @@ Antes de publicar en producción: auditar las rutas con `ENV=production` y compr
 | **Descargas (BOL, agreement)** | `'form' => 'download'` → `app/forms/download.php`: nombre + correo + formato → entrega `assets/downloads/<archivo>` con `Content-Disposition` y avisa por correo; si el archivo no existe devuelve 422 con mensaje claro (no 500) y registra la solicitud en `storage/downloads.log`. |
 | **Newsletter del blog** | Solo maquetado. Conectar cuando el cliente elija herramienta. |
 
-JavaScript: GSAP solo en las rutas con movimiento, módulos pequeños, `defer`, cada uno se carga solo en la página que lo usa (`main.js` en todas). El sitio funciona y se lee sin JS.
+JavaScript: GSAP en todas las rutas (descarga diferida), módulos pequeños, `defer`, cada uno se carga solo en la página que lo usa (`main.js` en todas). El sitio funciona y se lee sin JS.
 
 ---
 
