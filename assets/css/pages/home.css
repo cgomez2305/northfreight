@@ -51,7 +51,7 @@
 .home-step { display: flex; flex-direction: column; gap: 12px; padding: 28px clamp(16px, 2vw, 32px) 8px; }
 .home-step:first-child { padding-left: 0; }
 .home-step + .home-step { border-left: 1px solid var(--hairline); }
-.home-step__n { font-family: var(--font-head); font-weight: 900; font-size: clamp(72px, 8vw, 104px); line-height: .85; letter-spacing: -.03em; color: var(--cyan-line); }
+.home-step__n { font-family: var(--font-head); font-weight: 900; font-size: clamp(72px, 8vw, 104px); line-height: .85; letter-spacing: -.03em; color: var(--cyan); }
 .home-step .t-h3 { margin-top: 12px; line-height: 1.02; color: var(--text); }
 .home-step .t-card { color: var(--text-2); }
 @media (max-width: 1024px) {

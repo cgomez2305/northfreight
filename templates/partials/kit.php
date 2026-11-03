@@ -96,10 +96,10 @@ function ns_img(array $o): string
 /** Lockup del logo (§5.6). $variant: 'dark' (sobre navy, por defecto). */
 function ns_logo(string $class = 'logo'): string
 {
-    return '<a class="' . e($class) . '" href="' . e(url('/')) . '" aria-label="' . e(cfg('brand')) . ' home">'
+    return '<a class="' . e($class) . '" href="' . e(url('/')) . '">'
         . '<img class="logo__mark" src="' . e(asset('img/isotype-white.svg')) . '" alt="" width="46" height="46">'
         . '<span class="logo__text"><span class="logo__name">North<span>star</span></span>'
-        . '<span class="logo__sub">Freight Solutions</span></span></a>';
+        . '<span class="logo__sub">Freight Solutions</span><span class="sr-only"> home</span></span></a>';
 }
 
 /**

@@ -451,7 +451,7 @@ Pendientes técnicos conocidos:
 - **Presupuesto de CSS:** ≤ 18 KB gzip por página (fonts + tokens + base + components + grupo de página). Tras el rediseño: 12–13 KB.
 - Imágenes WebP con `srcset`/`sizes`, `width`/`height` explícitos, `loading="lazy"` salvo la imagen del hero (`fetchpriority="high"`).
 - Video con fachada: nada de iframe hasta el clic.
-- Objetivo Lighthouse móvil: Performance ≥ 90, Accessibility ≥ 95, Best Practices ≥ 95, SEO 100. LCP < 2.5 s, CLS < 0.1. **Las cifras anteriores al rediseño (home 91, LCP 3,0 s, TBT 190 ms) ya no valen:** el rediseño quitó GSAP y el hero SVG, y el LCP ahora es la foto del hero. Medir de nuevo **sobre el sitio publicado**, y comprobar primero que la página está completa (ver §13).
+- Objetivo Lighthouse móvil: Performance ≥ 90, Accessibility ≥ 95, Best Practices ≥ 95, SEO 100. LCP < 2.5 s, CLS < 0.1. **Medido en el sitio publicado tras el rediseño (2026-11-03, sin GSAP):** home Performance 100 (LCP 1,6 s, TBT 60 ms), how-it-works 100 (LCP 1,2 s), calculadora IFTA 100 (LCP 1,2 s); CLS 0; Best Practices 100; Accessibility 100 tras corregir el contraste de los números del onboarding y el nombre accesible del logo. **SEO sale 69 solo porque el sitio está en staging con `noindex`** (en producción es 100). Repetir la medición tras cada cambio visual, sobre el sitio publicado y con la página completa (§13).
 - HTML semántico: `header`, `nav`, `main`, `section` con encabezado, `footer`; `button` para acciones, `a` para navegación.
 - `aria-label` en botones de solo icono; `aria-expanded`/`aria-controls` en menús; `aria-live` en resultados de calculadoras.
 - Contraste AA en todo el texto; foco visible en cian.
