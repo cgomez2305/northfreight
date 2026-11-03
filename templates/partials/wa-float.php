@@ -2,7 +2,7 @@
 /**
  * Botón flotante de WhatsApp (todas las pantallas). Esquina inferior derecha; ≤760px sube por encima de la barra móvil.
  * Se oculta con el pop-up del menú abierto (CSS body:has(.mobile-menu:not([hidden])) o body.menu-open).
- * El contenedor lleva la sombra (drop-shadow) y el enlace el chaflán: clip-path recortaría una sombra propia.
+ * Botón en píldora (solo ≥761px; en móvil la barra .mbar hace de acceso fijo).
  * Params: wa(string|null) clave/mensaje de WhatsApp de la ruta.
  */
 require_once __DIR__ . '/kit.php';

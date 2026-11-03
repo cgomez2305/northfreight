@@ -1,6 +1,6 @@
 <?php
 /**
- * Barra fija móvil (≤760px): "Talk to a dispatcher" (cian, flex 1) + llamada (cuadrado 56px). Mismo chaflán de 14px.
+ * Barra fija móvil (≤760px): "Talk to a dispatcher" (cian, flex 1) + llamada (cuadrado 56px). Botones en píldora.
  * Se oculta cuando el pop-up está abierto: CSS body:has(.mobile-menu:not([hidden])) o la clase body.menu-open (opcional, JS).
  * Params: wa(string|null).
  */

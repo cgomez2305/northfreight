@@ -3,7 +3,7 @@
  * Layout del sitio. Contrato: recibe $route, $cfg y $content (HTML de la página ya renderizado). No imprime H1
  * (lo pone cada página, normalmente con partial('hero')).
  *
- * Claves de ruta que lee: title, meta, path, template, status, schema, wa, og, motion, css (grupos de CSS; anula el mapa plantilla => grupo), cta (false => sin bloque CTA final).
+ * Claves de ruta que lee: title, meta, path, template, status, schema, wa, og, css (grupos de CSS; anula el mapa plantilla => grupo), cta (false => sin bloque CTA final).
  * Orden: head (SEO, OG, fuentes, CSS, JSON-LD) → skip link → opsbar + header (nav, megas, menú móvil) →
  *        <main id="main"> → cta → footer → mbar → scripts.
  */
@@ -39,14 +39,10 @@ foreach ($cssGroups as $g) {
     }
 }
 
-// JS (solo si el archivo existe). main.js en todo; módulos por plantilla; motion solo con $route['motion'].
+// JS (solo si el archivo existe). main.js en todo; módulos por plantilla. Sin librerías de terceros.
 $scripts = [];
 $jsByTemplate = ['tool-rpm' => 'calc-rpm.js', 'tool-ifta' => 'calc-ifta.js', 'blog' => 'blog-filter.js', 'home' => 'video.js', 'desk' => 'video.js'];
 $jsFile = static fn(string $f): bool => is_file(NS_ROOT . '/assets/js/' . $f);
-$gsap = !empty($route['motion']) && $jsFile('motion.js');
-if ($gsap && is_file(NS_ROOT . '/assets/css/motion.css')) {
-    $css[] = 'css/motion.css'; // reglas que necesitan las animaciones (solo bajo html.js-motion)
-}
 ?><!doctype html>
 <html lang="en-US">
 <head>
@@ -78,8 +74,8 @@ if ($gsap && is_file(NS_ROOT . '/assets/css/motion.css')) {
 <link rel="icon" href="<?= e(asset('img/favicon.svg')) ?>" type="image/svg+xml">
 <link rel="icon" href="<?= e(asset('img/favicon.png')) ?>" type="image/png" sizes="180x180">
 <link rel="apple-touch-icon" href="<?= e(asset('img/favicon.png')) ?>">
-<link rel="preload" href="/assets/fonts/saira-var.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/assets/fonts/dm-sans-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/barlow-condensed-900.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/barlow-400.woff2" as="font" type="font/woff2" crossorigin>
 <?php foreach ($css as $c): ?>
 <link rel="stylesheet" href="<?= e(asset($c)) ?>">
 <?php endforeach; ?>
@@ -108,14 +104,6 @@ if ($gsap && is_file(NS_ROOT . '/assets/css/motion.css')) {
 <?php endif; ?>
 <?php if (isset($jsByTemplate[$template]) && $jsFile($jsByTemplate[$template])): ?>
 <script src="<?= e(asset('js/' . $jsByTemplate[$template])) ?>" defer></script>
-<?php endif; ?>
-<?php if ($gsap): ?>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
-<?php if ($jsFile('split.js')): ?>
-<script src="<?= e(asset('js/split.js')) ?>" defer></script>
-<?php endif; ?>
-<script src="<?= e(asset('js/motion.js')) ?>" defer></script>
 <?php endif; ?>
 </body>
 </html>

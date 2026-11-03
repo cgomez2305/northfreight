@@ -1,4 +1,4 @@
-/* NorthStar Freight — main.js: relojes de la ops bar, megas, pop-up móvil. Mejora progresiva: sin JS el sitio funciona. */
+/* NorthStar Freight — main.js: relojes de la ops bar, mega menús y pop-up móvil. Mejora progresiva: sin JS el sitio funciona. */
 (function () {
   'use strict';
   var d = document;
@@ -189,79 +189,5 @@
     });
     d.addEventListener('focusin', function (e) { if (isOpen && !menu.contains(e.target)) (closeBtn || menu).focus(); });
     onMq(function () { if (!mq.matches) close(); });
-  })();
-  /* ---- Header: .is-scrolled en <html> al pasar ~80 px (IntersectionObserver sobre un centinela; el CSS lo estila) ---- */
-  (function () {
-    if (!('IntersectionObserver' in window)) return;
-    var s = d.createElement('div');
-    s.setAttribute('aria-hidden', 'true');
-    s.style.cssText = 'position:absolute;top:80px;left:0;width:1px;height:1px;pointer-events:none;visibility:hidden';
-    d.body.appendChild(s);
-    new IntersectionObserver(function (en) {
-      var e = en[en.length - 1];
-      d.documentElement.classList.toggle('is-scrolled', !e.isIntersecting && e.boundingClientRect.top < 0);
-    }).observe(s);
-  })();
-
-  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  /* ---- Progreso de lectura (artículos): barra de 2 px bajo el header; --p 0..1 (animation-timeline si existe) ---- */
-  (function () {
-    var art = d.querySelector('.blog-prose'), header = d.getElementById('site-header');
-    if (!art || !header || reduce) return;
-    var bar = d.createElement('div');
-    bar.className = 'read-progress';
-    bar.setAttribute('aria-hidden', 'true');
-    header.appendChild(bar);
-    if (window.CSS && CSS.supports && CSS.supports('animation-timeline', 'scroll()')) { bar.setAttribute('data-native', ''); return; }
-    var raf = 0;
-    function upd() {
-      raf = 0;
-      var r = art.getBoundingClientRect(), span = r.height - window.innerHeight * 0.5;
-      bar.style.setProperty('--p', Math.max(0, Math.min(1, span > 0 ? -r.top / span : 0)).toFixed(3));
-    }
-    function sched() { if (!raf) raf = requestAnimationFrame(upd); }
-    window.addEventListener('scroll', sched, { passive: true });
-    window.addEventListener('resize', sched);
-    sched();
-  })();
-
-  /* ---- Calculadoras: .is-tick ~400 ms en el resultado que cambia (observa las regiones aria-live) ---- */
-  (function () {
-    if (!window.MutationObserver || reduce) return;
-    var live = $$('[data-calc] [aria-live]'), ready = false, timers = new WeakMap();
-    if (!live.length) return;
-    setTimeout(function () { ready = true; }, 700);
-    var mo = new MutationObserver(function (ms) {
-      if (!ready) return;
-      ms.forEach(function (m) {
-        var n = m.target.nodeType === 1 ? m.target : m.target.parentElement, o = n && n.closest ? n.closest('[data-out]') : null;
-        if (!o) return;
-        o.classList.remove('is-tick');
-        void o.offsetWidth;
-        o.classList.add('is-tick');
-        clearTimeout(timers.get(o));
-        timers.set(o, setTimeout(function () { o.classList.remove('is-tick'); }, 420));
-      });
-    });
-    live.forEach(function (el) { mo.observe(el, { childList: true, characterData: true, subtree: true }); });
-  })();
-
-  /* ---- Chips del blog: --cx/--cy/--cw/--ch del chip activo (el CSS desliza el fondo; sin Flip) ---- */
-  (function () {
-    var box = d.querySelector('[data-blog-filter]');
-    if (!box) return;
-    function pos() {
-      var on = box.querySelector('[aria-pressed="true"]');
-      if (!on) return;
-      box.style.setProperty('--cx', on.offsetLeft + 'px');
-      box.style.setProperty('--cy', on.offsetTop + 'px');
-      box.style.setProperty('--cw', on.offsetWidth + 'px');
-      box.style.setProperty('--ch', on.offsetHeight + 'px');
-      box.classList.add('has-slide');
-    }
-    if (window.MutationObserver) new MutationObserver(pos).observe(box, { attributes: true, attributeFilter: ['aria-pressed'], subtree: true });
-    window.addEventListener('resize', pos);
-    if (d.fonts && d.fonts.ready) d.fonts.ready.then(pos); else setTimeout(pos, 0); // sin lectura de layout síncrona en la carga
   })();
 })();

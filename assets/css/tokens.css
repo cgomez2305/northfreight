@@ -1,118 +1,63 @@
-/* NorthStar Freight Solutions — tokens (CLAUDE.md §5). Único archivo donde viven los hex. */
+/* NorthStar Freight Solutions — tokens. Único archivo donde viven los hex y rgba. Sistema oscuro (Brief A, estilo "Fourlines"). */
 :root {
-  /* Color §5.1 */
-  --navy: #071C35;
-  --navy-deep: #04132A;
+  /* Superficies */
+  --bg: #04101F;               /* fondo base del sitio */
+  --panel: #0A1D33;            /* paneles, bandas y tarjetas */
+  --panel-2: #0F2A47;          /* tarjeta destacada, hover, inputs */
+  --navy-deep: #04132A;        /* texto sobre botón cian */
+
+  /* Marca */
   --cyan: #06A6CC;
-  --cyan-ink: #04799A;
   --cyan-light: #6FD3EC;
-  --ink: #0B1B2E;
-  --slate: #4A5B6E;
-  --on-dark: #C9D6E3;
-  --on-dark-muted: #8FA3B8;
-  --on-dark-soft: #B9C8D8;
-  --surface: #F3F6F9;
-  --line: #DCE4EC;
-  --line-soft: #E3EAF1;
-  --field: #C9D4DF;
-  --white: #FFFFFF;
 
-  /* Añadidos por la maqueta (ver §5.1) */
-  --on-dark-strong: #E6EEF6;   /* enlaces de nav sobre navy */
-  --ink-2: #24364A;            /* cuerpo de artículos */
-  --surface-hover: #EAF1F7;    /* hover de tarjetas */
+  /* Texto (todos pasan AA ≥ 4.5:1 sobre --bg, --panel y --panel-2) */
+  --text: #EEF3F8;
+  --text-2: #B9C8D8;
+  --text-3: #8FA3B8;
 
-  /* Alfas sobre oscuro */
-  --line-on-dark: rgba(255, 255, 255, .1);
-  --line-on-dark-soft: rgba(255, 255, 255, .08);
-  --tint-on-dark: rgba(255, 255, 255, .06);
-  --fill-on-dark: rgba(255, 255, 255, .09);
+  /* Líneas y alfas */
+  --hairline: rgba(255, 255, 255, .10);
+  --hairline-strong: rgba(255, 255, 255, .18);
+  --cyan-line: rgba(6, 166, 204, .55);
   --cyan-tint: rgba(6, 166, 204, .12);
-  --cyan-tint-2: rgba(6, 166, 204, .18);
-  --cyan-tint-3: rgba(6, 166, 204, .24);
-  --cyan-pulse: rgba(6, 166, 204, .55);
-  --cyan-pulse-0: rgba(6, 166, 204, 0);
-  --overlay: rgba(4, 19, 42, .72);
-  --overlay-bar: rgba(4, 19, 42, .96);
-  --shadow-deep: rgba(0, 0, 0, .6);
-  --shadow-navy: rgba(4, 19, 42, .6);
+  --overlay: rgba(4, 16, 31, .72);
+  --glass-bg: rgba(10, 29, 51, .72);       /* píldora del header (translúcida con desenfoque) */
+  --glass-blur: 16px;
+  --photo-fade: linear-gradient(180deg, rgba(4, 16, 31, .3) 0%, rgba(4, 16, 31, .74) 38%, rgba(4, 16, 31, .94) 100%);   /* solo sobre fotos: garantiza contraste AA del texto */
+  --photo-fade-side: linear-gradient(90deg, rgba(4, 16, 31, .86) 0%, rgba(4, 16, 31, .55) 55%, rgba(4, 16, 31, .1) 100%);
   --ph-bg: #FFF3B0;            /* marca de placeholder (solo staging) */
 
-  /* Header glassmorphism (sticky) */
-  --glass-bg: rgba(7, 28, 53, .8);         /* navy a 80 %: legible sobre fondo claro y oscuro */
-  --glass-shine: rgba(255, 255, 255, .07); /* brillo superior del cristal */
-  --glass-line: rgba(255, 255, 255, .14);  /* borde inferior */
-  --glass-blur: 18px;
-  --header-h: 76px;                        /* alto del header sticky: offsets de anclas y bloques sticky */
-
-  /* Profundidad: bordes, luz, elevación, fondos y grano. Solo alfas/gradientes de la paleta (sin colores nuevos). */
-  --edge-light: rgba(255, 255, 255, .14);
-  --edge-hi: rgba(255, 255, 255, .32);
-  --edge-cyan: rgba(6, 166, 204, .5);
-  --edge-ink: rgba(7, 28, 53, .09);
-  --edge-ink-2: rgba(7, 28, 53, .18);
-  --sheen-light: linear-gradient(180deg, rgba(255, 255, 255, .6), rgba(255, 255, 255, 0) 55%);
-  --hi-line: rgba(255, 255, 255, .85);
-  --glow-soft: drop-shadow(0 10px 22px rgba(6, 166, 204, .22));
-  --mask-fade: radial-gradient(60% 80% at 85% 55%, #000, transparent 75%);
-  --glass-bg-strong: rgba(7, 28, 53, .94);
-  --sheen: linear-gradient(180deg, rgba(255, 255, 255, .07), rgba(255, 255, 255, 0) 45%);
-  --sheen-btn: linear-gradient(180deg, rgba(255, 255, 255, .3), rgba(255, 255, 255, 0) 58%);
-  --sweep: linear-gradient(105deg, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, .4) 50%, rgba(255, 255, 255, 0) 70%);
-  --btn-inset: inset 0 1px 0 rgba(255, 255, 255, .38), inset 0 -2px 0 rgba(4, 19, 42, .16);
-  --elev-1: drop-shadow(0 1px 0 rgba(7, 28, 53, .07)) drop-shadow(0 10px 16px rgba(7, 28, 53, .08));
-  --elev-dark: drop-shadow(0 22px 30px rgba(0, 0, 0, .38));
-  --glow-cyan: drop-shadow(0 10px 26px rgba(6, 166, 204, .42));
-  --lift: 0 24px 34px -16px rgba(4, 19, 42, .3);
-  --lift-dark: 0 24px 34px -14px rgba(0, 0, 0, .55);
-  --grid-dark: rgba(255, 255, 255, .035);
-  --grid-light: rgba(7, 28, 53, .05);
-  --grid: linear-gradient(var(--grid-dark) 1px, transparent 1px) 0 0 / 48px 48px, linear-gradient(90deg, var(--grid-dark) 1px, transparent 1px) 0 0 / 48px 48px;
-  --grid-l: linear-gradient(var(--grid-light) 1px, transparent 1px) 0 0 / 48px 48px, linear-gradient(90deg, var(--grid-light) 1px, transparent 1px) 0 0 / 48px 48px;
-  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 .5 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='.09'/%3E%3C/svg%3E");
-  --bg-hero: radial-gradient(60% 80% at 78% 12%, rgba(6, 166, 204, .2), transparent 62%), radial-gradient(45% 55% at 0% 100%, rgba(6, 166, 204, .09), transparent 70%), linear-gradient(180deg, var(--navy), var(--navy-deep));
-  --bg-band: radial-gradient(55% 90% at 10% 0%, rgba(6, 166, 204, .17), transparent 62%), radial-gradient(50% 70% at 100% 100%, rgba(6, 166, 204, .08), transparent 70%), linear-gradient(180deg, var(--navy), var(--navy-deep));
-  --bg-surface-tech: radial-gradient(75% 100% at 50% 45%, transparent, var(--surface) 92%), var(--grid-l), var(--surface);
-  --mask-star: url("../img/star-outline.svg");
-  --mask-star-solid: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 249 249'%3E%3Cpath d='M127 0L98 100L0 123L99 149L122 249L153 148L249 125L150 98Z'/%3E%3C/svg%3E");   /* estrella NorthStar maciza: marcador de la ruta de pasos */
-  --route-fill: linear-gradient(var(--cyan), var(--cyan));   /* trazo recorrido de la ruta (se dimensiona con --p) */
-  --reg-mark-bg: linear-gradient(var(--cyan), var(--cyan)) 0 0 / 10px 1.5px no-repeat, linear-gradient(var(--cyan), var(--cyan)) 0 0 / 1.5px 10px no-repeat, linear-gradient(var(--cyan), var(--cyan)) 100% 100% / 10px 1.5px no-repeat, linear-gradient(var(--cyan), var(--cyan)) 100% 100% / 1.5px 10px no-repeat;   /* marcas de registro (dos L de 10 px) de las tarjetas claras */
-  --ruler: repeating-linear-gradient(90deg, var(--edge-light) 0 1px, transparent 1px 48px) 0 100% / 100% 12px no-repeat, repeating-linear-gradient(90deg, var(--line-on-dark) 0 1px, transparent 1px 12px) 0 100% / 100% 6px no-repeat, linear-gradient(var(--line-on-dark), var(--line-on-dark)) 0 100% / 100% 1px no-repeat;   /* regla de referencias en el borde inferior de los heros internos (marcas cada 48 px, alineadas con --grid) */
-
-  /* Tipografía §5.2 */
-  --font-head: "Saira", "Arial Narrow", Arial, sans-serif;
-  --font-body: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  /* Tipografía */
+  --font-head: "Barlow Condensed", "Arial Narrow", Arial, sans-serif;
+  --font-body: "Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  /* Layout §5.3 */
+  /* Layout */
   --max: 1280px;
   --gutter: clamp(20px, 4vw, 48px);
-  --wrap: calc(var(--max) + 2 * var(--gutter));   /* ancho exterior: el contenido mide 1280px como en la maqueta */
-  --section-y: clamp(64px, 9vw, 120px);
-  --pre-cta-y: clamp(110px, 12vw, 160px);
+  --wrap: calc(var(--max) + 2 * var(--gutter));   /* ancho exterior: el contenido mide 1280px */
+  --inset: clamp(12px, 1.2vw, 16px);              /* margen de los paneles grandes al borde de la ventana */
+  --section-y: clamp(72px, 10vw, 140px);
+  --pre-cta-y: clamp(72px, 10vw, 140px);
   --head-gap: 40px;
   --card-gap: 14px;
-  --card-pad: 26px;
+  --card-pad: 28px;
   --tile-pad: 22px;
   --btn-h: 56px;
+  --header-h: 96px;            /* pill (64) + márgenes: offsets de anclas y bloques sticky */
 
-  /* Formas §5.5 */
-  --cut-card: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px));
-  --cut-tile: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
-  --cut-btn: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px);
-  --cut-img: polygon(18% 0, 100% 0, 100% 100%, 0 100%, 0 18%);
-  --cut-lg: polygon(0 0, calc(100% - 56px) 0, 100% 56px, 100% 100%, 56px 100%, 0 calc(100% - 56px));
-  --cut-cta: polygon(0 64px, 100% 0, 100% 100%, 0 100%);
+  /* Formas */
+  --r-card: 24px;
+  --r-tile: 16px;
+  --r-panel: 32px;
+  --r-pill: 9999px;
 
-  /* Movimiento §5.7 */
-  --ease: cubic-bezier(.2, .7, .2, 1);
-  --t-fast: .2s;
-  --t-card: .35s;
+  /* Transiciones (150-250 ms, solo color/fondo/borde y transform ≤ 2 px) */
+  --t-fast: .18s;
 
   /* Capas */
   --z-header: 40;
   --z-float: 45;
   --z-mbar: 50;
-  --mbar-h: 81px;                          /* alto de la barra móvil (12 + 56 + 12 + borde); sube el botón flotante */
   --z-modal: 100;
 }

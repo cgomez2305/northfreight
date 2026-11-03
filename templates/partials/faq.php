@@ -1,6 +1,6 @@
 <?php
 /**
- * FAQ: <details>/<summary> con icono (estrella) que gira 45° al abrir. Imprime {{ph:X}} con ph(). Si no hay ítems no pinta nada.
+ * FAQ: <details>/<summary> en filas con línea fina y marcador (+) a la izquierda que gira 45° al abrir. Imprime {{ph:X}} con ph(). Si no hay ítems no pinta nada.
  * El JSON-LD FAQPage lo pone el layout (page_schema) a partir de la ruta.
  * Params: items(array de ['q','a','link'=>['label','path']?] como devuelve route_faq_items()/faq_items(); el enlace también
  *         se acepta como [label, path]),
@@ -36,7 +36,7 @@ $faqLink = static function (array $it): ?array {
   <div class="faq__list">
     <?php foreach ($items as $n => $it): $link = $faqLink($it); ?>
     <details class="faq__item"<?= $openFirst && $n === 0 ? ' open' : '' ?>>
-      <summary class="faq__q"><span><?= phtext($it['q']) ?></span><span class="faq__icon" aria-hidden="true"><?= ns_star(18) ?></span></summary>
+      <summary class="faq__q"><span><?= phtext($it['q']) ?></span><span class="faq__icon" aria-hidden="true"><?= ns_icon('plus', 16) ?></span></summary>
       <p class="faq__a t-body"><?= phtext($it['a']) ?><?php if ($link !== null && route_is_live($link[1])): ?> <a href="<?= e(url($link[1])) ?>"><?= e($link[0]) ?> <span class="arrow" aria-hidden="true">→</span></a><?php endif; ?></p>
     </details>
     <?php endforeach; ?>

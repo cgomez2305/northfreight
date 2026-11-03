@@ -1,16 +1,16 @@
 <?php
 /**
- * Tarjeta con chaflán. Variantes: light (defecto, fondo surface), dark (navy), link (toda la tarjeta es <a>, con barra y hover).
+ * Tarjeta redondeada (24px). Variantes: light (defecto, fondo panel), dark (destacada: panel-2 con borde cian fino), link (toda la tarjeta es <a>, con hover).
  * Params:
- *  variant 'light'|'dark'|'link'   size 'default'|'lg'|'tile'   (lg = padding fluido de home; tile = chaflán pequeño)
+ *  variant 'light'|'dark'|'link'   size 'default'|'lg'|'tile'   (lg = padding fluido de home; tile = radio pequeño)
  *  tag     string  etiqueta eyebrow ("A · Load board")      code  string  etiqueta mono ("LOG · 01")
  *  num     string  número grande ("01")                     icon  string  nombre de ns_icon()  | icon_html string (SVG propio)
  *  title   string  H3 (marcas permitidas)                   text  string  (marcas permitidas)
  *  href    string  destino (variant link, o enlace inferior)   cta string  texto del enlace inferior ("Load tracking")
- *  bar     bool    barra superior animada (defecto: true en link, false en el resto)
+ *  bar     bool    (sin efecto visual: se conserva por compatibilidad)
  *  hover   bool    elevación al pasar el ratón sin ser enlace
  *  h       string  etiqueta del título ('h3' defecto)    cls string clase extra   min_title bool (min-height 2 líneas)
- *  wrap    bool    envoltorio .card-wrap (defecto true): lleva la sombra (el clip-path de la tarjeta recorta box-shadow) y el levantamiento al hover
+ *  wrap    bool    envoltorio .card-wrap (defecto true)
  * Nota: dentro de variant link no hay enlaces anidados (el texto cta se pinta como span).
  */
 require_once __DIR__ . '/kit.php';

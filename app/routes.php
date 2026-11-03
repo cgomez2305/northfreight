@@ -14,7 +14,6 @@
  *   crumbs     (opcional) migas completas [[label, path], …] (incluye Home); anula a 'parent' en la miga visible y en el JSON-LD
  *   cta        (opcional) false => el layout no imprime el bloque CTA final
  *   faq        clave de app/data/faq.php (o null)
- *   motion     bool, true => la página carga GSAP/motion.js (home y servicios)
  *   extras     doc (legal), equip (equipment), slug (post)
  *
  * La clave especial '404' no es una URL: es la ruta que usa index.php para el error 404.
@@ -38,7 +37,6 @@ return [
         'wa'         => 'default',
         'breadcrumb' => 'Home',
         'faq'        => 'home',
-        'motion'     => true,
     ],
     '/dispatch-for-owner-operators/' => [
         'template'   => 'owner',
@@ -52,7 +50,6 @@ return [
         'wa'         => 'owner',
         'breadcrumb' => 'Owner-operators',
         'faq'        => 'owner',
-        'motion'     => true,
     ],
     '/amazon-relay-dispatch/' => [
         'template'   => 'relay',
@@ -67,7 +64,6 @@ return [
         'breadcrumb' => 'Amazon Relay',
         'crumbs'     => [['Home', '/'], ['Amazon Relay dispatch', '/amazon-relay-dispatch/']],   // maqueta
         'faq'        => 'relay',
-        'motion'     => true,
     ],
     '/dry-van-dispatch/' => [
         'template'   => 'dryvan',
@@ -82,7 +78,6 @@ return [
         'breadcrumb' => 'Dry van',
         'crumbs'     => [['Home', '/'], ['Dry van dispatch', '/dry-van-dispatch/']],   // maqueta
         'faq'        => 'dryvan',
-        'motion'     => true,
     ],
     '/load-tracking/' => [
         'template'   => 'tracking',
@@ -96,7 +91,6 @@ return [
         'wa'         => 'tracking',
         'breadcrumb' => 'Load tracking',
         'faq'        => null,
-        'motion'     => true,
     ],
     '/trucking-back-office/' => [
         'template'   => 'backoffice',
@@ -110,7 +104,6 @@ return [
         'wa'         => 'backoffice',
         'breadcrumb' => 'Back office',
         'faq'        => null,
-        'motion'     => true,
     ],
     '/how-it-works/' => [
         'template'   => 'how',
@@ -124,7 +117,6 @@ return [
         'wa'         => 'default',
         'breadcrumb' => 'How it works',
         'faq'        => null,
-        'motion'     => true,
     ],
     '/our-desk/' => [
         'template'   => 'desk',
@@ -138,7 +130,6 @@ return [
         'wa'         => 'default',
         'breadcrumb' => 'Our desk',
         'faq'        => null,
-        'motion'     => true,
     ],
     '/contact/' => [
         'template'   => 'contact',
@@ -153,7 +144,6 @@ return [
         'wa'         => 'default',
         'breadcrumb' => 'Contact',
         'faq'        => null,
-        'motion'     => false,
         'cta'        => false,   // la maqueta no tiene bloque CTA final
     ],
     // Legales: título/H1 del prototipo (no están en el doc de copy). Texto pendiente de abogado.
@@ -170,7 +160,6 @@ return [
         'wa'         => 'default',
         'breadcrumb' => 'Privacy policy',
         'faq'        => null,
-        'motion'     => true,
         'cta'        => false,   // la maqueta no tiene bloque CTA final
     ],
     '/terms/' => [
@@ -186,7 +175,6 @@ return [
         'wa'         => 'default',
         'breadcrumb' => 'Terms',
         'faq'        => null,
-        'motion'     => true,
         'cta'        => false,   // la maqueta no tiene bloque CTA final
     ],
 
@@ -206,7 +194,6 @@ return [
         'wa'         => 'default',
         'breadcrumb' => 'Resources',
         'faq'        => null,
-        'motion'     => true,
     ],
     '/resources/bol-template/' => [
         'template'   => 'doc-bol',
@@ -222,7 +209,6 @@ return [
         'breadcrumb' => 'Bill of lading template',
         'parent'     => '/resources/',
         'faq'        => 'doc-bol',
-        'motion'     => true,
     ],
     '/resources/ifta-calculator/' => [
         'template'   => 'tool-ifta',
@@ -237,7 +223,6 @@ return [
         'breadcrumb' => 'IFTA calculator',
         'parent'     => '/resources/',
         'faq'        => 'tool-ifta',
-        'motion'     => true,
     ],
     '/resources/rate-per-mile-calculator/' => [
         'template'   => 'tool-rpm',
@@ -252,7 +237,6 @@ return [
         'breadcrumb' => 'Rate per mile calculator',
         'parent'     => '/resources/',
         'faq'        => 'tool-rpm',
-        'motion'     => true,
     ],
     '/resources/dispatcher-carrier-agreement/' => [
         'template'   => 'doc-agreement',
@@ -268,7 +252,6 @@ return [
         'breadcrumb' => 'Dispatcher-carrier agreement',
         'parent'     => '/resources/',
         'faq'        => 'doc-agreement',
-        'motion'     => true,
     ],
     '/resources/glossary/' => [
         'template'   => 'glossary',
@@ -283,7 +266,6 @@ return [
         'breadcrumb' => 'Trucking glossary',
         'parent'     => '/resources/',
         'faq'        => null,
-        'motion'     => true,
     ],
     '/blog/' => [
         'template'   => 'blog',
@@ -298,7 +280,6 @@ return [
         'breadcrumb' => 'Blog',
         'parent'     => '/resources/',
         'faq'        => null,
-        'motion'     => true,
     ],
     '/blog/how-much-does-truck-dispatch-cost/' => [
         'template'   => 'post',
@@ -314,7 +295,6 @@ return [
         'breadcrumb' => 'How much does truck dispatch service cost?',
         'parent'     => '/blog/',
         'faq'        => 'post-how-much-does-truck-dispatch-cost',
-        'motion'     => true,
     ],
     '/blog/amazon-relay-requirements/' => [
         'template'   => 'post',
@@ -330,7 +310,6 @@ return [
         'breadcrumb' => 'Amazon Relay requirements',
         'parent'     => '/blog/',
         'faq'        => 'post-amazon-relay-requirements',
-        'motion'     => true,
     ],
     '/blog/amazon-relay-load-board/' => [
         'template'   => 'post',
@@ -346,7 +325,6 @@ return [
         'breadcrumb' => 'Amazon Relay load board',
         'parent'     => '/blog/',
         'faq'        => 'post-amazon-relay-load-board',
-        'motion'     => true,
     ],
     '/blog/lumper-fees-detention-pay/' => [
         'template'   => 'post',
@@ -362,7 +340,6 @@ return [
         'breadcrumb' => 'Lumper fees and detention pay',
         'parent'     => '/blog/',
         'faq'        => 'post-lumper-fees-detention-pay',
-        'motion'     => true,
     ],
 
     // ------------------------------------------------------------------
@@ -383,7 +360,6 @@ return [
         'breadcrumb' => 'Box truck',
         'crumbs'     => [['Home', '/'], ['Services', '/dispatch-for-owner-operators/'], ['Box truck', '/box-truck-dispatch/']],   // maqueta: Home / Services / equipo
         'faq'        => null,   // las FAQ viven en app/data/equipment.php
-        'motion'     => true,
     ],
     '/hotshot-dispatch/' => [
         'template'   => 'equipment',
@@ -399,7 +375,6 @@ return [
         'breadcrumb' => 'Hotshot',
         'crumbs'     => [['Home', '/'], ['Services', '/dispatch-for-owner-operators/'], ['Hotshot', '/hotshot-dispatch/']],   // maqueta: Home / Services / equipo
         'faq'        => null,
-        'motion'     => true,
     ],
     '/flatbed-dispatch/' => [
         'template'   => 'equipment',
@@ -415,7 +390,6 @@ return [
         'breadcrumb' => 'Flatbed',
         'crumbs'     => [['Home', '/'], ['Services', '/dispatch-for-owner-operators/'], ['Flatbed', '/flatbed-dispatch/']],   // maqueta: Home / Services / equipo
         'faq'        => null,
-        'motion'     => true,
     ],
     '/power-only-dispatch/' => [
         'template'   => 'equipment',
@@ -431,7 +405,6 @@ return [
         'breadcrumb' => 'Power only',
         'crumbs'     => [['Home', '/'], ['Services', '/dispatch-for-owner-operators/'], ['Power only', '/power-only-dispatch/']],   // maqueta: Home / Services / equipo
         'faq'        => null,
-        'motion'     => true,
     ],
     '/reefer-dispatch/' => [
         'template'   => 'equipment',
@@ -447,7 +420,6 @@ return [
         'breadcrumb' => 'Reefer',
         'crumbs'     => [['Home', '/'], ['Services', '/dispatch-for-owner-operators/'], ['Reefer', '/reefer-dispatch/']],   // maqueta: Home / Services / equipo
         'faq'        => null,
-        'motion'     => true,
     ],
 
     // ------------------------------------------------------------------
@@ -465,7 +437,6 @@ return [
         'wa'         => 'default',
         'breadcrumb' => 'Page not found',
         'faq'        => null,
-        'motion'     => true,
     ],
 ];
 

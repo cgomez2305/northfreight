@@ -11,7 +11,7 @@ $email = (string) cfg('email');
 <div class="opsbar" id="opsbar">
   <div class="opsbar__in">
     <?php if ($show): ?>
-    <div class="opsbar__status"><span class="opsbar__dot pulse" aria-hidden="true"></span><span><span class="hide-m">Dispatch desk · </span>On shift</span></div>
+    <div class="opsbar__status"><span class="opsbar__dot" aria-hidden="true"></span><span><span class="hide-m">Dispatch desk · </span>On shift</span></div>
     <?php endif; ?>
     <div class="opsbar__clocks" role="group" aria-label="Current time in US time zones">
       <span>ET <strong><span data-t="et">--:--</span></strong></span>
