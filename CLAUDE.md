@@ -30,12 +30,11 @@ Orden de prioridad cuando hay conflicto: **respuesta del cliente > PDF de concep
 Por qué:
 - Hostinger Business sirve PHP de forma nativa; no hace falta proceso Node ni build en el servidor.
 - PHP solo se usa para **includes, layout, rutas, metadatos y el formulario**. La salida es HTML estático; LiteSpeed lo cachea.
-- Cero dependencias en el front: CSS propio con tokens y JavaScript vanilla. GSAP solo donde haya animación de scroll.
+- Cero dependencias en el front: CSS propio con tokens y JavaScript vanilla (sin GSAP ni ninguna librería de terceros).
 - Sin base de datos. El contenido vive en archivos PHP de datos (`app/data/*.php`).
 
 Dependencias permitidas:
 - **PHPMailer** (vía Composer) para enviar el formulario por SMTP de Hostinger.
-- **GSAP 3 + ScrollTrigger** desde cdnjs, versión fija, cargado solo en las páginas que lo usan.
 - Nada más sin acordarlo antes.
 
 Opcional (fase 2): un script `bin/build.php` que pre-renderiza todas las rutas a `dist/*.html` para servirlas como estáticas puras. No es necesario para la primera versión.
@@ -74,18 +73,18 @@ Opcional (fase 2): un script `bin/build.php` que pre-renderiza todas las rutas a
 │   │   ├── mega-services.php
 │   │   ├── mega-resources.php
 │   │   ├── mobile-menu.php  # pop-up móvil
-│   │   ├── hero.php         # hero interno reutilizable (migas, eyebrow, H1, swoosh, lead, CTAs, columna derecha opcional)
+│   │   ├── hero.php         # hero interno reutilizable (migas, eyebrow, H1, lead, CTAs, foto o tarjeta a la derecha)
 │   │   ├── section-head.php # eyebrow + H2 + lead
-│   │   ├── card.php         # tarjeta con chaflán (variantes: light, dark, link)
+│   │   ├── card.php         # tarjeta redondeada (param image para foto arriba; variantes destacada y link)
 │   │   ├── faq.php          # <details> + schema FAQPage
-│   │   ├── summary.php      # bloque "In short": respuesta de 2 frases + 3 puntos al inicio de las páginas de servicio (extraíble por buscadores e IA)
+│   │   ├── summary.php      # bloque "In short" (param variant 'lead' en el home): respuesta de 2 frases + 3 puntos (extraíble por buscadores e IA)
 │   │   ├── breadcrumbs.php  # migas + schema BreadcrumbList
 │   │   ├── video.php        # fachada de video con capítulos
 │   │   ├── cta.php          # bloque final "Let's talk about your operation."
 │   │   ├── footer.php
 │   │   ├── mbar.php         # barra fija móvil (WhatsApp + llamada)
-│   │   ├── wa-float.php     # botón flotante de WhatsApp (todas las pantallas)
-│   │   └── kit.php          # funciones auxiliares de los partials (iconos SVG, logo, estrella, swoosh, imágenes)
+│   │   ├── wa-float.php     # botón flotante de WhatsApp (solo ≥761px)
+│   │   └── kit.php          # funciones auxiliares de los partials (iconos SVG, logo, estrella, imágenes)
 │   └── pages/               # una plantilla por página (ver §7); subcarpetas con contenido: legal/, posts/, company/
 ├── assets/
 │   ├── css/
@@ -98,9 +97,8 @@ Opcional (fase 2): un script `bin/build.php` que pre-renderiza todas las rutas a
 │   │   ├── calc-rpm.js
 │   │   ├── calc-ifta.js
 │   │   ├── blog-filter.js
-│   │   ├── video.js       # fachada + capítulos
-│   │   └── motion.js      # GSAP ScrollTrigger (solo donde se carga)
-│   ├── fonts/             # woff2 locales (Saira variable, DM Sans variable, JetBrains Mono)
+│   │   └── video.js       # fachada + capítulos
+│   ├── fonts/             # woff2 locales (Barlow, Barlow Condensed, JetBrains Mono)
 │   ├── img/               # WebP + fallback JPG, nombres descriptivos en inglés
 │   └── downloads/         # bol-template.pdf, bol-template.docx, dispatcher-carrier-agreement.docx
 └── storage/               # logs del formulario y rate-limit (fuera de git, sin acceso web)
@@ -146,127 +144,67 @@ Cada ruta define:
 
 ## 5. Sistema de diseño
 
+**Dirección (decisión de Carlos, 2026-11-03):** estilo del sitio https://fourlines.framer.website/ "muy bien aplicado, clean, sin animaciones 2D". Sitio 100 % oscuro, fotografía protagonista, titulares enormes en Barlow Condensed, formas redondeadas y cero decoración técnica. Se conserva la paleta de marca (navy + cian). Sustituye al sistema anterior (claro/oscuro alternado, chaflanes, Saira/DM Sans, blueprint, GSAP).
+
 ### 5.1 Color (tokens)
+
+Todos viven en `assets/css/tokens.css` (**ningún hex ni rgba fuera de ese archivo**).
 
 | Token | Hex | Uso |
 |---|---|---|
-| `--navy` | `#071C35` | Superficie oscura principal (heros, bandas), texto de títulos sobre claro |
-| `--navy-deep` | `#04132A` | Footer, CTA final, pop-up móvil, paneles más oscuros |
-| `--cyan` | `#06A6CC` | Acento de marca: botones primarios, palabras resaltadas, estrella |
-| `--cyan-ink` | `#04799A` | Cian para texto y enlaces sobre fondo claro (pasa AA) |
-| `--cyan-light` | `#6FD3EC` | Eyebrows y detalles sobre fondo oscuro |
-| `--ink` | `#0B1B2E` | Texto principal sobre claro |
-| `--slate` | `#4A5B6E` | Texto secundario sobre claro |
-| `--on-dark` | `#C9D6E3` | Párrafos sobre navy |
-| `--on-dark-muted` | `#8FA3B8` | Metadatos y migas sobre oscuro |
-| `--on-dark-soft` | `#B9C8D8` | Enlaces del footer y etiquetas sobre oscuro |
-| `--on-dark-strong` | `#E6EEF6` | Enlaces de la navegación sobre oscuro (en la maqueta) |
-| `--surface` | `#F3F6F9` | Fondos de sección claros y tarjetas |
-| `--surface-hover` | `#EAF1F7` | Hover de tarjetas sobre `--surface` |
-| `--ink-2` | `#24364A` | Texto de apoyo sobre claro (en la maqueta) |
-| `--line` | `#DCE4EC` | Divisores y bordes |
-| `--line-soft` | `#E3EAF1` | Divisores suaves |
-| `--field` | `#C9D4DF` | Borde de inputs |
-| `--white` | `#FFFFFF` | Fondo base |
+| `--bg` | `#04101F` | Fondo base de todas las páginas |
+| `--panel` | `#0A1D33` | Bandas grandes, tarjetas, footer, paneles de hero interno |
+| `--panel-2` | `#0F2A47` | Tarjeta destacada, hover, inputs, mega menús |
+| `--navy-deep` | `#04132A` | Texto sobre botón cian |
+| `--cyan` | `#06A6CC` | Acento: botones primarios, segunda línea del titular, etiquetas mono |
+| `--cyan-light` | `#6FD3EC` | Hover del botón primario y detalles |
+| `--text` | `#EEF3F8` | Titulares y texto principal |
+| `--text-2` | `#B9C8D8` | Párrafos |
+| `--text-3` | `#8FA3B8` | Metadatos, migas, notas |
 
-También hay tokens alfa en `tokens.css` (`--line-on-dark`, `--tint-on-dark`, `--cyan-tint*`, overlays y sombras), `--ph-bg` (marca de placeholder), `--wrap` y las formas `--cut-*`. **Ningún hex ni rgba fuera de `tokens.css`.** Foco visible: `--cyan-ink` sobre fondo claro (el cian puro da 2,86:1 sobre blanco).
-
-Sobre cian, el texto va en `--navy-deep` (`#04132A`), nunca en blanco.
+Alfas: `--hairline` (borde fino .10), `--hairline-strong` (.18), `--cyan-line`, `--cyan-tint`, `--overlay`, `--glass-bg`, degradados sobre foto (`--hero-fade-*`), `--arrow-mask` (flecha SVG), `--ph-bg` (marca de placeholder). Contraste: `--text`, `--text-2` y `--text-3` pasan AA (≥ 5,6:1) sobre `--bg`, `--panel` y `--panel-2`; el cian pasa ≥ 5:1 sobre oscuro; sobre cian el texto va en `--navy-deep`. Foco visible: `outline: 2px solid var(--cyan)`.
 
 ### 5.2 Tipografía
 
+Fuentes locales en `assets/fonts/` (woff2 latin sin hinting, ~60 KB en total), declaradas en `assets/css/fonts.css`:
+
 | Rol | Familia | Configuración |
 |---|---|---|
-| Display / títulos | **Saira** variable | `font-stretch:125%`, `font-variation-settings:'wdth' 125`, MAYÚSCULAS, peso 800–900, `letter-spacing:-.02em` en tamaños grandes |
-| Eyebrows / etiquetas | **Saira** | `wdth 112`, peso 600, MAYÚSCULAS, `letter-spacing:.34em` (secciones) o `.24em` (meta) |
-| Texto | **DM Sans** variable | 400–700. Es la fuente de lectura del usuario; no cambiarla. |
-| Datos / horas / códigos | **JetBrains Mono** | 400–600, `tabular-nums` |
+| Titulares | **Barlow Condensed** 700 / 900 | Frase normal (NO mayúsculas), `letter-spacing` negativo, line-height ~.9 |
+| Texto | **Barlow** 400 / 500 / 600 | 16-20 px |
+| Etiquetas, datos, migas, chips | **JetBrains Mono** | 11-12 px, MAYÚSCULAS, `letter-spacing` ~.1em |
 
-No usar Bricolage, Inter, Space Grotesk ni ninguna otra fuente. No usar texto solo en contorno (outline).
+No usar otras fuentes. La flecha "→" se dibuja con una máscara SVG (`.arrow`, `--arrow-mask`) porque Barlow y JetBrains no la traen.
 
-Escala (máximo en escritorio; todos con `clamp()` y bajan proporcionalmente):
-
-| Clase | Valor | Uso |
-|---|---|---|
-| `.t-display` | `clamp(42px,5vw,76px)` / lh .92 | Titular visual del home ("Booked. Tracked. Documented.") |
-| `.t-h1` | `clamp(38px,5.2vw,76px)` / lh .92 | H1 de páginas de servicio, empresa y recursos |
-| `.t-h1-long` | `clamp(34px,4.4vw,60px)` | H1 de artículos y páginas legales |
-| `.t-cta` | `clamp(36px,5.8vw,84px)` / lh .9 | Solo el titular del bloque final de contacto |
-| `.t-h2` | `clamp(30px,4vw,56px)` / lh .96 | H2 de sección (todas) |
-| `.t-h2-s` | `clamp(26px,3.2vw,40px)` | Títulos de bandas destacadas |
-| `.t-h3` | `20px` / peso 800 / lh 1.05 | Título de tarjeta |
-| `.t-prose-h2` | `clamp(24px,2.6vw,34px)` | H2 dentro de artículos |
-| `.t-lead` | `clamp(16px,1.4vw,18px)` / lh 1.65 | Entrada del hero |
-| `.t-body` | `17px` / lh 1.65–1.75 | Párrafos de sección, FAQ, glosario |
-| `.t-card` | `15px` / lh 1.6 | Texto en tarjetas |
-| `.t-small` | `13–14px` | Notas, ayudas de formulario |
-| `.t-eyebrow` | `11px` | Etiqueta sobre H2 |
-| `.t-meta` | `10px` | Migas, etiquetas en tarjetas |
-
-Reglas: un solo H1 por página. `h1,h2,h3 { text-wrap: balance }`. Las palabras clave del título van en `--cyan` dentro del mismo H (span), nunca como imagen.
+Escala (`assets/css/base.css`, todo con `clamp()`): `.t-display` hasta 136 px (titular visual del home), `.t-h1` hasta 104 px, `.t-h1-long` hasta 76 px (artículos y legales), `.t-cta` hasta 104 px, `.t-h2` hasta 72 px, `.t-h2-s` hasta 48 px, `.t-h3` 28 px, `.t-prose-h2` hasta 44 px, `.t-lead` 18-20 px, `.t-body` 18 px, `.t-card` 16 px, `.t-eyebrow` 12 px, `.t-meta` 11 px. Un solo H1 por página; las palabras clave del titular van en cian dentro del mismo H (span), nunca como imagen.
 
 ### 5.3 Espaciado y layout
 
-- Contenedor: `max-width:1280px; margin:0 auto; padding-inline: clamp(20px,4vw,48px)`. **El gutter mínimo es 20px**: ningún texto ni botón toca el borde.
-- Sección: `padding-block: clamp(64px,9vw,120px)`.
-- Sección inmediatamente antes del CTA final: `padding-bottom: clamp(110px,12vw,160px)` (el CTA sube 64px con su corte diagonal).
-- Hero interno: `padding-top: clamp(36px,6vw,80px); padding-bottom: clamp(56px,8vw,104px)`.
-- Encabezado de sección → contenido: `gap: 40px`.
-- Tarjetas: padding `26px` (tiles pequeños `22px`); gap entre tarjetas `14px` (tiles `12px`).
-- Botones: alto mínimo `56px` (secundarios dentro de tarjetas `52px`); todo control táctil ≥ `44px`.
-- Espaciado entre hermanos con `flex`/`grid` + `gap`; no márgenes sueltos.
+- Contenedor: `--max` 1280 px con gutter `clamp(20px, 4vw, 48px)` (**mínimo 20 px**).
+- Sección: `padding-block: var(--section-y)` = `clamp(72px, 10vw, 140px)`.
+- Bandas grandes (`--panel`) con `--inset` (12-16 px) al borde de la ventana y radio 32.
+- Encabezado de sección → contenido: 40 px. Tarjetas: padding 28 px, gap 14 px.
+- Botones: alto mínimo 56 px (52 en tarjetas, 48 `--sm`, 60 `--lg`); todo control táctil ≥ 44 px. Inputs 52 px.
+- Prosa de artículos y legales: `--prose` 720 px, interlineado 1,7.
 
 ### 5.4 Grids y breakpoints
 
-| Clase | Escritorio | ≤1024px | ≤640px |
-|---|---|---|---|
-| `.g2` | 2 col | 2 | 1 |
-| `.g3` | 3 col | 3 | 1 |
-| `.g3h` | 3 col | 3 | 2 |
-| `.g4` | 4 col | 2 × 2 | 1 |
-| `.g5` | 5 col | 3 + 2 (grid de 6, spans 2/3) | 1 |
-| `.g6` | 6 col | 3 | 1 |
+`.g2` (2 col), `.g3`/`.g3h` (3), `.g4` (4 → 2 × 2 ≤1024), `.g5` (5 → 3 + 2), `.g6` (6 → 3); a 1 columna ≤640 (`.g3h` a 2). Siempre `repeat(N, minmax(0,1fr))`. **Ninguna tarjeta huérfana.**
 
-Siempre `repeat(N, minmax(0,1fr))`. **Ninguna tarjeta queda huérfana en una fila.**
+- `≥1025px`: navegación completa con mega menús. `≤1024px`: hamburguesa + pop-up, sin mega menús ni correo de la barra superior.
+- `≤760px`: barra fija móvil (`mbar`), body con `padding-bottom`. `≤640px`: grids a una columna, botones principales a ancho completo.
 
-Breakpoints:
-- `≥1025px`: navegación completa con mega menús.
-- `≤1024px`: hamburguesa + pop-up; se ocultan los mega menús y el correo de la barra superior.
-- `≤760px`: aparece la barra fija móvil (`mbar`); se ocultan elementos `.hide-mobile`; el body gana `padding-bottom` para no quedar tapado.
-- `≤640px`: grids a una columna; botones principales a ancho completo.
+### 5.5 Formas
 
-### 5.5 Formas de marca
+Sin chaflanes ni `clip-path` decorativos en ningún sitio. Radios (tokens): tarjetas `--r-card` 24, tiles `--r-tile` 16, paneles/bandas/hero/footer `--r-panel` 32, botones, chips, nav y marcadores `--r-pill`. Fotos con radio 24-32. Sin sombras pesadas: borde fino `--hairline` + fondo `--panel`.
 
-- **Chaflanes** (no se usan bordes redondeados en ningún sitio):
-  - `.cut` (tarjetas): `clip-path: polygon(0 0,calc(100% - 22px) 0,100% 22px,100% 100%,22px 100%,0 calc(100% - 22px))`
-  - `.cut-s` (tiles): mismo patrón con `12px`.
-  - `.btn` (botones): `polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px)` — chaflán arriba-izquierda y abajo-derecha. **Todos los botones, incluida la barra móvil, usan este mismo corte de 14px.**
-  - Imágenes de hero: chaflán grande `polygon(18% 0,100% 0,100% 100%,0 100%,0 18%)` o `56px` en esquinas opuestas.
-- **Estrella NorthStar** (SVG, `viewBox="0 0 249 249"`): `M127 0L98 100L0 123L99 149L122 249L153 148L249 125L150 98Z`. Se usa como viñeta, marcador y acento (con animación `twinkle` lenta).
-- **Swoosh** bajo los H1 (SVG `viewBox="0 0 220 14"`, 200×12): `polygon points="0,14 220,0 210,6 60,14"` en cian.
-- **Ticker** inclinado `-1.6deg` en cian bajo el hero del home.
-- **Corte diagonal** superior del CTA final: `clip-path: polygon(0 64px,100% 0,100% 100%,0 100%)` con `margin-top:-64px`.
+### 5.6 Logo
 
-### 5.6 Logo (lockup del header y footer)
-
-- Isotipo blanco/cian `46×46px` + bloque de texto a la derecha con `margin-left: 2px`, **centrado en vertical respecto al isotipo** (`align-items: center`). Decisión de Carlos: con la alineación a la base de la N (`flex-end`, como en la maqueta original) el texto quedaba unos 10 px por debajo del eje de los enlaces del header. Ahora el centro de la marca, el del texto y el de los enlaces coinciden.
-- "NORTH**STAR**": Saira wdth 125, peso 900, `22px`, `line-height: 15.84px`, blanco con "STAR" en `--cyan`.
-- "FREIGHT SOLUTIONS": Saira wdth 112, peso 600, `8px`, `line-height: 5.76px`, `letter-spacing: .49em`, color `#B9C8D8`.
-- Separación vertical entre las dos líneas: `4px`. Los dos renglones miden lo mismo de ancho.
-- Proporciones verificadas contra el logo original; no cambiarlas a ojo.
-- **Centrado óptico del isotipo:** el SVG está bien recortado (2 unidades de margen por cada lado del viewBox, centrado geométrico). Lo que no está centrado es su **peso visual**: la N blanca pesa abajo a la izquierda y la estrella ligera queda arriba a la derecha, así que el centro de masa cae ~5 px por debajo y ~3 px a la izquierda del centro de la caja (a 46 px). Corrección a la mitad: `.logo__mark { transform: translateY(-5%) }` en el header/footer y, en `favicon.svg`/`favicon.png`, el isotipo al 92 % desplazado arriba-derecha. No se desplaza en horizontal en el logo para no romper la alineación con el gutter.
-- Isotipo en SVG (`assets/img/isotype-white.svg` y `isotype.svg`), sin recortes.
+Isotipo (`assets/img/isotype-white.svg`, 40 px) + texto "NORTHSTAR" (Barlow Condensed 900, STAR en cian) y "FREIGHT SOLUTIONS" (mono pequeña), alineados al centro vertical. Centrado óptico del isotipo: `translateY(-5%)` en header/footer; en `favicon.svg`/`favicon.png` el isotipo al 92 % desplazado arriba-derecha. Las imágenes para redes (avatar navy, avatar blanco, PNG transparente) se generaron con ese mismo desplazamiento (no están en el repo).
 
 ### 5.7 Movimiento
 
-- Existentes: `twinkle` de la estrella (4.8s), punto "live" con pulso, ticker en marquesina, aparición `rise` de la tarjeta del hero, pop-up móvil (fondo `fade` .25s + panel `slide` desde la derecha .35s), hover de tarjetas (`translateY(-3px)`) y botones (`-2px`).
-- **Ampliado por Carlos ("se ve muy plano"):** GSAP 3.12.5 + ScrollTrigger (sin más librerías) con entradas de hasta 32px y .9s (×0.7 en móvil), ease `expo.out`/`power3.out`, escalonado .06–.09s. Regla: **una orquestación por sección**, distinta según el tipo de bloque. Hay: cabeceras de sección con máscara por líneas y swoosh que se dibuja; rejillas de tarjetas escalonadas; pasos de "How it works" y "How we plug in" como **ruta con paradas numeradas** y un marcador de estrella que la recorre con el scroll (`--p`, `.is-on`); ticker que acelera con la velocidad de scroll; spotlight en tarjetas oscuras y botones magnéticos (máx. 6px) solo con `(hover:hover) and (pointer:fine)`; horas del desk log "tecleadas"; barra de progreso de lectura en artículos; header que cambia con `.is-scrolled`. Descartado: tilt 3D, View Transitions, scroll suave (Lenis), pin de secciones largas, SplitText (la división en líneas es `assets/js/split.js`) y **todo parallax y toda estrella que gira con el scroll en cualquier hero** (Carlos: "no tiene sentido"; tampoco la diagonal discontinua que cruzaba los titulares).
-- **Lenguaje "blueprint" (plano técnico):** el movimiento y los detalles cuentan el nicho (dispatch, rate con, check calls, POD) en trazo de línea fina: ruta de pasos con paradas, cotas `|—|` antes de los eyebrows de sección, marcas de registro en L en las esquinas no achaflanadas de las tarjetas claras (solo en hover con puntero), regla de referencias cada 48 px en el borde inferior de los heros internos y cajetín en la etiqueta "Example". Sin colores nuevos: solo alfas/gradientes de la paleta en `tokens.css` (`--mask-star-solid`, `--route-fill`, `--reg-mark-bg`, `--ruler`).
-- **Hero de la home = "Ruta de una carga" (decisión de Carlos):** un panel de plano con SVG inline y CSS puro (sin GSAP; estado por defecto = el FINAL y cada animación con `backwards`, así `prefers-reduced-motion`, sin JS y GSAP bloqueado se ven completos). Una pasada de ~6,5 s (suave: ease-in/out al arrancar y parar, velocidad constante entre paradas, horas con barrido continuo, no a saltos) sincronizada con el titular "Booked. Tracked. Documented.": BOOKED = ruta que se traza + sello RATE CON (06:12); TRACKED = camión dry van recorre la ruta con check call (09:40); DOCUMENTED = llegada a la estrella NorthStar (11:55) + sello POD y "IN TRANSIT" → "POD FILED". Las palabras se iluminan con `.hw::after` (clip-path, sin tocar layout). El desk log queda fusionado como `figcaption`. **Totalmente automática (decisión de Carlos: "no que la active el usuario, hay gente que no entiende"): sin botones.** Arranca sola al cargar (en móvil, al entrar el panel en pantalla al 35 %, `.bp--wait`), aguanta ~4,5 s con el plano completo y se repite en bucle con un reinicio suave (el panel se desvanece, la capa blanca de "DOCUMENTED." vuelve a cubrirla y todo reinicia; el script inline de `home.php` pone `.bp-out`/`.bp-end`). El bucle se detiene mientras el panel no se ve o la pestaña está oculta (al volver, empieza de cero) y no existe con `prefers-reduced-motion` (plano final estático). Nota WCAG 2.2.2: un bucle >5 s sin control de pausa es una desviación consciente, decorativa, igual que el ticker. La ruta es un EJEMPLO ("Example lane"): sin ciudades ni cifras. La foto de stock del camión ya no se usa en el sitio (los archivos siguen en `assets/img/`).
-- **La entrada del hero es CSS puro** (`.anim-rise` y escalonado en `components.css`, con `animation-fill-mode: backwards`): titular y lead son visibles desde el primer pintado y solo se desplazan 18px. Animar el hero con GSAP desde el CDN retrasaba el LCP ~0,2–0,6 s. El resto de entradas (`motion.js`) arrancan tras `load` + idle y preparan cada sección solo cuando está a ≤1,8 pantallas.
-- Todo el contenido es visible sin JavaScript y sin scroll: `html.js-motion` la añade `motion.js` solo cuando GSAP y ScrollTrigger existen, y el CSS **nunca** oculta nada si falta esa clase. Si GSAP falla se restaura todo. Las bandas oscuras y las rejillas entran con opacity+translate (nunca con `clip-path` + `filter` sobre secciones grandes: 3 → 45 fotogramas lentos).
-- `prefers-reduced-motion: reduce` desactiva todas las animaciones y transformaciones de hover y no crea `html.js-motion`.
-- **Profundidad (CSS):** bordes de luz, sombras `drop-shadow` en el padre sin `clip-path` (`.card-wrap`), fondos de hero y bandas en capas (`--bg-hero`, `--bg-band`) con rejilla técnica, grano, botones con brillo y glow. Todo con alfas y gradientes de los colores existentes, definidos en `tokens.css`.
+**Decisión de Carlos: fuera todas las animaciones 2D decorativas.** Eliminados: GSAP y ScrollTrigger (el sitio no tiene JS de terceros), `motion.js`, `split.js`, `motion.css`, la clave `motion` de las rutas, el hero "Ruta de una carga" (plano SVG), el ticker, la estrella que gira, el pulso del punto "live", cotas, marcas de registro, regla de referencias, ruta de pasos con marcador, spotlight, botones magnéticos, máscara de titulares por líneas, swoosh, barra de progreso de lectura y entradas por scroll. **No reintroducir ninguna.** Permitido: transiciones CSS de 150-250 ms (`--t-fast`) en color, fondo, borde y `translate` ≤ 2 px al pasar el cursor o enfocar; el abrir/cerrar del FAQ (`<details>`) y el menú móvil (fade + slide). `prefers-reduced-motion` desactiva todo. Todo el contenido se ve desde el primer pintado y sin JavaScript.
 
 ---
 
@@ -274,29 +212,32 @@ Breakpoints:
 
 | Componente | Comportamiento |
 |---|---|
-| **Ops bar** | Franja superior oscura: punto cian con pulso + "Dispatch desk · On shift" + relojes ET/CT/MT/PT (Intl, se actualizan cada 20 s) + correo (oculto ≤1024). **Decisión de Carlos: se replica tal cual la maqueta (visible).** ⚠️ "On shift" afirma que el desk está trabajando; el cliente aún debe confirmar horario (ver §10). Flag `SHOW_ON_SHIFT` en `app/config.php`. |
-| **Nav** | Logo · Services ▾ · Resources ▾ · How it works · Our desk · Contact · botón "WhatsApp us". Mega menú abre al hover y al clic, cierra al salir y con Esc; `aria-expanded` en los disparadores. **Header sticky en todas las pantallas con glassmorphism** (decisión de Carlos): `position: sticky; top: 0`, fondo `--glass-bg` (navy al 80 %) con `backdrop-filter: blur(--glass-blur) saturate(1.4)` aplicado en un `::before` (nunca en el propio `.header`: un `backdrop-filter` ahí convierte al header en bloque contenedor del menú móvil `position: fixed` y lo rompe). La barra superior (`.opsbar`) NO es sticky: se va con el scroll. `.site-top` es `display: contents` para que el sticky dure toda la página. Detrás de la posición inicial hay una banda navy en el `body` (`base.css`) para que el cristal no se aclare sobre el fondo blanco. Respaldo sólido si no hay `backdrop-filter` o con `prefers-reduced-transparency`. Altura `--header-h` (76 px): los bloques `sticky` de página y las anclas (`scroll-margin-top`, `scroll-padding-top`) la suman para no quedar tapados. |
-| **Mega Services** | Dispatch services (Owner-operators, Amazon Relay, Dry van) · Operations & back office (Load tracking, Back office) · chips "By equipment" (solo equipos confirmados) · tarjeta destacada de Amazon Relay. ⚠️ La tarjeta destacada tiene texto encima de la foto: rehacerla con el texto debajo o al lado. |
+| **Ops bar** | Franja fina en mono sobre `--bg` (sin fondo propio): punto cian + "Dispatch desk · On shift" + relojes ET/CT/MT/PT (Intl, cada 20 s) + correo (oculto ≤1024). **Decisión de Carlos: visible.** ⚠️ "On shift" afirma que el desk trabaja; el cliente debe confirmar horario (§10). Flag `SHOW_ON_SHIFT` en `app/config.php`. |
+| **Nav** | Píldora flotante sticky (`top` ~12-16 px, radio total, fondo `--glass-bg`). El `backdrop-filter` va en un `::before` o hijo, **nunca en el propio `.header`** (rompería el menú móvil `position: fixed`). Respaldo sólido sin `backdrop-filter` y con `prefers-reduced-transparency`. Logo · Services ▾ · Resources ▾ · How it works · Our desk · Contact · botón pill "WhatsApp us". Mega menús abren al hover y al clic, cierran al salir y con Esc (`aria-expanded`). `--header-h` (96 px) lo suman las anclas y los bloques sticky. |
+| **Mega Services** | Panel redondeado centrado (~940 px, `--panel-2`) con 2 columnas (Dispatch services · Operations & back office; chips "By equipment" solo con equipos confirmados) más tarjeta destacada de Amazon Relay (foto arriba, texto debajo). |
 | **Mega Resources** | Free tools (IFTA, Rate per mile) · Templates (BOL, Agreement) · Learn (Glossary, Blog) · tarjeta cian de descarga del BOL. |
-| **Pop-up móvil** | `role="dialog" aria-modal="true"`, fondo navy translúcido con desenfoque, panel desde la derecha (ancho completo en móvil, 440px en tablet), cabecera con logo + botón cerrar, acordeones Services/Resources, enlaces principales, bloque fijo inferior con WhatsApp y llamada. Bloquea el scroll del body, cierra con Esc, clic en el fondo o en un enlace, y devuelve el foco al botón que lo abrió. **Mientras está abierto, la barra móvil se oculta.** |
-| **Barra móvil (mbar)** | Fija abajo, de borde a borde, fondo `--navy-deep` 96% con desenfoque y línea superior. Botones alineados al gutter de 20px: "Talk to a dispatcher" (cian, flex 1) + llamada (cuadrado 56px). Respeta `env(safe-area-inset-bottom)`. Solo ≤760px. |
-| **Botón flotante de WhatsApp** | Fijo abajo a la derecha **solo a partir de 761px** (escritorio y tablet), con el mensaje de WhatsApp de la ruta; icono de 56px, chaflán de botón (14px), cian con texto navy-deep. **En ≤760px NO se muestra** (decisión de Carlos: "no tiene sentido tener el de WhatsApp y la isla sticky bottom"): ahí la barra móvil (`.mbar`) ya trae "Talk to a dispatcher" (WhatsApp) y la llamada, y se queda como único elemento fijo inferior. Se oculta con el pop-up del menú abierto. La sombra va en el contenedor (`drop-shadow`): un `clip-path` recortaría la sombra del propio enlace. |
-| **Hero interno** | Migas → eyebrow opcional → H1 → swoosh → tagline opcional → lead → CTAs → columna derecha opcional (imagen, tarjeta de datos o vista previa de documento). Los heros internos llevan una regla de referencias de plano en el borde inferior (`.hero--int`) y una estrella grande estática. |
-| **Plano de ruta (hero de la home)** | `figure.bp` con SVG inline (viewBox 520×300): rejilla y marcos de plano, ruta con chaflanes a 45°, camión dry van de perfil que no rota, nodo ORIGIN, check call, estrella NorthStar de destino, sellos RATE CON y POD, cota "SHIPPER TO RECEIVER". Ver el guion en §5.7. Accesibilidad: SVG `aria-hidden`; la descripción es la `figcaption` (log de 3 filas + texto sr-only). Con `ph('ID')` vacío en producción solo se imprime "POD FILED". |
-| **Tarjeta** | Chaflán `.cut`, fondo `--surface` (variante oscura en navy para la última o la destacada), número/etiqueta mono, H3, texto, enlace con flecha "→" en DM Sans. |
-| **FAQ** | `<details>/<summary>` con la estrella NorthStar que gira 45° al abrir (así es en la maqueta). El layout genera el JSON-LD FAQPage. En producción se descartan las FAQ con placeholders. |
-| **Video del equipo** | Fachada (imagen + botón play centrado); el iframe/video se carga al hacer clic. Pie **debajo** del video ("Meet the desk · 3 chapters", "Video · 3–4 min"). Capítulos como botones que marcan el activo y saltan al minuto. |
-| **CTA final** | Isotipo 56px en flujo encima del titular "Let's talk about **your operation.**", texto "No forms first…", botón grande de WhatsApp con el número visible + botón de correo. |
-| **Footer** | Logo + descripción · Services · Company (How it works, Our desk, Resources, Blog, Contact) · Talk to the desk. Fila inferior: © año, MC#/USDOT (o eliminar si no aplica), Privacy, Terms. |
+| **Pop-up móvil** | `role="dialog" aria-modal="true"`, panel desde la derecha, acordeones Services/Resources (`<details>`), enlaces, bloque inferior con WhatsApp y llamada. Bloquea el scroll del body, cierra con Esc, fondo o enlace, devuelve el foco. Mientras está abierto se oculta la `mbar`. |
+| **Barra móvil (mbar)** | Fija abajo, solo ≤760 px: "Talk to a dispatcher" (cian, flex 1) + llamada (círculo 56 px). Respeta `env(safe-area-inset-bottom)`. |
+| **Botón flotante de WhatsApp** | Fijo abajo a la derecha **solo ≥761 px**, con el mensaje de la ruta. En ≤760 px no se muestra (la `mbar` ya lo trae). Se oculta con el pop-up abierto. |
+| **Hero del home** | Casi a pantalla completa, con la píldora del menú encima. Foto (`truck-oncoming-dusk-mirror`, `<img>` con `srcset`, `width/height` y `fetchpriority="high"`) a ancho completo con radio 32 y degradado desde la izquierda y abajo (contraste ≥ 5,6:1 medido). Kicker H1 en mono, titular "Booked. Tracked. **Documented.**" (última palabra en cian), lead, CTAs y chips. En móvil la foto va arriba y se funde con el fondo. |
+| **Hero interno** | Panel redondeado `--panel` con migas mono, H1 grande de dos tonos, lead, CTAs y, a la derecha (debajo del texto en móvil), foto con radio 24 (`image.ratio`, `image.small` para la de 490 px) o tarjeta de datos / vista previa de documento. Cada página usa una foto distinta; ninguna se repite dentro de la misma página. |
+| **Resumen "In short"** | Frase-declaración a ancho completo, sin caja (borde izquierdo fino cian en páginas internas; variante `lead` en el home, condensada 32-58 px), con 3 puntos como chips pill mono. |
+| **Tarjeta** | Borde `--hairline`, fondo `--panel`, radio 24; número/etiqueta mono (`.card__meta`), título condensado, texto, enlace con flecha. Variante destacada (`--panel-2` o cian); variante con foto (`image`): foto arriba y texto debajo. |
+| **Onboarding (home)** | 4 pasos en fila con número enorme condensado y divisores finos, más fila "4 / 1 / 0" (steps, desk, forms) con copy ya afirmado en el sitio. |
+| **Evidencia (home)** | 6 documentos como chips pill y tarjeta "Desk log · Example" (3 filas; `ph('ID')` se vacía en producción). |
+| **FAQ** | `<details>/<summary>` con marcador + a la izquierda y filas de borde fino. El layout genera el JSON-LD FAQPage. En producción se descartan las FAQ con placeholders. |
+| **Video del equipo** | Fachada (imagen + play centrado); el iframe/video se carga al clic. Pie debajo; capítulos como botones. Sin video real el play queda desactivado. |
+| **CTA final** | Panel grande `--panel` con isotipo, titular "Let's talk about **your operation.**", texto "No forms first…", botón WhatsApp con el número visible + botón de correo. |
+| **Footer** | Panel grande redondeado: logo + descripción · Services · Company · Talk to the desk; fila inferior © año, MC#/USDOT (ph), Privacy, Terms. |
+| **Formularios y calculadoras** | Etiquetas mono, inputs de 52 px, borde fino, foco cian; resultados con `aria-live`. |
 
-Reglas de UI que salieron de las auditorías y no se negocian:
-1. **Ningún texto sobre imágenes.** Pies, etiquetas y tarjetas van debajo o al lado de la foto. (Excepción única: el botón de play del video.)
-2. Ningún texto a menos de 20px del borde de la pantalla.
-3. Sin scroll horizontal entre 360 y 1440px. **Se comprueba con `overflow-x: clip` DESACTIVADO** (inyectar `html,body,main{overflow:visible!important}` y medir `scrollWidth` o buscar elementos con `right > innerWidth`): `clip` lo oculta en navegadores modernos pero Safari < 16 y algunos navegadores integrados no lo soportan y ahí sí hay scroll horizontal. Lo que sobresale a propósito (el ticker de la home, con márgenes -5 % e inclinación) va dentro de un envoltorio con `overflow: hidden` real (`.ticker-bleed`); `base.css` añade `@supports not (overflow-x: clip) { body { overflow-x: hidden } }` como red de seguridad, y `overflow-x: hidden` + `overscroll-behavior-x: none` en `<html>` (Safari de iPhone ignora el del `<body>` si el `<html>` no lo tiene). Probar también con emulación móvil táctil y un `scrollTo(400, 0)` lateral, y medir los elementos `position: fixed` (mbar, botón flotante) contra los bordes del viewport: no crean `scrollWidth`, pero en iOS pueden dejar desplazar la vista.
+Reglas de UI no negociables:
+1. **Texto sobre foto solo con degradado que garantice contraste AA medido (≥ 4,5:1)**: hero del home. En tarjetas y heros internos el texto va debajo o al lado de la foto. Excepción: botón play del video.
+2. Ningún texto a menos de 20 px del borde de la pantalla.
+3. Sin scroll horizontal entre 360 y 1440 px. **Se comprueba con `overflow-x: clip` DESACTIVADO** (inyectar `html,body,main{overflow:visible!important}` y medir `scrollWidth`): `clip` lo oculta en navegadores modernos pero Safari < 16 y algunos navegadores integrados no lo soportan. `base.css` lleva `@supports not (overflow-x: clip) { body { overflow-x: hidden } }` y `overflow-x: hidden` + `overscroll-behavior-x: none` en `<html>`. Probar con emulación móvil táctil y `scrollTo(400, 0)`, y medir los elementos `position: fixed` (mbar, botón flotante) contra el viewport.
 4. Sin tarjetas huérfanas en ningún breakpoint.
 5. Sin marcas de agua detrás de títulos ni botones.
-6. La flecha "→" siempre en DM Sans (Saira no tiene el glifo).
-7. Contraste AA mínimo (las etiquetas grises pequeñas incluidas). Foco visible en todo control.
+6. Contraste AA mínimo (etiquetas mono pequeñas incluidas). Foco visible en todo control.
 
 ---
 
@@ -439,7 +380,7 @@ Medidos con la auditoría sobre las 22 rutas live (staging). Se pintan con `ph()
 | `confirm terms: weekly, monthly, cancel anytime` | home (FAQ del contrato) |
 | `confirm how account access is handled`, `confirm` | Relay |
 | `confirm load boards`, `confirm` | Dry van |
-| `ID` | home y Load tracking (desk log de ejemplo) |
+| `ID` | home (tarjeta "Desk log · Example") y Load tracking (desk log de ejemplo) |
 | `hours · time zone`, `other confirmed types` | Contact |
 | `date`, `Business address`, `Cookie and analytics tools…`, `Limitation of liability clause…` | Privacy y Terms (texto del abogado) |
 | `Publish date` | los 4 artículos del blog |
@@ -462,7 +403,7 @@ Antes de publicar en producción: auditar las rutas con `ENV=production` y compr
 | **Descargas (BOL, agreement)** | `'form' => 'download'` → `app/forms/download.php`: nombre + correo + formato → entrega `assets/downloads/<archivo>` con `Content-Disposition` y avisa por correo; si el archivo no existe devuelve 422 con mensaje claro (no 500) y registra la solicitud en `storage/downloads.log`. |
 | **Newsletter del blog** | Solo maquetado. Conectar cuando el cliente elija herramienta. |
 
-JavaScript: sin dependencias salvo GSAP, módulos pequeños, `defer`, cada uno se carga solo en la página que lo usa. El sitio funciona y se lee sin JS.
+JavaScript: cero dependencias, módulos pequeños, `defer`, cada uno se carga solo en la página que lo usa (`main.js` en todas). El sitio funciona y se lee sin JS.
 
 ---
 
@@ -501,17 +442,16 @@ Pendientes técnicos conocidos:
 - `.htaccess` sin probar (el servidor de desarrollo `php -S` no lo lee): probar en staging de Hostinger (HTTPS, barra final, bloqueo de `app/`, caché, compresión).
 - Plantilla de correo y credenciales SMTP reales: crear `app/config.local.php` en el servidor desde `app/config.local.example.php` (`APP_SECRET`, `SMTP_*`, `MAIL_TO`, `PREVIEW_TOKEN`, `ENV`, `DOMAIN`).
 
-Estado de verificación (staging, `ENV=production` en Lighthouse móvil, 4 rutas): Performance 94–95, Accessibility 100, Best Practices 100, SEO 100, CLS 0. **LCP 2,8–3,0 s (objetivo < 2,5 s)** medido con `php -S` sin compresión ni caché; revisarlo en Hostinger con LiteSpeed y, si no baja, precargar la imagen del hero y sustituir las fotos de 490 px.
 
 ---
 
 ## 11. Rendimiento y accesibilidad
 
-- Fuentes en local (`woff2`, subset latino), `font-display: swap`, `preload` de Saira 900 y DM Sans 400. **Fuentes recortadas a los ejes que usa el sitio (202 KB → 79 KB, quitó ~0,6 s de LCP):** Saira peso 600–900 con `wdth` 112–125; DM Sans peso 400–700 con `opsz` 9–24; JetBrains Mono peso 400–600 solo ASCII/Latin-1. Un peso, ancho o carácter fuera de esos rangos se recorta al extremo más cercano: si se necesita, regenerar la fuente (ver comentario en `assets/css/fonts.css`; las originales están en el historial de git).
-- **Presupuesto de CSS:** tras la capa de profundidad cada página carga 60–65 KB sin comprimir (~16–17 KB gzip). Se mide en gzip (lo que viaja): ≤ 18 KB.
+- Fuentes en local (`woff2`, subset latino sin hinting, ~60 KB: Barlow 400/500/600, Barlow Condensed 700/900, JetBrains Mono variable), `font-display: swap`, `preload` de Barlow Condensed 900 y Barlow 400. Para otro peso o glifo, regenerar con `fontTools.subset` desde Google Fonts (ver comentario en `assets/css/fonts.css`).
+- **Presupuesto de CSS:** ≤ 18 KB gzip por página (fonts + tokens + base + components + grupo de página). Tras el rediseño: 12–13 KB.
 - Imágenes WebP con `srcset`/`sizes`, `width`/`height` explícitos, `loading="lazy"` salvo la imagen del hero (`fetchpriority="high"`).
 - Video con fachada: nada de iframe hasta el clic.
-- Objetivo Lighthouse móvil: Performance ≥ 90, Accessibility ≥ 95, Best Practices ≥ 95, SEO 100. LCP < 2.5 s, CLS < 0.1. **Medido en el sitio publicado (2026-11-02, con JavaScript y GSAP funcionando):** home 91 (LCP 3,0 s, **TBT 190 ms**), how-it-works 92 (LCP 3,0 s), blog 93 (LCP 3,3 s), calculadora IFTA 100; CLS 0; Accessibility/Best Practices 100. Cumple Performance ≥ 90 pero **el LCP de 3,0–3,3 s está por encima de 2,5 s** y el TBT de la home es alto: pendiente de optimizar (candidatos: el bucle y el SVG del hero, `motion.js`, GSAP desde el CDN). Las cifras anteriores de 96–98 se midieron en `php -S` local sin compresión y, en parte, con una página rota sin JS: no son comparables. Antes de cada cambio de estilo o movimiento, repetir esta medición **sobre el sitio publicado o con un servidor completo**, y comprobar primero que la página está completa (ver §13).
+- Objetivo Lighthouse móvil: Performance ≥ 90, Accessibility ≥ 95, Best Practices ≥ 95, SEO 100. LCP < 2.5 s, CLS < 0.1. **Las cifras anteriores al rediseño (home 91, LCP 3,0 s, TBT 190 ms) ya no valen:** el rediseño quitó GSAP y el hero SVG, y el LCP ahora es la foto del hero. Medir de nuevo **sobre el sitio publicado**, y comprobar primero que la página está completa (ver §13).
 - HTML semántico: `header`, `nav`, `main`, `section` con encabezado, `footer`; `button` para acciones, `a` para navegación.
 - `aria-label` en botones de solo icono; `aria-expanded`/`aria-controls` en menús; `aria-live` en resultados de calculadoras.
 - Contraste AA en todo el texto; foco visible en cian.
