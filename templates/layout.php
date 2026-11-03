@@ -82,9 +82,6 @@ $jsByTemplate = ['tool-rpm' => 'calc-rpm.js', 'tool-ifta' => 'calc-ifta.js', 'bl
 <link rel="apple-touch-icon" href="<?= e(asset('img/favicon.png')) ?>">
 <link rel="preload" href="/assets/fonts/barlow-condensed-900.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/barlow-400.woff2" as="font" type="font/woff2" crossorigin>
-<?php if ($gsap): ?>
-<link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-<?php endif; ?>
 <?php foreach ($css as $c): ?>
 <link rel="stylesheet" href="<?= e(asset($c)) ?>">
 <?php endforeach; ?>
@@ -112,9 +109,7 @@ $jsByTemplate = ['tool-rpm' => 'calc-rpm.js', 'tool-ifta' => 'calc-ifta.js', 'bl
 <script src="<?= e(asset('js/main.js')) ?>" defer></script>
 <?php endif; ?>
 <?php if ($gsap): ?>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" integrity="sha512-7eHRwcbYkK4d9g/6tD/mhkf++eoTHwpNM9woBxtPUBWm67zeAfFC+HrdoE2GanKeocly/VxeLvIqwvCdk7qScg==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" integrity="sha512-onMTRKJBKz8M1TnqqDuGBlowlH0ohFzMXYRNebz+yOcc5TQr/zAKsthzhuv0hiyUKEiQEQXEynnXCvNTOk50dg==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
-<script src="<?= e(asset('js/motion.js')) ?>" defer></script>
+<script src="<?= e(asset('js/motion.js')) ?>" data-gsap="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" data-gsap-sri="sha512-7eHRwcbYkK4d9g/6tD/mhkf++eoTHwpNM9woBxtPUBWm67zeAfFC+HrdoE2GanKeocly/VxeLvIqwvCdk7qScg==" data-st="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" data-st-sri="sha512-onMTRKJBKz8M1TnqqDuGBlowlH0ohFzMXYRNebz+yOcc5TQr/zAKsthzhuv0hiyUKEiQEQXEynnXCvNTOk50dg==" defer></script>
 <?php endif; ?>
 <?php if (isset($jsByTemplate[$template]) && $jsFile($jsByTemplate[$template])): ?>
 <script src="<?= e(asset('js/' . $jsByTemplate[$template])) ?>" defer></script>

@@ -6,6 +6,26 @@
    4 bandas (CTA final y Amazon Relay) · 5 entradas del onboarding y de las cifras. Estilos que necesitan: assets/css/motion.css. */
 (function () {
   'use strict';
+  /* GSAP y ScrollTrigger NO bloquean ni compiten con el LCP: se descargan tras `load` + idle, desde cdnjs (versión fija con SRI en los data-* de
+     este <script>), y solo entonces arrancan las escenas. Si la descarga falla, la página queda completa y estática. */
+  var cur = document.currentScript, cfg = cur && cur.dataset ? cur.dataset : {};
+  function inject(src, sri, cb) {
+    var s = document.createElement('script');
+    s.src = src; s.integrity = sri; s.crossOrigin = 'anonymous'; s.referrerPolicy = 'no-referrer'; s.async = false;
+    s.onload = cb; s.onerror = function () {};
+    document.head.appendChild(s);
+  }
+  function load() {
+    if (window.gsap && window.ScrollTrigger) return main();
+    if (!cfg.gsap || !cfg.st) return;
+    inject(cfg.gsap, cfg.gsapSri, function () { inject(cfg.st, cfg.stSri, function () { if (window.gsap && window.ScrollTrigger) main(); }); });
+  }
+  function later() {
+    if (window.requestIdleCallback) window.requestIdleCallback(load, { timeout: 1500 }); else setTimeout(load, 200);
+  }
+  if (document.readyState === 'complete') later(); else window.addEventListener('load', later);
+
+  function main() {
   var g = window.gsap, ST = window.ScrollTrigger, d = document, root = d.documentElement;
   var rm = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
   if (!g || !ST || !window.matchMedia || (rm && rm.matches)) return;
@@ -155,4 +175,5 @@
     else setTimeout(start, 120);
   }
   if (d.readyState === 'complete') boot(); else window.addEventListener('load', boot);
+  }
 })();
