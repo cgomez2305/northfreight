@@ -111,5 +111,6 @@ a.card.card--dark.co-res:hover .card__code { color: var(--cyan-light); }
 .co-faqwrap { display: flex; flex-wrap: wrap; gap: 48px; align-items: flex-start; }
 .co-faqhead { flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
 .co-faqlist { flex: 2 1 520px; min-width: 0; }
+.co-faq summary > .co-faq__plus { flex: none; order: -1; }   /* la pregunta es texto suelto: sin esto el + (único hijo) se estiraba como una píldora a la derecha */
 .co-faq__plus .icon { stroke-width: 2.4; }
 .co-related { margin-top: 24px; }

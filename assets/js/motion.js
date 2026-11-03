@@ -1,9 +1,12 @@
-/* NorthStar Freight: motion.js. Escenas de scroll con GSAP 3.12.5 + ScrollTrigger (profundidad y parallax, estilo "Fourlines").
-   Todo va ligado al scroll (scrub) y solo anima transform y opacity. La única excepción son las entradas del onboarding (una vez, .7 s).
+/* NorthStar Freight: motion.js. Escenas de scroll con GSAP 3.12.5 + ScrollTrigger (profundidad y parallax, estilo "Fourlines") en TODAS las rutas.
+   Todo va ligado al scroll (scrub) y solo anima transform y opacity. Las únicas excepciones son las entradas de cifras (una vez, .7 s).
    Mejora progresiva: arranca tras `load` + idle (no toca LCP ni TBT). html.js-motion solo existe si hay GSAP, ScrollTrigger y no hay
    prefers-reduced-motion; si algo falla se revierte todo y la página queda completa y estática.
-   Escenas: 1 hero de la home fijado que se encoge · 2 carril horizontal fijado de servicios · 3 parallax de fotos (.px) ·
-   4 bandas (CTA final y Amazon Relay) · 5 entradas del onboarding y de las cifras. Estilos que necesitan: assets/css/motion.css. */
+   Sistema común (se activa por clases que ya existen en los partials, nada por página):
+     hero interno (.hero) · bandas y paneles (.section--surface, .section--dark, .home-relay, .cta, .footer, .co-band) · rejillas 3D por filas
+     (.g2 a .g6, .blog-grid) · titulares de sección (.t-h2, .t-h2-s) · marcos de foto (.px) con parallax y escala · cifras (entradas una vez).
+   Solo home: hero fijado, carril horizontal fijado de servicios. Móvil (<1025 px): parallax de fotos, cifras y entrada de bandas, sin pines ni 3D.
+   Nunca se anima ningún input, select, textarea ni resultado aria-live. Estilos que necesitan: assets/css/motion.css. */
 (function () {
   'use strict';
   /* GSAP y ScrollTrigger NO bloquean ni compiten con el LCP: se descargan tras `load` + idle, desde cdnjs (versión fija con SRI en los data-* de
@@ -122,40 +125,146 @@
     });
   }
 
-  /* ---- Escena 4: bandas (CTA final y Amazon Relay). Entran escalando de .94 a 1 y subiendo 60 px; solo escritorio ---- */
-  function bandScene() {
-    $('.home-relay, .cta').forEach(function (el) {
-      g.fromTo(el, { scale: 0.94, y: 60 }, {
-        scale: 1, y: 0, ease: 'none', transformOrigin: '50% 50%',
-        scrollTrigger: { trigger: el, start: 'top 85%', end: 'top 40%', scrub: 0.5 }
+  /* ---- Utilidades del sistema común ---- */
+  // Posición vertical SIN transformaciones (suma de offsetTop): estable aunque el elemento o sus padres estén en su estado inicial de la escena
+  function absTop(el) { var y = 0; while (el) { y += el.offsetTop; el = el.offsetParent; } return y; }
+  // Agrupa elementos en filas visuales (misma posición vertical) para crear un trigger por fila y no uno por tarjeta
+  function rowsOf(els) {
+    var out = [];
+    els.forEach(function (el) {
+      var t = absTop(el), r = out[out.length - 1];
+      if (r && Math.abs(r.top - t) < 24) r.els.push(el); else out.push({ top: t, els: [el] });
+    });
+    return out;
+  }
+  /* Opacidad inicial 0.95 (no 0.5/0.25): con menos, el cian pequeño sobre --panel-2 baja de 4,5:1 (0.9 => 4,4:1) y Lighthouse lo mide en las tarjetas aún sin llegar. El efecto lo dan la rotación y el desplazamiento. */
+  // will-change solo mientras la escena está activa (no se dejan capas fijas en bloques grandes)
+  function wc(el) { return function (self) { el.style.willChange = self.isActive ? 'transform, opacity' : ''; }; }
+  function sees(el) { return !!(el.offsetWidth || el.offsetHeight || el.getClientRects().length) && !el.hidden; }
+  var hasLive = function (el) { return !!el.querySelector('[data-calc], [aria-live]:not(.sr-only)'); };
+  var hasField = function (el) { return !!el.querySelector('form, input, select, textarea'); };
+
+  /* ---- Hero interno (todas las páginas internas, sin pin, solo escritorio): mientras sale de la pantalla el panel se aleja ---- */
+  function heroInt() {
+    $('.hero:not(.hero--home)').forEach(function (hero) {
+      var main = one('.hero__main', hero), video = one('.video', hero);
+      // herramientas con la calculadora dentro del hero: nada de escalar el panel (arrastraría los campos); solo sube y se atenúa el bloque de texto
+      if (hasField(hero) || hasLive(hero)) {
+        if (main && !main.querySelector('input, select, textarea, [aria-live]')) {
+          g.fromTo(main, { y: 0, opacity: 1 }, { y: -60, opacity: 0.15, ease: 'none', scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 0.6 } });
+        }
+        return;
+      }
+      var tl = g.timeline({
+        defaults: { ease: 'none', duration: 1 },
+        scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 0.6, onToggle: wc(hero) }
+      });
+      tl.fromTo(hero, { scale: 1, y: 0 }, { scale: 0.95, y: 40, transformOrigin: '50% 50%' }, 0);
+      if (main) tl.fromTo(main, { y: 0, opacity: 1 }, { y: -60, opacity: 0.15 }, 0);
+      if (video) tl.fromTo(video, { scale: 1 }, { scale: 0.92, transformOrigin: '50% 50%' }, 0);
+    });
+  }
+
+  /* ---- Bandas y paneles grandes (CTA final, footer, paneles de sección, banda de Relay): entran subiendo; en móvil solo y + opacidad ---- */
+  function bandScene(desk) {
+    var all = $('.section--surface, .section--dark, .home-relay, .cta, .footer, .co-band');
+    all.forEach(function (el) {
+      if (hasLive(el) || (el.parentElement && el.parentElement.closest('.section--surface, .section--dark, .home-relay, .cta, .footer, .co-band'))) return;
+      g.fromTo(el, desk ? { scale: 0.94, y: 60 } : { y: 40, opacity: 0.95 }, {
+        scale: 1, y: 0, opacity: 1, ease: 'none', transformOrigin: '50% 50%',
+        scrollTrigger: desk
+          ? { trigger: el, start: 'clamp(top 90%)', end: 'clamp(top 45%)', scrub: 0.5, onToggle: wc(el) }
+          : { trigger: el, start: 'clamp(top 92%)', end: 'clamp(top 70%)', scrub: 0.5 }
       });
     });
   }
 
-  /* ---- Escena 5: entradas (una sola vez, no ligadas al scroll): pasos del onboarding y fila 4/1/0 ---- */
-  function enterScene() {
-    ['.home-steps', '.home-figures'].forEach(function (sel) {
-      var list = one(sel);
-      var items = list ? $(':scope > li', list) : [];
+  /* ---- Rejillas de tarjetas con profundidad 3D (solo escritorio): un trigger por FILA, cada tarjeta escalonada ---- */
+  function gridScene(rail) {
+    var undo = [];
+    $('.g2, .g3, .g4, .g5, .g6, .blog-grid').forEach(function (grid) {
+      if (grid.closest('.hero, .footer, [data-calc], form') || (rail && grid.matches('.home-cards')) || hasField(grid)) return;
+      var items = A.slice.call(grid.children).filter(sees);
       if (!items.length) return;
-      g.from(items, {
+      var prev = grid.style.perspective; grid.style.perspective = '1200px';
+      undo.push(function () { grid.style.perspective = prev; });
+      rowsOf(items).forEach(function (row) {
+        var off = function () { return Math.max(0, absTop(row.els[0]) - absTop(grid)); };
+        var tl = g.timeline({
+          defaults: { ease: 'none' },
+          scrollTrigger: { trigger: grid, start: function () { return 'top+=' + off() + ' 95%'; }, end: function () { return 'top+=' + off() + ' 60%'; }, scrub: true, invalidateOnRefresh: true }
+        });
+        row.els.forEach(function (el, i) {
+          tl.fromTo(el, { rotateX: 10, y: 48, opacity: 0.95, transformOrigin: '50% 100%' }, { rotateX: 0, y: 0, opacity: 1, duration: 1 }, i * 0.12);
+        });
+      });
+    });
+    return function () { undo.forEach(function (f) { f(); }); };
+  }
+
+  /* ---- Titulares de sección (solo escritorio): la cabecera entera sube 40 px (titular, eyebrow y lead juntos: no se solapan) ---- */
+  function headScene(rail) {
+    var done = [];
+    $('.t-h2, .t-h2-s').forEach(function (h) {
+      if (h.closest('.hero, .cta, .blog-feat, .home-cards') || (rail && h.closest('.home-services'))) return;
+      var par = h.parentElement, box = h.closest('.section-head') || (par && !par.matches('.container, .section, section, main') ? par : h);
+      if (done.indexOf(box) >= 0 || box.querySelector('input, select, textarea')) return;
+      done.push(box);
+      g.fromTo(box, { y: 40 }, { y: 0, ease: 'none', scrollTrigger: { trigger: box, start: 'top 95%', end: 'top 72%', scrub: 0.4 } });
+    });
+  }
+
+  /* ---- Marcos de foto grandes fuera de rejillas y héroes (video, medios de servicio, destacado del blog): entran escalando ---- */
+  function mediaScene() {
+    $('.px').forEach(function (px) {
+      if (px.closest('.hero, .card, .home-cards, .g2, .g3, .g4, .g5, .g6, .blog-grid')) return;
+      g.fromTo(px, { scale: 0.92 }, { scale: 1, ease: 'none', transformOrigin: '50% 50%',
+        scrollTrigger: { trigger: px, start: 'top 95%', end: 'top 55%', scrub: true } });
+    });
+  }
+
+  /* ---- Cifras y pasos (home: onboarding y 4/1/0; How it works): entrada una vez, .7 s, escalonada por fila ---- */
+  function enterScene() {
+    var list = [];
+    $('.home-steps, .home-figures, .sb-hw-steps').forEach(function (ul) {
+      list.push.apply(list, A.slice.call(ul.children).filter(function (el) { return sees(el) && el.getBoundingClientRect().top > vh() * 0.9; }));
+    });
+    rowsOf(list).forEach(function (row) {
+      var par = row.els[0].parentElement;
+      var start = function () { return 'top+=' + Math.max(0, absTop(row.els[0]) - absTop(par)) + ' 88%'; };
+      g.from(row.els, {
         y: 40, opacity: 0, duration: 0.7, ease: 'power3.out', stagger: 0.08, clearProps: 'opacity,transform',
-        scrollTrigger: { trigger: list, start: 'top 85%', once: true }
+        scrollTrigger: { trigger: par, start: start, once: true, invalidateOnRefresh: true }
       });
     });
   }
 
   function build(ctx) {
     var c = ctx.conditions, undo = [];
-    if (c.desk) {
+    if (c.desk) {   // los pines primero: así el resto de triggers mide ya con los espaciadores de pin
       heroScene();
       var off = c.rail ? railScene() : null;
       if (off) undo.push(off);
     }
     photoScene(!!c.rail);
-    if (c.desk) bandScene();
+    if (c.desk) {
+      heroInt();
+      undo.push(gridScene(!!c.rail));
+      headScene(!!c.rail);
+      mediaScene();
+    }
     enterScene();
+    bandScene(!!c.desk);
     return function () { undo.forEach(function (f) { f(); }); };
+  }
+
+  // Si cambia la altura de la página (FAQ abierta, filas nuevas del IFTA, filtro del blog) las posiciones guardadas se recalculan
+  function watch() {
+    var last = d.body.offsetHeight, t = 0;
+    function again() { clearTimeout(t); t = setTimeout(function () { if (!dead) ST.refresh(); last = d.body.offsetHeight; }, 220); }
+    d.addEventListener('toggle', again, true);
+    d.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('[data-blog-filter], [data-calc]')) again(); });
+    if (window.ResizeObserver) new window.ResizeObserver(function () { if (Math.abs(d.body.offsetHeight - last) > 2) again(); }).observe(d.body);
   }
 
   function start() {
@@ -163,8 +272,9 @@
     try {
       root.classList.add('js-motion');
       mm = g.matchMedia();
-      mm.add({ desk: '(min-width: 1025px)', rail: '(min-width: 1025px) and (min-height: 700px)' }, build);
+      mm.add({ all: '(min-width: 1px)', desk: '(min-width: 1025px)', rail: '(min-width: 1025px) and (min-height: 700px)' }, build);
       ST.refresh();
+      watch();
       if (d.fonts && d.fonts.ready) d.fonts.ready.then(function () { if (!dead) ST.refresh(); });
       if (rm && rm.addEventListener) rm.addEventListener('change', function () { if (rm.matches) fail(); });
     } catch (e) { fail(); }

@@ -2,6 +2,10 @@
    Regla: nada se oculta si falta html.js-motion (sin JS, GSAP bloqueado o prefers-reduced-motion todo se ve completo y estático).
    Escenas: 1 hero de la home (pin), 2 carril de servicios (pin + horizontal), 3 parallax de fotos (.px), 4 bandas (CTA, Relay), 5 entradas. */
 
+/* ---- Footer y bandas: el desplazamiento inicial hacia abajo (y: 60) de la última banda no debe alargar la altura del documento mientras se hace scroll
+   (si lo alargara, el scrub del footer nunca llegaría a 1). overflow-y: clip recorta ese desborde sin crear contenedor de scroll ni romper el header sticky ---- */
+@supports (overflow-y: clip) { .js-motion body { overflow-y: clip; } }
+
 /* ---- Escena 3: parallax de fotos (.px). Marco con overflow hidden; la imagen mide 120 % del alto y arranca centrada (-8,34 % de su alto).
    La geometría es la misma con y sin JS a propósito: así la foto no "salta" cuando motion.js empieza a moverla. ---- */
 .px { overflow: hidden; }

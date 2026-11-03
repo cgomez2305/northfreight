@@ -142,6 +142,7 @@ return [
     ],
     '/contact/' => [
         'template'   => 'contact',
+        'motion'     => true,
         'form'       => 'contact',   // handler POST en app/forms/contact.php
         'title'      => 'Contact NorthStar Freight | Talk to a Dispatcher',
         'meta'       => 'Talk to a NorthStar dispatcher on WhatsApp at +1 863-651-3322 or email nfreightsolutionsllc@gmail.com. No forms first: tell us about your trucks.',
@@ -158,6 +159,7 @@ return [
     // Legales: título/H1 del prototipo (no están en el doc de copy). Texto pendiente de abogado.
     '/privacy-policy/' => [
         'template'   => 'legal',
+        'motion'     => true,
         'doc'        => 'privacy',
         'title'      => 'Privacy Policy | NorthStar Freight Solutions',
         'meta'       => 'How NorthStar Freight Solutions LLC collects, uses and protects the information you share through this website, WhatsApp and email.',
@@ -173,6 +175,7 @@ return [
     ],
     '/terms/' => [
         'template'   => 'legal',
+        'motion'     => true,
         'doc'        => 'terms',
         'title'      => 'Terms of Use | NorthStar Freight Solutions',
         'meta'       => 'The rules for using the NorthStar website and the free tools and templates published on it. Results are estimates, not legal or tax advice.',
@@ -193,6 +196,7 @@ return [
     // ------------------------------------------------------------------
     '/resources/' => [
         'template'   => 'resources',
+        'motion'     => true,
         'title'      => 'Free Trucking Resources for Owner-Operators | NorthStar', // TODO verificar con doc de copy
         'meta'       => 'Free trucking tools, templates and guides from a dispatch desk: IFTA and rate per mile calculators, BOL template, agreement, glossary and blog.', // TODO
         'h1'         => 'Free trucking resources from the desk',
@@ -206,6 +210,7 @@ return [
     ],
     '/resources/bol-template/' => [
         'template'   => 'doc-bol',
+        'motion'     => true,
         'form'       => 'download',   // handler POST en app/forms/download.php
         'title'      => 'BOL Template (Bill of Lading) in PDF & Word | NorthStar', // TODO verificar con doc de copy
         'meta'       => 'Free bill of lading (BOL) template in PDF and Word: every field brokers and receivers expect, ready to print. The same BOL our desk files on every load.', // TODO
@@ -221,6 +226,7 @@ return [
     ],
     '/resources/ifta-calculator/' => [
         'template'   => 'tool-ifta',
+        'motion'     => true,
         'title'      => 'IFTA Calculator for Owner-Operators | NorthStar', // TODO verificar con doc de copy
         'meta'       => 'Free IFTA calculator: enter miles and gallons by state to see fleet MPG, net taxable gallons and an estimated quarterly fuel tax. Estimates only.', // TODO
         'h1'         => 'IFTA calculator',
@@ -235,6 +241,7 @@ return [
     ],
     '/resources/rate-per-mile-calculator/' => [
         'template'   => 'tool-rpm',
+        'motion'     => true,
         'title'      => 'Rate Per Mile Calculator for Truckers | NorthStar', // TODO verificar con doc de copy
         'meta'       => 'Free rate per mile calculator: loaded and all-in RPM, fuel cost and what is left after the trip. Know if a load pays before you book it.', // TODO
         'h1'         => 'Rate per mile calculator',
@@ -249,6 +256,7 @@ return [
     ],
     '/resources/dispatcher-carrier-agreement/' => [
         'template'   => 'doc-agreement',
+        'motion'     => true,
         'form'       => 'download',   // handler POST en app/forms/download.php
         'title'      => 'Dispatcher-Carrier Agreement Template | NorthStar', // TODO verificar con doc de copy
         'meta'       => 'Dispatcher carrier agreement template: what a fair dispatch contract covers, from scope and fees to your right to refuse loads. Not legal advice.', // TODO
@@ -264,6 +272,7 @@ return [
     ],
     '/resources/glossary/' => [
         'template'   => 'glossary',
+        'motion'     => true,
         'title'      => 'Trucking Glossary: Dispatch Terms Explained | NorthStar', // TODO verificar con doc de copy
         'meta'       => 'Trucking glossary from a dispatch desk: deadhead, TONU, rate con, lumper, detention and more, explained in one or two lines.', // TODO
         'h1'         => 'Trucking glossary',
@@ -362,6 +371,7 @@ return [
     // ------------------------------------------------------------------
     '/box-truck-dispatch/' => [
         'template'   => 'equipment',
+        'motion'     => true,
         'equip'      => 'box',
         'title'      => 'Box Truck Dispatch Service | NorthStar Freight', // TODO
         'meta'       => 'Box truck dispatch for owner-operators: we find loads that fit a straight truck and handle brokers, check calls and paperwork from one dispatch desk.', // TODO
@@ -377,6 +387,7 @@ return [
     ],
     '/hotshot-dispatch/' => [
         'template'   => 'equipment',
+        'motion'     => true,
         'equip'      => 'hotshot',
         'title'      => 'Hotshot Dispatch Services | NorthStar Freight', // TODO
         'meta'       => 'Hotshot dispatch for owner-operators: time-sensitive loads that fit your pickup and trailer, securement confirmed first and brokers kept updated.', // TODO
@@ -392,6 +403,7 @@ return [
     ],
     '/flatbed-dispatch/' => [
         'template'   => 'equipment',
+        'motion'     => true,
         'equip'      => 'flatbed',
         'title'      => 'Flatbed Dispatch Services | NorthStar Freight', // TODO
         'meta'       => 'Flatbed dispatch for owner-operators: loads matched to your deck, dimensions, tarps and securement confirmed, and every load tracked to delivery.', // TODO
@@ -407,6 +419,7 @@ return [
     ],
     '/power-only-dispatch/' => [
         'template'   => 'equipment',
+        'motion'     => true,
         'equip'      => 'power-only',
         'title'      => 'Power Only Dispatch Service | NorthStar Freight', // TODO
         'meta'       => 'Power only dispatch for owner-operators: loads for your tractor, trailer pickup and drop details confirmed, and every move tracked and documented.', // TODO
@@ -422,6 +435,7 @@ return [
     ],
     '/reefer-dispatch/' => [
         'template'   => 'equipment',
+        'motion'     => true,
         'equip'      => 'reefer',
         'title'      => 'Reefer Dispatch Service | NorthStar Freight', // TODO
         'meta'       => 'Reefer dispatch for owner-operators: temperature-controlled loads that fit your unit, set points confirmed and temperature records kept per load.', // TODO
@@ -441,6 +455,7 @@ return [
     // ------------------------------------------------------------------
     '404' => [
         'template'   => '404',
+        'motion'     => true,
         'title'      => 'Page Not Found | NorthStar Freight',
         'meta'       => 'The page you are looking for does not exist. Talk to a NorthStar dispatcher on WhatsApp or go back to the home page.',
         'h1'         => 'Page not found',
