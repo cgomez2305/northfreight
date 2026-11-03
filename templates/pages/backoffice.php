@@ -21,6 +21,7 @@ partial('hero', [
     'tagline' => 'The work behind the load, done right.',
     'lead'    => 'Paperwork organized, settlements prepared and disputes followed until they close.',
     'ctas'    => [['label' => 'Talk to the desk', 'href' => wa($route['wa']), 'wa' => true, 'arrow' => true]],
+    'image'   => ['base' => 'dry-van-trailers-loading-docks', 'alt' => 'Dry van trailers backed into warehouse loading docks'],
 ]);
 
 // Resumen "In short" (SEO/GEO): editable aquí. Solo información que ya está en el copy de esta página; sin cifras, tarifas ni promesas nuevas.

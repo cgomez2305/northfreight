@@ -22,7 +22,7 @@ partial('hero', [
     'ctas'  => [
         ['label' => 'Talk to a dispatcher', 'href' => wa($route['wa']), 'wa' => true, 'arrow' => true],
     ],
-    'image' => ['base' => 'dry-van-trailer-highway-dusk', 'alt' => 'Dry van trailer on the highway at dusk'],
+    'image' => ['base' => 'red-semi-dry-van-open-road', 'alt' => 'Red semi truck pulling a dry van on an open road'],
 ]);
 
 // Resumen "In short" (SEO/GEO): editable aquí. Solo información que ya está en el copy de esta página; sin cifras, tarifas ni promesas nuevas.

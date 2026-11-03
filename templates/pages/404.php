@@ -8,7 +8,6 @@ require_once NS_ROOT . '/templates/partials/kit.php';
 ob_start(); ?>
 <div class="co-404" aria-hidden="true">
   <span class="co-404__num">404</span>
-  <?= ns_star(40, 'co-404__star twinkle') ?>
 </div>
 <?php
 $aside = ob_get_clean();

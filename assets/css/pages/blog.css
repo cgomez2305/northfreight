@@ -1,5 +1,4 @@
 /* ---- Hero (índice y artículo) ---- */
-.blog-hero .hero__eyebrow .star { display: none; }
 .blog-hero--index .hero__in { padding-bottom: clamp(40px, 5vw, 64px); }
 .blog-hero--post .hero__in { padding-bottom: clamp(48px, 6vw, 80px); row-gap: 22px; }
 .blog-hero .hero__main { gap: 22px; }
@@ -8,7 +7,7 @@
 .blog-byline__by { display: inline-flex; gap: 8px; align-items: center; }
 .blog-byline img { width: 22px; height: 22px; display: block; }
 /* ---- Índice: tarjeta destacada ---- */
-.blog-featured { padding-bottom: clamp(56px, 8vw, 96px); }
+.blog-featured { padding-block: clamp(24px, 3vw, 40px) clamp(56px, 8vw, 96px); }
 .blog-feat { display: flex; flex-wrap: wrap; background: var(--panel); color: var(--text); text-decoration: none; border-radius: var(--r-card); overflow: hidden; border: 1px solid var(--hairline); transition: translate var(--t-fast), border-color var(--t-fast); }
 .blog-feat:hover { translate: 0 -2px; border-color: var(--hairline-strong); }
 .blog-feat:focus-visible { outline-offset: 3px; }
@@ -34,11 +33,12 @@
 .blog-grid { list-style: none; margin: 0; padding: 0; }
 .blog-item { display: flex; min-width: 0; }
 .blog-item[hidden] { display: none; }
-.blog-item .card { flex: 1; min-height: 260px; box-sizing: border-box; display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto 1fr auto; gap: 14px 12px; }
-.blog-item .card__tag { grid-column: 1; grid-row: 1; }
-.blog-item .card__code { grid-column: 2; grid-row: 1; text-align: right; }
-.blog-item .card__title, .blog-item .card__text, .blog-item .card__link { grid-column: 1 / -1; }
-.blog-item .card__title { font-size: 30px; font-weight: 700; }
+/* Tarjetas del índice: con foto (artículos) o sin foto (herramientas y guías, con etiqueta y código limpios) */
+.blog-grid { gap: clamp(20px, 2.4vw, 32px); }
+.blog-item .card { flex: 1; min-height: 260px; box-sizing: border-box; gap: 14px; }
+.blog-item .card--photo { min-height: 0; }
+.blog-item .card__title { font-size: 30px; font-weight: 700; line-height: 1.02; }
+.blog-item .card:not(.card--photo) { --card-pad: clamp(24px, 2.4vw, 32px); }
 /* ---- Newsletter (solo maquetado) ---- */
 .blog-news { padding-top: clamp(56px, 8vw, 96px); }
 .blog-news__in { display: flex; flex-wrap: wrap; gap: 32px; align-items: center; justify-content: space-between; }
@@ -73,11 +73,11 @@ details[open] > summary > .blog-plus { transform: rotate(45deg); }
   .blog-tocm { display: block; }
 }
 /* ---- Artículo: prosa ---- */
-.blog-prose { flex: 1 1 560px; min-width: 0; max-width: 760px; }
+.blog-prose { flex: 1 1 560px; min-width: 0; max-width: var(--prose); }
 .blog-prose h2 { color: var(--text); margin: 56px 0 18px; scroll-margin-top: calc(var(--header-h) + 24px); }
-.blog-prose p { font-size: 18px; line-height: 1.75; color: var(--text-2); margin: 0 0 18px; }
+.blog-prose p { font-size: 18px; line-height: 1.7; color: var(--text-2); margin: 0 0 18px; }
 .blog-prose ul { margin: 0 0 20px; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
-.blog-prose li { position: relative; padding-left: 26px; font-size: 18px; line-height: 1.65; color: var(--text-2); }
+.blog-prose li { position: relative; padding-left: 26px; font-size: 18px; line-height: 1.7; color: var(--text-2); }
 .blog-prose li::before { content: ''; position: absolute; left: 2px; top: .72em; width: 7px; height: 7px; background: var(--cyan); border-radius: 50%; }
 .blog-prose strong { color: var(--text); }
 .blog-prose p a, .blog-prose li a { font-weight: 500; }

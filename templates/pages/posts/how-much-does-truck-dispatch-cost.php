@@ -28,7 +28,7 @@ $pricing = ph('NorthStar pricing model: percentage, flat fee or plan details to 
 
 <h2 class="t-prose-h2" id="math">What the math looks like</h2>
 <p>Use the same numbers to compare offers. A worked example with a percentage model:</p>
-<div class="blog-stats cut-s">
+<div class="blog-stats">
   <p class="blog-stat"><span class="mono blog-stat__k">LOAD GROSS</span><span class="head blog-stat__v">$2,500</span></p>
   <p class="blog-stat"><span class="mono blog-stat__k">8% FEE</span><span class="head blog-stat__v blog-stat__v--hl">$200</span></p>
   <p class="blog-stat"><span class="mono blog-stat__k">4 LOADS / WEEK</span><span class="head blog-stat__v">$800</span></p>

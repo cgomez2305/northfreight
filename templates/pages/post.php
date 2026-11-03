@@ -22,7 +22,7 @@ $plus = static fn(int $size): string => '<span class="blog-plus" aria-hidden="tr
 
 // Caja "Talk to the desk" dentro del artículo.
 $callout = static function () use ($route): void { ?>
-<aside class="blog-callout cut" aria-label="Talk to the desk">
+<aside class="blog-callout" aria-label="Talk to the desk">
   <div class="blog-callout__text">
     <span class="t-meta blog-callout__tag">Talk to the desk</span>
     <p class="head blog-callout__title">Rather have a dispatcher handle this?</p>
@@ -97,7 +97,7 @@ partial('hero', [
         <span class="t-meta blog-toc__label">On this page</span>
         <?php $tocNav($toc); ?>
       </div>
-      <a class="blog-aside__card cut-s" href="<?= e(url('/contact/')) ?>">
+      <a class="blog-aside__card" href="<?= e(url('/contact/')) ?>">
         <span class="head blog-aside__title">Questions about your trucks?</span>
         <span class="blog-aside__link">Talk to a dispatcher <span class="arrow" aria-hidden="true">→</span></span>
       </a>
@@ -108,7 +108,7 @@ partial('hero', [
         <?php $tocNav($toc, 'blog-toc--m'); ?>
       </details>
       <?php if (!empty($takeaways)): ?>
-      <div class="blog-takeaways cut">
+      <div class="blog-takeaways">
         <span class="t-meta blog-takeaways__label">Key takeaways</span>
         <ul>
           <?php foreach ($takeaways as $t): ?><li><?= $t ?></li><?php endforeach; ?>
@@ -144,7 +144,6 @@ partial('hero', [
           'title'   => $r['title'],
           'text'    => $r['text'],
           'cta'     => 'Open',
-          'bar'     => false,
           'cls'     => !empty($r['dark']) ? 'card--dark' : '',
       ]); ?>
       <?php endforeach; ?>

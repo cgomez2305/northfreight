@@ -3,7 +3,7 @@
  * Cabecera de sección: eyebrow + H2 (+ lead). Marcas en textos: {hl}…{/hl}, {br}, {{ph:X}}.
  * Params: title(string, requerido), eyebrow(string|null), lead(string|null), tag('h2' defecto|'h1'|'h3'),
  *         size('h2' defecto|'h2-s'), theme('light' defecto|'dark'), split(bool: lead a la derecha en escritorio),
- *         swoosh(bool, sin efecto: se conserva por compatibilidad), id(string|null para aria-labelledby/ancla), cls(string).
+ *         id(string|null para aria-labelledby/ancla), cls(string).
  */
 require_once __DIR__ . '/kit.php';
 $tag = in_array($tag ?? 'h2', ['h1', 'h2', 'h3'], true) ? ($tag ?? 'h2') : 'h2';

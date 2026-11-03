@@ -25,13 +25,6 @@ function ns_star(int $size = 16, string $class = ''): string
         . '" viewBox="0 0 249 249" aria-hidden="true" focusable="false"><path d="M127 0L98 100L0 123L99 149L122 249L153 148L249 125L150 98Z"/></svg>';
 }
 
-/** Swoosh bajo los H1 (§5.5): viewBox 220x14. */
-function ns_swoosh(int $w = 200, int $h = 12, string $class = ''): string
-{
-    return '<svg class="swoosh' . ($class !== '' ? ' ' . e($class) : '') . '" width="' . $w . '" height="' . $h
-        . '" viewBox="0 0 220 14" aria-hidden="true" focusable="false"><polygon points="0,14 220,0 210,6 60,14"/></svg>';
-}
-
 /** Iconos de trazo (24x24, currentColor). Nombres: arrow whatsapp phone chevron close menu play calc trend doc doc-down check mail truck pin plus book. */
 function ns_icon(string $name, int $size = 18, string $class = ''): string
 {

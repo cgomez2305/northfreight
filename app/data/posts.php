@@ -10,6 +10,7 @@
  * published / modified (solo artículos): fechas ISO YYYY-MM-DD. 'published' queda VACÍO hasta que el cliente confirme la fecha real
  *   de publicación (no se inventa; mientras tanto la pantalla usa 'date' con ph()). 'modified' = última edición real del contenido.
  *   Alimentan datePublished/dateModified del JSON-LD Article y el byline (<time datetime>) del artículo.
+ * image (opcional, solo artículos): ['base' => 'nombre-en-assets/img', 'alt' => '…'] foto de la tarjeta del índice; sin image la tarjeta va sin foto.
  * Orden = orden de aparición en la maqueta: destacado primero, luego el resto.
  */
 
@@ -37,6 +38,7 @@ return [
     ],
     [
         'slug'     => 'amazon-relay-requirements',
+        'image'    => ['base' => 'red-semi-dry-van-open-road', 'alt' => 'Red semi truck pulling a dry van on an open road'],
         'path'     => '/blog/amazon-relay-requirements/',
         'title'    => 'Amazon Relay requirements for carriers',
         'category' => 'Amazon Relay',
@@ -58,6 +60,7 @@ return [
     ],
     [
         'slug'     => 'amazon-relay-load-board',
+        'image'    => ['base' => 'two-semis-hillside-highway', 'alt' => 'Two semi trucks on a highway through the hills'],
         'path'     => '/blog/amazon-relay-load-board/',
         'title'    => 'How the Amazon Relay load board works',
         'category' => 'Amazon Relay',
@@ -79,6 +82,7 @@ return [
     ],
     [
         'slug'     => 'lumper-fees-detention-pay',
+        'image'    => ['base' => 'dry-van-trailers-loading-docks', 'alt' => 'Dry van trailers backed into warehouse loading docks'],
         'path'     => '/blog/lumper-fees-detention-pay/',
         'title'    => 'Lumper fees and detention pay: how to get paid for both',
         'category' => 'Paperwork & pay',

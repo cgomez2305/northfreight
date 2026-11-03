@@ -21,13 +21,12 @@ $guides = array_filter([
 partial('hero', [
     'route' => $route,
     'cls'   => 'sa-hero--relay',
-    'deco'  => 'lane',
-    'stack' => true,
     'h1'    => 'Amazon Relay dispatch, {hl}handled end to end{/hl}',
     'lead'  => 'Relay rewards carriers who move fast and keep clean records. Our desk watches the load board, books the work that fits your trucks and manages performance and disputes inside your account.',
     'ctas'  => [
         ['label' => 'Ask about Relay dispatch', 'href' => wa($route['wa']), 'wa' => true, 'arrow' => true],
     ],
+    'image' => ['base' => 'white-semi-mountain-highway-crop', 'alt' => 'White semi truck with a dry van trailer on a mountain highway', 'small' => true, 'sizes' => '(min-width:1025px) 490px, 100vw'],
 ]);
 
 // Resumen "In short" (SEO/GEO): editable aquí. Solo información que ya está en el copy de esta página; sin cifras, tarifas ni promesas nuevas.
@@ -72,7 +71,7 @@ partial('summary', [
   <div class="container sa-guides__in">
     <h2 class="t-eyebrow sa-guides__label" id="relay-guides">Guides for Relay carriers</h2>
     <?php foreach ($guides as $g): ?>
-      <a class="cut-s sa-guides__link" href="<?= e(url($g[0])) ?>"><?= e($g[1]) ?> <span class="arrow" aria-hidden="true">→</span></a>
+      <a class="sa-guides__link" href="<?= e(url($g[0])) ?>"><?= e($g[1]) ?> <span class="arrow" aria-hidden="true">→</span></a>
     <?php endforeach; ?>
   </div>
 </section>

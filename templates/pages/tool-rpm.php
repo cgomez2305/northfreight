@@ -30,7 +30,7 @@ $related = array_values(array_filter($related, static fn(array $c): bool => rout
 // Calculadora (columna derecha del hero).
 ob_start();
 ?>
-<div class="tools-calc cut" data-calc="rpm">
+<div class="tools-calc" data-calc="rpm">
   <form class="tools-calc__form g2" aria-label="Load details" autocomplete="off" novalidate>
     <p class="tools-calc__label t-meta">Load details · example values</p>
     <?php foreach ($fields as [$key, $label, $value, $money, $hint]): $id = 'rpm-' . $key; ?>
@@ -82,7 +82,7 @@ partial('hero', [
     <?php partial('section-head', ['eyebrow' => 'How to use it', 'title' => 'How to calculate rate per mile in three steps', 'id' => 'rpm-steps-title']); ?>
     <ol class="g3 tools-steps">
       <?php foreach ($steps as $n => $text): ?>
-      <li class="tools-step cut-s"><span class="tools-step__n mono">STEP <?= sprintf('%02d', $n + 1) ?></span><span class="tools-step__t"><?= e($text) ?></span></li>
+      <li class="tools-step"><span class="tools-step__n mono">STEP <?= sprintf('%02d', $n + 1) ?></span><span class="tools-step__t"><?= e($text) ?></span></li>
       <?php endforeach; ?>
     </ol>
   </div>

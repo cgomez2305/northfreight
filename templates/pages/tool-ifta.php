@@ -57,13 +57,13 @@ partial('hero', [
 <section class="tools-band tools-band--calc" aria-label="IFTA calculator" data-calc="ifta">
   <div class="container tools-band__in">
     <div class="tools-tiles" aria-live="polite" aria-atomic="true">
-      <div class="tools-tile cut-s"><span class="tools-tile__label mono">Total miles</span><span class="tools-tile__val" data-out="totalMiles">—</span></div>
-      <div class="tools-tile cut-s"><span class="tools-tile__label mono">Total gallons</span><span class="tools-tile__val" data-out="totalGal">—</span></div>
-      <div class="tools-tile cut-s"><span class="tools-tile__label mono">Fleet MPG</span><span class="tools-tile__val" data-out="mpg">—</span></div>
-      <div class="tools-tile tools-tile--accent cut-s"><span class="tools-tile__label mono">Net tax due</span><span class="tools-tile__val" data-out="totalDue">—</span></div>
+      <div class="tools-tile"><span class="tools-tile__label mono">Total miles</span><span class="tools-tile__val" data-out="totalMiles">—</span></div>
+      <div class="tools-tile"><span class="tools-tile__label mono">Total gallons</span><span class="tools-tile__val" data-out="totalGal">—</span></div>
+      <div class="tools-tile"><span class="tools-tile__label mono">Fleet MPG</span><span class="tools-tile__val" data-out="mpg">—</span></div>
+      <div class="tools-tile tools-tile--accent"><span class="tools-tile__label mono">Net tax due</span><span class="tools-tile__val" data-out="totalDue">—</span></div>
     </div>
 
-    <div class="tools-sheet cut">
+    <div class="tools-sheet">
       <div class="tools-sheet__head">
         <p class="tools-calc__label t-meta">Miles &amp; fuel by state · example values</p>
         <button type="button" class="btn btn--navy btn--sm tools-add" data-add>+ Add state</button>
@@ -95,7 +95,7 @@ partial('hero', [
     <?php partial('section-head', ['eyebrow' => 'How to use it', 'title' => 'How to use the IFTA calculator in three steps', 'id' => 'ifta-steps-title']); ?>
     <ol class="g3 tools-steps">
       <?php foreach ($steps as $n => $text): ?>
-      <li class="tools-step cut-s"><span class="tools-step__n mono">STEP <?= sprintf('%02d', $n + 1) ?></span><span class="tools-step__t"><?= e($text) ?></span></li>
+      <li class="tools-step"><span class="tools-step__n mono">STEP <?= sprintf('%02d', $n + 1) ?></span><span class="tools-step__t"><?= e($text) ?></span></li>
       <?php endforeach; ?>
     </ol>
   </div>

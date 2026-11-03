@@ -7,7 +7,7 @@
  *  num     string  número grande ("01")                     icon  string  nombre de ns_icon()  | icon_html string (SVG propio)
  *  title   string  H3 (marcas permitidas)                   text  string  (marcas permitidas)
  *  href    string  destino (variant link, o enlace inferior)   cta string  texto del enlace inferior ("Load tracking")
- *  bar     bool    (sin efecto visual: se conserva por compatibilidad)
+ *  image   array   ['base','alt','sizes'?] foto arriba (radio 24, 4:3) y el texto debajo, sin caja (tarjeta de foto)
  *  hover   bool    elevación al pasar el ratón sin ser enlace
  *  h       string  etiqueta del título ('h3' defecto)    cls string clase extra   min_title bool (min-height 2 líneas)
  *  wrap    bool    envoltorio .card-wrap (defecto true)
@@ -17,25 +17,26 @@ require_once __DIR__ . '/kit.php';
 $variant = $variant ?? 'light';
 $size = $size ?? 'default';
 $isLink = $variant === 'link' && !empty($href);
-$bar = $bar ?? $isLink;
+$image = !empty($image) && is_array($image) ? $image : null;
 $el = $isLink ? 'a' : 'article';
 $h = in_array($h ?? 'h3', ['h2', 'h3', 'h4', 'p'], true) ? ($h ?? 'h3') : 'h3';
-$cls = 'card' . ($variant === 'dark' ? ' card--dark' : '') . ($size === 'lg' ? ' card--lg' : '') . ($size === 'tile' ? ' card--tile' : '')
+$cls = 'card' . ($variant === 'dark' ? ' card--dark' : '') . ($size === 'lg' ? ' card--lg' : '') . ($size === 'tile' ? ' card--tile' : '') . ($image ? ' card--photo' : '')
     . (!empty($hover) ? ' card--hover' : '') . (!empty($cls) ? ' ' . $cls : '');
 $wrap = $wrap ?? true;
 $hasTop = !empty($icon) || !empty($icon_html) || !empty($num);
 ?>
 <?php if ($wrap): ?><div class="card-wrap"><?php endif; ?>
 <<?= $el ?> class="<?= e($cls) ?>"<?= $isLink ? ' href="' . e($href) . '"' : '' ?>>
-  <?php if ($bar): ?><span class="card__bar" aria-hidden="true"></span><?php endif; ?>
+  <?php if ($image): ?><figure class="card__photo"><?= ns_img(['base' => $image['base'], 'alt' => $image['alt'] ?? '', 'sizes' => $image['sizes'] ?? '(min-width:1025px) 410px, (min-width:641px) 33vw, 100vw']) ?></figure><?php endif; ?>
   <?php if ($hasTop && (!empty($icon) || !empty($icon_html))): ?>
   <div class="card__top">
     <span class="card__icon" aria-hidden="true"><?= !empty($icon_html) ? $icon_html : ns_icon($icon, 26) ?></span>
     <?php if (!empty($num)): ?><span class="card__num" aria-hidden="true"><?= e($num) ?></span><?php endif; ?>
   </div>
   <?php elseif (!empty($num)): ?><span class="card__num" aria-hidden="true"><?= e($num) ?></span><?php endif; ?>
-  <?php if (!empty($tag)): ?><span class="card__tag t-meta"><?= ns_rich($tag) ?></span><?php endif; ?>
-  <?php if (!empty($code)): ?><span class="card__code"><?= ns_rich($code) ?></span><?php endif; ?>
+  <?php if (!empty($tag) && !empty($code)): ?><div class="card__meta"><span class="card__tag t-meta"><?= ns_rich($tag) ?></span><span class="card__code"><?= ns_rich($code) ?></span></div>
+  <?php elseif (!empty($tag)): ?><span class="card__tag t-meta"><?= ns_rich($tag) ?></span>
+  <?php elseif (!empty($code)): ?><span class="card__code"><?= ns_rich($code) ?></span><?php endif; ?>
   <?php if (!empty($title)): ?><<?= $h ?> class="head t-h3 card__title<?= $size === 'tile' ? ' card__title--s' : '' ?><?= !empty($min_title) ? ' h2-min' : '' ?>"><?= ns_rich($title) ?></<?= $h ?>><?php endif; ?>
   <?php if (!empty($text)): ?><p class="card__text t-card"><?= ns_rich($text) ?></p><?php endif; ?>
   <?php if (!empty($cta)): ?>

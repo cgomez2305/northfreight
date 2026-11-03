@@ -16,9 +16,7 @@ $relayLive = route_is_live('/amazon-relay-dispatch/');
       <?php foreach ($m['dispatch'] as $i): ?>
       <a class="mega__link" href="<?= e(url($i[2])) ?>"><?= ns_icon($i[3], 16) ?><span class="mega__text"><strong class="mega__title"><?= e($i[0]) ?></strong><span class="mega__desc"><?= e($i[1]) ?></span></span></a>
       <?php endforeach; ?>
-    </div>
-    <div class="mega__col">
-      <span class="mega__label t-meta">Operations &amp; back office</span>
+      <span class="mega__label mega__label--gap t-meta">Operations &amp; back office</span>
       <?php foreach ($m['ops'] as $i): ?>
       <a class="mega__link" href="<?= e(url($i[2])) ?>"><?= ns_icon($i[3], 16) ?><span class="mega__text"><strong class="mega__title"><?= e($i[0]) ?></strong><span class="mega__desc"><?= e($i[1]) ?></span></span></a>
       <?php endforeach; ?>
@@ -33,7 +31,7 @@ $relayLive = route_is_live('/amazon-relay-dispatch/');
     </div>
     <?php if ($relayLive): ?>
     <a class="mega__feature" href="<?= e(url('/amazon-relay-dispatch/')) ?>">
-      <span class="mega__feature-img"><?= ns_img(['base' => 'dry-van-trailers-loading-docks', 'alt' => '', 'sizes' => '400px', 'widths' => [640]]) ?></span>
+      <span class="mega__feature-img"><?= ns_img(['base' => 'dry-van-trailer-highway-dusk', 'alt' => '', 'sizes' => '380px', 'widths' => [640]]) ?></span>
       <span class="mega__feature-body">
         <span class="t-meta c-cyan-light">Our specialty</span>
         <span class="head mega__feature-title">Amazon Relay, handled end to end</span>

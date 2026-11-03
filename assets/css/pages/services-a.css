@@ -22,9 +22,6 @@
 .sa-ol { margin: 0; padding: 0; list-style: none; }
 .sa-ol > li { display: flex; min-width: 0; }
 .sa-step { padding: 24px; gap: 10px; }
-@media (min-width: 761px) {
-  .sa-hero--dryvan .hero__media { min-height: 420px; }
-}
 /* ---- Plantilla de equipo ---- */
 .sa-sheet { background: var(--bg); color: var(--text); padding: clamp(20px, 3vw, 32px); display: flex; flex-direction: column; border: 1px solid var(--hairline); border-radius: var(--r-card); }
 .sa-sheet__head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-bottom: 6px; }

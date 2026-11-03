@@ -46,7 +46,7 @@ partial('hero', [
 
     <div class="sb-ct-status" role="status" aria-live="polite"><?php if (!empty($flash['ok'])): ?><p class="sb-ct-msg"><?= e(is_string($flash['ok']) ? $flash['ok'] : 'Thanks, we received your message.') ?></p><?php elseif ($errors): ?><p class="sb-ct-msg sb-ct-msg--error">Please check the highlighted fields and send it again.</p><?php endif; ?></div>
 
-    <form class="sb-ct-form cut g2" method="post" action="<?= e(url('/contact/')) ?>">
+    <form class="sb-ct-form g2" method="post" action="<?= e(url('/contact/')) ?>">
       <input type="hidden" name="form_ts" value="<?= time() ?>">
       <input type="hidden" name="csrf" value="<?= function_exists('csrf_token') ? e(csrf_token()) : '' ?>">
       <div class="sr-only" aria-hidden="true">

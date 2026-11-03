@@ -23,8 +23,12 @@
   --overlay: rgba(4, 16, 31, .72);
   --glass-bg: rgba(10, 29, 51, .72);       /* píldora del header (translúcida con desenfoque) */
   --glass-blur: 16px;
-  --photo-fade: linear-gradient(180deg, rgba(4, 16, 31, .3) 0%, rgba(4, 16, 31, .74) 38%, rgba(4, 16, 31, .94) 100%);   /* solo sobre fotos: garantiza contraste AA del texto */
-  --photo-fade-side: linear-gradient(90deg, rgba(4, 16, 31, .86) 0%, rgba(4, 16, 31, .55) 55%, rgba(4, 16, 31, .1) 100%);
+  /* Degradados solo sobre fotos (garantizan contraste AA del texto). Hero de la home: velo desde la izquierda y desde abajo; el resto de la foto queda a la vista. */
+  --hero-fade-left: linear-gradient(90deg, rgba(4, 16, 31, .93) 0%, rgba(4, 16, 31, .9) 40%, rgba(4, 16, 31, .74) 54%, rgba(4, 16, 31, .45) 66%, rgba(4, 16, 31, .18) 76%, rgba(4, 16, 31, 0) 86%);
+  --hero-fade-bottom: linear-gradient(0deg, rgba(4, 16, 31, .75) 0%, rgba(4, 16, 31, .3) 22%, rgba(4, 16, 31, 0) 44%);
+  --hero-fade-top: linear-gradient(180deg, rgba(4, 16, 31, .5) 0%, rgba(4, 16, 31, 0) 22%);   /* detrás de la píldora del menú */
+  --hero-fade-m: linear-gradient(180deg, rgba(4, 16, 31, 0) 52%, var(--bg) 100%);            /* móvil: la foto se funde con el fondo */
+  --arrow-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12h15M13 6l6 6-6 6'/%3E%3C/svg%3E");
   --ph-bg: #FFF3B0;            /* marca de placeholder (solo staging) */
 
   /* Tipografía */
@@ -42,6 +46,7 @@
   --head-gap: 40px;
   --card-gap: 14px;
   --card-pad: 28px;
+  --prose: 720px;              /* ancho de lectura de artículos y legales */
   --tile-pad: 22px;
   --btn-h: 56px;
   --header-h: 96px;            /* pill (64) + márgenes: offsets de anclas y bloques sticky */

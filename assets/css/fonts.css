@@ -1,6 +1,6 @@
 /* Fuentes locales (woff2, subset latino). Barlow (texto), Barlow Condensed (titulares) y JetBrains Mono (etiquetas y datos).
    Cada archivo lleva solo los pesos que usa el sitio: Barlow 400/500/600, Barlow Condensed 700/900, JetBrains Mono 400-600 (variable). Un peso fuera de estos
-   se resuelve al más cercano. Las flechas (→ ↗) no están en los subsets: caen a la fuente del sistema (ver .arrow en base.css). */
+   se resuelve al más cercano. Las flechas (→) no están en los subsets: se dibujan con una máscara SVG (ver .arrow en base.css). */
 @font-face { font-family: "Barlow"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/barlow-400.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212, U+FEFF, U+FFFD; }
 @font-face { font-family: "Barlow"; font-style: normal; font-weight: 500; font-display: swap; src: url("../fonts/barlow-500.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212, U+FEFF, U+FFFD; }
 @font-face { font-family: "Barlow"; font-style: normal; font-weight: 600; font-display: swap; src: url("../fonts/barlow-600.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212, U+FEFF, U+FFFD; }

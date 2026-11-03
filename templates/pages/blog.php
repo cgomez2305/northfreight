@@ -30,7 +30,7 @@ $chips = ['all' => 'All', 'dispatch' => 'Dispatch', 'relay' => 'Amazon Relay', '
 ]); ?>
 
 <?php if ($featured): ?>
-<section class="blog-featured section--dark" aria-label="Featured article">
+<section class="blog-featured" aria-label="Featured article">
   <div class="container">
     <a class="blog-feat" href="<?= e(url($featured['path'])) ?>">
       <span class="blog-feat__media">
@@ -78,7 +78,7 @@ $chips = ['all' => 'All', 'dispatch' => 'Dispatch', 'relay' => 'Amazon Relay', '
             'title'   => $p['title'],
             'text'    => $p['excerpt'],
             'cta'     => 'Read',
-            'bar'     => false,
+            'image'   => !$isLink && !empty($p['image']) ? $p['image'] + ['sizes' => '(min-width:1025px) 410px, (min-width:641px) 33vw, 100vw'] : null,
         ]); ?>
       </li>
       <?php endforeach; ?>

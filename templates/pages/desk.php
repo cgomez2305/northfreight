@@ -18,12 +18,11 @@ $values = [
     ['Clear communication', 'Updates you can follow, in one channel.'],
 ];
 ?>
-<section class="hero on-dark sb-dk-hero" data-motion="hero">
+<section class="hero on-dark sb-dk-hero">
   <div class="container hero__in">
     <div class="hero__main">
       <?php partial('breadcrumbs', ['route' => $route]); ?>
       <h1 class="hero__title t-h1">Built by dispatchers. <span class="hl">Run as a team.</span></h1>
-      <?= ns_swoosh(200, 12) ?>
       <p class="hero__lead t-lead">At NorthStar, behind every load there are people coordinating information, decisions and follow-up. We want you to know who we are and how we work with you.</p>
       <?php partial('video', ['part' => 'chapters', 'id' => 'desk', 'chapters' => $chapters, 'chapters_label' => 'Jump to a chapter']); ?>
     </div>
@@ -45,7 +44,7 @@ $values = [
     <ul class="g4">
       <?php foreach ($team as $p): ?>
       <li>
-        <article class="sb-dk-person cut">
+        <article class="sb-dk-person">
           <div class="sb-dk-person__photo">
             <?php if (!empty($p['photo'])): ?>
             <?= ns_img(['base' => (string) $p['photo'], 'alt' => phplain((string) $p['name']), 'sizes' => '(min-width:1025px) 280px, (min-width:641px) 50vw, 100vw']) ?>

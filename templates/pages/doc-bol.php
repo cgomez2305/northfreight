@@ -36,7 +36,6 @@ $doc = [
 
 ob_start();
 include __DIR__ . '/company/preview-bol.php';
-echo ns_star(54, 'co-paper-star');
 $aside = ob_get_clean();
 
 partial('hero', [

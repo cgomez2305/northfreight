@@ -28,7 +28,7 @@ partial('hero', [
         ['label' => 'Talk to a dispatcher', 'href' => wa($route['wa']), 'wa' => true, 'arrow' => true],
         ['label' => 'How we onboard', 'href' => url('/how-it-works/'), 'variant' => 'ghost'],
     ],
-    'image'   => ['base' => 'red-semi-dry-van-open-road', 'alt' => 'Red owner-operator semi truck pulling a dry van on an open road'],
+    'image'   => ['base' => 'truck-oncoming-dusk-mirror', 'alt' => 'Semi truck approaching at dusk, seen from a car’s side mirror'],
 ]);
 
 // Resumen "In short" (SEO/GEO): editable aquí. Solo información que ya está en el copy de esta página; sin cifras, tarifas ni promesas nuevas.

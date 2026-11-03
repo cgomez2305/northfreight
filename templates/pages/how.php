@@ -19,6 +19,7 @@ partial('hero', [
     'eyebrow' => 'How we plug into your operation',
     'h1'    => 'How truck dispatching works {hl}with NorthStar{/hl}',
     'lead'  => 'Hiring a dispatch company should not mean losing control of your trucks. Here is exactly how we start and how we work with you every day.',
+    'image' => ['base' => 'two-semis-hillside-highway', 'alt' => 'Two semi trucks on a highway through the hills', 'ratio' => '5x4'],
 ]);
 
 // Resumen "In short" (SEO/GEO): editable aquí. Solo información que ya está en el copy de esta página; sin cifras, tarifas ni promesas nuevas.
@@ -34,10 +35,10 @@ partial('summary', [
 
 <section class="section">
   <div class="container sb-hw-wrap">
-    <ol class="sb-hw-steps" data-motion="steps">
+    <ol class="sb-hw-steps">
       <?php foreach ($steps as $i => [$title, $text]): $last = $i === count($steps) - 1; ?>
       <li class="sb-hw-step">
-        <?php if ($last): ?><span class="sb-hw-step__num sb-hw-step__num--end" aria-hidden="true"><?= ns_star(30, 'twinkle') ?></span>
+        <?php if ($last): ?><span class="sb-hw-step__num sb-hw-step__num--end" aria-hidden="true"><?= ns_star(30) ?></span>
         <?php else: ?><span class="sb-hw-step__num" aria-hidden="true"><?= sprintf('%02d', $i + 1) ?></span><?php endif; ?>
         <div class="sb-hw-step__body">
           <h2 class="head sb-hw-step__title"><?= e($title) ?></h2>

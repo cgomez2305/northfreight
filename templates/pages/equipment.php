@@ -35,7 +35,7 @@ $faq = route_faq_items($route);
 
 ob_start();
 ?>
-<div class="cut sa-sheet">
+<div class="sa-sheet">
   <div class="sa-sheet__head">
     <h2 class="t-meta sa-sheet__title">Equipment sheet</h2>
     <?= ns_star(22) ?>
@@ -90,7 +90,7 @@ partial('hero', [
         <?php endforeach; ?>
       </ol>
     </div>
-    <aside class="cut sa-need__card" aria-labelledby="eq-need">
+    <aside class="sa-need__card" aria-labelledby="eq-need">
       <span class="t-meta sa-need__tag">To get started</span>
       <h3 class="head sa-need__title" id="eq-need">What we need from you</h3>
       <ul class="sa-need__list">

@@ -13,9 +13,8 @@
  *  tagline string  frase corta bajo el titular
  *  lead    string  entrada
  *  ctas    array   [['label','href','variant'=>'primary|ghost','icon'=>'arrow|whatsapp|null','arrow'=>bool (→ de texto)],…]
- *  image   array   ['base'=>'red-semi-dry-van-open-road','alt'=>'…','stripe'=>bool,'star'=>bool(true),'sizes'=>'…']
+ *  image   array   ['base'=>'red-semi-dry-van-open-road','alt'=>'…','ratio'=>'4x3'|'5x4','small'=>bool (máx. 490px de ancho: fotos de 490px),'sizes'=>'…'] foto a la derecha (radio 24; en móvil debajo del texto)
  *  aside   string  HTML ya renderizado (tarjeta de datos / vista previa de documento); va tras la imagen si hay ambas
- *  deco    string  (sin efecto: se conserva por compatibilidad con las plantillas)
  *  stack   bool    true => sin columna derecha, H1 hasta 980px
  *  cls     string  clase extra en <section>
  */
@@ -26,7 +25,6 @@ $size = ($size ?? 'h1') === 'h1-long' ? 't-h1-long' : 't-h1';
 $h1tag = ($h1_tag ?? 'h1') === 'p' ? 'p' : 'h1';
 $image = $image ?? null;
 $aside = $aside ?? '';
-$deco = $deco ?? null;
 $stack = !empty($stack) || (!$image && $aside === '');
 $ctas = $ctas ?? [];
 ?>
@@ -34,7 +32,7 @@ $ctas = $ctas ?? [];
   <div class="container hero__in">
     <div class="hero__main">
       <?php if (isset($crumbs)): partial('breadcrumbs', ['crumbs' => $crumbs]); elseif (isset($route)): partial('breadcrumbs', ['route' => $route]); endif; ?>
-      <?php if (!empty($eyebrow)): ?><p class="hero__eyebrow t-eyebrow"><?= ns_star(16) ?><span><?= ns_rich($eyebrow) ?></span></p><?php endif; ?>
+      <?php if (!empty($eyebrow)): ?><p class="hero__eyebrow t-eyebrow"><span><?= ns_rich($eyebrow) ?></span></p><?php endif; ?>
       <<?= $h1tag ?> class="hero__title <?= $size ?>"><?= $h1html ?></<?= $h1tag ?>>
       <?php if (!empty($tagline)): ?><p class="t-tagline"><?= ns_rich($tagline) ?></p><?php endif; ?>
       <?php if (!empty($lead)): ?><p class="hero__lead t-lead"><?= ns_rich($lead) ?></p><?php endif; ?>
@@ -49,9 +47,7 @@ $ctas = $ctas ?? [];
     <?php if ($image || $aside !== ''): ?>
     <div class="hero__aside">
       <?php if ($image): ?>
-      <div class="hero__media<?= !empty($image['stripe']) ? ' hero__media--stripe' : '' ?>">
-        <div class="hero__clip"><?= ns_img(['base' => $image['base'], 'alt' => $image['alt'] ?? '', 'eager' => true, 'sizes' => $image['sizes'] ?? '(min-width:1025px) 560px, 100vw']) ?></div>
-              </div>
+      <figure class="hero__photo<?= ($image['ratio'] ?? '4x3') === '5x4' ? ' hero__photo--5x4' : '' ?><?= !empty($image['small']) ? ' hero__photo--s' : '' ?>"><?= ns_img(['base' => $image['base'], 'alt' => $image['alt'] ?? '', 'eager' => true, 'sizes' => $image['sizes'] ?? '(min-width:1025px) 560px, 100vw']) ?></figure>
       <?php endif; ?>
       <?= $aside ?>
     </div>
