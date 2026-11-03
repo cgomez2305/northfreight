@@ -30,11 +30,12 @@ Orden de prioridad cuando hay conflicto: **respuesta del cliente > PDF de concep
 Por qué:
 - Hostinger Business sirve PHP de forma nativa; no hace falta proceso Node ni build en el servidor.
 - PHP solo se usa para **includes, layout, rutas, metadatos y el formulario**. La salida es HTML estático; LiteSpeed lo cachea.
-- Cero dependencias en el front: CSS propio con tokens y JavaScript vanilla (sin GSAP ni ninguna librería de terceros).
+- Cero dependencias en el front salvo GSAP: CSS propio con tokens y JavaScript vanilla.
 - Sin base de datos. El contenido vive en archivos PHP de datos (`app/data/*.php`).
 
 Dependencias permitidas:
 - **PHPMailer** (vía Composer) para enviar el formulario por SMTP de Hostinger.
+- **GSAP 3.12.5 + ScrollTrigger** desde cdnjs (versión fija, con SRI), cargados solo en las rutas con `'motion' => true`.
 - Nada más sin acordarlo antes.
 
 Opcional (fase 2): un script `bin/build.php` que pre-renderiza todas las rutas a `dist/*.html` para servirlas como estáticas puras. No es necesario para la primera versión.
@@ -97,7 +98,8 @@ Opcional (fase 2): un script `bin/build.php` que pre-renderiza todas las rutas a
 │   │   ├── calc-rpm.js
 │   │   ├── calc-ifta.js
 │   │   ├── blog-filter.js
-│   │   └── video.js       # fachada + capítulos
+│   │   ├── video.js       # fachada + capítulos
+│   │   └── motion.js      # GSAP ScrollTrigger: escenas de scroll (solo en rutas con 'motion' => true)
 │   ├── fonts/             # woff2 locales (Barlow, Barlow Condensed, JetBrains Mono)
 │   ├── img/               # WebP + fallback JPG, nombres descriptivos en inglés
 │   └── downloads/         # bol-template.pdf, bol-template.docx, dispatcher-carrier-agreement.docx
@@ -204,7 +206,16 @@ Isotipo (`assets/img/isotype-white.svg`, 40 px) + texto "NORTHSTAR" (Barlow Cond
 
 ### 5.7 Movimiento
 
-**Decisión de Carlos: fuera todas las animaciones 2D decorativas.** Eliminados: GSAP y ScrollTrigger (el sitio no tiene JS de terceros), `motion.js`, `split.js`, `motion.css`, la clave `motion` de las rutas, el hero "Ruta de una carga" (plano SVG), el ticker, la estrella que gira, el pulso del punto "live", cotas, marcas de registro, regla de referencias, ruta de pasos con marcador, spotlight, botones magnéticos, máscara de titulares por líneas, swoosh, barra de progreso de lectura y entradas por scroll. **No reintroducir ninguna.** Permitido: transiciones CSS de 150-250 ms (`--t-fast`) en color, fondo, borde y `translate` ≤ 2 px al pasar el cursor o enfocar; el abrir/cerrar del FAQ (`<details>`) y el menú móvil (fade + slide). `prefers-reduced-motion` desactiva todo. Todo el contenido se ve desde el primer pintado y sin JavaScript.
+**Decisión de Carlos (2026-11-03):** fuera las animaciones PLANAS 2D (plano de ruta, ticker, máscara de titulares por líneas, swoosh, estrella que gira, pulso, cotas, marcas de registro, spotlight, botones magnéticos, barra de lectura): **no reintroducirlas**. SÍ quiere el movimiento de https://fourlines.framer.website/: **GSAP + ScrollTrigger con escenas de scroll con profundidad y parallax** (`assets/js/motion.js` + `assets/css/motion.css`, solo en las rutas con `'motion' => true`: home, owner, relay, dryvan, tracking, backoffice, how, desk, blog y artículos).
+
+Escenas (todas ligadas al scroll con `scrub`, solo `transform` y `opacity`; nunca animar `filter`, `clip-path`, `box-shadow`, tamaño ni `border-radius` en bloques grandes):
+1. **Hero del home** (≥1025 px): fijado ~100 % del alto de la ventana (`scrub .6`); la foto se encoge (scale 1 → .86, radio fijo 32) con parallax interno, el texto sube y se desvanece, y las dos líneas del titular se separan (x ∓48).
+2. **Carril de servicios** (≥1025 px y ≥700 px de alto): la sección se fija y las 3 tarjetas con foto se desplazan en horizontal (`scrub 1`), con rotación ±2° alternada, desfase vertical escalonado, escala .92 → 1 (`containerAnimation`) y parallax horizontal de la foto. La opacidad .6 → 1 va en la foto, no en la tarjeta, para que el texto conserve contraste AA. El foco de teclado en una tarjeta hace scroll al punto del pin que la muestra. Por debajo de 1025 px o con poco alto: rejilla (o carril nativo), sin pin.
+3. **Parallax de fotos** (`.px`, también en móvil): imagen al 120 % del marco con `overflow: hidden`, yPercent ≈ ±8. La geometría de `.px` va SIN depender de `html.js-motion` (con esa condición la foto daba un salto de zoom al activarse el JS).
+4. **Bandas** (≥1025 px): CTA final y banda de Relay entran con scale .94 → 1 y y 60 → 0.
+5. **Entradas** del onboarding y de la fila 4/1/0: y 40 → 0 + opacidad, una vez, .7 s, `power3.out`.
+
+Reglas: `html.js-motion` la añade `motion.js` solo tras `load` + idle, cuando existen `gsap` y `ScrollTrigger` y no hay `prefers-reduced-motion: reduce`; **el CSS nunca oculta contenido sin esa clase** (sin JS, con GSAP bloqueado o con movimiento reducido todo se ve completo y estático). `gsap.matchMedia()` separa escritorio (pines y carril) de móvil (solo parallax); cualquier excepción revierte todo. El `<img>` del hero conserva `fetchpriority="high"` (LCP). Hover/focus: transiciones CSS de 150-250 ms. Pendiente: medir los fotogramas del carril y del hero en un navegador con GPU real (en Chromium con rasterizado por software ~20 % de fotogramas > 33 ms; el carril combina rotación y esquinas redondeadas).
 
 ---
 
@@ -219,7 +230,7 @@ Isotipo (`assets/img/isotype-white.svg`, 40 px) + texto "NORTHSTAR" (Barlow Cond
 | **Pop-up móvil** | `role="dialog" aria-modal="true"`, panel desde la derecha, acordeones Services/Resources (`<details>`), enlaces, bloque inferior con WhatsApp y llamada. Bloquea el scroll del body, cierra con Esc, fondo o enlace, devuelve el foco. Mientras está abierto se oculta la `mbar`. |
 | **Barra móvil (mbar)** | Fija abajo, solo ≤760 px: "Talk to a dispatcher" (cian, flex 1) + llamada (círculo 56 px). Respeta `env(safe-area-inset-bottom)`. |
 | **Botón flotante de WhatsApp** | Fijo abajo a la derecha **solo ≥761 px**, con el mensaje de la ruta. En ≤760 px no se muestra (la `mbar` ya lo trae). Se oculta con el pop-up abierto. |
-| **Hero del home** | Casi a pantalla completa, con la píldora del menú encima. Foto (`truck-oncoming-dusk-mirror`, `<img>` con `srcset`, `width/height` y `fetchpriority="high"`) a ancho completo con radio 32 y degradado desde la izquierda y abajo (contraste ≥ 5,6:1 medido). Kicker H1 en mono, titular "Booked. Tracked. **Documented.**" (última palabra en cian), lead, CTAs y chips. En móvil la foto va arriba y se funde con el fondo. |
+| **Hero del home** | Fijado con GSAP (escena 1 de §5.7). Casi a pantalla completa, con la píldora del menú encima. Foto (`truck-oncoming-dusk-mirror`, `<img>` con `srcset`, `width/height` y `fetchpriority="high"`) a ancho completo con radio 32 y degradado desde la izquierda y abajo (contraste ≥ 5,6:1 medido). Kicker H1 en mono, titular "Booked. Tracked. **Documented.**" (última palabra en cian), lead, CTAs y chips. En móvil la foto va arriba y se funde con el fondo. |
 | **Hero interno** | Panel redondeado `--panel` con migas mono, H1 grande de dos tonos, lead, CTAs y, a la derecha (debajo del texto en móvil), foto con radio 24 (`image.ratio`, `image.small` para la de 490 px) o tarjeta de datos / vista previa de documento. Cada página usa una foto distinta; ninguna se repite dentro de la misma página. |
 | **Resumen "In short"** | Frase-declaración a ancho completo, sin caja (borde izquierdo fino cian en páginas internas; variante `lead` en el home, condensada 32-58 px), con 3 puntos como chips pill mono. |
 | **Tarjeta** | Borde `--hairline`, fondo `--panel`, radio 24; número/etiqueta mono (`.card__meta`), título condensado, texto, enlace con flecha. Variante destacada (`--panel-2` o cian); variante con foto (`image`): foto arriba y texto debajo. |
@@ -403,7 +414,7 @@ Antes de publicar en producción: auditar las rutas con `ENV=production` y compr
 | **Descargas (BOL, agreement)** | `'form' => 'download'` → `app/forms/download.php`: nombre + correo + formato → entrega `assets/downloads/<archivo>` con `Content-Disposition` y avisa por correo; si el archivo no existe devuelve 422 con mensaje claro (no 500) y registra la solicitud en `storage/downloads.log`. |
 | **Newsletter del blog** | Solo maquetado. Conectar cuando el cliente elija herramienta. |
 
-JavaScript: cero dependencias, módulos pequeños, `defer`, cada uno se carga solo en la página que lo usa (`main.js` en todas). El sitio funciona y se lee sin JS.
+JavaScript: GSAP solo en las rutas con movimiento, módulos pequeños, `defer`, cada uno se carga solo en la página que lo usa (`main.js` en todas). El sitio funciona y se lee sin JS.
 
 ---
 
