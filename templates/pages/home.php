@@ -15,19 +15,22 @@ $tags = $variantA
 // Hero: mensaje de WhatsApp de la página.
 $waHref = wa($route['wa'] ?? null);
 
+// Tamaño de las fotos de las tarjetas de servicio (carril ≥1025px: ancho de tarjeta clamp(320px,40vw,600px) + 18 % de parallax)
+$railSizes = '(min-width:1025px) 700px, (min-width:641px) 33vw, 100vw';
+
 $services = [
     ['num' => '01', 'title' => 'Dispatch & load booking',
      'text' => 'We search, negotiate and book freight on Amazon Relay and dry van lanes, plan routes around hours of service and coordinate every pickup with your drivers.',
      'href' => url('/dispatch-for-owner-operators/'), 'cta' => 'Dispatch for owner-operators',
-     'image' => ['base' => 'red-semi-dry-van-open-road', 'alt' => 'Red semi truck pulling a dry van on an open road']],
+     'image' => ['base' => 'red-semi-dry-van-open-road', 'alt' => 'Red semi truck pulling a dry van on an open road', 'sizes' => $railSizes]],
     ['num' => '02', 'title' => 'Load tracking & check calls',
      'text' => 'Every trip followed from pickup to POD: ETAs, arrivals and departures logged, incidents documented and brokers kept informed, so you are not on the phone.',
      'href' => url('/load-tracking/'), 'cta' => 'Load tracking',
-     'image' => ['base' => 'two-semis-hillside-highway', 'alt' => 'Two semi trucks on a highway through the hills']],
+     'image' => ['base' => 'two-semis-hillside-highway', 'alt' => 'Two semi trucks on a highway through the hills', 'sizes' => $railSizes]],
     ['num' => '03', 'title' => 'Trucking back office',
      'text' => 'Paperwork organized, settlements prepared and disputes followed with evidence. We also help onboard new drivers so they are ready to roll on day one.',
      'href' => url('/trucking-back-office/'), 'cta' => 'Back office services',
-     'image' => ['base' => 'dry-van-trailers-loading-docks', 'alt' => 'Dry van trailers backed into warehouse loading docks']],
+     'image' => ['base' => 'dry-van-trailers-loading-docks', 'alt' => 'Dry van trailers backed into warehouse loading docks', 'sizes' => $railSizes]],
 ];
 
 $relay = [
@@ -76,7 +79,7 @@ $figures = [
       <?php if ($variantA): ?>
       <p class="t-display home-hero__title home-hero__title--a"><?= e($headline) ?></p>
       <?php else: ?>
-      <p class="t-display home-hero__title">Booked. Tracked.<br><span class="hl">Documented.</span></p>
+      <p class="t-display home-hero__title"><span class="home-hero__l1">Booked. Tracked.</span> <span class="home-hero__l2 hl">Documented.</span></p>
       <?php endif; ?>
       <p class="hero__lead t-lead">NorthStar is your remote dispatch and back-office desk. We book Amazon Relay and dry van freight, follow every load to delivery, and keep the paperwork that protects your pay. That is how incidents get handled with evidence and operations run as a team.</p>
       <div class="hero__ctas">
@@ -100,14 +103,20 @@ $figures = [
     ],
 ]); ?>
 
-<!-- 01 SERVICES -->
+<!-- 01 SERVICES: rejilla de 3 tarjetas con foto; con html.js-motion y ≥1025px motion.js la convierte en un carril horizontal fijado (.home-services__pin) -->
 <section class="section home-services" id="services" aria-labelledby="services-title">
-  <div class="container stack">
-    <?php partial('section-head', ['eyebrow' => '01 · What we manage', 'title' => 'Three fronts.{br}One dispatch desk.', 'id' => 'services-title', 'split' => true,
-        'lead' => 'Most truck dispatch companies stop at the booking. We stay on the load until the money is in. The same team that books it tracks it and closes it out.']); ?>
-    <div class="g3 home-cards">
-      <?php foreach ($services as $s): partial('card', $s + ['size' => 'lg', 'hover' => true]); endforeach; ?>
+  <div class="home-services__pin">
+    <div class="container">
+      <?php partial('section-head', ['eyebrow' => '01 · What we manage', 'title' => 'Three fronts.{br}One dispatch desk.', 'id' => 'services-title', 'split' => true,
+          'lead' => 'Most truck dispatch companies stop at the booking. We stay on the load until the money is in. The same team that books it tracks it and closes it out.']); ?>
     </div>
+    <div class="container home-rail">
+      <div class="g3 home-cards">
+        <?php foreach ($services as $s): partial('card', $s + ['size' => 'lg', 'hover' => true]); endforeach; ?>
+      </div>
+    </div>
+  </div>
+  <div class="container">
     <p class="eyebrow home-more">
       <?php if (route_is_live('/dry-van-dispatch/')): ?><a href="<?= e(url('/dry-van-dispatch/')) ?>">Dry van dispatch <span class="arrow" aria-hidden="true">→</span></a><?php endif; ?>
       <?php if (route_is_live('/amazon-relay-dispatch/')): ?><a href="<?= e(url('/amazon-relay-dispatch/')) ?>">Amazon Relay dispatch <span class="arrow" aria-hidden="true">→</span></a><?php endif; ?>

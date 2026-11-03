@@ -60,7 +60,7 @@ partial('summary', [
           'lead' => 'Relay moves fast: good blocks go in minutes and a weak scorecard limits what you can book. A desk that watches the board and fixes issues early keeps your trucks earning.',
       ]); ?>
     </div>
-    <div class="sa-media">
+    <div class="sa-media px">
       <?= ns_img(['base' => 'dry-van-trailers-loading-docks', 'alt' => 'Dry van trailers backed into warehouse loading docks', 'sizes' => '(min-width:1025px) 600px, 100vw']) ?>
     </div>
   </div>

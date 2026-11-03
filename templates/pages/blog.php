@@ -33,7 +33,7 @@ $chips = ['all' => 'All', 'dispatch' => 'Dispatch', 'relay' => 'Amazon Relay', '
 <section class="blog-featured" aria-label="Featured article">
   <div class="container">
     <a class="blog-feat" href="<?= e(url($featured['path'])) ?>">
-      <span class="blog-feat__media">
+      <span class="blog-feat__media px">
         <?= ns_img(['base' => 'white-semi-mountain-highway-crop', 'alt' => 'White semi truck with a dry van trailer on a mountain highway', 'sizes' => '(min-width:1025px) 600px, 100vw']) ?>
       </span>
       <span class="blog-feat__body">

@@ -13,6 +13,7 @@
  *   parent     (opcional) ruta padre para las migas; sin parent: Home > esta página
  *   crumbs     (opcional) migas completas [[label, path], …] (incluye Home); anula a 'parent' en la miga visible y en el JSON-LD
  *   cta        (opcional) false => el layout no imprime el bloque CTA final
+ *   motion     (opcional) true => carga GSAP + ScrollTrigger + motion.js + motion.css (escenas de scroll y parallax de fotos)
  *   faq        clave de app/data/faq.php (o null)
  *   extras     doc (legal), equip (equipment), slug (post)
  *
@@ -27,6 +28,7 @@ return [
     // ------------------------------------------------------------------
     '/' => [
         'template'   => 'home',
+        'motion'     => true,
         'title'      => 'Truck Dispatch Services | Remote Dispatch Desk | NorthStar',
         'meta'       => 'Truck dispatch services from a remote dispatch company: Amazon Relay and dry van booking, load tracking and back office. Message a dispatcher on WhatsApp.',
         'h1'         => 'Truck dispatch services for owner-operators & small fleets',
@@ -40,6 +42,7 @@ return [
     ],
     '/dispatch-for-owner-operators/' => [
         'template'   => 'owner',
+        'motion'     => true,
         'title'      => 'Dispatch Services for Owner-Operators | NorthStar Freight',
         'meta'       => 'Dispatch services for owner-operators: an independent truck dispatcher books your loads, handles brokers and tracks every trip. Updates on WhatsApp.',
         'h1'         => 'Dispatch services for owner-operators',
@@ -53,6 +56,7 @@ return [
     ],
     '/amazon-relay-dispatch/' => [
         'template'   => 'relay',
+        'motion'     => true,
         'title'      => 'Amazon Relay Dispatch Service | NorthStar Freight',
         'meta'       => 'Amazon Relay dispatch for carriers: load board monitoring, block booking, trip records, scorecard follow-up and disputes filed with evidence.',
         'h1'         => 'Amazon Relay dispatch, handled end to end',
@@ -67,6 +71,7 @@ return [
     ],
     '/dry-van-dispatch/' => [
         'template'   => 'dryvan',
+        'motion'     => true,
         'title'      => 'Dry Van Dispatch Service | NorthStar Freight',
         'meta'       => 'Dry van dispatch for owner-operators and small fleets: load search, rate negotiation, check calls and paperwork from one dispatch desk.',
         'h1'         => 'Dry van dispatch service',
@@ -81,6 +86,7 @@ return [
     ],
     '/load-tracking/' => [
         'template'   => 'tracking',
+        'motion'     => true,
         'title'      => 'Truck Load Tracking & Check Calls | NorthStar Freight',
         'meta'       => 'Truck load tracking and check calls: we follow every load from pickup to POD with ETAs, arrival timestamps and incident reports, so brokers stay informed.',
         'h1'         => 'Load tracking and check calls for your trucks',
@@ -94,6 +100,7 @@ return [
     ],
     '/trucking-back-office/' => [
         'template'   => 'backoffice',
+        'motion'     => true,
         'title'      => 'Trucking Back Office Services | NorthStar Freight',
         'meta'       => 'Back office for trucking companies: settlement preparation, dispute management, document organization and driver onboarding, done by your dispatch desk.',
         'h1'         => 'Trucking back office services',
@@ -107,6 +114,7 @@ return [
     ],
     '/how-it-works/' => [
         'template'   => 'how',
+        'motion'     => true,
         'title'      => 'How Truck Dispatching Works With NorthStar',
         'meta'       => 'How we plug into your trucking operation in four steps: we learn your fleet, agree on scope and contacts, run the day-to-day and review together.',
         'h1'         => 'How truck dispatching works with NorthStar',
@@ -120,6 +128,7 @@ return [
     ],
     '/our-desk/' => [
         'template'   => 'desk',
+        'motion'     => true,
         'title'      => 'About NorthStar Freight Solutions | Our Dispatch Desk',
         'meta'       => 'Meet the NorthStar dispatch desk: the people who book, track and document your loads, and why we run operations as a team.',
         'h1'         => 'Built by dispatchers. Run as a team.',
@@ -269,6 +278,7 @@ return [
     ],
     '/blog/' => [
         'template'   => 'blog',
+        'motion'     => true,
         'title'      => 'Truck Dispatch Blog for Owner-Operators | NorthStar', // TODO verificar con doc de copy
         'meta'       => 'Practical guides for owner-operators and small fleets: what dispatch costs, how Amazon Relay works and how to get paid for lumper and detention.', // TODO
         'h1'         => 'From the dispatch desk',
@@ -283,6 +293,7 @@ return [
     ],
     '/blog/how-much-does-truck-dispatch-cost/' => [
         'template'   => 'post',
+        'motion'     => true,
         'slug'       => 'how-much-does-truck-dispatch-cost',
         'title'      => 'How Much Does Truck Dispatch Service Cost? | NorthStar', // TODO verificar con doc de copy
         'meta'       => 'Dispatch fees explained: percentage of the gross, flat weekly or per load. See what each model costs an owner-operator and what should be included.', // TODO
@@ -298,6 +309,7 @@ return [
     ],
     '/blog/amazon-relay-requirements/' => [
         'template'   => 'post',
+        'motion'     => true,
         'slug'       => 'amazon-relay-requirements',
         'title'      => 'Amazon Relay Requirements for Carriers | NorthStar', // TODO verificar con doc de copy
         'meta'       => 'Amazon Relay requirements for carriers: authority, SCAC code, insurance, equipment and the steps to get approved, explained in plain language.', // TODO
@@ -313,6 +325,7 @@ return [
     ],
     '/blog/amazon-relay-load-board/' => [
         'template'   => 'post',
+        'motion'     => true,
         'slug'       => 'amazon-relay-load-board',
         'title'      => 'How the Amazon Relay Load Board Works | NorthStar', // TODO verificar con doc de copy
         'meta'       => 'How the Amazon Relay load board works: one-way loads, round trips and blocks, and how loads are posted, booked and tracked in the Relay app.', // TODO
@@ -328,6 +341,7 @@ return [
     ],
     '/blog/lumper-fees-detention-pay/' => [
         'template'   => 'post',
+        'motion'     => true,
         'slug'       => 'lumper-fees-detention-pay',
         'title'      => 'Lumper Fees & Detention Pay: Get Paid for Both | NorthStar', // TODO verificar con doc de copy
         'meta'       => 'Lumper fees and detention pay: what to document at the dock so lumper receipts and detention hours show up on your settlement.', // TODO

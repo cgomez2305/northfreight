@@ -26,7 +26,10 @@
 }
 
 /* ---- 01 Services ---- */
+.home-hero__l1, .home-hero__l2 { display: block; }   /* cada línea del titular es un bloque: motion.js las desplaza en sentidos opuestos */
+
 .home-services { --head-gap: 56px; }
+.home-services__pin { display: flex; flex-direction: column; gap: var(--head-gap); margin-bottom: var(--head-gap); }   /* con html.js-motion y ≥1025px motion.js lo fija (pin) y desplaza el carril (motion.css) */
 .home-cards { gap: clamp(20px, 2.4vw, 32px); }
 .home-more { display: flex; flex-wrap: wrap; gap: 8px; font-size: 12px; }
 .home-more a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 20px; border: 1px solid var(--hairline-strong); border-radius: var(--r-pill); color: var(--text-2); text-decoration: none; transition: border-color var(--t-fast), color var(--t-fast); }

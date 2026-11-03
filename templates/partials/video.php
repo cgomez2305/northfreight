@@ -41,7 +41,7 @@ $chaptersHtml = static function () use ($chapters, $chapters_label, $id): void {
 <div class="video<?= $theme ?>" data-video id="<?= e($part === 'chapters' ? $id . '-chapters' : $id) ?>"<?= !empty($src) ? ' data-video-src="' . e($src) . '"' : '' ?><?= $part === 'chapters' ? ' data-video-for="' . e($id) . '"' : '' ?>>
   <?php if ($showChapters && $part === 'chapters') { $chaptersHtml(); } ?>
   <?php if ($showPlayer): ?>
-  <div class="video__frame">
+  <div class="video__frame px">
     <?= ns_img(['base' => $image['base'], 'alt' => $image['alt'] ?? '', 'sizes' => '(min-width:1025px) 600px, 100vw']) ?>
     <button type="button" class="video__play" data-video-play aria-label="Play the video"><?= ns_icon('play', 28) ?></button>
   </div>

@@ -1,0 +1,44 @@
+/* motion.css: solo lo que necesitan las escenas de scroll de motion.js (GSAP + ScrollTrigger). Se carga únicamente en rutas con 'motion' => true.
+   Regla: nada se oculta si falta html.js-motion (sin JS, GSAP bloqueado o prefers-reduced-motion todo se ve completo y estático).
+   Escenas: 1 hero de la home (pin), 2 carril de servicios (pin + horizontal), 3 parallax de fotos (.px), 4 bandas (CTA, Relay), 5 entradas. */
+
+/* ---- Escena 3: parallax de fotos (.px). Marco con overflow hidden; la imagen mide 120 % del alto y arranca centrada (-8,34 % de su alto).
+   La geometría es la misma con y sin JS a propósito: así la foto no "salta" cuando motion.js empieza a moverla. ---- */
+.px { overflow: hidden; }
+.px img { height: 120%; max-height: none; transform: translateY(-8.34%); will-change: transform; }
+
+/* ---- Escena 1: hero de la home. El contenedor de la foto se encoge y revela el fondo; necesita el radio fijo y el recorte ---- */
+@media (min-width: 1025px) {
+  .js-motion .hero--home .hero__bg { clip-path: inset(1px round calc(var(--r-panel) - 1px)); will-change: transform; }   /* recorte ESTÁTICO con radio fijo (no se anima); el 1px evita la línea de foto cruda que asoma por el borde al escalar con medio píxel */
+  .js-motion .hero--home .hero__bg picture { overflow: hidden; border-radius: var(--r-panel); }   /* la foto se recorta también en su propio marco: atenúa la fila de borde que asoma al escalar */
+  .js-motion .hero--home .hero__main,
+  .js-motion .hero--home .tags,
+  .js-motion .hero--home .home-hero__l1,
+  .js-motion .hero--home .home-hero__l2 { will-change: transform, opacity; }
+}
+
+/* ---- Escena 2: carril horizontal de servicios (≥1025px y ≥700px de alto). Debajo de eso o sin html.js-motion queda la rejilla de 3 tarjetas ---- */
+@media (min-width: 1025px) and (min-height: 700px) {
+  .js-motion .home-services { padding-top: 0; }
+  .js-motion .home-services__pin { min-height: 100vh; min-height: 100svh; padding-top: calc(var(--header-h) + 4px); padding-bottom: 24px; gap: 28px; }
+  .js-motion .home-services .t-h2 { font-size: clamp(38px, 4.2vw, 56px); }
+
+  /* el marco recorta de borde a borde de la ventana; el padding extra deja sitio a la rotación y al desfase de las tarjetas sin ocupar layout */
+  .js-motion .home-rail { --rail-h: clamp(380px, calc(100vh - 340px), 750px); --rail-h: clamp(380px, calc(100svh - 340px), 750px); --rail-w: clamp(320px, 40vw, 600px);
+    max-width: none; margin: -24px 0 -90px; padding: 24px 0 90px; overflow: hidden; overflow: clip; }
+  .js-motion .home-cards { position: relative; display: flex; flex-wrap: nowrap; align-items: flex-start; width: max-content; gap: clamp(24px, 3vw, 48px);
+    padding-inline: max(var(--gutter), calc((100% - var(--max)) / 2)); }
+  .js-motion .home-cards > .card-wrap { flex: none; width: var(--rail-w); will-change: transform; }
+
+  /* tarjeta: foto de fondo con degradado y el texto encima (el degradado garantiza contraste AA, ver --card-fade) */
+  .js-motion .home-cards .card { height: var(--rail-h); padding: clamp(24px, 2.2vw, 32px); gap: 12px; justify-content: flex-end; overflow: hidden;
+    background: var(--panel); border: 1px solid var(--hairline); border-radius: var(--r-card); }
+  .js-motion .home-cards .card > :not(.card__photo) { position: relative; z-index: 1; margin-inline: 0; }
+  .js-motion .home-cards .card__photo { position: absolute; inset: 0; margin: 0; aspect-ratio: auto; border-radius: 0; }
+  .js-motion .home-cards .card__photo::after { content: ""; position: absolute; inset: 0; background: var(--card-fade); }
+  .js-motion .home-cards .card__photo img { width: 118%; max-width: none; height: 100%; transform: none; will-change: transform; }   /* parallax horizontal (xPercent) */
+  .js-motion .home-cards .card__link { margin-top: 0; }
+  .js-motion .home-cards .card__num, .js-motion .home-cards .card__link { color: var(--cyan-light); }
+  .js-motion .home-cards .card__title { font-size: clamp(34px, 3vw, 44px); }
+  .js-motion .home-cards .card__text { color: var(--text); }
+}

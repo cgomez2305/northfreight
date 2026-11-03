@@ -8,6 +8,7 @@
  *  title   string  H3 (marcas permitidas)                   text  string  (marcas permitidas)
  *  href    string  destino (variant link, o enlace inferior)   cta string  texto del enlace inferior ("Load tracking")
  *  image   array   ['base','alt','sizes'?] foto arriba (radio 24, 4:3) y el texto debajo, sin caja (tarjeta de foto)
+ *  px      bool    false => la foto no entra en el parallax vertical genérico (.px); defecto true (el carril de la home la mueve en horizontal)
  *  hover   bool    elevación al pasar el ratón sin ser enlace
  *  h       string  etiqueta del título ('h3' defecto)    cls string clase extra   min_title bool (min-height 2 líneas)
  *  wrap    bool    envoltorio .card-wrap (defecto true)
@@ -27,7 +28,7 @@ $hasTop = !empty($icon) || !empty($icon_html) || !empty($num);
 ?>
 <?php if ($wrap): ?><div class="card-wrap"><?php endif; ?>
 <<?= $el ?> class="<?= e($cls) ?>"<?= $isLink ? ' href="' . e($href) . '"' : '' ?>>
-  <?php if ($image): ?><figure class="card__photo"><?= ns_img(['base' => $image['base'], 'alt' => $image['alt'] ?? '', 'sizes' => $image['sizes'] ?? '(min-width:1025px) 410px, (min-width:641px) 33vw, 100vw']) ?></figure><?php endif; ?>
+  <?php if ($image): ?><figure class="card__photo<?= ($px ?? true) ? ' px' : '' ?>"><?= ns_img(['base' => $image['base'], 'alt' => $image['alt'] ?? '', 'sizes' => $image['sizes'] ?? '(min-width:1025px) 410px, (min-width:641px) 33vw, 100vw']) ?></figure><?php endif; ?>
   <?php if ($hasTop && (!empty($icon) || !empty($icon_html))): ?>
   <div class="card__top">
     <span class="card__icon" aria-hidden="true"><?= !empty($icon_html) ? $icon_html : ns_icon($icon, 26) ?></span>

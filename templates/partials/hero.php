@@ -47,7 +47,7 @@ $ctas = $ctas ?? [];
     <?php if ($image || $aside !== ''): ?>
     <div class="hero__aside">
       <?php if ($image): ?>
-      <figure class="hero__photo<?= ($image['ratio'] ?? '4x3') === '5x4' ? ' hero__photo--5x4' : '' ?><?= !empty($image['small']) ? ' hero__photo--s' : '' ?>"><?= ns_img(['base' => $image['base'], 'alt' => $image['alt'] ?? '', 'eager' => true, 'sizes' => $image['sizes'] ?? '(min-width:1025px) 560px, 100vw']) ?></figure>
+      <figure class="hero__photo px<?= ($image['ratio'] ?? '4x3') === '5x4' ? ' hero__photo--5x4' : '' ?><?= !empty($image['small']) ? ' hero__photo--s' : '' ?>"><?= ns_img(['base' => $image['base'], 'alt' => $image['alt'] ?? '', 'eager' => true, 'sizes' => $image['sizes'] ?? '(min-width:1025px) 560px, 100vw']) ?></figure>
       <?php endif; ?>
       <?= $aside ?>
     </div>

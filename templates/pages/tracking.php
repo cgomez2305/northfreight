@@ -69,7 +69,7 @@ partial('summary', [
       <?php endif; ?>
     </div>
     <div class="sb-media">
-      <div class="sb-media__clip">
+      <div class="sb-media__clip px">
         <?= ns_img(['base' => 'two-semis-hillside-highway', 'alt' => 'Two semi trucks on a highway through the hills', 'sizes' => '(min-width:1025px) 600px, 100vw']) ?>
       </div>
     </div>

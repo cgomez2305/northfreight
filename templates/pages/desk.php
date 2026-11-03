@@ -45,7 +45,7 @@ $values = [
       <?php foreach ($team as $p): ?>
       <li>
         <article class="sb-dk-person">
-          <div class="sb-dk-person__photo">
+          <div class="sb-dk-person__photo px">
             <?php if (!empty($p['photo'])): ?>
             <?= ns_img(['base' => (string) $p['photo'], 'alt' => phplain((string) $p['name']), 'sizes' => '(min-width:1025px) 280px, (min-width:641px) 50vw, 100vw']) ?>
             <?php else: ?>
