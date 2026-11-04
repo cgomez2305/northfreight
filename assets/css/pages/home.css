@@ -169,6 +169,7 @@
 .why__link { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; margin-top: 4px; font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--cyan-light); text-decoration: none; transition: color var(--t-fast); }
 .why__link:hover { color: var(--text); }
 @media (max-width: 900px) { .why__list { grid-template-columns: minmax(0, 1fr); } }
+@media (min-width: 641px) and (max-width: 900px) { .why__photo { aspect-ratio: 16 / 9; } }
 
 /* ---- Banda de video (partial video-band): capa con póster + video, tarjeta de texto encima (>=761px) o debajo (móvil) ---- */
 .vband { margin: calc(var(--section-y) * -.25) var(--inset) var(--section-y); }

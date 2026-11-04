@@ -203,6 +203,7 @@
         if (l[n]) l[n].focus();
       }
     });
+    d.addEventListener('keydown', function (e) { if (e.key === 'Escape' && current) close(false); });   // abierto solo por hover (sin foco dentro del header): Esc también lo cierra (WCAG 1.4.13)
     d.addEventListener('pointerdown', function (e) { if (current && !header.contains(e.target)) close(false); });
     d.addEventListener('focusin', function (e) {
       if (!current) return;

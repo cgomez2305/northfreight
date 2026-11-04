@@ -23,6 +23,6 @@ Todo el material de stock viene de **Pixabay** (Pixabay Content License: uso com
 | Archivo | Pixabay ID | Autor | Origen | Notas |
 |---|---|---|---|---|
 | `hero.mp4`, `hero-poster.webp/.jpg` | 209542 | phlyingdoctor | https://pixabay.com/videos/id-209542/ | Autopista vista desde un dron, 12 s a 1280×720, 24 fps, sin audio; bucle con fundido de costura. |
-| `freight-yard.mp4` | 143479 | u_t230tq6rtc | https://pixabay.com/videos/id-143479/ | Patio de carga desde un dron, 9 s a 1280×720, sin audio. |
+| `freight-yard.mp4` | 143479 | u_t230tq6rtc | https://pixabay.com/videos/id-143479/ | Patio de carga desde un dron, 8 s a 1280×720, sin audio; recortado a 8 s con fundido de costura de 1 s para que el bucle no salte (`freight-yard-poster.webp` = primer fotograma del bucle). |
 
 Las fotos anteriores (`white-semi-*`, `red-semi-*`, `two-semis-*`, `dry-van-*`, `dispatch-team-*`, `truck-oncoming-*`) son stock genérico del andamiaje inicial; su origen no está documentado y se sustituirán por fotos propias del cliente (CLAUDE.md §10).
