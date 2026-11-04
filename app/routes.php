@@ -16,13 +16,16 @@
  *   css / js   (opcional) listas de grupos de CSS (assets/css/pages/*.css) y módulos JS (assets/js/*.js) que anulan los de la plantilla (solo lo que esa página usa)
  *   motion     (opcional) true => carga GSAP + ScrollTrigger + motion.js + motion.css (escenas de scroll y parallax de fotos)
  *   faq        clave de app/data/faq.php (o null)
- *   extras     doc (legal), equip (equipment), slug (post)
+ *   extras     doc (legal), equip (equipment), slug (post), job (vacante: slug de app/data/jobs.php)
+ *   noindex    (opcional) true => <meta robots noindex, follow> en producción, aunque la ruta sea live (apply, gracias); no entra en sitemap ni llms
+ *   gate       (opcional) 'lead-thanks' => solo se sirve con el token firmado de un envío real (?t=…); sin él, 303 a /careers/apply/ (sin sesiones)
+ *   schema_name (opcional) nombre del nodo Service/WebPage cuando el H1 no sirve como nombre
  *
  * La clave especial '404' no es una URL: es la ruta que usa index.php para el error 404.
  * Title/meta/h1 de las páginas del doc de copy son EXACTOS; los marcados TODO no están en el doc.
  */
 
-return [
+$routes = [
 
     // ------------------------------------------------------------------
     // FASE 1 — LIVE
@@ -370,6 +373,79 @@ return [
     ],
 
     // ------------------------------------------------------------------
+    // CARRERAS Y CAPTACIÓN DE CONDUCTORES (brief P). NorthStar es un servicio de dispatch, no un empleador de owner-operators: JobPosting solo en vacantes reales (jobs.php).
+    // title/meta/h1 no están en el doc de copy: TODO verificar con Carlos. /careers/owner-operators/ apunta a "owner operator jobs" y "partner with a dispatcher", NO a
+    // "dispatch services for owner-operators" (esa keyword es de /dispatch-for-owner-operators/).
+    // ------------------------------------------------------------------
+    '/careers/' => [
+        'template'   => 'careers',
+        'motion'     => true,
+        'title'      => 'Truck Driver Jobs & Owner Operator Partnerships | NorthStar', // TODO
+        'meta'       => 'Truck driver jobs and owner operator partnerships: NorthStar is a dispatch service, not a job offer. Partner with the desk or see company driver openings.', // TODO
+        'h1'         => 'Truck driver jobs & owner operator partnerships',
+        'schema'     => ['WebPage', 'FAQPage', 'BreadcrumbList'],
+        'status'     => 'live',
+        'sitemap'    => true,
+        'priority'   => 0.7,
+        'wa'         => 'careers',
+        'breadcrumb' => 'Careers',
+        'faq'        => 'careers',
+    ],
+    '/careers/owner-operators/' => [
+        'template'    => 'careers-owner',
+        'motion'      => true,
+        'title'       => 'Owner Operator Jobs: Partner With a Dispatcher | NorthStar', // TODO
+        'meta'        => 'Owner operator jobs? NorthStar is a dispatch partnership, not a job offer: you approve every load and the desk books, tracks and documents them.', // TODO
+        'h1'          => 'Owner operator jobs: partner with a dispatcher',
+        'schema'      => ['Service', 'FAQPage', 'BreadcrumbList'],
+        'schema_name' => 'Dispatch partnership for owner-operators',
+        'status'      => 'live',
+        'sitemap'     => true,
+        'priority'    => 0.8,
+        'wa'          => 'careers-owner',
+        'breadcrumb'  => 'Owner operators',
+        'parent'      => '/careers/',
+        'faq'         => 'careers-owner',
+    ],
+    '/careers/apply/' => [
+        'template'   => 'apply',
+        'motion'     => true,
+        'form'       => 'lead',   // handler POST en app/forms/lead.php
+        'js'         => ['apply.js'],
+        'noindex'    => true,     // formulario sin contenido propio: no se indexa ni entra en sitemap/llms (el contenido está en /careers/ y /careers/owner-operators/)
+        'title'      => 'Start Your Application | NorthStar Freight', // TODO
+        'meta'       => 'Apply to work with the NorthStar dispatch desk: four short steps, no phone call first. Message us on WhatsApp if you prefer.', // TODO
+        'h1'         => 'Start your application',
+        'schema'     => ['BreadcrumbList'],
+        'status'     => 'live',
+        'sitemap'    => false,
+        'priority'   => 0.4,
+        'wa'         => 'careers',
+        'breadcrumb' => 'Apply',
+        'parent'     => '/careers/',
+        'faq'        => null,
+        'cta'        => false,
+    ],
+    '/careers/thank-you/' => [
+        'template'   => 'thanks',
+        'motion'     => true,
+        'gate'       => 'lead-thanks',
+        'noindex'    => true,
+        'title'      => 'Application Received | NorthStar Freight', // TODO
+        'meta'       => 'We received your application. Here is what happens next with the NorthStar dispatch desk.', // TODO
+        'h1'         => 'Application received',
+        'schema'     => [],
+        'status'     => 'live',
+        'sitemap'    => false,
+        'priority'   => 0.0,
+        'wa'         => 'careers',
+        'breadcrumb' => 'Application received',
+        'crumbs'     => [['Home', '/'], ['Careers', '/careers/'], ['Application received', '/careers/thank-you/']],
+        'faq'        => null,
+        'cta'        => false,
+    ],
+
+    // ------------------------------------------------------------------
     // PÁGINAS POR EQUIPO — DRAFT hasta que el cliente confirme (§7.4). Datos en app/data/equipment.php.
     // title/meta/h1 de la maqueta + keyword de §7.4. TODO verificar con doc de copy.
     // ------------------------------------------------------------------
@@ -472,6 +548,48 @@ return [
         'faq'        => null,
     ],
 ];
+
+// ----------------------------------------------------------------------
+// COMPANY DRIVERS (CDL-A): el hub y cada vacante se generan desde app/data/jobs.php. Sin vacantes activas el hub queda en draft (404) y no hay páginas de vacante.
+// Una vacante vencida (valid_through < hoy) o pausada también da 404 y sale del sitemap. Sin JobPosting en ninguna otra página.
+// ----------------------------------------------------------------------
+$nsJobs = jobs_active();
+$routes['/careers/cdl-a-drivers/'] = [
+    'template'   => 'cdl-hub',
+    'motion'     => true,
+    'title'      => 'CDL-A Company Driver Jobs | NorthStar Freight', // TODO
+    'meta'       => 'Open CDL-A company driver positions at NorthStar Freight Solutions: what each job involves and how to apply. Only real openings are listed.', // TODO
+    'h1'         => 'CDL-A company driver jobs',
+    'schema'     => ['ItemList', 'BreadcrumbList'],
+    'status'     => $nsJobs ? 'live' : 'draft',
+    'sitemap'    => true,
+    'priority'   => 0.6,
+    'wa'         => 'driver',
+    'breadcrumb' => 'CDL-A drivers',
+    'parent'     => '/careers/',
+    'faq'        => null,
+];
+foreach (jobs_all() as $nsSlug => $nsJob) {
+    $nsTitle = trim((string) $nsJob['title']);
+    $routes['/careers/cdl-a-drivers/' . $nsSlug . '/'] = [
+        'template'   => 'job',
+        'motion'     => true,
+        'job'        => $nsSlug,
+        'title'      => mb_strimwidth($nsTitle . ' | NorthStar Freight', 0, 60, '', 'UTF-8'),
+        'meta'       => mb_strimwidth(trim((string) ($nsJob['summary'] ?? '')) !== '' ? trim((string) $nsJob['summary']) : $nsTitle . ' at NorthStar Freight Solutions. See what the job involves and how to apply.', 0, 155, '', 'UTF-8'),
+        'h1'         => $nsTitle,
+        'schema'     => ['JobPosting', 'BreadcrumbList'],
+        'status'     => isset($nsJobs[$nsSlug]) ? 'live' : 'draft',
+        'sitemap'    => true,
+        'priority'   => 0.6,
+        'wa'         => 'driver',
+        'breadcrumb' => $nsTitle,
+        'parent'     => '/careers/cdl-a-drivers/',
+        'faq'        => null,
+    ];
+}
+
+return $routes;
 
 // ----------------------------------------------------------------------
 // FASE 2 (no registrar todavía)

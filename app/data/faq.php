@@ -11,8 +11,88 @@
  *     para que ninguna respuesta incompleta llegue a prod ni a FAQPage.
  */
 
+// Vacantes reales (app/data/jobs.php): las preguntas del hub de carreras dependen de si hay vacantes publicadas.
+$nsJobsActive = function_exists('jobs_active') ? jobs_active() : [];
+
 return [
 
+    // /careers/ (hub): preguntas de conductores. Solo se afirma lo que el sitio ya afirma; lo demás va con {{ph:…}} y se descarta en producción.
+    'careers' => [
+        [
+            'q' => 'Is this a job offer?',
+            'a' => 'For owner-operators, no. NorthStar is a dispatch service: the desk works as your independent truck dispatcher while you keep running your own truck and approving every load.',
+            'link' => ['label' => 'Owner operator partnership', 'path' => '/careers/owner-operators/'],
+        ],
+        [
+            'q' => 'What does the desk handle for me?',
+            'a' => 'We find and book the loads, deal with brokers, track every trip and keep the paperwork that gets you paid.',
+        ],
+        [
+            'q' => 'Do I have to take every load you find?',
+            'a' => 'No. You approve each one.',
+        ],
+        [
+            'q' => 'How do I get started?',
+            'a' => 'Send the short application or message us on WhatsApp. We learn your operation, agree on contacts and scope, and review how we will work together before the first load.',
+            'link' => ['label' => 'Start the application', 'path' => '/careers/apply/'],
+        ],
+        [
+            'q' => 'What does it cost?',
+            'a' => 'Our dispatch fee is {{ph:YOUR FEE: % of gross or flat weekly}}. Scope is agreed before we start, so you always know what the desk handles and what it costs.',
+        ],
+        [
+            'q' => 'What do I need to apply?',
+            'a' => '{{ph:confirm requirements: authority, insurance, equipment and documents}}.',
+        ],
+        [
+            'q' => 'I do not own a truck. Can you help me find a driving job?',
+            'a' => $nsJobsActive
+                ? 'Yes, when there are openings. The open company driver positions are listed on the CDL-A drivers page.'
+                : 'Not right now: there are no company driver openings listed. If that changes, they will appear on this site.',
+            'link' => $nsJobsActive ? ['label' => 'CDL-A company driver jobs', 'path' => '/careers/cdl-a-drivers/'] : null,
+        ],
+        [
+            'q' => 'How will I get updates?',
+            'a' => 'On WhatsApp, at every stage of the load.',
+        ],
+    ],
+
+    // /careers/owner-operators/
+    'careers-owner' => [
+        [
+            'q' => 'Is this an owner operator job?',
+            'a' => 'No. It is a dispatch partnership: you keep running your own truck and the NorthStar desk works as your independent truck dispatcher.',
+        ],
+        [
+            'q' => 'How much does a dispatcher charge an owner-operator?',
+            'a' => '{{ph:YOUR FEE: % of gross or flat weekly}}. Scope is agreed before we start.',
+        ],
+        [
+            'q' => 'Who decides which loads I run?',
+            'a' => 'You do. You approve each load, and we tell you what we booked and why.',
+        ],
+        [
+            'q' => 'What equipment do you dispatch?',
+            'a' => '{{ph:confirm equipment types}}.',
+        ],
+        [
+            'q' => 'Can you help if I am just getting my authority?',
+            'a' => '{{ph:confirm whether the desk works with new authorities and what it needs}}.',
+        ],
+        [
+            'q' => 'Do you dispatch Amazon Relay loads?',
+            'a' => 'Yes. Operational and administrative management of Amazon Relay accounts is a core part of what we do: booking, trip records, performance follow-up and disputes.',
+            'link' => ['label' => 'Amazon Relay dispatch', 'path' => '/amazon-relay-dispatch/'],
+        ],
+        [
+            'q' => 'Will I have one dispatcher or a team?',
+            'a' => 'A team, not a single dispatcher. Updates reach you on WhatsApp, where you already work.',
+        ],
+        [
+            'q' => 'What happens after I apply?',
+            'a' => 'The desk reads your application and gets in touch, on WhatsApp if you prefer. Together we agree on who approves loads, how and when we report, and which tasks the desk owns from day one.',
+        ],
+    ],
     // FAQ global (doc de copy §FAQ) — textos exactos. Se usa en el home.
     'home' => [
         [

@@ -49,7 +49,7 @@ $jsList = array_values(array_filter($jsList, static fn($j): bool => is_string($j
 <link rel="canonical" href="<?= e(canonical($route)) ?>">
 <?php endif; ?>
 <?php if (noindex($route)): ?>
-<meta name="robots" content="noindex, nofollow">
+<meta name="robots" content="<?= is_production() && ($route['status'] ?? 'live') === 'live' && ($route['gate'] ?? '') === '' ? 'noindex, follow' : 'noindex, nofollow' ?>">
 <?php endif; ?>
 <meta property="og:type" content="<?= $template === 'post' ? 'article' : 'website' ?>">
 <meta property="og:site_name" content="<?= e(cfg('brand')) ?>">

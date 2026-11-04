@@ -18,6 +18,7 @@ function ns_css_group_map(): array
         'legal' => 'company', '404' => 'company', 'resources' => 'company', 'doc-bol' => 'company', 'doc-agreement' => 'company',
         'glossary' => 'tools', 'tool-rpm' => 'tools', 'tool-ifta' => 'tools',
         'blog' => 'blog', 'post' => 'blog',
+        'careers' => 'careers', 'careers-owner' => 'careers', 'apply' => 'careers', 'thanks' => 'careers', 'cdl-hub' => 'careers', 'job' => 'careers',
     ];
 }
 

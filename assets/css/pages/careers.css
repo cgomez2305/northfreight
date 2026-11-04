@@ -1,0 +1,135 @@
+/* Carreras y captación de conductores (brief P): /careers/, owner-operators, solicitud multipaso, gracias, vacantes. Prefijos cr-, crs, crc, ap. Solo tokens. */
+
+/* ---- Hero ---- */
+.cr-hero--apply .hero__in, .cr-hero--thanks .hero__in { padding-block: clamp(28px, 4vw, 44px); }
+.cr-hero .hero__lead { max-width: 600px; }
+.cr-hero--apply .hero__lead, .cr-hero--thanks .hero__lead { max-width: 560px; }
+.cr-more { padding-top: 4px; }
+.cr-link { font-weight: 600; font-size: 16px; color: var(--cyan); text-decoration: none; }
+.cr-link:hover { color: var(--cyan-light); }
+.cr-link:focus-visible { outline: 2px solid var(--cyan); outline-offset: 4px; border-radius: 4px; }
+.cr-empty { max-width: 640px; }
+.cr-eeo { font-size: 14px; line-height: 1.6; color: var(--text-3); max-width: 640px; }
+
+/* ---- Caminos (2 tarjetas con foto). La tarjeta de aviso (sin vacantes) no es un enlace: foto algo más tenue ---- */
+.cr-paths .card__photo { aspect-ratio: 3 / 2; }
+.cr-card--note .card__photo { opacity: .72; }
+
+/* ---- Requisitos (solo datos pendientes del cliente; en producción la sección no se imprime) ---- */
+.cr-reqs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: 12px; margin: 0; padding: 0; list-style: none; }
+.cr-reqs li { padding: 18px 20px; background: var(--panel); border: 1px solid var(--hairline); border-radius: var(--r-tile); color: var(--text-2); }
+
+/* ---- Filas-tarjeta de "seguir leyendo" y equipos ---- */
+.cr-rows { display: flex; flex-direction: column; gap: 14px; }
+.cr-fee { display: grid; gap: 28px; }
+.cr-fee__text { display: flex; flex-direction: column; gap: 16px; max-width: 520px; }
+@media (min-width: 1025px) { .cr-fee { grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: 56px; align-items: start; } }
+
+/* ---- Inicio rápido (paso 1 por GET, sin datos personales) ---- */
+.cr-quick { display: grid; gap: 16px; padding: clamp(20px, 4vw, 36px); background: var(--panel); border: 1px solid var(--hairline); border-radius: var(--r-card); }
+@media (min-width: 761px) { .cr-quick { grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) auto; align-items: end; } }
+
+/* ---- Pasos numerados (partial steps) ---- */
+.crs { display: grid; gap: 28px; margin: 0; padding: 0; list-style: none; }
+.crs__item { display: flex; flex-direction: column; gap: 12px; min-width: 0; padding-top: 22px; border-top: 1px solid var(--hairline-strong); }
+.crs__n { font-family: var(--font-head); font-weight: 900; font-size: clamp(44px, 6vw, 72px); line-height: .9; letter-spacing: -.02em; color: var(--cyan); }
+.crs__title { font-size: clamp(26px, 2.4vw, 32px); line-height: 1; color: var(--text); }
+.crs__text { color: var(--text-2); max-width: 36ch; }
+@media (min-width: 641px) { .crs--n4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 761px) { .crs--n3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1025px) { .crs--n4 { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px; } }
+
+/* ---- Comparativa (partial compare): tabla real; en ≤760 px cada fila es una tarjeta con las dos columnas rotuladas ---- */
+.crc__table { width: 100%; border-collapse: separate; border-spacing: 0; }
+.crc__table th, .crc__table td { padding: 20px 24px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--hairline); font-size: 17px; line-height: 1.5; color: var(--text-2); }
+.crc__table thead th { font-family: var(--font-mono); font-weight: 500; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--text-3); border-bottom-color: var(--hairline-strong); }
+.crc__table tbody th { font-family: var(--font-head); font-weight: 700; font-size: 24px; line-height: 1.1; color: var(--text); width: 24%; }
+.crc__table .crc__desk { background: var(--panel); color: var(--text); }
+.crc__table thead .crc__desk { color: var(--cyan); }
+@media (max-width: 760px) {
+  .crc__table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .crc__table, .crc__table tbody, .crc__table tr, .crc__table th, .crc__table td { display: block; width: 100%; }
+  .crc__table tr { margin-bottom: 14px; background: var(--panel); border: 1px solid var(--hairline); border-radius: var(--r-card); overflow: hidden; }
+  .crc__table tbody th { width: auto; padding: 20px 20px 4px; border: 0; }
+  .crc__table td { padding: 10px 20px 16px; border: 0; }
+  .crc__table td::before { content: attr(data-label); display: block; margin-bottom: 4px; font-family: var(--font-mono); font-weight: 500; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--text-3); }
+  .crc__table .crc__desk { background: var(--panel-2); }
+  .crc__table .crc__desk::before { color: var(--cyan); }
+}
+
+/* ---- Vacantes ---- */
+.cr-facts { display: flex; flex-direction: column; gap: 14px; margin: 0; padding: 24px; background: var(--glass-strong); border: 1px solid var(--hairline-strong); border-radius: var(--r-card); }
+.cr-facts dt { color: var(--cyan); }
+.cr-facts dd { margin: 4px 0 0; font-weight: 600; font-size: 18px; color: var(--text); }
+.cr-job { gap: 36px; }
+.cr-job__block { display: flex; flex-direction: column; gap: 16px; }
+.cr-job__list { margin: 0; padding: 0; list-style: none; }
+.cr-job__list li { padding: 14px 0; border-bottom: 1px solid var(--hairline); font-size: 18px; line-height: 1.5; color: var(--text-2); }
+.cr-thanks__act { display: flex; flex-wrap: wrap; gap: 12px; }
+
+/* ---- Solicitud multipaso (.ap). Sin JS: cuatro fieldset apilados. Con JS (apply.js añade .ap--js): un paso a la vez ---- */
+.ap { display: flex; flex-direction: column; gap: 28px; padding: clamp(20px, 4vw, 40px); background: var(--panel); border: 1px solid var(--hairline); border-radius: var(--r-card); }
+.ap__step { display: flex; flex-direction: column; gap: 22px; min-width: 0; margin: 0; padding: 0 0 28px; border: 0; border-bottom: 1px solid var(--hairline); }
+.ap__step:last-of-type { border-bottom: 0; padding-bottom: 0; }
+.ap__legend { display: flex; flex-direction: column; gap: 8px; width: 100%; padding: 0; margin-bottom: 22px; font-size: clamp(32px, 5vw, 44px); line-height: .95; color: var(--text); }
+.ap__legend .t-meta { color: var(--cyan); }
+.ap__legend:focus { outline: none; }
+.ap__legend:focus-visible { outline: 2px solid var(--cyan); outline-offset: 6px; border-radius: 4px; }
+.ap__group { display: flex; flex-direction: column; gap: 12px; min-width: 0; margin: 0; padding: 0; border: 0; }
+.ap__label { padding: 0; margin-bottom: 12px; font-weight: 600; font-size: 18px; line-height: 1.4; color: var(--text); }
+.ap__opt-tag { margin-left: 6px; font-family: var(--font-mono); font-weight: 500; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--text-3); }
+.ap__hint, .ap__note { font-size: 15px; line-height: 1.55; color: var(--text-2); }
+.ap__hint a { color: var(--cyan-light); text-decoration: underline; text-underline-offset: 3px; }
+.ap__opts { display: grid; grid-template-columns: 1fr; gap: 10px; }
+@media (min-width: 641px) { .ap__opts { grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); } .ap__opts--wrap { grid-template-columns: repeat(auto-fill, minmax(min(100%, 180px), 1fr)); } }
+.ap__opt, .ap__check { position: relative; display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 12px 18px; background: var(--bg); border: 1px solid var(--hairline-strong); border-radius: var(--r-tile); color: var(--text); font-size: 16px; line-height: 1.35; cursor: pointer; transition: border-color var(--t-fast, .15s), background-color var(--t-fast, .15s); }
+.ap__opt:hover { border-color: var(--text-3); }
+.ap__opt input, .ap__check input { flex: none; display: grid; place-content: center; width: 22px; height: 22px; margin: 0; border: 2px solid var(--text-3); border-radius: 50%; background: transparent; appearance: none; -webkit-appearance: none; }
+.ap__opt input[type="checkbox"], .ap__check input { border-radius: 6px; }
+.ap__opt input:checked, .ap__check input:checked { border-color: var(--cyan); background: var(--cyan); box-shadow: inset 0 0 0 4px var(--panel-2); }
+.ap__opt input[type="checkbox"]:checked, .ap__check input:checked { box-shadow: none; }
+.ap__opt input[type="checkbox"]:checked::after, .ap__check input:checked::after { content: ""; width: 5px; height: 10px; margin-top: -2px; border: solid var(--navy-deep); border-width: 0 2px 2px 0; rotate: 45deg; }
+.ap__opt:has(input:checked) { background: var(--panel-2); border-color: var(--cyan); }
+.ap__opt:has(input:focus-visible), .ap__check:has(input:focus-visible) { outline: 2px solid var(--cyan); outline-offset: 2px; }
+.ap__grid { display: grid; grid-template-columns: 1fr; gap: 22px; }
+@media (min-width: 761px) { .ap__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.ap__consent { display: flex; flex-direction: column; gap: 10px; }
+.ap__check { align-items: flex-start; font-size: 14px; line-height: 1.55; color: var(--text-2); cursor: pointer; }
+.ap__check input { margin-top: 1px; }
+.ap__err { display: flex; align-items: flex-start; gap: 8px; font-family: var(--font-body); font-weight: 600; font-size: 14px; letter-spacing: 0; text-transform: none; line-height: 1.4; color: var(--text); }
+.ap__err::before { content: "!"; flex: none; display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; margin-top: 1px; border: 2px solid var(--text); border-radius: 50%; font-size: 11px; font-weight: 700; line-height: 1; }
+.ap .input[aria-invalid="true"] { border: 2px solid var(--text); }
+.ap__group:has(.ap__err) .ap__opt { border-color: var(--text-3); }
+.ap__alert { margin-bottom: 20px; padding: 18px 22px; background: var(--panel-2); border: 1px solid var(--hairline-strong); border-left: 6px solid var(--text); border-radius: var(--r-tile); color: var(--text); }
+.ap__alert:focus { outline: none; }
+.ap__alert:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+.ap__alert-title { font-weight: 600; font-size: 17px; }
+.ap__alert ul { margin: 10px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 4px; }
+.ap__alert a { color: var(--text); text-decoration: underline; text-underline-offset: 3px; font-size: 15px; }
+.ap__nav { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.ap__submit { margin-left: auto; }
+@media (max-width: 640px) { .ap__nav { flex-direction: column-reverse; align-items: stretch; } .ap__nav .btn { width: 100%; } .ap__submit { margin-left: 0; } }
+/* Progreso (solo con JS) */
+.ap__prog { display: flex; flex-direction: column; gap: 14px; }
+.ap__count { color: var(--text-2); }
+.ap__bar { height: 6px; overflow: hidden; background: var(--bg); border: 1px solid var(--hairline-strong); border-radius: var(--r-pill); }
+.ap__bar i { display: block; width: 100%; height: 100%; background: var(--cyan); transform-origin: left center; transform: scaleX(.25); transition: transform .3s ease; }
+.ap__dots { display: none; margin: 0; padding: 0; list-style: none; }
+@media (min-width: 761px) {
+  .ap__dots { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+  .ap__dots li { display: flex; align-items: center; gap: 10px; min-width: 0; color: var(--text-3); font-size: 14px; }
+  .ap__dots span { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border: 1px solid var(--hairline-strong); border-radius: 50%; font-family: var(--font-mono); font-size: 12px; }
+  .ap__dots b { font-weight: 500; overflow-wrap: anywhere; }
+  .ap__dots li[aria-current="step"] { color: var(--text); }
+  .ap__dots li[aria-current="step"] span, .ap__dots li.is-done span { background: var(--cyan); border-color: var(--cyan); color: var(--navy-deep); }
+}
+/* Con JS: solo el paso actual. html.js-apply (script inline previo al formulario) pinta ya ese estado antes de que apply.js arranque, para no mover la página (CLS 0) */
+.ap--js .ap__step, .js-apply .ap__step { border-bottom: 0; padding-bottom: 0; }
+.ap--js .ap__legend .t-meta, .js-apply .ap__legend .t-meta { display: none; }   /* con JS el progreso ("Step n of 4") ya está arriba */
+.js-apply .ap__step:not([data-ap-step="1"]) { display: none; }
+/* Elementos solo de JS: ocultos de base; html.js-apply (antes de apply.js) y .ap--js (después) los muestran igual, y el atributo hidden (global, !important) los apaga por paso */
+.ap__js-only { display: none; }
+.js-apply .ap__prog.ap__js-only, .ap--js .ap__prog.ap__js-only { display: flex; }
+.js-apply .ap__next.ap__js-only, .ap--js .ap__next.ap__js-only, .ap--js .ap__back.ap__js-only { display: inline-flex; }
+.js-apply .ap__submit { display: none; }
+@media (prefers-reduced-motion: reduce) { .ap__bar i { transition: none; } }

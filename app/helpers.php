@@ -66,6 +66,39 @@ function data(string $name): array
 }
 
 // ---------------------------------------------------------------------
+// Vacantes de company drivers (app/data/jobs.php)
+// ---------------------------------------------------------------------
+
+/** Todas las vacantes declaradas en app/data/jobs.php (slug => datos). Lee el archivo directamente (se usa también desde routes.php y faq.php). */
+function jobs_all(): array
+{
+    static $all = null;
+    if ($all === null) {
+        $raw = require NS_ROOT . '/app/data/jobs.php';
+        $all = [];
+        foreach (is_array($raw) ? $raw : [] as $slug => $job) {
+            if (is_string($slug) && preg_match('/^[a-z0-9][a-z0-9-]{0,80}$/', $slug) === 1 && is_array($job) && trim((string) ($job['title'] ?? '')) !== '') {
+                $all[$slug] = $job;
+            }
+        }
+    }
+    return $all;
+}
+
+/** Vacantes activas HOY: status 'active', posted <= hoy y valid_through (obligatoria) >= hoy. Una vencida desaparece sola (404, fuera del sitemap). */
+function jobs_active(?string $today = null): array
+{
+    $today ??= gmdate('Y-m-d');
+    return array_filter(jobs_all(), static function (array $j) use ($today): bool {
+        $posted = trim((string) ($j['posted'] ?? ''));
+        $until = trim((string) ($j['valid_through'] ?? ''));
+        return ($j['status'] ?? '') === 'active'
+            && iso_date_ok($posted) && $posted <= $today
+            && iso_date_ok($until) && $until >= $today;
+    });
+}
+
+// ---------------------------------------------------------------------
 // Escape, URLs, assets, contacto
 // ---------------------------------------------------------------------
 
@@ -256,7 +289,7 @@ function noindex(?array $route = null): bool
     if (!is_production()) {
         return true;
     }
-    return $route !== null && ($route['status'] ?? 'live') !== 'live';
+    return $route !== null && (($route['status'] ?? 'live') !== 'live' || !empty($route['noindex']));
 }
 
 // ---------------------------------------------------------------------
@@ -475,7 +508,7 @@ function service_schema(array $route): array
 {
     return [
         '@type'       => 'Service',
-        'name'        => $route['h1'],
+        'name'        => $route['schema_name'] ?? $route['h1'],
         'description' => $route['meta'],
         'url'         => canonical($route),
         'serviceType' => $route['breadcrumb'] ?? $route['h1'],
@@ -531,6 +564,15 @@ function page_schema(array $route): array
             'WebSite'             => website_schema(),
             'ProfessionalService' => organization_schema('ProfessionalService'),
             'Service'             => service_schema($route),
+            'WebPage'             => [
+                '@type'       => 'WebPage',
+                'name'        => $route['h1'],
+                'description' => $route['meta'],
+                'url'         => canonical($route),
+                'isPartOf'    => ['@id' => abs_url('/') . '#website'],
+                'about'       => ['@id' => abs_url('/') . '#organization'],
+            ],
+            'JobPosting'          => job_schema($route),
             'FAQPage'             => faq_schema(route_faq_items($route)),
             'BreadcrumbList'      => breadcrumb_schema($route),
             'WebApplication'      => [
@@ -558,6 +600,61 @@ function page_schema(array $route): array
         };
     }
     return array_values(array_filter($graph));
+}
+
+/**
+ * JobPosting de una vacante real (route['job'] = slug de app/data/jobs.php). Solo campos con dato: baseSalary solo si la vacante trae `pay`, sin cifras inventadas.
+ * Devuelve null si la vacante no existe o ya no está activa (schema_clean descarta además cualquier campo con placeholder).
+ */
+function job_schema(array $route): ?array
+{
+    $j = jobs_active()[(string) ($route['job'] ?? '')] ?? null;
+    if ($j === null) {
+        return null;
+    }
+    $loc = is_array($j['location'] ?? null) ? $j['location'] : [];
+    $desc = [(string) ($j['summary'] ?? '')];
+    foreach (['responsibilities' => 'Responsibilities', 'requirements' => 'Requirements', 'benefits' => 'Benefits'] as $k => $label) {
+        $list = array_values(array_filter(array_map('strval', (array) ($j[$k] ?? []))));
+        if ($list) {
+            $desc[] = $label . ': ' . implode('; ', $list) . '.';
+        }
+    }
+    $node = [
+        '@type'              => 'JobPosting',
+        'title'              => (string) $j['title'],
+        'description'        => implode(' ', array_filter($desc)),
+        'datePosted'         => (string) $j['posted'],
+        'validThrough'       => (string) $j['valid_through'] . 'T23:59:59',
+        'employmentType'     => (string) ($j['employment_type'] ?? 'FULL_TIME'),
+        'directApply'        => true,
+        'url'                => canonical($route),
+        'hiringOrganization' => ['@type' => 'Organization', 'name' => BRAND, 'sameAs' => abs_url('/'), 'logo' => 'https://' . DOMAIN . '/assets/img/isotype.svg'],
+        'jobLocation'        => [
+            '@type'   => 'Place',
+            'address' => [
+                '@type'           => 'PostalAddress',
+                'addressLocality' => $loc['city'] ?? null,
+                'addressRegion'   => $loc['region'] ?? null,
+                'postalCode'      => $loc['postal'] ?? null,
+                'addressCountry'  => $loc['country'] ?? 'US',
+            ],
+        ],
+    ];
+    $pay = is_array($j['pay'] ?? null) ? $j['pay'] : [];
+    if ((isset($pay['min']) || isset($pay['max'])) && in_array($pay['unit'] ?? '', ['HOUR', 'WEEK', 'MONTH', 'YEAR'], true)) {
+        $node['baseSalary'] = [
+            '@type'    => 'MonetaryAmount',
+            'currency' => (string) ($pay['currency'] ?? 'USD'),
+            'value'    => array_filter([
+                '@type'    => 'QuantitativeValue',
+                'minValue' => $pay['min'] ?? null,
+                'maxValue' => $pay['max'] ?? null,
+                'unitText' => (string) $pay['unit'],
+            ], static fn($v) => $v !== null),
+        ];
+    }
+    return $node;
 }
 
 /** true si $s es una fecha ISO válida YYYY-MM-DD. */
