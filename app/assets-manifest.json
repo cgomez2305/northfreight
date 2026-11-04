@@ -78,8 +78,8 @@
         },
         "home-motion": {
             "file": "css/dist/home-motion.css",
-            "hash": "b1332379d7",
-            "bytes": 86006,
+            "hash": "5a5d64d032",
+            "bytes": 86175,
             "sources": [
                 {
                     "path": "css/fonts.css",
@@ -103,8 +103,8 @@
                 },
                 {
                     "path": "css/pages/home.css",
-                    "size": 22709,
-                    "crc32": "e354b3ac"
+                    "size": 23823,
+                    "crc32": "cb9d43ca"
                 },
                 {
                     "path": "css/motion.css",
@@ -272,12 +272,12 @@
             },
             "motion": {
                 "file": "js/dist/motion.min.js",
-                "hash": "e638c84769",
-                "bytes": 14148,
+                "hash": "6b5ab4ffc9",
+                "bytes": 14238,
                 "source": {
                     "path": "js/motion.js",
-                    "size": 30290,
-                    "crc32": "388df32f"
+                    "size": 30769,
+                    "crc32": "d66f0bef"
                 }
             },
             "video": {

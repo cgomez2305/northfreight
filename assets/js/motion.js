@@ -15,16 +15,18 @@
   /* GSAP y ScrollTrigger NO bloquean ni compiten con el LCP: se descargan tras `load` + idle, desde cdnjs (versión fija con SRI en los data-* de
      este <script>), y solo entonces arrancan las escenas. Si la descarga falla, la página queda completa y estática. */
   var cur = document.currentScript, cfg = cur && cur.dataset ? cur.dataset : {};
+  /* html.hero-pre (la pone un script inline del home) reserva el espacio del pin-spacer del hero para que la página no salte cuando GSAP lo inserta; si GSAP no va a correr, se libera ya. */
+  function unpre() { document.documentElement.classList.remove('hero-pre'); }
   function inject(src, sri, cb) {
     var s = document.createElement('script');
     s.src = src; s.integrity = sri; s.crossOrigin = 'anonymous'; s.referrerPolicy = 'no-referrer'; s.async = false;
-    s.onload = cb; s.onerror = function () {};
+    s.onload = cb; s.onerror = unpre;
     document.head.appendChild(s);
   }
   function load() {
     if (window.gsap && window.ScrollTrigger) return main();
-    if (!cfg.gsap || !cfg.st) return;
-    inject(cfg.gsap, cfg.gsapSri, function () { inject(cfg.st, cfg.stSri, function () { if (window.gsap && window.ScrollTrigger) main(); }); });
+    if (!cfg.gsap || !cfg.st) return unpre();
+    inject(cfg.gsap, cfg.gsapSri, function () { inject(cfg.st, cfg.stSri, function () { if (window.gsap && window.ScrollTrigger) main(); else unpre(); }); });
   }
   function later() {
     if (window.requestIdleCallback) window.requestIdleCallback(load, { timeout: 1500 }); else setTimeout(load, 200);
@@ -34,8 +36,8 @@
   function main() {
   var g = window.gsap, ST = window.ScrollTrigger, d = document, root = d.documentElement;
   var rm = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : null;
-  if (!g || !ST || !window.matchMedia || (rm && rm.matches)) return;
-  try { g.registerPlugin(ST); } catch (e) { return; }
+  if (!g || !ST || !window.matchMedia || (rm && rm.matches)) return unpre();
+  try { g.registerPlugin(ST); } catch (e) { return unpre(); }
   ST.config({ ignoreMobileResize: true });
 
   var A = Array.prototype;
@@ -48,6 +50,7 @@
     if (dead) return; dead = true;
     try { if (mm) mm.revert(); ST.getAll().forEach(function (t) { t.kill(); }); } catch (e) { /* nada */ }
     root.classList.remove('js-motion');
+    unpre();
   }
 
   /* ---- Escena 1: hero de la home. Fijado ~100 % del alto de la ventana; la foto se encoge, el texto sube y se desvanece ---- */
@@ -460,6 +463,7 @@
     if (dead || root.classList.contains('js-motion')) return;
     try {
       root.classList.add('js-motion');
+      unpre();   // la reserva se retira en este mismo turno en que ScrollTrigger inserta el pin-spacer: ningún pintado entre medias, así que la página no se mueve
       mm = g.matchMedia();
       mm.add({ all: '(min-width: 1px)', desk: '(min-width: 1025px)', rail: '(min-width: 1025px) and (min-height: 700px)' }, build);
       ST.refresh();

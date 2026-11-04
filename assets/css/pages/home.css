@@ -25,6 +25,9 @@
 .hero-wa__note { margin: 0; font-size: 15px; line-height: 1.5; color: var(--text-2); }
 .hero-wa__ui { display: flex; flex-direction: column; gap: 12px; }
 .hero-wa__ui[hidden] { display: none; }
+/* Sin salto de maquetación: un script inline previo al widget pone html.js-wa (mismo patrón que js-tabs); con JS el widget ya nace con su forma final (controles visibles, sin la nota), así main.js no cambia su alto al activarlo. Sin JS no hay clase: controles ocultos y nota visible. */
+.js-wa .hero-wa__ui[hidden] { display: flex !important; }   /* base.css fuerza [hidden] con !important */
+.js-wa .hero-wa__note { display: none; }
 .hero-wa__tabs { display: flex; gap: 2px; padding: 3px; border: 1px solid var(--hairline-strong); border-radius: var(--r-pill); background: var(--bg); }
 .hero-wa__tab { flex: 1 1 auto; min-width: 0; min-height: 44px; padding: 0 8px; border: 0; border-radius: var(--r-pill); background: transparent; font-size: 13px; font-weight: 600; line-height: 1.1; text-align: center; color: var(--text-2); transition: background-color var(--t-fast), color var(--t-fast); }
 .hero-wa__tab:hover { color: var(--text); }
@@ -46,6 +49,12 @@
   /* El widget va arriba a la derecha, sobre el cielo oscuro (abajo taparía el camión de la foto): absoluto respecto de .hero__in, que ocupa todo el alto del hero */
   .hero--home .hero__in { align-self: stretch; position: relative; }
   .hero--home .hero-wa { position: absolute; right: var(--gutter); top: calc(var(--header-h) + 16px); width: clamp(330px, 28vw, 400px); }
+}
+
+/* Reserva del pin del hero: motion.js fija el hero con un pin-spacer que añade ~100vh de recorrido bajo él (≥1025px). Sin reserva, el resto de la página saltaba ese alto cuando GSAP lo insertaba (~1 s después de la carga: CLS visible en pantallas altas).
+   Un script inline previo al hero pone html.hero-pre y --pin-h (= window.innerHeight, lo mismo que mide GSAP) solo en ≥1025px sin reduced-motion; motion.js la quita en el mismo turno en que crea el pin-spacer (sin pintado entre medias), y también si GSAP falla o no llega. Sin JS no hay clase ni espacio extra. */
+@media (min-width: 1025px) {
+  .hero-pre .hero--home { margin-bottom: var(--pin-h, 100vh); }
 }
 
 /* Móvil: la foto va arriba, entera, y se funde con el fondo; el texto debajo */

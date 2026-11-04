@@ -102,6 +102,7 @@ $figures = [
 ?>
 <!-- HERO: foto protagonista (v2: nf-hero-highway-poster, master 3840×2160 con la gradación de marca; degradado solo desde la izquierda y abajo) + titular + widget de WhatsApp. Recortes reales: -m (4:5, ≤760 px) y -sq (cuadrado, 761 a 1024 px); en escritorio la foto 16:9 completa con srcset 640 a 3200.
      Slot de video: si existe assets/video/hero.mp4 (o .webm) $heroVideo lo activa: el <video> va vacío (preload none, sin src) y main.js le pone la fuente tras load + idle en >=1025px, con fundido sobre la foto (que sigue siendo el LCP). Sin archivos no se emite nada y no hay peticiones. -->
+<script>(function(w,d){var r=d.documentElement;r.classList.add('js-wa');if(w.matchMedia&&w.matchMedia('(min-width:1025px)').matches&&!w.matchMedia('(prefers-reduced-motion: reduce)').matches){r.style.setProperty('--pin-h',w.innerHeight+'px');r.classList.add('hero-pre');w.addEventListener('load',function(){setTimeout(function(){if(!r.classList.contains('js-motion'))r.classList.remove('hero-pre')},7000)})}})(window,document)</script>
 <section class="hero hero--home" id="top">
   <div class="hero__bg"<?= $heroVideo ? ' data-hero-video data-mp4="' . e($heroVideo['mp4'] ?? '') . '" data-webm="' . e($heroVideo['webm'] ?? '') . '"' : '' ?>><?= ns_img(['base' => 'nf-hero-highway-poster', 'widths' => [640, 1024, 1280, 1600, 2048, 2560, 3200], 'alt' => 'White semi truck driving along a highway through dark hills under a heavy gray sky at dawn', 'eager' => true, 'sizes' => '100vw',
         'art' => [
@@ -139,7 +140,7 @@ $figures = [
             <button type="button" class="hero-wa__chip" aria-pressed="false" data-svc="<?= e(strtolower($c)) ?>"><?= e($c) ?></button>
             <?php endforeach; ?>
           </div>
-          <p class="hero-wa__msg" data-wa-msg></p>
+          <p class="hero-wa__msg" data-wa-msg><?= e('Hi, ' . $waTabs[0][2] . ' and I\'d like to talk about dispatch with NorthStar.') ?></p>
         </div>
       </div>
       <a class="btn btn--primary btn--card hero-wa__go" href="<?= e($waHref) ?>" rel="noopener" data-wa-open><span class="btn__t">Open WhatsApp</span></a>
