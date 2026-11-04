@@ -10,13 +10,14 @@
  * published / modified (solo artículos): fechas ISO YYYY-MM-DD. 'published' queda VACÍO hasta que el cliente confirme la fecha real
  *   de publicación (no se inventa; mientras tanto la pantalla usa 'date' con ph()). 'modified' = última edición real del contenido.
  *   Alimentan datePublished/dateModified del JSON-LD Article y el byline (<time datetime>) del artículo.
- * image (opcional, solo artículos): ['base' => 'nombre-en-assets/img', 'alt' => '…'] foto de la tarjeta del índice; sin image la tarjeta va sin foto.
+ * image (opcional): ['base' => 'nombre-en-assets/img', 'alt' => '…'] foto de la tarjeta del índice (artículos y tarjetas 'link' de recursos); sin image la tarjeta va sin foto.
  * Orden = orden de aparición en la maqueta: destacado primero, luego el resto.
  */
 
 return [
     [
         'slug'     => 'how-much-does-truck-dispatch-cost',
+        'image'    => ['base' => 'nf-vintage-calculator-night-road', 'alt' => 'Vintage desk calculator beside a notepad and a clock, with a truck on a night road behind'],
         'path'     => '/blog/how-much-does-truck-dispatch-cost/',
         'title'    => 'How much does truck dispatch service cost?',
         'category' => 'Dispatch',
@@ -38,7 +39,7 @@ return [
     ],
     [
         'slug'     => 'amazon-relay-requirements',
-        'image'    => ['base' => 'red-semi-dry-van-open-road', 'alt' => 'Red semi truck pulling a dry van on an open road'],
+        'image'    => ['base' => 'nf-clipboard-on-truck-hood', 'alt' => 'Checklist on a clipboard resting on a truck hood at a night dock'],
         'path'     => '/blog/amazon-relay-requirements/',
         'title'    => 'Amazon Relay requirements for carriers',
         'category' => 'Amazon Relay',
@@ -60,7 +61,7 @@ return [
     ],
     [
         'slug'     => 'amazon-relay-load-board',
-        'image'    => ['base' => 'two-semis-hillside-highway', 'alt' => 'Two semi trucks on a highway through the hills'],
+        'image'    => ['base' => 'nf-tablet-cab-night-yard', 'alt' => 'Tablet mounted in a truck cab at night looking over a yard of trailers'],
         'path'     => '/blog/amazon-relay-load-board/',
         'title'    => 'How the Amazon Relay load board works',
         'category' => 'Amazon Relay',
@@ -82,7 +83,7 @@ return [
     ],
     [
         'slug'     => 'lumper-fees-detention-pay',
-        'image'    => ['base' => 'dry-van-trailers-loading-docks', 'alt' => 'Dry van trailers backed into warehouse loading docks'],
+        'image'    => ['base' => 'nf-dock-waiting-clock', 'alt' => 'Wall clock beside a loading dock door at night as a trailer waits'],
         'path'     => '/blog/lumper-fees-detention-pay/',
         'title'    => 'Lumper fees and detention pay: how to get paid for both',
         'category' => 'Paperwork & pay',
@@ -104,6 +105,7 @@ return [
     ],
     [
         'slug'     => 'rate-per-mile',
+        'image'    => ['base' => 'nf-calculator-map-dashboard', 'alt' => 'Calculator and route map on a truck dashboard at dusk'],
         'path'     => '/resources/rate-per-mile-calculator/',
         'title'    => 'Rate per mile: know if a load pays',
         'category' => 'Dispatch',
@@ -116,6 +118,7 @@ return [
     ],
     [
         'slug'     => 'glossary',
+        'image'    => ['base' => 'nf-cards-fan-key-fob', 'alt' => 'Fan of blank cards beside a notebook and a truck key fob'],
         'path'     => '/resources/glossary/',
         'title'    => 'The trucking glossary for new owner-operators',
         'category' => 'Dispatch',
@@ -128,6 +131,7 @@ return [
     ],
     [
         'slug'     => 'fill-a-bol',
+        'image'    => ['base' => 'nf-shipping-form-clipboard', 'alt' => 'Clipboard with a blank shipping form under a cool light'],
         'path'     => '/resources/bol-template/',
         'title'    => 'How to fill a bill of lading',
         'category' => 'Paperwork & pay',

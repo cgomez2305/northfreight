@@ -3,8 +3,8 @@
  * CTA final "Let's talk about your operation." en un panel redondeado.
  * El bloque anterior se separa con .pre-cta (el layout marca <main class="has-cta"> y lo aplica a la última .section).
  * Params: wa(string|null clave/mensaje), title(string con marcas), text(string),
- *         image(array|null, opcional: ['base'=>'truck-night-rain-headlights','alt'=>''] foto de fondo DECORATIVA, oscurecida con --cta-veil;
- *         con foto el contenido va centrado. Sin image queda el panel liso de siempre).
+ *         image(array|null, opcional: ['base'=>'nf-lone-truck-rain-night','alt'=>''] foto de fondo DECORATIVA, oscurecida con --cta-veil (desde la izquierda; en móvil la foto va arriba, recorte <base>-m si existe);
+ *         con foto el texto va a la izquierda. Sin image queda el panel liso de siempre).
  */
 require_once __DIR__ . '/kit.php';
 $wa = $wa ?? null;
@@ -12,7 +12,8 @@ $email = (string) cfg('email');
 $image = !empty($image['base']) ? $image : null;
 ?>
 <section class="cta on-dark<?= $image ? ' cta--photo' : '' ?>" aria-labelledby="cta-title">
-  <?php if ($image): ?><div class="cta__bg" aria-hidden="true"><?= ns_img(['base' => (string) $image['base'], 'alt' => '', 'sizes' => '(min-width:1025px) 1012px, (min-width:761px) 100vw, 250vw']) ?></div><?php endif; ?>
+  <?php if ($image): $ctaM = (string) $image['base'] . '-m'; ?><div class="cta__bg" aria-hidden="true"><?= ns_img(['base' => (string) $image['base'], 'alt' => '', 'sizes' => '100vw',
+      'art' => is_file(NS_ROOT . '/assets/img/' . $ctaM . '-658.webp') ? [['media' => '(max-width:760px)', 'base' => $ctaM, 'sizes' => '100vw']] : []]) ?></div><?php endif; ?>
   <div class="container cta__in">
     <div class="cta__main">
       <img class="cta__mark" src="<?= e(asset('img/isotype-white.svg')) ?>" alt="" width="56" height="56">

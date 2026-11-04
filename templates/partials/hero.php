@@ -13,7 +13,7 @@
  *  tagline string  frase corta bajo el titular
  *  lead    string  entrada
  *  ctas    array   [['label','href','variant'=>'primary|ghost','icon'=>'arrow|whatsapp|null','arrow'=>bool (→ de texto, solo en ghost: los primarios ya llevan la celda de flecha ↗ por CSS)],…]
- *  image   array   ['base'=>'red-semi-dry-van-open-road','alt'=>'…','small'=>bool (máx. 490px de ancho: fotos de 490px),'sizes'=>'…'] foto a la derecha (radio 24; en móvil debajo del texto)
+ *  image   array   ['base'=>'nf-cab-interior-cyan-night','alt'=>'…','small'=>bool (máx. 490px de ancho: solo para fotos pequeñas),'sizes'=>'…'] foto a la derecha (radio 24; en móvil debajo del texto)
  *  aside   string  HTML ya renderizado (tarjeta de datos / vista previa de documento); va tras la imagen si hay ambas
  *  stack   bool    true => sin columna derecha, H1 hasta 980px
  *  cls     string  clase extra en <section>

@@ -33,8 +33,8 @@
   --arrow-ne: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2304132A' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 17L17 7M8 7h9v9'/%3E%3C/svg%3E");   /* flecha ↗ en navy-deep: celda de los botones primarios */
   --btn-cell: rgba(4, 19, 42, .14);        /* celda circular del botón primario (sobre cian) */
   --glass-strong: rgba(10, 29, 51, .88);   /* widget de WhatsApp del hero: más opaco que el menú para sostener AA sobre la foto */
-  --cta-veil: radial-gradient(ellipse 75% 105% at 50% 50%, rgba(4, 16, 31, .87) 0%, rgba(4, 16, 31, .84) 52%, rgba(4, 16, 31, .4) 100%);   /* CTA final con foto (nocturna, truck-night-rain-headlights): más opaco detrás del texto centrado (contraste medido >= 5,5:1 también en el cian grande) y más foto en los bordes */
-  --cta-edge-mask: linear-gradient(90deg, transparent 0, #000 14%, #000 86%, transparent 100%);   /* máscara de alfa: la foto del CTA se funde con el panel por los lados (≥1025px) */
+  --cta-veil: linear-gradient(90deg, rgba(4, 16, 31, .94) 0%, rgba(4, 16, 31, .9) 40%, rgba(4, 16, 31, .62) 54%, rgba(4, 16, 31, .2) 68%, rgba(4, 16, 31, 0) 80%);   /* CTA final con foto (nf-lone-truck-rain-night, 21:9): velo desde la izquierda, donde va el texto; el camión queda a la vista en el tercio derecho */
+  --cta-veil-m: linear-gradient(180deg, rgba(4, 16, 31, .35) 0%, rgba(4, 16, 31, 0) 28%, rgba(4, 16, 31, 0) 52%, var(--panel-2) 100%);   /* CTA móvil: la foto va arriba y se funde con el panel donde empieza el texto */
   --ph-bg: #FFF3B0;            /* marca de placeholder (solo staging) */
 
   /* Tipografía */

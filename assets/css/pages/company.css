@@ -33,6 +33,10 @@
 }
 /* Tarjeta de recurso (hub y "relacionados" de las plantillas de documento) */
 .co-res { gap: 14px; min-height: 200px; box-sizing: border-box; }
+.co-res__photo { margin: 0 0 4px; aspect-ratio: 3 / 2; overflow: hidden; border-radius: var(--r-tile); background: var(--bg); }   /* foto 3:2 nativa: sin recorte ni ampliación */
+.co-res__photo picture { display: block; width: 100%; height: 100%; }
+.co-res__photo img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.co-res--photo { min-height: 0; }
 .co-res__top { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 28px; }
 .co-res__top .icon { color: var(--cyan); stroke-width: 1.8; }
 .co-res .card__code { font-weight: 600; letter-spacing: .06em; color: var(--cyan); }

@@ -3,7 +3,7 @@
  * Video con fachada: imagen + botón play centrado (único control sobre imagen permitido), pie DEBAJO y capítulos.
  * No hay iframe hasta el clic (lo hace video.js).
  * Params:
- *  image   array   ['base'=>'dispatch-team-headsets-office','alt'=>'…']  (portada)
+ *  image   array   ['base'=>'nf-dispatch-room-wide-night','alt'=>'…']  (portada)
  *  title   string  pie: "Meet the desk {hl}· 3 chapters{/hl}"           meta string  "Video · 3–4 min"
  *  chapters array  [['title','desc'?,'t'=>'0:00'|null,'href'?], …]  t=null => ph('0:00') (pendiente); con href es <a>, sin href <button>
  *  chapters_label string ("Jump to a chapter")

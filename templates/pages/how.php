@@ -19,7 +19,7 @@ partial('hero', [
     'eyebrow' => 'How we plug into your operation',
     'h1'    => 'How truck dispatching works {hl}with NorthStar{/hl}',
     'lead'  => 'Hiring a dispatch company should not mean losing control of your trucks. Here is exactly how we start and how we work with you every day.',
-    'image' => ['base' => 'nf-route-map-night-trucks-43', 'alt' => 'Glowing route lines over a dark map with trucks on a night highway'],
+    'image' => ['base' => 'nf-route-map-night-trucks-r43', 'alt' => 'Glowing route lines over a dark map with trucks on a night highway'],
 ]);
 
 // Resumen "In short" (SEO/GEO): editable aquí. Solo información que ya está en el copy de esta página; sin cifras, tarifas ni promesas nuevas.

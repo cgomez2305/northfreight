@@ -69,7 +69,7 @@ function ns_icon(string $name, int $size = 18, string $class = ''): string
 
 /**
  * <picture> responsive sobre {dir}/{base}-{ancho}.webp (+ {base}.jpg de respaldo si existe).
- * $o: base (sin extensión), alt, sizes, class, eager(bool), widths(array, por defecto los que existan), dir ('img' por defecto; 'video' para los fotogramas de assets/video),
+ * $o: base (sin extensión), alt, sizes, class, eager(bool), widths(array, por defecto los que existan), dir ('img' por defecto; 'video' para fotogramas en assets/video, hoy sin uso),
  *     art(array de ['media'=>…, 'base'=>…, 'sizes'=>…, 'widths'=>…?]: recortes alternativos que se emiten ANTES de la fuente normal; el primero cuya media coincida gana).
  * `sizes` debe describir el ANCHO que ocupa la imagen una vez recortada con object-fit: cover (marco, margen de .px y alto incluidos), no solo el ancho del marco: con marcos
  * más altos que la foto manda el alto, y un `sizes` corto hace elegir una variante demasiado pequeña (se ve pixelada). Regla: ancho útil = max(ancho marco, alto imagen × proporción foto).
@@ -142,9 +142,9 @@ function ns_img(array $o): string
 }
 
 /**
- * Video de fondo del hero del home: devuelve ['mp4'=>url,'webm'=>url,'poster'=>url] solo con los archivos que existan en assets/video/{nombre}.{mp4,webm}
- * y {nombre}-poster-1920.webp (vacío si no hay mp4/webm: queda la foto). main.js lo monta tras `load` + idle, solo en >=1025px, sin prefers-reduced-motion ni saveData;
- * si falla, la foto sigue. Activo con assets/video/hero.mp4 (muted, sin audio, bucle con fundido, 1920×1080); hero.webm es opcional.
+ * Slot de video de fondo del hero del home: devuelve ['mp4'=>url,'webm'=>url] solo con los archivos que existan en assets/video/{nombre}.{mp4,webm}
+ * (vacío si no hay ninguno: queda la foto y no se emite <video> ni se pide nada). main.js lo monta tras `load` + idle, solo en >=1025px, sin prefers-reduced-motion ni saveData;
+ * si falla, la foto sigue. Hoy no hay videos (se retiraron los de stock); se reactiva subiendo hero.mp4 (muted, sin audio, bucle, 1920×1080) a assets/video/.
  */
 function ns_hero_video(string $name = 'hero'): array
 {
@@ -156,9 +156,6 @@ function ns_hero_video(string $name = 'hero'): array
         if (is_file(NS_ROOT . "/assets/video/$name.$ext")) {
             $out[$ext] = asset("video/$name.$ext");
         }
-    }
-    if ($out && is_file(NS_ROOT . "/assets/video/$name-poster-1920.webp")) {
-        $out['poster'] = asset("video/$name-poster-1920.webp");
     }
     return $out;
 }

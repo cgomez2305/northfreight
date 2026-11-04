@@ -24,7 +24,7 @@ $waTabs = [
 ];
 $waChips = ['Load booking', 'Load tracking', 'Back office'];
 
-// Video de fondo del hero (assets/video/hero.mp4, opcional hero.webm). main.js lo activa tras load + idle solo en >=1025px; sin él queda la foto. Ver ns_hero_video() en kit.php.
+// Slot de video del hero: hoy NO hay videos (assets/video/ no existe y no se pide nada). Para reactivarlo basta subir assets/video/hero.mp4 (opcional hero.webm): main.js lo monta tras load + idle solo en >=1025px sobre la foto. Ver ns_hero_video() en kit.php.
 $heroVideo = ns_hero_video('hero');
 
 // Ancho útil de las fotos de las tarjetas de servicio. Carril ≥1025px: la foto manda por el ALTO de la tarjeta (≤540 px, cover) → ~540 × 1,5 = 810 px de foto, no el ancho de la tarjeta.

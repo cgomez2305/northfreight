@@ -71,7 +71,7 @@ partial('hero', [
   <div class="container stack">
     <?php partial('section-head', ['eyebrow' => 'Learn', 'title' => 'Guides written by dispatchers', 'id' => 'res-learn']); ?>
     <div class="g4">
-      <?php foreach ($learn as $rc) { include __DIR__ . '/company/res-card.php'; } ?>
+      <?php $rcSizes = '(min-width:1025px) 300px, (min-width:641px) 50vw, calc(100vw - 72px)'; foreach ($learn as $rc) { include __DIR__ . '/company/res-card.php'; } ?>
     </div>
   </div>
 </section>

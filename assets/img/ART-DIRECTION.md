@@ -300,3 +300,33 @@ Slow push-in on a quiet dispatch operations room at night: wide monitors showing
 ## 7. Entrega
 
 Nombra los archivos exactamente como en la tabla (por ejemplo `hero-highway-poster.jpg`), un archivo por imagen, mínimo 3840 px en el lado largo, sin texto. Si una imagen sale bien pero con un defecto pequeño (una rueda rara, una mancha), mándala igual y yo la limpio o la recorto. Si quieres una segunda opción de alguna, genera 2 o 3 variantes y márcalas `-a`, `-b`, `-c`.
+
+
+## 8. Entregadas (set Night Freight integrado)
+
+Las 36 piezas están en `assets/img/nf-*` (WebP + JPG; masters fuera del repo). Mapa archivo → slot (ninguna foto se repite dentro de una misma página; ver `CREDITS.md` para los recortes):
+
+| Archivo | Slot |
+|---|---|
+| `nf-highway-dusk-white-trucks` | Home: hero (LCP), con recortes `-m` y `-sq` |
+| `nf-lone-truck-rain-night` | CTA final de todas las páginas (`CTA_IMAGE`), recorte `-m` en móvil |
+| `nf-trailer-dock-dusk` · `nf-phone-route-rain-highway` · `nf-logistics-desk-cyan` | Home: carril de servicios (dispatch, tracking, back office) |
+| `nf-truck-lights-rain-front` · `nf-white-truck-cyan-horizon` | Home: pastillas del H2 "Three fronts" (`-pill-320`) |
+| `nf-phone-chat-dashboard` · `nf-archive-aisle-cyan` · `nf-dispatch-room-maps` | Home: "Why a desk" (3:2 y `-tall` 4:5 en ≥1025 px) |
+| `nf-hands-map-keys` · `nf-signing-clipboard-night` · `nf-white-truck-rainy-highway` · `nf-trailer-rows-aerial` | Home: onboarding (3:2 y `-tall`) |
+| `nf-dispatch-room-wide-night` | Home: fachada del video "Meet the desk" |
+| `nf-trailer-dock-night-mist` | Home: banda de imagen (slot de video) |
+| `nf-dock-door-amber-night` | Home: foto del FAQ (4:5 nativo) |
+| `nf-cab-interior-cyan-night` | Hero de Owner-operators |
+| `nf-hitching-trailer-rain` · `nf-tablet-cab-night-yard` | Amazon Relay: hero y bloque "Why Relay needs a dedicated desk" |
+| `nf-white-truck-cyan-horizon` (`-r43`) | Hero de Dry van; además OG por defecto y pastilla del home |
+| `nf-route-map-night-trucks` (`-r43`) | Hero de How it works y tarjeta relacionada |
+| `nf-desk-rain-window-night` | Hero de Trucking back office |
+| `nf-dispatch-room-maps` | Our desk: fachada del video del hero |
+| `nf-highway-side-mirror-night` | Load tracking: bloque "Proof, not promises" y tarjeta relacionada |
+| `nf-trailer-dock-night-wide` | Mega menú de Services: tarjeta de Amazon Relay |
+| `nf-vintage-calculator-night-road` · `nf-clipboard-on-truck-hood` · `nf-tablet-cab-night-yard` · `nf-dock-waiting-clock` | Portadas del blog: costes, requisitos de Relay, load board, lumper y detention |
+| `nf-calculator-map-dashboard` · `nf-fuel-nozzle-truck-stop` · `nf-shipping-form-clipboard` · `nf-contracts-amber-cyan` · `nf-cards-fan-key-fob` | Tarjetas de recursos: rate per mile, IFTA, BOL, agreement, glosario |
+| `nf-loading-dock-blue-hour` | Tarjeta "All articles" de Resources y foto de Box truck (draft) |
+| `nf-lone-truck-blue-twilight` · `nf-white-fleet-blue-hour` · `nf-truck-lights-rain-front` · `nf-white-truck-rainy-highway` | Fotos provisionales de Hotshot, Flatbed, Power only y Reefer (páginas en draft) |
+| `nf-route-network-glow-blue` | Sin usar (fondo opcional del Desk log: se omite para no restar contraste ni peso) |

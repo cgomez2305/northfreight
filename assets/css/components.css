@@ -257,22 +257,25 @@ a.card:hover .card__icon, .card--hover:hover .card__icon { background: var(--cya
 .cta__mark { width: 48px; height: 48px; display: block; }
 .cta__text { max-width: 520px; font-size: 19px; line-height: 1.55; color: var(--text-2); }
 .cta__actions { position: relative; flex: 1 1 340px; max-width: 440px; display: flex; flex-direction: column; gap: 12px; }
-/* Con foto (param image): foto de fondo oscurecida con --cta-veil (contraste del texto medido) y contenido centrado */
-.cta--photo { background: var(--bg); }
-@media (min-width: 1025px) { .cta--photo { background: var(--panel); border: 1px solid var(--hairline); } }   /* con la foto a 1000 px el panel se lee por los lados */
+/* Con foto (param image): la foto (nf-lone-truck-rain-night, 21:9; recorte -m 4:5 en móvil) llena el panel; el texto va a la izquierda sobre --cta-veil (contraste medido >= 4,5:1) y el camión queda a la vista a la derecha.
+   Padding vertical reducido: la altura del panel fija la ampliación de la foto (cover por alto); ≤ ~650 px mantiene x1,6 en retina con la foto de 822 px de alto. */
+.cta--photo { background: var(--panel-2); }
 .cta__bg { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
 .cta__bg picture { display: block; width: 100%; height: 100%; }
-.cta__bg img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 34%; }   /* sin .px: a alto completo la foto de 1280 px no se amplía más de lo necesario */
-/* ≥1025px la foto ocupa como mucho 1000 px y se funde con el panel por los lados: a 1000 px (alto ~675) la foto de 1280×853 se amplía x0,79 (x1,58 en retina); a todo el ancho del panel (~1410 px) serían x1,10 y x2,2 */
-@media (min-width: 1025px) { .cta--photo .cta__bg { inset: 0; width: min(100%, 1000px); margin-inline: auto; -webkit-mask-image: var(--cta-edge-mask); mask-image: var(--cta-edge-mask); } }
+.cta__bg img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; }   /* sin .px: sin escala extra sobre la foto */
 .cta__bg::after { content: ""; position: absolute; inset: 0; background: var(--cta-veil); }
-.cta--photo .cta__in { z-index: 1; flex-direction: column; align-items: center; justify-content: center; gap: 40px; text-align: center; }
-.cta--photo .cta__main { flex: none; align-items: center; }
-.cta--photo .cta__text { margin-inline: auto; }
-.cta--photo .cta__actions { flex: none; width: 100%; max-width: none; flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: stretch; }
-.cta--photo .cta__actions .btn { flex: 0 1 400px; }
-.cta--photo .btn--mail { background: var(--glass-strong); }   /* sobre la foto el botón de correo lleva fondo propio: la etiqueta mono (text-3) mantiene AA también sobre los reflejos */
-@media (max-width: 640px) { .cta--photo .cta__actions .btn { flex-basis: 100%; } }
+.cta--photo .cta__in { z-index: 1; flex-direction: column; align-items: flex-start; justify-content: center; gap: 32px; text-align: left; padding-block: clamp(48px, 5vw, 72px); }
+.cta--photo .cta__main { flex: none; max-width: 640px; align-items: flex-start; }
+.cta--photo .cta__actions { flex: none; width: 100%; max-width: none; flex-direction: row; flex-wrap: wrap; justify-content: flex-start; align-items: stretch; }
+.cta--photo .cta__actions .btn { flex: 0 1 360px; }
+.cta--photo .btn--mail { background: var(--glass-strong); }   /* sobre la foto el botón de correo lleva fondo propio: la etiqueta mono (text-3) mantiene AA */
+@media (max-width: 760px) {
+  /* móvil: foto arriba (recorte 4:5, sin depender de la altura del texto) fundida con el panel; el texto debajo */
+  .cta__bg { position: relative; inset: auto; height: min(100vw, 440px); }
+  .cta__bg::after { background: var(--cta-veil-m); }
+  .cta--photo .cta__in { margin-top: calc(-1 * clamp(56px, 16vw, 96px)); padding-top: 0; padding-bottom: 48px; align-items: stretch; }
+  .cta--photo .cta__actions .btn { flex-basis: 100%; }
+}
 
 /* ---- Footer: panel grande redondeado ---- */
 .footer { margin: var(--inset); border-radius: var(--r-panel); background: var(--panel); color: var(--text-3); }

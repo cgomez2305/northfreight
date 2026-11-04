@@ -31,7 +31,7 @@ $relayLive = route_is_live('/amazon-relay-dispatch/');
     </div>
     <?php if ($relayLive): ?>
     <a class="mega__feature" href="<?= e(url('/amazon-relay-dispatch/')) ?>">
-      <span class="mega__feature-img"><?= ns_img(['base' => 'nf-trailer-dock-night-wide', 'alt' => '', 'sizes' => '380px', 'widths' => [640, 1024]]) ?></span>
+      <span class="mega__feature-img"><?= ns_img(['base' => 'nf-trailer-dock-night-wide', 'alt' => '', 'sizes' => '380px', 'widths' => [640]]) ?></span>
       <span class="mega__feature-body">
         <span class="t-meta c-cyan-light">Our specialty</span>
         <span class="head mega__feature-title">Amazon Relay, handled end to end</span>

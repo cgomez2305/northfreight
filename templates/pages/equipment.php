@@ -66,6 +66,7 @@ partial('hero', [
         ['label' => 'Talk to a dispatcher', 'href' => wa($route['wa']), 'wa' => true, 'arrow' => true],
         ['label' => 'How we onboard', 'href' => url('/how-it-works/'), 'variant' => 'ghost'],
     ],
+    'image'   => $eq['image'] ?? null,
     'aside'   => $sheet,
 ]);
 ?>
