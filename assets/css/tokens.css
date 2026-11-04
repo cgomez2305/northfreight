@@ -43,9 +43,9 @@
   --ph-bg: #FFF3B0;            /* marca de placeholder (solo staging) */
 
   /* Tipografía */
-  --font-head: "Barlow Condensed", "Arial Narrow", Arial, sans-serif;
-  --font-body: "Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-head: "Barlow Condensed", "Barlow Condensed Fallback", "Arial Narrow", Arial, sans-serif;
+  --font-body: "Barlow", "Barlow Fallback", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "JetBrains Mono", "JetBrains Mono Fallback", ui-monospace, SFMono-Regular, Menlo, monospace;
 
   /* Layout */
   --max: 1280px;

@@ -23,8 +23,8 @@ Hoja antes y después de las 4 pruebas (exterior nocturno, cielo nublado claro, 
 ## Archivos
 
 - `nf-<nombre>.jpg`: respaldo a 1600 px de ancho (calidad 85, progresivo).
-- `nf-<nombre>-{640,1024,1280,1600,2048,2560}.webp` y `-3200.webp` solo en los heros fotográficos (patrón A) y el CTA: calidad 83, `method=6`, `unsharp` suave (radio 0,6, 40 %) en todas las variantes (todas son reducciones; no se exporta el ancho nativo). El mega menú solo lleva 640 y 1024. `ns_img()` los detecta por nombre.
-- Fuera del set: `favicon.png|svg`, `isotype*.svg`, `star-outline.svg` y `og-default.jpg`.
+- `nf-<nombre>-{640,1024,1280,1600,2048,2560}.webp` y `-3200.webp` solo en los heros fotográficos (patrón A) y el CTA: calidad 83, `method=6`, `unsharp` suave (radio 0,6, 40 %) en todas las variantes (todas son reducciones; no se exporta el ancho nativo). **Fase M (2026-11-04):** las variantes de 1600 px o más de las fotos que NO son heros (`nf-hero-*` queda en 83) se recomprimieron a calidad 80, `method=6` (83 de 85 archivos; 12,1 MB a 9,5 MB, −22 %; PSNR 43 a 46 dB frente al archivo anterior; diferencia imperceptible a 100 % en comparación lado a lado). Solo se recomprimió si el ahorro era ≥ 15 % (`nf-freight-dock-1600` y `nf-onboarding-learn-1600` se quedaron como estaban). Al regenerar una variante ≥ 1600 de esas fotos, usar calidad 80. El mega menú solo lleva 640 y 1024. `ns_img()` los detecta por nombre.
+- Fuera del set: `favicon.png|svg`, `isotype*.svg` y `og-default.jpg` (`star-outline.svg` se borró en la fase M: nada lo usaba).
 
 ## Recortes reales (desde el master gradado a resolución nativa, no con `cover`)
 

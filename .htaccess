@@ -70,11 +70,13 @@ ErrorDocument 404 /index.php
 </FilesMatch>
 
 # ---- 6) Compresión ----------------------------------------------------
+# Texto comprimible: HTML, CSS, JS (los dos tipos MIME), JSON (+ JSON-LD), XML, texto plano y SVG. NO se comprimen imágenes raster, woff2, mp4 ni webm (ya vienen comprimidos).
+# LiteSpeed (Hostinger) usa su propia compresión del servidor; estas directivas cubren Apache y sirven de documentación de los tipos esperados.
 <IfModule mod_brotli.c>
-    AddOutputFilterByType BROTLI_COMPRESS text/html text/plain text/css text/xml application/xml application/javascript application/json image/svg+xml
+    AddOutputFilterByType BROTLI_COMPRESS text/html text/plain text/css text/xml text/javascript application/xml application/javascript application/x-javascript application/json application/ld+json image/svg+xml
 </IfModule>
 <IfModule mod_deflate.c>
-    AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml application/xml application/javascript text/javascript application/json image/svg+xml font/ttf
+    AddOutputFilterByType DEFLATE text/html text/plain text/css text/xml text/javascript application/xml application/javascript application/x-javascript application/json application/ld+json image/svg+xml font/ttf
 </IfModule>
 
 # ---- 7) Caché y cabeceras ---------------------------------------------
@@ -99,9 +101,19 @@ ErrorDocument 404 /index.php
     # HTML: corto (index.php fija además su propio Cache-Control)
     ExpiresByType text/html "access plus 5 minutes"
 </IfModule>
+# Los CSS minificados del build (assets/css/dist/*.css, ver bin/build-assets.php) entran en la misma regla de 1 año: su ?v= es un hash del contenido, así que cambia solo cuando cambia el archivo.
+# Las fuentes se enlazan sin ?v= (desde el CSS y el preload): si se sustituye un woff2, darle un nombre nuevo.
 <IfModule mod_headers.c>
     <FilesMatch "\.(css|js|woff2?|webp|avif|jpe?g|png|svg|ico|mp4|webm)$">
         Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+    # Los tipos que se comprimen varían según Accept-Encoding: las cachés intermedias deben distinguirlos.
+    <FilesMatch "\.(css|js|svg|json|xml|txt)$">
+        Header append Vary "Accept-Encoding"
+    </FilesMatch>
+    # Video: rangos de bytes (el navegador pide trozos con Range y recibe 206; sin esto no se puede saltar ni reanudar).
+    <FilesMatch "\.(mp4|webm)$">
+        Header set Accept-Ranges "bytes"
     </FilesMatch>
     Header always set X-Content-Type-Options "nosniff"
 </IfModule>

@@ -14,6 +14,7 @@ if (!defined('NS_ROOT')) {
     define('NS_ROOT', dirname(__DIR__));
 }
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/assets.php';   // CSS por ruta y archivos dist del build (con respaldo a los sueltos)
 
 // ---------------------------------------------------------------------
 // Entorno y datos

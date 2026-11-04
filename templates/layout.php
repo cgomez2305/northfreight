@@ -20,27 +20,11 @@ $desc = (string) ($route['meta'] ?? '');
 $ogOwn = isset($route['og']) || is_file(NS_ROOT . '/assets/img/og/' . $template . '.jpg');
 $ogImage = $ogOwn ? og_image($route) : 'https://' . cfg('domain') . asset('img/og-default.jpg');
 
-// CSS: núcleo común (fuentes, tokens, base, components) + el grupo de página de la plantilla (assets/css/pages/<grupo>.css).
-// Mapa plantilla => grupo en un solo sitio; la ruta puede anularlo con 'css' => ['grupo', …] (nombres sin .css; [] = sin grupo).
-$cssByTemplate = [
-    'home' => 'home',
-    'owner' => 'services-a', 'relay' => 'services-a', 'dryvan' => 'services-a', 'equipment' => 'services-a',
-    'tracking' => 'services-b', 'backoffice' => 'services-b', 'how' => 'services-b', 'desk' => 'services-b', 'contact' => 'services-b',
-    'legal' => 'company', '404' => 'company', 'resources' => 'company', 'doc-bol' => 'company', 'doc-agreement' => 'company',
-    'glossary' => 'tools', 'tool-rpm' => 'tools', 'tool-ifta' => 'tools',
-    'blog' => 'blog', 'post' => 'blog',
-];
-$cssGroups = isset($route['css']) ? (array) $route['css'] : (isset($cssByTemplate[$template]) ? [$cssByTemplate[$template]] : []);
-$css = ['css/fonts.css', 'css/tokens.css', 'css/base.css', 'css/components.css'];
-foreach ($cssGroups as $g) {
-    $g = basename((string) $g, '.css');
-    if (preg_match('/^[a-z0-9-]+$/', $g) === 1 && is_file(NS_ROOT . '/assets/css/pages/' . $g . '.css')) {
-        $css[] = 'css/pages/' . $g . '.css';
-    }
-}
-if (!empty($route['motion']) && is_file(NS_ROOT . '/assets/css/motion.css')) {
-    $css[] = 'css/motion.css';   // reglas que necesitan las escenas (todas bajo html.js-motion)
-}
+// CSS: núcleo común (fuentes, tokens, base, components) + el grupo de página de la plantilla (assets/css/pages/<grupo>.css) + motion.css si la ruta carga GSAP.
+// La lista (y el mapa plantilla => grupo, anulable por ruta con 'css' => ['grupo', …]) vive en app/assets.php. Si el build (bin/build-assets.php) dejó un
+// archivo dist vigente para esa lista, se enlaza UNO solo; si no coincide con las fuentes, se enlazan los archivos sueltos como siempre.
+$css = ns_css_sources($route);
+$cssDist = ns_dist_css($css);
 
 // Movimiento: solo rutas con 'motion' => true cargan GSAP 3.12.5 + ScrollTrigger (cdnjs, versión fija con SRI) y motion.js/motion.css.
 // Todo lo que necesita html.js-motion lo añade motion.js solo si GSAP existe y no hay prefers-reduced-motion.
@@ -85,9 +69,11 @@ $jsList = array_values(array_filter($jsList, static fn($j): bool => is_string($j
 <link rel="apple-touch-icon" href="<?= e(asset('img/favicon.png')) ?>">
 <link rel="preload" href="/assets/fonts/barlow-condensed-900.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/barlow-400.woff2" as="font" type="font/woff2" crossorigin>
-<?php foreach ($css as $c): ?>
+<?php if ($cssDist !== null): ?>
+<link rel="stylesheet" href="<?= e($cssDist['url']) ?>">
+<?php else: foreach ($css as $c): ?>
 <link rel="stylesheet" href="<?= e(asset($c)) ?>">
-<?php endforeach; ?>
+<?php endforeach; endif; ?>
 <?php schema_json(page_schema($route)); ?>
 </head>
 <body<?= $ctaOn ? '' : ' class="no-cta"' ?>>
