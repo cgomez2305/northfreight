@@ -5,7 +5,7 @@
    Sistema común (se activa por clases que ya existen en los partials, nada por página):
      hero interno (.hero) · bandas y paneles (.section--surface, .section--dark, .home-relay, .cta, .footer, .co-band) · rejillas 3D por filas
      (.g2 a .g6, .blog-grid) · titulares de sección (.t-h2, .t-h2-s) · marcos de foto (.px) con parallax y escala · cifras (entradas una vez).
-   Solo home: hero fijado, carril horizontal fijado de servicios. Móvil (<1025 px): parallax de fotos, cifras y entrada de bandas, sin pines ni 3D.
+   Solo home: hero fijado (también se desvanece el widget de WhatsApp y sigue el video de fondo opcional), carril horizontal fijado de servicios. Móvil (<1025 px): parallax de fotos, cifras y entrada de bandas, sin pines ni 3D.
    Nunca se anima ningún input, select, textarea ni resultado aria-live. Estilos que necesitan: assets/css/motion.css. */
 (function () {
   'use strict';
@@ -53,7 +53,7 @@
     var main = hero && one('.hero__main', hero);
     if (!hero || !bg || !img || !main) return;
     var l1 = one('.home-hero__l1', hero), l2 = one('.home-hero__l2', hero);
-    var tags = one('.tags', hero), ctas = one('.hero__ctas', hero);
+    var tags = one('.tags', hero), ctas = one('.hero__ctas', hero), wa = one('.hero-wa', hero), vid = one('video', bg);
     var tl = g.timeline({
       defaults: { ease: 'none', duration: 1 },  // duración 1 = todo el recorrido del pin
       scrollTrigger: { trigger: hero, start: 'top top', end: function () { return '+=' + Math.round(vh()); }, pin: true, scrub: 0.6, anticipatePin: 1, invalidateOnRefresh: true }
@@ -62,6 +62,8 @@
       .fromTo(img, { yPercent: 0, scale: 1.12 }, { yPercent: -6, scale: 1.04, transformOrigin: '0% 62%' }, 0)
       .fromTo(main, { y: 0 }, { y: -140 }, 0)
       .fromTo(main, { opacity: 1 }, { opacity: 0, duration: 0.6 }, 0);
+    if (vid) tl.fromTo(vid, { yPercent: 0, scale: 1.12 }, { yPercent: -6, scale: 1.04, transformOrigin: '0% 62%' }, 0);   // video de fondo opcional: sigue a la foto
+    if (wa) tl.fromTo(wa, { y: 0, opacity: 1 }, { y: -90, opacity: 0, duration: 0.5 }, 0);   // el widget de WhatsApp se desvanece con el texto
     if (l1) tl.fromTo(l1, { x: 0 }, { x: -48 }, 0);
     if (l2) tl.fromTo(l2, { x: 0 }, { x: 48 }, 0);
     var fade = [tags, ctas].filter(Boolean);
@@ -117,7 +119,7 @@
   function photoScene(rail) {
     $('.px').forEach(function (px) {
       var img = one('img', px);
-      if (!img || (rail && px.closest('.home-cards'))) return; // las del carril se mueven en horizontal (escena 2)
+      if (!img || (rail && px.closest('.home-cards')) || !sees(px)) return; // las del carril se mueven en horizontal (escena 2); las ocultas (foto del FAQ en <1025px) no necesitan trigger
       g.fromTo(img, { y: 0, yPercent: -0.4 }, {
         yPercent: -16.2, ease: 'none',
         scrollTrigger: { trigger: px, start: 'top bottom', end: 'bottom top', scrub: true }
@@ -217,7 +219,7 @@
   /* ---- Marcos de foto grandes fuera de rejillas y héroes (video, medios de servicio, destacado del blog): entran escalando ---- */
   function mediaScene() {
     $('.px').forEach(function (px) {
-      if (px.closest('.hero, .card, .home-cards, .g2, .g3, .g4, .g5, .g6, .blog-grid')) return;
+      if (px.closest('.hero, .card, .home-cards, .g2, .g3, .g4, .g5, .g6, .blog-grid, .faq__media, .cta') || !sees(px)) return;   // el CTA y la foto sticky del FAQ solo llevan el parallax interno
       g.fromTo(px, { scale: 0.92 }, { scale: 1, ease: 'none', transformOrigin: '50% 50%',
         scrollTrigger: { trigger: px, start: 'top 95%', end: 'top 55%', scrub: true } });
     });

@@ -5,7 +5,7 @@
  * Reutilizable: pasa otras filas en `rows` (misma forma que app/data/stages.php) y un `title` propio (H2 único dentro de la página).
  * Params: rows(array, por defecto data('stages')), title(string con marcas), eyebrow(string|null), lead(string|null), id(string),
  *         section(bool, true: envuelve en <section class="section"> con .pre-cta si pre_cta), pre_cta(bool).
- * Solo texto (sin foto). La tabla es una <table> real con <caption> para lectores de pantalla.
+ * Solo texto (sin foto). La tabla es una <table> real con <caption> para lectores de pantalla. Estilos (.stage*) en assets/css/pages/services-b.css (grupo de how-it-works); en otra familia de plantillas, añadir ese grupo a la ruta con `css`.
  */
 require_once __DIR__ . '/kit.php';
 $rows = $rows ?? data('stages');

@@ -102,4 +102,5 @@ summary::-webkit-details-marker { display: none; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
   .btn:hover, .card:hover, a.card:hover { transform: none !important; translate: none !important; }
+  a.btn--primary:hover::after, a.btn--navy:hover::after, a.sb-dk-row__in:hover .sb-dk-row__go { rotate: none !important; }
 }

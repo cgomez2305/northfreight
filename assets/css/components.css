@@ -222,43 +222,7 @@ a.card:hover .card__icon, .card--hover:hover .card__icon { background: var(--cya
 .faq__item[open] .faq__icon, .sa-faq__item[open] .sa-faq__plus, .co-faq[open] .co-faq__plus { transform: rotate(45deg); background: var(--cyan-tint); }
 .faq__a, .sa-faq__a, .co-faq p, .blog-prose .blog-faq__a { margin: 0 0 24px 54px; max-width: 720px; font-size: 18px; line-height: 1.65; color: var(--text-2); }
 .faq__a a { font-weight: 600; }
-/* Variante con foto sticky (param image) y filas numeradas "Q/01". <1025px: sin foto, solo la numeración */
-.faq--photo { display: block; }
-.faq__main { display: flex; flex-direction: column; gap: 40px; min-width: 0; }
-.faq__main > * { flex: none; }
-.faq__media { display: none; }
-.faq__n { order: 2; flex: none; min-width: 34px; font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: .1em; color: var(--cyan); }
-.faq--photo .faq__q > :first-child { order: 3; }
-.faq--photo .faq__a { margin-left: 104px; }
-@media (min-width: 1025px) {
-  .faq--photo { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 40px clamp(48px, 6vw, 96px); align-items: start; }
-  .faq__media { display: block; position: sticky; top: calc(var(--header-h) + 24px); }
-  .faq__photo { margin: 0; aspect-ratio: 4 / 5; overflow: hidden; background: var(--panel); border-radius: var(--r-card); }
-  .faq__photo picture { display: block; width: 100%; height: 100%; }
-  .faq__photo img { display: block; width: 100%; height: 100%; object-fit: cover; }
-}
-@media (max-width: 640px) { .faq__q, .sa-faq__q, .co-faq summary, .blog-faq__q { font-size: 22px; } .faq__a, .sa-faq__a, .co-faq p, .blog-prose .blog-faq__a, .faq--photo .faq__a { margin-left: 0; } }
-
-/* ---- Tabla "A load, stage by stage" (partial stage-table): panel con filas de borde fino; <=760px cada fila es una tarjeta ---- */
-.stage { background: var(--panel); border: 1px solid var(--hairline); border-radius: var(--r-card); padding: clamp(6px, 1vw, 12px) clamp(14px, 2.4vw, 32px); }
-.stage__table { width: 100%; table-layout: fixed; text-align: left; }
-.stage__table thead th { padding: 20px 20px 14px; color: var(--text-3); font-weight: 500; text-align: left; border-bottom: 1px solid var(--hairline-strong); }
-.stage__table tbody th, .stage__table td { padding: 26px 20px; vertical-align: top; text-align: left; font-size: 16px; font-weight: 400; line-height: 1.5; color: var(--text-2); border-bottom: 1px solid var(--hairline); }
-.stage__table tbody tr:last-child > * { border-bottom: 0; }
-.stage__table thead th:first-child, .stage__table tbody th { width: 19%; }
-.stage__n { display: block; margin-bottom: 8px; font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: .1em; color: var(--cyan); }
-.stage__name { display: block; font-family: var(--font-head); font-weight: 900; font-size: clamp(26px, 2.6vw, 34px); line-height: 1; letter-spacing: -.01em; color: var(--text); }
-.stage__file { display: inline-flex; align-items: flex-start; gap: 10px; color: var(--text); }
-.stage__file .icon { margin-top: 4px; color: var(--cyan); stroke-width: 2.4; }
-@media (max-width: 760px) {
-  .stage { padding: 0; background: transparent; border: 0; border-radius: 0; }
-  .stage__table, .stage__table tbody, .stage__table tr, .stage__table th, .stage__table td { display: block; width: auto; }
-  .stage__table thead { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
-  .stage__table tbody tr { margin-bottom: 12px; padding: 22px 22px 8px; background: var(--panel); border: 1px solid var(--hairline); border-radius: var(--r-tile); }
-  .stage__table tbody th, .stage__table td { padding: 0 0 18px; border-bottom: 0; }
-  .stage__table td::before { content: attr(data-label); display: block; margin-bottom: 4px; font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--text-3); }
-  .stage__table tbody th { width: auto; }
-}
+@media (max-width: 640px) { .faq__q, .sa-faq__q, .co-faq summary, .blog-faq__q { font-size: 22px; } .faq__a, .sa-faq__a, .co-faq p, .blog-prose .blog-faq__a { margin-left: 0; } }
 
 /* ---- Video ---- */
 .video__frame { position: relative; overflow: hidden; aspect-ratio: 16 / 10; background: var(--bg); border-radius: var(--r-card); }
@@ -334,6 +298,7 @@ nav.footer__col .foot__link { font-family: var(--font-mono); font-size: 12px; te
 .footer__bar { max-width: var(--wrap); margin: 0 auto; padding: 22px var(--gutter) 28px; border-top: 1px solid var(--hairline); display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; font-family: var(--font-mono); font-size: 12px; letter-spacing: .04em; }
 .footer__bar .foot__link { font-size: 12px; }
 .footer__legal { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; }
+@media (min-width: 761px) { .footer__bar { padding-right: max(var(--gutter), 76px); } }   /* deja libre el botón flotante de WhatsApp */
 @media (pointer: coarse) { .foot__link { display: inline-flex; align-items: center; min-height: 44px; } .footer__col { gap: 0; } }
 @media (max-width: 760px) { .footer { margin-bottom: 96px; } }
 

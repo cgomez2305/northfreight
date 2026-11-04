@@ -118,7 +118,6 @@
       v.addEventListener('error', drop, true);
       v.addEventListener('playing', function () { if (!done) bg.classList.add('has-video'); });
       bg.appendChild(v);
-      v.preload = 'auto';
       try { var p = v.play(); if (p && p.catch) p.catch(drop); } catch (e) { drop(); }
     }
     function later() { if (window.requestIdleCallback) window.requestIdleCallback(start, { timeout: 2500 }); else setTimeout(start, 400); }

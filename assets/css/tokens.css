@@ -33,7 +33,7 @@
   --arrow-ne: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2304132A' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 17L17 7M8 7h9v9'/%3E%3C/svg%3E");   /* flecha ↗ en navy-deep: celda de los botones primarios */
   --btn-cell: rgba(4, 19, 42, .14);        /* celda circular del botón primario (sobre cian) */
   --glass-strong: rgba(10, 29, 51, .88);   /* widget de WhatsApp del hero: más opaco que el menú para sostener AA sobre la foto */
-  --cta-veil: linear-gradient(180deg, rgba(4, 16, 31, .8) 0%, rgba(4, 16, 31, .74) 50%, rgba(4, 16, 31, .86) 100%);   /* CTA final con foto: texto centrado, contraste medido ≥ 4,5:1 */
+  --cta-veil: radial-gradient(ellipse 75% 105% at 50% 50%, rgba(4, 16, 31, .93) 0%, rgba(4, 16, 31, .9) 52%, rgba(4, 16, 31, .5) 100%);   /* CTA final con foto: más opaco detrás del texto centrado (contraste medido >= 4,5:1 también en el cian grande) y más foto en los bordes */
   --ph-bg: #FFF3B0;            /* marca de placeholder (solo staging) */
 
   /* Tipografía */

@@ -117,7 +117,7 @@ $figures = [
             <button type="button" class="hero-wa__chip" aria-pressed="false" data-svc="<?= e(strtolower($c)) ?>"><?= e($c) ?></button>
             <?php endforeach; ?>
           </div>
-          <p class="hero-wa__msg" data-wa-msg aria-label="Message preview"></p>
+          <p class="hero-wa__msg" data-wa-msg></p>
         </div>
       </div>
       <a class="btn btn--primary btn--card hero-wa__go" href="<?= e($waHref) ?>" rel="noopener" data-wa-open>Open WhatsApp</a>
