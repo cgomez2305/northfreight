@@ -1,6 +1,6 @@
 <?php
 /**
- * Front controller del panel (subdominio captacion.). Rutas: / (panel), /leads/{id}, /login, /login/2fa, /logout.
+ * Front controller del panel (subdominio captacion.). Rutas: / (dashboard), /leads, /leads/{id}, /leads/{id}/{accion}, /leads/bulk, /leads/export, /ajax/search, /ajax/notifications/read, /login, /login/2fa, /logout.
  * setup.php y api/lead.php son puntos de entrada propios. Cualquier otra ruta: 404.
  */
 
@@ -8,8 +8,11 @@ declare(strict_types=1);
 
 require dirname(__DIR__) . '/src/bootstrap.php';
 
+use Captacion\Controllers\AjaxController;
 use Captacion\Controllers\AuthController;
-use Captacion\Controllers\PanelController;
+use Captacion\Controllers\DashboardController;
+use Captacion\Controllers\LeadActionsController;
+use Captacion\Controllers\LeadsController;
 use Captacion\Services\Storage;
 
 error_reporting(E_ALL);
@@ -46,7 +49,17 @@ if ($path === '/robots.txt') {
 
 switch (true) {
     case $path === '/':
-        PanelController::dashboard();
+        DashboardController::index();
+    case $path === '/leads':
+        LeadsController::index();
+    case $path === '/leads/bulk':
+        LeadsController::bulk();
+    case $path === '/leads/export':
+        LeadsController::export();
+    case $path === '/ajax/search':
+        AjaxController::search();
+    case $path === '/ajax/notifications/read':
+        AjaxController::notificationsRead();
     case $path === '/login':
         AuthController::login();
     case $path === '/login/2fa':
@@ -54,7 +67,9 @@ switch (true) {
     case $path === '/logout':
         AuthController::logout();
     case preg_match('#^/leads/(\d{1,12})$#', $path, $m) === 1:
-        PanelController::lead((int) $m[1]);
+        LeadsController::show((int) $m[1]);
+    case preg_match('#^/leads/(\d{1,12})/([a-z-]{3,20})$#', $path, $m) === 1:
+        LeadActionsController::handle((int) $m[1], $m[2]);
     default:
         http_response_code(404);
         \Captacion\Middleware\SecurityHeaders::send();

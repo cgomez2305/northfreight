@@ -72,6 +72,40 @@ final class Catalog
         'note_added' => 'note', 'note_edited' => 'note', 'note_deleted' => 'note', 'task_created' => 'task', 'task_done' => 'task',
     ];
 
+    /** Etiquetas del desglose de la puntuacion (las de Scoring van sin acentos). */
+    public const SCORE_LABELS = [
+        'cdl_standard' => 'CDL estándar', 'cdl_a_standard' => 'CDL-A estándar', 'english' => 'Inglés', 'fmcsa_authority_active' => 'Autoridad activa (FMCSA)',
+        'fmcsa_insured' => 'Seguro vigente (FMCSA)', 'authority_age' => 'Antigüedad de la autoridad', 'dispatched_equipment' => 'Equipo que NorthStar despacha',
+        'trucks' => 'Número de camiones', 'experience' => 'Experiencia', 'hiring_state' => 'Estado de contratación', 'endorsement' => 'Endosos (Hazmat, Tanker)',
+        'referral' => 'Referido', 'complete' => 'Formulario completo',
+    ];
+
+    private const FIELD_LABELS = [
+        'name' => 'nombre', 'phone' => 'teléfono', 'email' => 'correo', 'state' => 'estado', 'language' => 'idioma', 'truck_count' => 'camiones', 'equipment_types' => 'equipo',
+        'years_experience' => 'experiencia', 'authority_status' => 'autoridad', 'cdl_type' => 'CDL', 'english_level' => 'inglés',
+    ];
+
+    /** Nota corta del desglose en español ("2 años", "falta: teléfono"). */
+    public static function scoreNote(string $note): string
+    {
+        if ($note === '') {
+            return '';
+        }
+        if ($note === 'cdl_unsure') {
+            return 'sin confirmar';
+        }
+        if ($note === 'sin dato') {
+            return 'sin dato';
+        }
+        if (isset(self::ENGLISH[$note])) {
+            return self::ENGLISH[$note];
+        }
+        if (str_starts_with($note, 'falta: ')) {
+            return 'falta ' . implode(', ', array_map(static fn($f) => self::FIELD_LABELS[trim($f)] ?? trim($f), explode(',', substr($note, 7))));
+        }
+        return (string) preg_replace_callback('/(\d+) anos?/', static fn($m) => $m[1] . ((int) $m[1] === 1 ? ' año' : ' años'), $note);
+    }
+
     public static function label(array $map, ?string $key, string $fallback = '—'): string
     {
         if ($key === null || $key === '') {
