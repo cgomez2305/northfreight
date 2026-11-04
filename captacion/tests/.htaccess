@@ -1,0 +1,8 @@
+# Nada de esta carpeta se sirve por web (el subdominio solo sirve captacion/public/; esto es el cinturon y los tirantes).
+<IfModule mod_authz_core.c>
+    Require all denied
+</IfModule>
+<IfModule !mod_authz_core.c>
+    Order allow,deny
+    Deny from all
+</IfModule>

@@ -17,3 +17,9 @@
 # Sistema / editores
 .DS_Store
 node_modules/
+
+# Mini-CRM de captacion: el .env real, logs, sesiones, locks y rate-limit viven solo en el servidor
+/captacion/config/.env
+/captacion/storage/*
+!/captacion/storage/.gitignore
+!/captacion/storage/.htaccess

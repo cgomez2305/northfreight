@@ -1,0 +1,44 @@
+# Subdominio captacion.northstarfreightsolutions.us -> la raiz del subdominio DEBE ser captacion/public/ (ver README).
+# Este .htaccess tiene su propio RewriteEngine: asi NO se heredan las reglas del .htaccess del sitio principal (que bloquearia /captacion/*).
+Options -Indexes -MultiViews
+ServerSignature Off
+DirectoryIndex index.php
+AddDefaultCharset UTF-8
+
+<IfModule mod_rewrite.c>
+RewriteEngine On
+
+# HTTPS obligatorio (se omite en localhost)
+RewriteCond %{HTTPS} !=on
+RewriteCond %{HTTP:X-Forwarded-Proto} !https [NC]
+RewriteCond %{HTTP_HOST} !^(localhost|127\.0\.0\.1)(:[0-9]+)?$ [NC]
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Algunos Apache/LiteSpeed no pasan Authorization a PHP: se pasa explicitamente (Bearer de api/lead.php)
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+
+# Nada de dotfiles, SQL, logs, markdown ni archivos de configuracion
+RewriteRule (^|/)\.(?!well-known) - [F,L]
+RewriteRule \.(md|sql|log|env|ini|sh|lock|bak)$ - [F,L,NC]
+
+# Todo lo que no sea un archivo real -> front controller
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [L]
+</IfModule>
+
+<IfModule mod_headers.c>
+Header always set X-Robots-Tag "noindex, nofollow, noarchive"
+Header always set X-Frame-Options "DENY"
+Header always set X-Content-Type-Options "nosniff"
+</IfModule>
+
+<FilesMatch "\.(md|sql|log|env|ini|sh|lock|bak)$">
+    <IfModule mod_authz_core.c>
+        Require all denied
+    </IfModule>
+    <IfModule !mod_authz_core.c>
+        Order allow,deny
+        Deny from all
+    </IfModule>
+</FilesMatch>
