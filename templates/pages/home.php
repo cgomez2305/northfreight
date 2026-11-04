@@ -58,7 +58,7 @@ $why = [
      'headset-agent-office', '/load-tracking/', 'Load tracking'],
     ['02', 'A record of every load', 'Arrival timestamps and photos kept on file, with the BOL and POD filed per load.',
      'archive-shelves-documents', '/trucking-back-office/', 'Trucking back office'],
-    ['03', 'A team, not a single dispatcher', 'The same desk books, tracks and documents every load, as one team.',
+    ['03', 'A team behind every load', 'The same desk books, tracks and documents every load, as one team.',
      'dispatch-desk-headset-monitors', '/how-it-works/', 'How it works'],
 ];
 
