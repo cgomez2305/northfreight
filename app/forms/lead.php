@@ -14,6 +14,9 @@
  *  - Atribucion (utm_*, referrer, landing, first_seen) llega en un campo oculto `attr` (JSON) que rellena main.js; sin JS el lead entra sin atribucion (valido).
  *  - Correo (PHPMailer, mismo camino que contact.php; sin SMTP se registra en storage/mail.log) y webhook opcional (LEAD_WEBHOOK_URL, POST JSON con cURL, timeout 4 s) se ejecutan tras guardar y
  *    NUNCA rompen la respuesta: si fallan se registra en storage/error.log y el lead sigue guardado.
+ *  - Mini-CRM de captacion (captacion/, fase Q1): con CAPTACION_ENABLED = 1 el lead tambien se entrega EN PROCESO al motor (Captacion\Services\LeadIngest::handle) antes de escribir el JSONL.
+ *    El JSONL SIEMPRE se escribe (respaldo) y lleva `crm_ingested` true/false (+ `crm_reason`): si el CRM esta apagado, sin .env, con la base caida o lanza cualquier excepcion, el lead no se pierde
+ *    y `php captacion/bin/import-jsonl.php` lo reimporta (idempotente por id). El visitante ve exactamente lo mismo con o sin CRM (mismo 303, mismos errores).
  */
 
 declare(strict_types=1);
@@ -82,6 +85,29 @@ function ns_lead_webhook(array $lead): bool
     } catch (Throwable $t) {
         ns_log_error('lead-webhook ' . get_class($t), $t->getMessage());
         return false;
+    }
+}
+
+/**
+ * Entrega el lead al motor del mini-CRM (en proceso, sin HTTP). NUNCA lanza: cualquier fallo devuelve ok=false con un motivo corto y el lead sigue su camino al JSONL.
+ * @return array{ok:bool,reason:?string,lead_id:?int}
+ */
+function ns_lead_crm_ingest(array $lead): array
+{
+    if (!defined('CAPTACION_ENABLED') || (int) CAPTACION_ENABLED !== 1) {
+        return ['ok' => false, 'reason' => 'disabled', 'lead_id' => null];
+    }
+    try {
+        $boot = NS_ROOT . '/captacion/src/bootstrap.php';
+        if (!is_file($boot)) {
+            return ['ok' => false, 'reason' => 'not_installed', 'lead_id' => null];
+        }
+        require_once $boot;
+        $r = \Captacion\Services\LeadIngest::handle(\Captacion\Services\LeadIngest::fromSiteLead($lead), 'web_careers', ['ip' => (string) ($_SERVER['REMOTE_ADDR'] ?? ''), 'public' => true]);
+        return ['ok' => (bool) $r['ok'], 'reason' => $r['ok'] ? null : (string) ($r['reason'] ?? 'rejected'), 'lead_id' => $r['lead_id'] ?? null];
+    } catch (Throwable $t) {
+        ns_log_error('lead-crm ' . get_class($t), $t->getMessage());   // sin datos del lead
+        return ['ok' => false, 'reason' => 'error', 'lead_id' => null];
     }
 }
 
@@ -259,7 +285,12 @@ function ns_lead_mail_body(array $l, array $opt): string
     ];
 
     ns_rate_hit();
-    if (!ns_lead_store($lead)) {
+    $crm = ns_lead_crm_ingest($lead);
+    $lead['crm_ingested'] = $crm['ok'];
+    if (!$crm['ok'] && $crm['reason'] !== 'disabled') {
+        $lead['crm_reason'] = $crm['reason'];
+    }
+    if (!ns_lead_store($lead) && !$crm['ok']) {   // solo es un error si NINGUN destino lo guardo
         ns_log_error('lead-store failed', 'no se pudo escribir storage/leads/');
         ns_render_page($route, ns_flash_error($form, [], $old, 'We could not save your application right now. Please message us on WhatsApp or email ' . ns_mail_to() . '.'), 503);
     }

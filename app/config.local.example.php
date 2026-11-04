@@ -74,6 +74,9 @@ define('RATE_LIMIT', 5);
 // define('LEAD_WEBHOOK_URL', 'https://hooks.example.com/northstar-leads');
 // Años mínimos de experiencia para marcar `qualified` (CDL estándar Sí + inglés Sí o Básico + años >= este valor). El usuario nunca ve el resultado.
 // define('LEAD_MIN_YEARS', 1);
+// Mini-CRM de captación (captacion/, fase Q1): 1 = además del JSONL, cada lead se entrega al motor del CRM en proceso (necesita captacion/config/.env con la base de datos y haber corrido
+// `php captacion/bin/migrate.php`). 0 (defecto) = apagado: el sitio se comporta exactamente como en la fase P. Si el CRM falla, el lead sigue guardándose en el JSONL con crm_ingested=false.
+// define('CAPTACION_ENABLED', 1);
 // Reservados para la analítica (§10). NADA los carga todavía: los eventos generate_lead / Lead solo salen si la página ya trae gtag/fbq.
 // define('GA_ID', '');
 // define('META_PIXEL_ID', '');

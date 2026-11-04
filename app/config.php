@@ -73,6 +73,8 @@ ns_default('LEAD_WEBHOOK_URL', '');
 // Años mínimos de experiencia para marcar un lead como `qualified` (junto con CDL estándar = Sí e inglés Sí/Básico). PENDIENTE (cliente): confirmar el número.
 ns_default('LEAD_MIN_YEARS', 1);
 // Analítica: reservados para cuando Carlos elija herramienta (§10). HOY NO SE CARGA NINGÚN SCRIPT DE TERCEROS: los eventos (generate_lead / Lead) solo se emiten si ya existen gtag/fbq en la página.
+// Mini-CRM de captacion (captacion/): 1 = ademas del JSONL, cada lead se entrega al motor en proceso (requiere captacion/config/.env y la base migrada). 0 = apagado (comportamiento de la fase P).
+ns_default('CAPTACION_ENABLED', 0);
 ns_default('GA_ID', '');
 ns_default('META_PIXEL_ID', '');
 // Consentimiento (TCPA) del formulario de solicitud. OPCIONAL para el usuario (la casilla va SIN marcar y no condiciona el envío). Cada lead guarda el texto exacto, la versión, la fecha UTC y la IP.

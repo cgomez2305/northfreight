@@ -33,6 +33,10 @@ RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 # ---- 3) Bloquear acceso web a código, datos y secretos --------------
 # Directorios internos (también los bloquea index.php en php -S).
 RewriteRule ^(app|templates|storage|vendor|bin|node_modules|\.git|\.claude)(/|$) - [F,L]
+# Mini-CRM de captacion (captacion/ y su carpeta cron/): NADA de ese codigo se sirve por el dominio principal. El panel vive en el subdominio captacion.,
+# cuya raiz debe ser captacion/public/ (ver captacion/README.md); el subdominio tiene su propio .htaccess y no pasa por esta regla (condicion de host).
+RewriteCond %{HTTP_HOST} !^captacion\. [NC]
+RewriteRule ^(captacion|cron)(/|$) - [F,L,NC]
 # Archivos sueltos: composer.*, configuración local, markdown, dotfiles (menos .well-known).
 RewriteRule ^composer\.(json|lock)$ - [F,L]
 RewriteRule (^|/)config\.local(\.example)?\.php$ - [F,L]

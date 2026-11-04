@@ -66,7 +66,7 @@ if (!in_array($method, ['GET', 'HEAD', 'POST'], true)) {
 
 // --- Rutas internas / archivos que nunca se sirven por web (equivale al bloqueo de .htaccess) ---
 $first = explode('/', ltrim($collapsed, '/'), 2)[0];
-$blocked = in_array($first, ['app', 'templates', 'storage', 'vendor', 'bin', 'node_modules', '.git', '.claude'], true)
+$blocked = in_array(strtolower($first), ['app', 'templates', 'storage', 'vendor', 'bin', 'captacion', 'cron', 'node_modules', '.git', '.claude'], true)
     || ($first !== '' && $first[0] === '.' && $first !== '.well-known')
     || preg_match('#(^|/)(composer\.(json|lock)|config\.local(\.example)?\.php|index\.php|\.htaccess|\.gitignore)$#', $collapsed)
     || preg_match('#\.(md|php|lock|log|ini|sh)$#i', $collapsed);
