@@ -67,3 +67,12 @@ El código solo pide el video en ≥1025 px, sin `prefers-reduced-motion` ni `sa
 |---|---|---|---|
 | `nf-hero-highway-poster-{640,1024,1280,1600,2048,2560,3200}` + `.jpg` (1600) | `hero-highway-poster` 3840×2160 | gradación de la fase J (grano 1,2 %), WebP 83, `method=6`, unsharp suave | Hero del home (LCP) |
 | `nf-freight-dock-{640,1024,1280,1600,2048,2560}` + `.jpg` (1600) | primer fotograma de `dock.mp4` (2688×1536), sin LUT | misma gradación (anti-banding con radios al 70 %) | Póster de la banda de video |
+
+
+## Recortes del FAQ por tema (fase L2)
+
+| Archivo | Master | Recorte | Uso |
+|---|---|---|---|
+| `nf-check-tracking-mirror-tall-{480,640,1024,1280}` | `check-tracking-mirror` 3840×2880 | 4:5 nativo (2304×2880), gradación de la fase J | FAQ del home, tema Amazon Relay |
+| `nf-hero-back-office-tall-{480,640,1024,1280}` | `hero-back-office` 3840×2880 | 4:5 nativo (2304×2880), gradación de la fase J | FAQ del home, tema alcance |
+| `nf-check-owner-approve-tall-{480,640,1024,1280}` | `check-owner-approve` 3840×2880 | 4:5 nativo (2304×2880), gradación de la fase J | FAQ del home, tema con quién trabajamos |
