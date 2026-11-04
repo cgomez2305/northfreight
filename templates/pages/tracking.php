@@ -70,7 +70,7 @@ partial('summary', [
     </div>
     <div class="sb-media">
       <div class="sb-media__clip px">
-        <?= ns_img(['base' => 'two-semis-hillside-highway', 'alt' => 'Two semi trucks on a highway through the hills', 'sizes' => '(min-width:1025px) 640px, (min-width:641px) 100vw, 640px']) ?>
+        <?= ns_img(['base' => 'nf-highway-side-mirror-night', 'alt' => 'Night highway with trucks seen in a truck’s side mirror', 'sizes' => '(min-width:1025px) 760px, (min-width:641px) 100vw, 640px']) ?>
       </div>
     </div>
   </div>

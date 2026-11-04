@@ -26,7 +26,7 @@ partial('hero', [
     'ctas'  => [
         ['label' => 'Ask about Relay dispatch', 'href' => wa($route['wa']), 'wa' => true, 'arrow' => true],
     ],
-    'image' => ['base' => 'white-semi-truck-front', 'alt' => 'White semi truck with a dry van trailer pulling out of a lot'],
+    'image' => ['base' => 'nf-hitching-trailer-rain', 'alt' => 'White semi truck backing under a dry van trailer in the rain at night'],
 ]);
 
 // Resumen "In short" (SEO/GEO): editable aquí. Solo información que ya está en el copy de esta página; sin cifras, tarifas ni promesas nuevas.
@@ -61,7 +61,7 @@ partial('summary', [
       ]); ?>
     </div>
     <div class="sa-media px">
-      <?= ns_img(['base' => 'dry-van-trailers-loading-docks', 'alt' => 'Dry van trailers backed into warehouse loading docks', 'sizes' => '(min-width:1025px) 640px, (min-width:641px) 100vw, 640px']) ?>
+      <?= ns_img(['base' => 'nf-tablet-cab-night-yard', 'alt' => 'Tablet mounted in a truck cab at night with a yard full of trailers beyond the windshield', 'sizes' => '(min-width:1025px) 760px, (min-width:641px) 100vw, 640px']) ?>
     </div>
   </div>
 </section>

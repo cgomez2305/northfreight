@@ -45,7 +45,7 @@ $reasons = [
       <?php partial('video', [
           'part'  => 'player',
           'id'    => 'desk',
-          'image' => ['base' => 'dispatch-team-headsets-office', 'alt' => 'Dispatchers wearing headsets at their workstations'],
+          'image' => ['base' => 'nf-dispatch-room-maps', 'alt' => 'Dispatch room at night with monitors showing route maps and an empty chair'],
           'title' => 'Meet the desk {hl}· 3 chapters{/hl}',
           'meta'  => 'Video · 3 to 4 min',
       ]); ?>

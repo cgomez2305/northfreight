@@ -21,7 +21,7 @@ partial('hero', [
     'tagline' => 'The work behind the load, done right.',
     'lead'    => 'Paperwork organized, settlements prepared and disputes followed until they close.',
     'ctas'    => [['label' => 'Talk to the desk', 'href' => wa($route['wa']), 'wa' => true, 'arrow' => true]],
-    'image'   => ['base' => 'archive-shelves-documents', 'alt' => 'Aisle of archive shelves with document boxes and folders'],
+    'image'   => ['base' => 'nf-desk-rain-window-night', 'alt' => 'Desk at night with a lamp, a stack of paper and a laptop beside a rain-covered window'],
 ]);
 
 // Resumen "In short" (SEO/GEO): editable aquí. Solo información que ya está en el copy de esta página; sin cifras, tarifas ni promesas nuevas.

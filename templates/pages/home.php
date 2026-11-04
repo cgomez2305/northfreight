@@ -35,15 +35,15 @@ $services = [
     ['num' => '01', 'title' => 'Dispatch & load booking',
      'text' => 'We search, negotiate and book freight on Amazon Relay and dry van lanes, plan routes around hours of service and coordinate every pickup with your drivers.',
      'href' => url('/dispatch-for-owner-operators/'), 'cta' => 'Dispatch for owner-operators',
-     'image' => ['base' => 'red-semi-dry-van-open-road', 'alt' => 'Red semi truck pulling a dry van on an open road', 'sizes' => $railSizes]],
+     'image' => ['base' => 'nf-trailer-dock-dusk', 'alt' => 'White dry van trailer backed into a warehouse loading dock at dusk', 'sizes' => $railSizes]],
     ['num' => '02', 'title' => 'Load tracking & check calls',
      'text' => 'Every trip followed from pickup to POD: ETAs, arrivals and departures logged, incidents documented and brokers kept informed, so you are not on the phone.',
      'href' => url('/load-tracking/'), 'cta' => 'Load tracking',
-     'image' => ['base' => 'two-semis-hillside-highway', 'alt' => 'Two semi trucks on a highway through the hills', 'sizes' => $railSizes]],
+     'image' => ['base' => 'nf-phone-route-rain-highway', 'alt' => 'Hand holding a phone with a route line while a semi truck drives past on a rainy highway', 'sizes' => $railSizes]],
     ['num' => '03', 'title' => 'Trucking back office',
      'text' => 'Paperwork organized, settlements prepared and disputes followed with evidence. We also help onboard new drivers so they are ready to roll on day one.',
      'href' => url('/trucking-back-office/'), 'cta' => 'Back office services',
-     'image' => ['base' => 'dry-van-trailers-loading-docks', 'alt' => 'Dry van trailers backed into warehouse loading docks', 'sizes' => $railSizes]],
+     'image' => ['base' => 'nf-logistics-desk-cyan', 'alt' => 'Desk at night with a laptop, a tablet showing a table, a stack of paperwork and a pen under a lamp', 'sizes' => $railSizes]],
 ];
 
 $relay = [
@@ -56,23 +56,23 @@ $relay = [
 // 03 Why a desk: tres razones ya afirmadas en el sitio (How it works, Our desk, Evidence). Cada una enlaza a la página donde se explica (son los elementos enfocables del sticky).
 $why = [
     ['01', 'One channel for every update', 'Updates you can follow, in one channel: WhatsApp, where you already work.',
-     'headset-agent-office', '/load-tracking/', 'Load tracking'],
+     'nf-phone-chat-dashboard', '/load-tracking/', 'Load tracking'],
     ['02', 'A record of every load', 'Arrival timestamps and photos kept on file, with the BOL and POD filed per load.',
-     'archive-shelves-documents', '/trucking-back-office/', 'Trucking back office'],
+     'nf-archive-aisle-cyan', '/trucking-back-office/', 'Trucking back office'],
     ['03', 'A team behind every load', 'The same desk books, tracks and documents every load, as one team.',
-     'dispatch-desk-headset-monitors', '/how-it-works/', 'How it works'],
+     'nf-dispatch-room-maps', '/how-it-works/', 'How it works'],
 ];
 
 // 04 Onboarding: foto decorativa por paso (alt descriptivo corto)
 $steps = [
     ['01', 'We learn your operation', 'Trucks, equipment, lanes, drivers and the accounts you already run, including Amazon Relay.',
-     ['base' => 'team-reviewing-documents', 'alt' => 'Two people going over a printed document at a desk']],
+     ['base' => 'nf-hands-map-keys', 'alt' => 'Two hands resting on a route map beside a truck key and a notebook']],
     ['02', 'We define scope & contacts', 'Who approves loads, how we report, and which tasks the desk owns from day one.',
-     ['base' => 'clipboard-signing-report', 'alt' => 'Hand filling in a report on a clipboard']],
+     ['base' => 'nf-signing-clipboard-night', 'alt' => 'Hand signing a form on a clipboard at night, with a trailer out of focus behind']],
     ['03', 'We run the day-to-day', 'Booking, tracking and documenting every load, with updates where you already work: WhatsApp.',
-     ['base' => 'truck-night-mountain-road', 'alt' => 'Semi truck driving a mountain road at night']],
+     ['base' => 'nf-white-truck-rainy-highway', 'alt' => 'White semi truck with a dry van trailer driving a wet highway at night']],
     ['04', 'We review & improve', 'Regular reviews of lanes, rates and incidents to keep your trucks earning.',
-     ['base' => 'aerial-trucks-parking-lot', 'alt' => 'Aerial view of semi trailers lined up in a truck lot']],
+     ['base' => 'nf-trailer-rows-aerial', 'alt' => 'Aerial view of white trailers lined up in rows in a truck lot at night']],
 ];
 
 $chapters = [
@@ -98,12 +98,13 @@ $figures = [
     ['0', 'forms before you talk to us'],
 ];
 ?>
-<!-- HERO: foto protagonista (degradado solo desde la izquierda y abajo) + titular + widget de WhatsApp. El <video> va vacío y sin descarga (preload none, sin src): main.js le pone la fuente tras load + idle en >=1025px y entra con un fundido sobre la foto (que sigue siendo el LCP). La foto es el primer fotograma del propio video (assets/video/hero-poster-*.webp, 1920×1080; recortes hero-poster-m-* en ≤760 px y hero-poster-sq-* en 761 a 1024 px), así que el paso foto → video no se ve -->
+<!-- HERO: foto protagonista (Night Freight: nf-highway-dusk-white-trucks; degradado solo desde la izquierda y abajo) + titular + widget de WhatsApp. Recortes reales: -m (4:5, ≤760 px) y -sq (cuadrado, 761 a 1024 px); en escritorio la foto 16:9 completa con srcset 1024/1280/1600/1672.
+     Slot de video: si existe assets/video/hero.mp4 (o .webm) $heroVideo lo activa: el <video> va vacío (preload none, sin src) y main.js le pone la fuente tras load + idle en >=1025px, con fundido sobre la foto (que sigue siendo el LCP). Sin archivos no se emite nada y no hay peticiones. -->
 <section class="hero hero--home" id="top">
-  <div class="hero__bg"<?= $heroVideo ? ' data-hero-video data-mp4="' . e($heroVideo['mp4'] ?? '') . '" data-webm="' . e($heroVideo['webm'] ?? '') . '" data-poster="' . e($heroVideo['poster'] ?? '') . '"' : '' ?>><?= ns_img(['dir' => 'video', 'base' => 'hero-poster', 'widths' => [1280, 1920], 'alt' => 'Aerial view of trucks and cars on a busy highway lined with trees at sunset', 'eager' => true, 'sizes' => '100vw',
+  <div class="hero__bg"<?= $heroVideo ? ' data-hero-video data-mp4="' . e($heroVideo['mp4'] ?? '') . '" data-webm="' . e($heroVideo['webm'] ?? '') . '"' : '' ?>><?= ns_img(['base' => 'nf-highway-dusk-white-trucks', 'widths' => [1024, 1280, 1600, 1672], 'alt' => 'White semi truck with a dry van trailer on a highway at dusk, with a second truck far ahead', 'eager' => true, 'sizes' => '100vw',
         'art' => [
-            ['media' => '(max-width:760px)', 'base' => 'hero-poster-m', 'sizes' => '250px'],   // móvil: recorte 1,17:1 (el marco es 366×312); se declara 250 px a propósito (440 w a DPR ≤1,75: ampliación x1,46; 640 w a DPR 2: x1,14; 948 w a DPR 3) para no subir el LCP móvil
-            ['media' => '(max-width:1024px)', 'base' => 'hero-poster-sq', 'widths' => [640, 1080], 'sizes' => '100vw']]]) ?><?php if ($heroVideo): ?><video class="hero__video" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video><?php endif; ?></div>
+            ['media' => '(max-width:760px)', 'base' => 'nf-highway-dusk-white-trucks-m', 'sizes' => '100vw'],   // móvil: recorte 4:5 real (753×941), camión principal entero
+            ['media' => '(max-width:1024px)', 'base' => 'nf-highway-dusk-white-trucks-sq', 'sizes' => '100vw']]]) ?><?php if ($heroVideo): ?><video class="hero__video" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video><?php endif; ?></div>
   <div class="container hero__in">
     <div class="hero__main">
       <h1 class="eyebrow home-kicker"><?= e($route['h1']) ?></h1>
@@ -158,7 +159,7 @@ $figures = [
 <section class="section home-services" id="services" aria-labelledby="services-title">
   <div class="home-services__pin">
     <div class="container">
-      <?php partial('section-head', ['eyebrow' => '01 · What we manage', 'title' => 'Three fronts.{pill:semi-truck-snowy-mountains}{br}One dispatch desk.{pill:white-semi-truck-front}', 'id' => 'services-title', 'split' => true,
+      <?php partial('section-head', ['eyebrow' => '01 · What we manage', 'title' => 'Three fronts.{pill:nf-truck-lights-rain-front}{br}One dispatch desk.{pill:nf-white-truck-cyan-horizon}', 'id' => 'services-title', 'split' => true,
           'lead' => 'Most truck dispatch companies stop at the booking. We stay on the load until the money is in. The same team that books it tracks it and closes it out.']); ?>
     </div>
     <div class="container home-rail">
@@ -254,7 +255,7 @@ $figures = [
     </div>
     <div class="home-team__video">
       <?php partial('video', ['part' => 'player', 'id' => 'desk',
-          'image' => ['base' => 'dispatch-team-headsets-office', 'alt' => 'Dispatchers wearing headsets at their workstations'],
+          'image' => ['base' => 'nf-dispatch-room-wide-night', 'alt' => 'Dispatch room at night with rows of monitors showing route maps and empty chairs'],
           'title' => 'A load doesn’t dispatch itself. {hl}There’s a team behind it.{/hl}', 'meta' => 'Video · 3 to 4 min']); ?>
     </div>
   </div>
@@ -295,13 +296,12 @@ $figures = [
   </div>
 </section>
 
-<!-- Banda de video: patio de carga (solo >=1025px; en móvil, movimiento reducido o saveData queda el póster). Sin H2 nuevo: el texto es un <p> con copy ya existente (evidencia) -->
+<!-- Banda de imagen (slot de video): foto fija nf-trailer-dock-night-mist con la tarjeta de texto. Para reactivar el video: subir assets/video/freight-yard.mp4 y pasar 'video' => 'freight-yard' (solo >=1025px, tras load + idle). Sin H2 nuevo: el texto es un <p> con copy ya existente (evidencia) -->
 <?php partial('video-band', [
-    'video'  => 'freight-yard',
+    'image'  => ['base' => 'nf-trailer-dock-night-mist', 'alt' => 'White semi truck and dry van parked in front of a warehouse dock in the night mist'],
     'text'   => 'Every load leaves a record: rate confirmation, check-call log, arrival timestamps, BOL and POD.',
-    'alt'    => 'Aerial view of a freight yard with semi trailers',
 ]); ?>
 
 <!-- 07 FAQ -->
 <?php partial('faq', ['items' => route_faq_items($route), 'eyebrow' => '07 · FAQ', 'title' => 'Truck dispatch questions carriers ask us.', 'pre_cta' => true,
-    'image' => ['base' => 'warehouse-sunlight-dock-tall', 'alt' => 'Sunlight streaming into a warehouse loading bay', 'sizes' => '(min-width:1025px) 560px, 0px']]); ?>
+    'image' => ['base' => 'nf-dock-door-amber-night', 'alt' => 'Open loading dock door glowing under an amber lamp at night', 'sizes' => '(min-width:1025px) 660px, 0px']]); ?>
