@@ -82,6 +82,8 @@ $chapters = [
 ];
 
 $docs = ['Rate confirmation', 'Check-call log', 'Arrival timestamps', 'BOL & POD', 'Incident photos', 'Settlement summary'];
+// Pila de documentos que se archiva (07 Evidence): tres hojas maquetadas (sin texto legible ni cifras), rotuladas con documentos ya afirmados (chips de arriba y "Rate con" del Desk log); la bandeja usa la etiqueta "Kept on file" de /how-it-works/.
+$filed = ['BOL', 'POD', 'Rate confirmation'];
 
 // Desk log de ejemplo (evidencia). El ID de carga es un placeholder: en producción ph() devuelve '' y solo se imprime "POD FILED".
 $loadId = ph('ID');
@@ -320,6 +322,23 @@ partial('photo-card', [
       </ul>
     </figure>
   </div>
+  <!-- PILA QUE SE ARCHIVA: con html.js-motion y >=1025px las hojas bajan una a una a la bandeja con el scroll (motion.js fileScene); sin JS, en móvil o con movimiento reducido ya están archivadas (estado final) -->
+  <div class="container home-file">
+    <figure class="fshow" role="img" aria-label="Three documents filed in a tray: BOL, POD and Rate confirmation. Example.">
+      <div class="fshow__sheets" aria-hidden="true">
+        <?php foreach ($filed as $i => $name): ?>
+        <div class="fsheet fsheet--<?= $i + 1 ?>" style="--i:<?= $i ?>">
+          <span class="fsheet__label"><?= e($name) ?></span>
+          <span class="fsheet__rule"></span>
+          <span class="fsheet__cols"><i></i><i></i></span>
+          <span class="fsheet__lines"><i></i><i></i><i></i><i></i></span>
+          <span class="fsheet__sign"><i></i></span>
+        </div>
+        <?php endforeach; ?>
+      </div>
+      <div class="fshow__tray" aria-hidden="true"><span class="fshow__t t-meta">Kept on file</span><span class="fshow__ex t-meta">Example</span></div>
+    </figure>
+  </div>
 </section>
 
 <!-- Banda de video: el póster es el primer fotograma gradado de assets/video/freight-dock.mp4 (nf-freight-dock), así que el paso foto a video es invisible; el video (una sola pasada, sin bucle, se queda en el último fotograma) se monta solo >=1025px, tras load + idle, y empieza al verse la banda. Sin H2 nuevo: el texto es un <p> con copy ya existente (evidencia) -->
@@ -341,4 +360,10 @@ partial('photo-card', [
 
 <!-- 09 FAQ -->
 <?php partial('faq', ['items' => route_faq_items($route), 'eyebrow' => '09 · FAQ', 'title' => 'Truck dispatch questions carriers ask us.', 'pre_cta' => true,
-    'image' => ['base' => 'nf-faq-dock-light-4x5', 'alt' => 'Open loading dock door under a warm wall light at dusk, with yellow bollards', 'sizes' => '(min-width:1025px) 660px, 0px']]); ?>
+    // Foto del FAQ por tema (cada pregunta de app/data/faq.php lleva 'topic'): 0 costo, arranque y contrato · 1 Amazon Relay · 2 alcance · 3 con quién trabajamos. El tema 0 es la foto de siempre (4:5 nativo).
+    'image' => ['base' => 'nf-faq-dock-light-4x5', 'alt' => 'Open loading dock door under a warm wall light at dusk, with yellow bollards', 'sizes' => '(min-width:1025px) 660px, 0px', 'topics' => [
+        ['base' => 'nf-faq-dock-light-4x5', 'alt' => 'Open loading dock door under a warm wall light at dusk, with yellow bollards'],
+        ['base' => 'nf-check-tracking-mirror-tall', 'alt' => 'Rain-streaked truck side mirror reflecting a white trailer on a wet highway at dusk'],
+        ['base' => 'nf-hero-back-office-tall', 'alt' => 'Office desk at night under a lamp, with forms in a tray, a stack of paper, a pen and an inked stamp'],
+        ['base' => 'nf-check-owner-approve-tall', 'alt' => 'A driver’s hand holding a phone with a check mark inside a truck cab at dusk'],
+    ]]]); ?>

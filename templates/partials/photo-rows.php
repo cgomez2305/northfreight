@@ -8,6 +8,9 @@
  *  items  array  [['n'=>'01','title'=>…,'text'=>…,'icon'=>'pin' (nombre de ns_icon),'image'=>['base','alt','pos'?,'sizes'?],'href'?=>url (la fila entera es un enlace),'tag'?=>'A · Load board' (sustituye al número)], …]
  *  tag    string 'h3' (defecto) | 'h2': nivel del título de cada fila
  *  label  string aria-label de la lista
+ *  rail   bool   riel de etapas (solo /how-it-works/): línea fina con una línea cian que se rellena con el scroll y un marcador numerado por fila (los números ya existen en cada fila).
+ *                Solo se ve con html.js-motion, >=1025px y >=700px de alto (el partial lo oculta en el resto): decorativo (aria-hidden), sin textos nuevos. motion.js railStages() lo anima con un solo trigger.
+ *                CSS en services-b.css (.prail, .prows-wrap).
  */
 require_once __DIR__ . '/kit.php';
 $items = $items ?? [];
@@ -15,7 +18,14 @@ $tag = ($tag ?? 'h3') === 'h2' ? 'h2' : 'h3';
 if (!$items) {
     return;
 }
+$rail = !empty($rail) && count($items) > 1;
 ?>
+<?php if ($rail): ?><div class="prows-wrap" data-prail>
+  <div class="prail" aria-hidden="true">
+    <span class="prail__line"><i class="prail__fill"></i></span>
+    <?php foreach ($items as $i => $it): ?><span class="prail__m" style="--k:<?= round($i / (count($items) - 1), 4) ?>"><b><?= e((string) ($it['n'] ?? $i + 1)) ?></b><b class="prail__on"><?= e((string) ($it['n'] ?? $i + 1)) ?></b></span><?php endforeach; ?>
+  </div>
+<?php endif; ?>
 <ol class="prows"<?= !empty($label) ? ' aria-label="' . e($label) . '"' : '' ?>>
   <?php foreach ($items as $i => $it): $href = !empty($it['href']) ? (string) $it['href'] : ''; $img = $it['image'] ?? []; $el = $href !== '' ? 'a' : 'div'; ?>
   <li class="prow" style="--i:<?= (int) $i ?>">
@@ -32,3 +42,4 @@ if (!$items) {
   </li>
   <?php endforeach; ?>
 </ol>
+<?php if ($rail): ?></div><?php endif; ?>

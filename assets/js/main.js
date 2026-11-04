@@ -215,6 +215,27 @@
     });
   })();
 
+  /* ---- FAQ con foto por tema ([data-faq-photos], partial faq con image.topics): al abrir una pregunta (<details>, evento toggle) la foto de su tema (data-topic) pasa a .is-on (fundido de opacidad en CSS).
+     Al cerrar la pregunta activa vuelve el tema de otra pregunta que siga abierta; si no queda ninguna se mantiene. Solo cambia opacidad y aria-hidden: el foco y el texto no se tocan. ---- */
+  (function () {
+    $$('[data-faq-photos]').forEach(function (fig) {
+      var root = fig.closest('.faq'), layers = $$('.faq__layer', fig), cur = -1;
+      if (!root || layers.length < 2) return;
+      layers.forEach(function (l, k) { if (l.classList.contains('is-on')) cur = k; });
+      function show(k) {
+        if (k === cur || !layers[k]) return; cur = k;
+        layers.forEach(function (l, i) { l.classList.toggle('is-on', i === k); if (i === k) l.removeAttribute('aria-hidden'); else l.setAttribute('aria-hidden', 'true'); });
+      }
+      function topicOf(det) { var t = parseInt(det.getAttribute('data-topic'), 10); return t >= 0 && t < layers.length ? t : 0; }
+      root.addEventListener('toggle', function (e) {
+        var det = e.target; if (!det || !det.matches || !det.matches('details.faq__item')) return;
+        if (det.open) { show(topicOf(det)); return; }
+        var open = $$('details.faq__item[open]', root);
+        if (open.length && open.every(function (o) { return topicOf(o) !== cur; })) show(topicOf(open[open.length - 1]));
+      }, true);
+    });
+  })();
+
   /* ---- Mega menús ---- */
   (function () {
     var header = d.getElementById('site-header');

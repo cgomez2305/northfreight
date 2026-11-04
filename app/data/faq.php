@@ -3,6 +3,7 @@
  * Bloques de FAQ reutilizables, por clave de página ($route['faq']).
  *
  * Cada ítem: ['q' => pregunta, 'a' => respuesta, 'link' => ['label'=>..., 'path'=>...] (opcional)].
+ * `topic` (opcional, solo el home): índice de la foto del FAQ que se muestra al abrir la pregunta (partial faq, param image.topics).
  * Convención de placeholders: `{{ph:TEXTO}}` marca un dato pendiente del cliente.
  *   - phtext($s)  -> HTML escapado; cada token pasa por ph() ([ TEXTO ] en staging, vacío en producción).
  *   - phplain($s) -> texto plano para JSON-LD ("[TEXTO]").
@@ -16,26 +17,32 @@ return [
     'home' => [
         [
             'q' => 'How much does a truck dispatch service cost?',
+            'topic' => 0,
             'a' => 'Our dispatch fee is {{ph:YOUR FEE: % of gross or flat weekly}}. Scope is agreed before we start, so you always know what the desk handles and what it costs.',
         ],
         [
             'q' => 'Do you dispatch Amazon Relay loads?',
+            'topic' => 1,
             'a' => 'Yes. Operational and administrative management of Amazon Relay accounts is a core part of what we do: booking, trip records, performance follow-up and disputes.',
         ],
         [
             'q' => 'Do you only book loads?',
+            'topic' => 2,
             'a' => 'No. We combine dispatch, load tracking and back-office work according to the scope we agree with you.',
         ],
         [
             'q' => 'How do we get started?',
+            'topic' => 0,
             'a' => 'Send us a WhatsApp message. We learn your operation, agree on contacts and scope, and review how we will work together before the first load.',
         ],
         [
             'q' => 'Do you work with owner-operators?',
+            'topic' => 3,
             'a' => 'Yes. We work with owner-operators and small fleets that run {{ph:confirm equipment types}}. Tell us about your trucks and we will tell you honestly if we are a fit.',
         ],
         [
             'q' => 'Do I need a contract?',
+            'topic' => 0,
             'a' => '{{ph:confirm terms: weekly, monthly, cancel anytime}}.',
         ],
     ],

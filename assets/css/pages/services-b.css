@@ -135,3 +135,16 @@ a.trio__in:hover .trio__cta { color: var(--cyan-light); }
 a.trio__in:focus-visible { outline-offset: 8px; border-radius: var(--r-card); }
 @media (max-width: 640px) { .trio { grid-template-columns: minmax(0, 1fr); } }
 
+/* ---- Riel de etapas de /how-it-works/ (photo-rows con rail): columna a la izquierda de las filas apiladas, fijada (sticky) como ellas. Línea fina --hairline-strong, línea cian encima (scaleY con scrub) y un marcador numerado por fila
+   (apagado: borde fino y número --text-3; encendido: capa cian que sube en opacidad y escala). Solo con html.js-motion, >=1025px y >=700px de alto; en el resto no se pinta (sin huecos). ---- */
+.prail { display: none; }
+@media (min-width: 1025px) and (min-height: 700px) {
+  .js-motion .prows-wrap { display: grid; grid-template-columns: 40px minmax(0, 1fr); column-gap: 28px; align-items: start; }
+  .js-motion .prail { display: block; position: sticky; top: calc(var(--header-h) + 8px); height: clamp(400px, 52vh, 500px); }
+  .prail__line { position: absolute; left: 19px; top: 20px; bottom: 20px; width: 2px; background: var(--hairline-strong); border-radius: 2px; }
+  .prail__fill { position: absolute; inset: 0; background: var(--cyan); border-radius: 2px; transform-origin: 50% 0; transform: scaleY(0); }
+  .prail__m { position: absolute; left: 0; top: calc(var(--k) * (100% - 40px)); width: 40px; height: 40px; display: grid; place-items: center; box-sizing: border-box; border: 1px solid var(--hairline-strong); border-radius: var(--r-pill); background: var(--bg); }
+  .prail__m b { grid-area: 1 / 1; font: 500 11px/1 var(--font-mono); letter-spacing: .06em; color: var(--text-3); }
+  .prail__m .prail__on { position: absolute; inset: -1px; display: grid; place-items: center; border-radius: var(--r-pill); background: var(--cyan); color: var(--navy-deep); opacity: 0; transform: scale(.82); }
+  .prail__line + .prail__m .prail__on { opacity: 1; transform: none; }   /* el 01 ya está encendido: la primera fila arranca en su sitio */
+}

@@ -168,8 +168,8 @@
   /* ---- Escena 3: parallax de fotos. La imagen (110 % del alto del marco) se desplaza mientras el marco cruza la ventana ---- */
   function photoScene(rail) {
     $('.px').forEach(function (px) {
-      var img = one('img', px);
-      if (!img || (rail && px.closest('.home-cards')) || !sees(px)) return; // las del carril se mueven en horizontal (escena 2); las ocultas (foto del FAQ en <1025px) no necesitan trigger
+      var img = $('img', px);   // un marco puede llevar varias fotos apiladas (FAQ por tema): se mueven juntas con un solo trigger
+      if (!img.length || (rail && px.closest('.home-cards')) || !sees(px)) return; // las del carril se mueven en horizontal (escena 2); las ocultas (foto del FAQ en <1025px) no necesitan trigger
       g.fromTo(img, { y: 0, yPercent: -0.3 }, {
         yPercent: -8.8, ease: 'none',
         scrollTrigger: { trigger: px, start: 'top bottom', end: 'bottom top', scrub: true }
@@ -321,6 +321,40 @@
     });
   }
 
+  /* ---- Pila de documentos que se archiva (.fshow en la sección Evidence del home, >=1025px): UN trigger con un timeline. Las tres hojas parten elevadas, inclinadas hacia atrás (rotateX) y a opacidad .9
+     y bajan a la bandeja una tras otra (escalonadas): la bandeja (CSS, z-index) tapa su parte baja y quedan archivadas con el rótulo a la vista. Solo transform y opacity ---- */
+  function fileScene() {
+    $('.fshow').forEach(function (box) {
+      var sheets = $('.fsheet', box);
+      if (sheets.length < 2 || !sees(box)) return;
+      var tl = g.timeline({ defaults: { ease: 'power1.out' },
+        scrollTrigger: { trigger: box, start: 'top 90%', end: 'top 30%', scrub: 0.5, invalidateOnRefresh: true,
+          onToggle: function (self) { sheets.forEach(function (el) { el.style.willChange = self.isActive ? 'transform, opacity' : ''; }); } } });
+      sheets.forEach(function (el, i) {
+        tl.fromTo(el, { y: -110 - i * 30, rotateX: 14, scale: 1.03, opacity: 0.9, transformOrigin: '50% 100%' },
+                      { y: 0, rotateX: 0, scale: 1, opacity: 1, duration: 0.55 }, i * 0.22);
+      });
+    });
+  }
+
+  /* ---- Riel de etapas (photo-rows con rail, /how-it-works/, >=1025px y >=700px de alto): UN trigger. Recorre las filas apiladas desde que la primera para en su sitio hasta que la última para en el suyo
+     (la fila k para en progreso k/(n-1): cada una avanza un alto de fila + hueco menos los 14 px del escalón sticky). La línea cian crece (scaleY 0 a 1) y cada marcador sube de opacidad y escala justo antes de
+     llegar su fila. Solo transform y opacity ---- */
+  function railStages() {
+    var hh = parseFloat(getComputedStyle(root).getPropertyValue('--header-h')) || 96;
+    $('[data-prail]').forEach(function (wrap) {
+      var ol = one('.prows', wrap), fill = one('.prail__fill', wrap), ons = $('.prail__on', wrap), rows = ol ? $('.prow', ol) : [], n = rows.length;
+      if (!ol || !fill || n < 2 || ons.length !== n || !sees(wrap)) return;
+      var span = function () { return (n - 1) * (rows[0].offsetHeight + (parseFloat(getComputedStyle(ol).rowGap) || 0) - 14); };
+      var tl = g.timeline({ defaults: { ease: 'none' },
+        scrollTrigger: { trigger: ol, start: function () { return 'top ' + Math.round(hh + 8); }, end: function () { return '+=' + Math.round(span()); }, scrub: 0.3, invalidateOnRefresh: true } });
+      tl.fromTo(fill, { scaleY: 0 }, { scaleY: 1, duration: 1 }, 0);
+      ons.forEach(function (on, k) {
+        if (k) tl.fromTo(on, { opacity: 0, scale: 0.82 }, { opacity: 1, scale: 1, duration: 0.1 }, k / (n - 1) - 0.1);
+      });
+    });
+  }
+
   /* ---- Cortina fotográfica (>=1025px y >=700px de alto): la foto queda fijada por CSS (sticky, motion.css) mientras la sección siguiente (.curtain-next) sube y la tapa. Un solo trigger por cortina:
      la imagen interior (110 % del marco) se desplaza de -0,3 % a -8,8 % de su alto (yPercent, igual que .px) a lo largo de todo el recorrido del wrapper. Solo transform ---- */
   function curtainScene() {
@@ -404,7 +438,8 @@
       headScene(!!c.rail);
       mediaScene();
       pcardScene();
-      if (c.rail) { rowsScene(); curtainScene(); }
+      if (c.rail) { rowsScene(); railStages(); curtainScene(); }
+      fileScene();
       textScene();
     }
     enterScene();

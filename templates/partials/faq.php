@@ -7,6 +7,9 @@
  *         title(string, defecto "Questions carriers ask us."), eyebrow(string, defecto "FAQ"),
  *         image(array|null, opcional: ['base'=>'nf-faq-dock-light-4x5','alt'=>'…','sizes'?]): en ≥1025px columna izquierda con la foto fija (sticky, radio 24, parallax .px)
  *           y a la derecha título + filas numeradas "Q/01…" en mono; <1025px la foto no se muestra. Sin image se mantiene el diseño de siempre. El JSON-LD FAQPage no cambia.
+ *           `image.topics` (opcional): lista de fotos [['base','alt','sizes'?], …] indexada por tema; cada ítem de `items` lleva 'topic' (índice, por defecto 0). Al abrir una pregunta la foto del
+ *           tema entra con fundido de opacidad (main.js, [data-faq-photos]); sin JS queda la del tema de la primera pregunta abierta. Las inactivas van con aria-hidden y loading lazy
+ *           (en <1025px el contenedor no se muestra y no se descarga ninguna). Sin `topics` queda la foto única de siempre.
  *         surface('white' defecto: sección blanca, tarjetas gris | 'light': sección gris, tarjetas blancas),
  *         open_first(bool, true), section(bool, true: envuelve en <section class="section"> con .pre-cta si pre_cta), pre_cta(bool), id.
  */
@@ -18,6 +21,10 @@ if (!$items) {
 $onLight = ($surface ?? 'white') === 'light';
 $openFirst = $open_first ?? true;
 $image = !empty($image['base']) ? $image : null;
+// Fotos por tema (opcional): se descartan los temas sin foto; el tema inicial es el de la primera pregunta abierta
+$topics = $image && !empty($image['topics']) && is_array($image['topics']) ? array_values($image['topics']) : [];
+$topicOf = static fn(array $it): int => isset($it['topic']) && isset($topics[(int) $it['topic']]) ? (int) $it['topic'] : 0;
+$initTopic = $topics && ($openFirst ?? true) && $items ? $topicOf($items[0]) : 0;
 $section = $section ?? true;
 // Enlace opcional de una pregunta: ['label'=>…,'path'=>…] o [label, path] => [label, path] | null.
 $faqLink = static function (array $it): ?array {
@@ -33,7 +40,17 @@ $faqLink = static function (array $it): ?array {
 <?php if ($section): ?><section class="section<?= $onLight ? ' section--surface' : '' ?><?= !empty($pre_cta) ? ' pre-cta' : '' ?>"<?= !empty($id) ? ' id="' . e($id) . '"' : '' ?> aria-labelledby="faq-title"><div class="container"><?php endif; ?>
 <div class="faq<?= $onLight ? ' faq--on-surface' : '' ?><?= $image ? ' faq--photo' : '' ?>">
   <?php if ($image): ?>
-  <div class="faq__media"><figure class="faq__photo px"><?= ns_img(['base' => (string) $image['base'], 'alt' => (string) ($image['alt'] ?? ''), 'sizes' => $image['sizes'] ?? '(min-width:1025px) 460px, 0px']) ?></figure></div>
+  <div class="faq__media">
+    <?php if ($topics): ?>
+    <figure class="faq__photo px" data-faq-photos>
+      <?php foreach ($topics as $t => $ph): ?>
+      <span class="faq__layer<?= $t === $initTopic ? ' is-on' : '' ?>"<?= $t === $initTopic ? '' : ' aria-hidden="true"' ?>><?= ns_img(['base' => (string) $ph['base'], 'alt' => (string) ($ph['alt'] ?? ''), 'sizes' => $ph['sizes'] ?? $image['sizes'] ?? '(min-width:1025px) 460px, 0px']) ?></span>
+      <?php endforeach; ?>
+    </figure>
+    <?php else: ?>
+    <figure class="faq__photo px"><?= ns_img(['base' => (string) $image['base'], 'alt' => (string) ($image['alt'] ?? ''), 'sizes' => $image['sizes'] ?? '(min-width:1025px) 460px, 0px']) ?></figure>
+    <?php endif; ?>
+  </div>
   <div class="faq__main">
   <?php endif; ?>
   <div class="faq__head">
@@ -42,7 +59,7 @@ $faqLink = static function (array $it): ?array {
   </div>
   <div class="faq__list">
     <?php foreach ($items as $n => $it): $link = $faqLink($it); ?>
-    <details class="faq__item"<?= $openFirst && $n === 0 ? ' open' : '' ?>>
+    <details class="faq__item"<?= $openFirst && $n === 0 ? ' open' : '' ?><?= $topics ? ' data-topic="' . $topicOf($it) . '"' : '' ?>>
       <summary class="faq__q"><span><?= phtext($it['q']) ?></span><?php if ($image): ?><span class="faq__n" aria-hidden="true">Q/<?= sprintf('%02d', $n + 1) ?></span><?php endif; ?><span class="faq__icon" aria-hidden="true"><?= ns_icon('plus', 16) ?></span></summary>
       <p class="faq__a t-body"><?= phtext($it['a']) ?><?php if ($link !== null && route_is_live($link[1])): ?> <a href="<?= e(url($link[1])) ?>"><?= e($link[0]) ?> <span class="arrow" aria-hidden="true">→</span></a><?php endif; ?></p>
     </details>

@@ -151,6 +151,36 @@
 .dlog__docs li { display: inline-flex; align-items: center; gap: 7px; padding: 6px 13px; border: 1px solid var(--hairline-strong); border-radius: var(--r-pill); font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--text-2); }
 .dlog__docs .icon { color: var(--cyan); stroke-width: 2.6; }
 
+/* ---- Pila de documentos que se archiva (.fshow): panel con tres hojas de formulario abstractas (sin texto ni cifras) y una bandeja "Kept on file" que tapa su parte baja.
+   >=1025px: hojas en fila; con html.js-motion motion.js fileScene las baja una a una (translateY, rotateX, scale, opacity). <=1024px: cascada vertical. Sin JS o con movimiento reducido ya están archivadas (este es el estado final). ---- */
+.home-file { margin-top: clamp(40px, 6vw, 72px); }
+.fshow { position: relative; margin: 0; overflow: hidden; padding: 24px 20px 0; background: var(--panel); border: 1px solid var(--hairline); border-radius: var(--r-panel); perspective: 1200px; }
+.fshow__sheets { display: grid; grid-template-columns: minmax(0, 340px); justify-content: center; }
+.fsheet { grid-area: 1 / 1; margin-top: calc(var(--i) * 80px); height: 300px; display: flex; flex-direction: column; gap: 14px; padding: 22px 22px 0; background: var(--text-2); border-radius: var(--r-tile) var(--r-tile) 0 0; color: var(--navy-deep); transform-origin: 50% 100%; overflow: hidden; isolation: isolate; }
+.fsheet > * { flex: none; }
+.fsheet--2 { background: var(--text); }
+.fsheet__label { font-family: var(--font-head); font-weight: 700; font-size: clamp(30px, 3vw, 38px); line-height: 1; letter-spacing: -.01em; }
+.fsheet__rule { height: 3px; width: 100%; background: var(--navy-deep); }
+.fsheet__cols { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.fsheet__cols i { height: 26px; border: 1px solid var(--text-3); border-radius: 6px; }
+.fsheet__lines { display: flex; flex-direction: column; gap: 9px; }
+.fsheet__lines i { height: 6px; border-radius: var(--r-pill); background: var(--text-3); opacity: .55; }
+.fsheet__lines i:nth-child(2) { width: 82%; } .fsheet__lines i:nth-child(3) { width: 91%; } .fsheet__lines i:nth-child(4) { width: 56%; }
+.fsheet--2 .fsheet__lines i:nth-child(2) { width: 68%; } .fsheet--3 .fsheet__lines i:nth-child(3) { width: 74%; }
+.fsheet__sign { margin-top: 14px; }
+.fsheet__sign i { display: block; width: 46%; height: 2px; background: var(--cyan); }
+.fshow__tray { position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: -110px -20px 0; height: 110px; padding: 0 clamp(20px, 3vw, 40px); background: var(--panel-2); border-top: 1px solid var(--hairline-strong); border-radius: var(--r-card) var(--r-card) 0 0; }
+.fshow__t { display: inline-flex; align-items: center; gap: 10px; color: var(--text); }
+.fshow__t::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--cyan); }
+.fshow__ex { color: var(--text-3); }
+@media (min-width: 1025px) {
+  .fshow { padding: 44px 56px 0; }
+  .fshow__sheets { grid-template-columns: repeat(3, minmax(0, 352px)); gap: 28px; }
+  .fsheet { grid-area: auto; margin-top: 0; height: 400px; padding: 28px 28px 0; gap: 16px; }
+  .fsheet__sign { margin-top: 18px; }
+  .fshow__tray { margin: -130px -56px 0; height: 130px; padding: 0 56px; }
+}
+
 /* ---- 03 Why a desk: tres tarjetas apiladas (foto arriba, texto debajo); con html.js-motion y >=1025px (alto >=700px) se convierte en el sticky de motion.css ---- */
 .home-why { --head-gap: 48px; }
 .why__pin { display: flex; flex-direction: column; gap: var(--head-gap); }
@@ -202,8 +232,11 @@
 @media (min-width: 1025px) {
   .faq--photo { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 40px clamp(48px, 6vw, 96px); align-items: start; }
   .faq__media { display: block; position: sticky; top: calc(var(--header-h) + 24px); }
-  .faq__photo { margin: 0; aspect-ratio: 4 / 5; overflow: hidden; background: var(--panel); border-radius: var(--r-card); }
+  .faq__photo { position: relative; margin: 0; aspect-ratio: 4 / 5; overflow: hidden; background: var(--panel); border-radius: var(--r-card); }
   .faq__photo picture { display: block; width: 100%; height: 100%; }
   .faq__photo img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .faq__layer { position: absolute; inset: 0; display: block; opacity: 0; transition: opacity 0s 300ms; }   /* fotos por tema (data-faq-photos): solo la del tema activo (.is-on) es visible; la saliente espera a que la entrante termine de fundirse y no se ve el fondo */
+  .faq__layer.is-on { z-index: 1; opacity: 1; transition: opacity 300ms ease; }
 }
+@media (min-width: 1025px) and (prefers-reduced-motion: reduce) { .faq__layer { transition: none; } }
 @media (max-width: 640px) { .faq--photo .faq__a { margin-left: 0; } }
