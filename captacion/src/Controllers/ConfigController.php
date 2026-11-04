@@ -127,7 +127,7 @@ final class ConfigController extends Responder
     private static function unlock(array $user): never
     {
         $tab = self::tabOf($_POST['tab'] ?? null);
-        $back = self::back($tab);
+        $back = ($_POST['tab'] ?? '') === 'actividad' ? '/actividad#retencion' : self::back($tab);
         self::requirePost($back);
         $r = Reauth::attempt($user, is_string($_POST['password'] ?? null) ? $_POST['password'] : '', is_string($_POST['code'] ?? null) ? $_POST['code'] : '', self::ip());
         if ($r['status'] === 'blocked') {
