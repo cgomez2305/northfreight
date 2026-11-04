@@ -48,7 +48,11 @@ summary::-webkit-details-marker { display: none; }
 .t-lead { font-size: clamp(18px, 1.5vw, 20px); line-height: 1.55; }
 .t-body { font-size: 18px; line-height: 1.65; }
 .t-card { font-size: 16px; line-height: 1.55; }
-.t-eyebrow { font-size: 12px; color: var(--cyan); }
+/* Etiqueta de sección tipo chip: borde fino, píldora, punto cian a la izquierda (el texto no cambia). Dentro de tarjetas no se usa chip (.card .t-eyebrow) */
+.t-eyebrow { display: inline-flex; align-items: center; align-self: flex-start; gap: 9px; max-width: 100%; padding: 7px 14px 7px 12px; border: 1px solid var(--hairline-strong); border-radius: var(--r-pill); font-size: 11px; line-height: 1.3; color: var(--text-2); }
+.t-eyebrow::before { content: ""; flex: none; width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); }
+.card .t-eyebrow { display: block; padding: 0; border: 0; border-radius: 0; font-size: 12px; color: var(--cyan); }
+.card .t-eyebrow::before { content: none; }
 .t-meta { font-size: 11px; }
 
 /* Color */

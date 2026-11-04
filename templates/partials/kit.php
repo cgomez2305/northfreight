@@ -93,6 +93,22 @@ function ns_img(array $o): string
     return $out . '</picture>';
 }
 
+/**
+ * Video de fondo OPCIONAL del hero del home: devuelve ['mp4'=>url,'webm'=>url] solo con los archivos que existan en assets/video/{nombre}.{mp4,webm}
+ * (vacío si no hay ninguno: queda la foto). main.js lo monta tras `load` + idle, solo en >=1025px, sin prefers-reduced-motion ni saveData; si falla, la foto sigue.
+ * Para activarlo basta subir assets/video/hero.mp4 (y opcionalmente hero.webm), muted, sin audio, ~4 a 8 s en bucle, <= 3 MB.
+ */
+function ns_hero_video(string $name = 'hero'): array
+{
+    $out = [];
+    foreach (['webm', 'mp4'] as $ext) {
+        if (preg_match('/^[a-z0-9-]+$/', $name) === 1 && is_file(NS_ROOT . "/assets/video/$name.$ext")) {
+            $out[$ext] = asset("video/$name.$ext");
+        }
+    }
+    return $out;
+}
+
 /** Lockup del logo (§5.6). $variant: 'dark' (sobre navy, por defecto). */
 function ns_logo(string $class = 'logo'): string
 {

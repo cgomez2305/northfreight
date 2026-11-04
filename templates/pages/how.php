@@ -1,7 +1,7 @@
 <?php
 /**
  * /how-it-works/ — maqueta How.html.
- * Orden: hero · 4 pasos (lista ordenada con línea discontinua) · What you can expect from the desk · CTA final (layout).
+ * Orden: hero · 4 pasos (lista ordenada con línea discontinua) · A load, stage by stage (partial stage-table) · What you can expect from the desk · CTA final (layout).
  */
 require_once NS_ROOT . '/templates/partials/kit.php';
 
@@ -49,6 +49,8 @@ partial('summary', [
     </ol>
   </div>
 </section>
+
+<?php partial('stage-table', ['eyebrow' => 'From booking to settlement', 'title' => 'A load, stage by stage', 'id' => 'hw-stages']); ?>
 
 <section class="section section--surface" aria-labelledby="hw-expect">
   <div class="container stack sb-gap-32">

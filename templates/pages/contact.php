@@ -21,7 +21,6 @@ $equip  = (string) ($old['equipment'] ?? '');
 ob_start(); ?>
 <a class="btn btn--primary btn--contact" href="<?= e(wa($route['wa'])) ?>" rel="noopener">
   <span class="btn__stack"><span class="btn__label t-meta">WhatsApp</span><span class="btn__num"><?= e($cfg['phone']) ?></span></span>
-  <?= ns_icon('arrow', 22) ?>
 </a>
 <a class="btn btn--mail" href="mailto:<?= e($email) ?>">
   <span class="btn__stack"><span class="btn__label t-meta">Email</span><span class="btn__mail"><?= e($email) ?></span></span>

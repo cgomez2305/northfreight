@@ -39,7 +39,7 @@ $ctas = $ctas ?? [];
       <?php if ($ctas): ?>
       <div class="hero__ctas">
         <?php foreach ($ctas as $c): $v = $c['variant'] ?? 'primary'; ?>
-        <a class="btn btn--<?= e($v) ?>" href="<?= e($c['href']) ?>"<?= !empty($c['wa']) ? ' rel="noopener"' : '' ?>><?php if (!empty($c['arrow'])): ?><span><?= e($c['label']) ?> <span class="arrow" aria-hidden="true">→</span></span><?php else: ?><?= e($c['label']) ?><?php endif; ?><?php if (!empty($c['icon'])) { echo ns_icon($c['icon']); } ?></a>
+        <a class="btn btn--<?= e($v) ?>" href="<?= e($c['href']) ?>"<?= !empty($c['wa']) ? ' rel="noopener"' : '' ?>><?php if (!empty($c['arrow']) && $v !== 'primary'): ?><span><?= e($c['label']) ?> <span class="arrow" aria-hidden="true">→</span></span><?php else: ?><?= e($c['label']) ?><?php endif; ?><?php if (!empty($c['icon'])) { echo ns_icon($c['icon']); } ?></a>
         <?php endforeach; ?>
       </div>
       <?php endif; ?>

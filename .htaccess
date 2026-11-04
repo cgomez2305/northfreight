@@ -92,6 +92,8 @@ ErrorDocument 404 /index.php
     ExpiresByType image/jpeg "access plus 1 year"
     ExpiresByType image/png "access plus 1 year"
     ExpiresByType image/svg+xml "access plus 1 year"
+    ExpiresByType video/mp4 "access plus 1 year"
+    ExpiresByType video/webm "access plus 1 year"
     ExpiresByType image/x-icon "access plus 1 year"
     # HTML: corto (index.php fija además su propio Cache-Control)
     ExpiresByType text/html "access plus 5 minutes"

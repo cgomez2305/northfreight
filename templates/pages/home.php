@@ -1,7 +1,7 @@
 <?php
 /**
  * Home (/) — replica de la maqueta index.html. Disponibles: $route, $cfg y los helpers.
- * Orden: hero · 01 Services · 02 Amazon Relay · 03 Onboarding · 04 Team + video · 05 Evidence · 06 FAQ (+ CTA del layout).
+ * Orden: hero (con widget "Start in WhatsApp" y soporte opcional de video de fondo) · 01 Services · 02 Amazon Relay · 03 Onboarding · 04 Team + video · 05 Evidence · 06 FAQ (+ CTA del layout).
  * El <h1> es el eyebrow pequeño (como la maqueta); el titular grande es un <p>. Estilos en assets/css/pages/home.css.
  */
 require_once NS_ROOT . '/templates/partials/kit.php';
@@ -14,6 +14,18 @@ $tags = $variantA
 
 // Hero: mensaje de WhatsApp de la página.
 $waHref = wa($route['wa'] ?? null);
+
+// Widget "Start in WhatsApp" (hero): pestañas = quién eres, chips = en qué ayudamos (los servicios que ya existen). main.js recompone el enlace wa.me
+// con el mensaje; sin JS el botón apunta al enlace por defecto de la ruta. No se guarda ni se envía ningún dato.
+$waTabs = [
+    ['owner', 'Owner-operator', 'I run an owner-operator business'],
+    ['fleet', 'Small fleet', 'I run a small fleet'],
+    ['relay', 'Amazon Relay', 'I haul Amazon Relay freight'],
+];
+$waChips = ['Load booking', 'Load tracking', 'Back office'];
+
+// Video de fondo opcional del hero (assets/video/hero.mp4 y hero.webm). Hoy no existen: queda la foto. Ver ns_hero_video() en kit.php.
+$heroVideo = ns_hero_video('hero');
 
 // Tamaño de las fotos de las tarjetas de servicio (carril ≥1025px: ancho de tarjeta clamp(320px,40vw,600px) + 18 % de parallax)
 $railSizes = '(min-width:1025px) 700px, (min-width:641px) 33vw, 100vw';
@@ -70,9 +82,9 @@ $figures = [
     ['0', 'forms before you talk to us'],
 ];
 ?>
-<!-- HERO: foto protagonista (degradado solo desde la izquierda y abajo) + titular -->
+<!-- HERO: foto protagonista (degradado solo desde la izquierda y abajo) + titular + widget de WhatsApp -->
 <section class="hero hero--home" id="top">
-  <div class="hero__bg"><?= ns_img(['base' => 'truck-oncoming-dusk-mirror', 'alt' => 'Semi truck approaching at dusk, seen from a car’s side mirror', 'eager' => true, 'sizes' => '100vw']) ?></div>
+  <div class="hero__bg"<?= $heroVideo ? ' data-hero-video data-mp4="' . e($heroVideo['mp4'] ?? '') . '" data-webm="' . e($heroVideo['webm'] ?? '') . '" data-poster="' . e(asset('img/truck-oncoming-dusk-mirror-1600.webp')) . '"' : '' ?>><?= ns_img(['base' => 'truck-oncoming-dusk-mirror', 'alt' => 'Semi truck approaching at dusk, seen from a car’s side mirror', 'eager' => true, 'sizes' => '100vw']) ?></div>
   <div class="container hero__in">
     <div class="hero__main">
       <h1 class="eyebrow home-kicker"><?= e($route['h1']) ?></h1>
@@ -83,13 +95,33 @@ $figures = [
       <?php endif; ?>
       <p class="hero__lead t-lead">NorthStar is your remote dispatch and back-office desk. We book Amazon Relay and dry van freight, follow every load to delivery, and keep the paperwork that protects your pay. That is how incidents get handled with evidence and operations run as a team.</p>
       <div class="hero__ctas">
-        <a class="btn btn--primary btn--lg" href="<?= e($waHref) ?>" rel="noopener">Talk to a dispatcher <?= ns_icon('arrow', 18) ?></a>
+        <a class="btn btn--primary btn--lg" href="<?= e($waHref) ?>" rel="noopener">Talk to a dispatcher</a>
         <a class="btn btn--ghost btn--lg" href="<?= e(url('/how-it-works/')) ?>">See how we onboard</a>
       </div>
+      <ul class="tags eyebrow" aria-label="What we cover">
+        <?php foreach ($tags as $t): ?><li class="tag"><?= e($t) ?></li><?php endforeach; ?>
+      </ul>
     </div>
-    <ul class="tags eyebrow" aria-label="What we cover">
-      <?php foreach ($tags as $t): ?><li class="tag"><?= e($t) ?></li><?php endforeach; ?>
-    </ul>
+    <div class="hero-wa" data-wa-widget data-wa-base="<?= e(cfg('wa_base')) ?>">
+      <p class="hero-wa__title t-meta">Start in WhatsApp</p>
+      <p class="hero-wa__note" data-wa-note>Open WhatsApp with a ready message and a dispatcher replies.</p>
+      <div class="hero-wa__ui" data-wa-ui hidden>
+        <div class="hero-wa__tabs" role="tablist" aria-label="I am">
+          <?php foreach ($waTabs as $i => [$key, $label, $who]): ?>
+          <button type="button" class="hero-wa__tab" role="tab" id="wa-tab-<?= e($key) ?>" aria-selected="<?= $i === 0 ? 'true' : 'false' ?>" aria-controls="wa-panel"<?= $i === 0 ? '' : ' tabindex="-1"' ?> data-who="<?= e($who) ?>"><?= e($label) ?></button>
+          <?php endforeach; ?>
+        </div>
+        <div class="hero-wa__panel" role="tabpanel" id="wa-panel" aria-labelledby="wa-tab-owner">
+          <div class="hero-wa__chips" role="group" aria-label="I want help with">
+            <?php foreach ($waChips as $c): ?>
+            <button type="button" class="hero-wa__chip" aria-pressed="false" data-svc="<?= e(strtolower($c)) ?>"><?= e($c) ?></button>
+            <?php endforeach; ?>
+          </div>
+          <p class="hero-wa__msg" data-wa-msg aria-label="Message preview"></p>
+        </div>
+      </div>
+      <a class="btn btn--primary btn--card hero-wa__go" href="<?= e($waHref) ?>" rel="noopener" data-wa-open>Open WhatsApp</a>
+    </div>
   </div>
 </section>
 
@@ -131,7 +163,7 @@ $figures = [
       <span class="t-eyebrow">02 · Specialty</span>
       <h2 class="t-h2" id="relay-title">Amazon Relay dispatch for <span class="hl">carriers who move fast.</span></h2>
       <p class="t-body home-relay__lead">Relay rewards carriers who move fast and keep clean records. Our desk watches the load board for you, books the blocks that fit your trucks and follows performance and disputes inside your account.</p>
-      <a class="btn btn--primary home-relay__btn" href="<?= e(url('/amazon-relay-dispatch/')) ?>"><span>Amazon Relay dispatch <span class="arrow" aria-hidden="true">→</span></span></a>
+      <a class="btn btn--primary home-relay__btn" href="<?= e(url('/amazon-relay-dispatch/')) ?>">Amazon Relay dispatch</a>
     </div>
     <div class="g2 home-relay__grid">
       <?php foreach ($relay as $i => [$tag, $title, $text]): partial('card', ['tag' => $tag, 'title' => $title, 'text' => $text, 'cls' => 'home-rcard' . ($i === 3 ? ' home-rcard--accent' : '')]); endforeach; ?>
@@ -189,20 +221,29 @@ $figures = [
         <?php endforeach; ?>
       </ul>
     </div>
-    <figure class="data-card home-log" aria-label="Desk log, example">
-      <div class="data-card__head">
-        <span class="eyebrow home-log__title">Desk log</span>
-        <span class="data-card__label t-meta">Example</span>
+    <figure class="dlog" aria-label="Desk log, example">
+      <div class="dlog__bar">
+        <span class="dlog__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span class="dlog__title t-meta">Load · Example</span>
+        <span class="dlog__pill t-meta"><span class="dlog__pdot" aria-hidden="true"></span>POD filed</span>
       </div>
-      <ul class="log">
+      <dl class="dlog__rows">
+        <?php if ($loadId !== ''): ?><div class="dlog__row"><dt>Load</dt><dd>#<?= $loadId ?></dd></div><?php endif; ?>
+        <div class="dlog__row"><dt>Handled by</dt><dd>Dispatch desk</dd></div>
+        <div class="dlog__row"><dt>Updates</dt><dd>WhatsApp</dd></div>
+      </dl>
+      <ol class="dlog__line">
         <?php foreach ($log as [$time, $text, $on]): ?>
-        <li class="log__row<?= $on ? ' log__row--on' : '' ?>"><span class="log__time"><?= e($time) ?></span><span class="log__text"><?= e($text) ?></span></li>
+        <li class="dlog__step<?= $on ? ' dlog__step--on' : '' ?>"><span class="dlog__time"><?= e($time) ?></span><span class="dlog__text"><?= e($text) ?></span></li>
         <?php endforeach; ?>
+      </ol>
+      <ul class="dlog__docs" aria-label="Documents on file">
+        <?php foreach (['BOL', 'POD', 'Rate con'] as $d): ?><li><?= ns_icon('check', 13) ?><?= e($d) ?></li><?php endforeach; ?>
       </ul>
-      <p class="data-card__status"><span class="data-card__dot" aria-hidden="true"></span>POD FILED<?= $loadId !== '' ? ' · LOAD #' . $loadId : '' ?></p>
     </figure>
   </div>
 </section>
 
 <!-- 06 FAQ -->
-<?php partial('faq', ['items' => route_faq_items($route), 'eyebrow' => '06 · FAQ', 'title' => 'Truck dispatch questions carriers ask us.', 'pre_cta' => true]); ?>
+<?php partial('faq', ['items' => route_faq_items($route), 'eyebrow' => '06 · FAQ', 'title' => 'Truck dispatch questions carriers ask us.', 'pre_cta' => true,
+    'image' => ['base' => 'white-semi-mountain-highway-sunrise', 'alt' => 'White semi truck pulling a dry van trailer on a mountain highway']]); ?>

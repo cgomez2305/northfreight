@@ -43,7 +43,7 @@ $showRes = cfg('show_resources') && $resources;
     </nav>
     <div class="mobile-menu__foot">
       <span class="t-meta mobile-menu__label">Talk to the desk</span>
-      <a class="btn btn--primary btn--between" href="<?= e(wa($wa)) ?>" rel="noopener">WhatsApp a dispatcher <span class="arrow" aria-hidden="true">→</span></a>
+      <a class="btn btn--primary btn--between" href="<?= e(wa($wa)) ?>" rel="noopener">WhatsApp a dispatcher</a>
       <a class="btn btn--ghost btn--card btn--between" href="<?= e(tel()) ?>">Call <?= e(cfg('phone')) ?></a>
     </div>
   </div>

@@ -5,6 +5,8 @@
  * Params: items(array de ['q','a','link'=>['label','path']?] como devuelve route_faq_items()/faq_items(); el enlace también
  *         se acepta como [label, path]),
  *         title(string, defecto "Questions carriers ask us."), eyebrow(string, defecto "FAQ"),
+ *         image(array|null, opcional: ['base'=>'dry-van-trailer-highway-dusk','alt'=>'…','sizes'?]): en ≥1025px columna izquierda con la foto fija (sticky, radio 24, parallax .px)
+ *           y a la derecha título + filas numeradas "Q/01…" en mono; <1025px la foto no se muestra. Sin image se mantiene el diseño de siempre. El JSON-LD FAQPage no cambia.
  *         surface('white' defecto: sección blanca, tarjetas gris | 'light': sección gris, tarjetas blancas),
  *         open_first(bool, true), section(bool, true: envuelve en <section class="section"> con .pre-cta si pre_cta), pre_cta(bool), id.
  */
@@ -15,6 +17,7 @@ if (!$items) {
 }
 $onLight = ($surface ?? 'white') === 'light';
 $openFirst = $open_first ?? true;
+$image = !empty($image['base']) ? $image : null;
 $section = $section ?? true;
 // Enlace opcional de una pregunta: ['label'=>…,'path'=>…] o [label, path] => [label, path] | null.
 $faqLink = static function (array $it): ?array {
@@ -28,7 +31,11 @@ $faqLink = static function (array $it): ?array {
 };
 ?>
 <?php if ($section): ?><section class="section<?= $onLight ? ' section--surface' : '' ?><?= !empty($pre_cta) ? ' pre-cta' : '' ?>"<?= !empty($id) ? ' id="' . e($id) . '"' : '' ?> aria-labelledby="faq-title"><div class="container"><?php endif; ?>
-<div class="faq<?= $onLight ? ' faq--on-surface' : '' ?>">
+<div class="faq<?= $onLight ? ' faq--on-surface' : '' ?><?= $image ? ' faq--photo' : '' ?>">
+  <?php if ($image): ?>
+  <div class="faq__media"><figure class="faq__photo px"><?= ns_img(['base' => (string) $image['base'], 'alt' => (string) ($image['alt'] ?? ''), 'sizes' => $image['sizes'] ?? '(min-width:1025px) 460px, 0px']) ?></figure></div>
+  <div class="faq__main">
+  <?php endif; ?>
   <div class="faq__head">
     <span class="t-eyebrow"><?= e($eyebrow ?? 'FAQ') ?></span>
     <h2 class="t-h2 c-navy" id="faq-title"><?= ns_rich($title ?? 'Questions carriers ask us.') ?></h2>
@@ -36,10 +43,11 @@ $faqLink = static function (array $it): ?array {
   <div class="faq__list">
     <?php foreach ($items as $n => $it): $link = $faqLink($it); ?>
     <details class="faq__item"<?= $openFirst && $n === 0 ? ' open' : '' ?>>
-      <summary class="faq__q"><span><?= phtext($it['q']) ?></span><span class="faq__icon" aria-hidden="true"><?= ns_icon('plus', 16) ?></span></summary>
+      <summary class="faq__q"><span><?= phtext($it['q']) ?></span><?php if ($image): ?><span class="faq__n" aria-hidden="true">Q/<?= sprintf('%02d', $n + 1) ?></span><?php endif; ?><span class="faq__icon" aria-hidden="true"><?= ns_icon('plus', 16) ?></span></summary>
       <p class="faq__a t-body"><?= phtext($it['a']) ?><?php if ($link !== null && route_is_live($link[1])): ?> <a href="<?= e(url($link[1])) ?>"><?= e($link[0]) ?> <span class="arrow" aria-hidden="true">→</span></a><?php endif; ?></p>
     </details>
     <?php endforeach; ?>
   </div>
+  <?php if ($image): ?></div><?php endif; ?>
 </div>
 <?php if ($section): ?></div></section><?php endif; ?>

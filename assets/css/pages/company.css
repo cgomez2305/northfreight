@@ -48,7 +48,9 @@ a.card.card--dark.co-res:hover .card__code { color: var(--cyan-light); }
 .co-bandsec { padding-top: 0; }
 .co-band { background: var(--cyan); color: var(--navy-deep); padding: clamp(28px, 5vw, 56px); display: flex; flex-wrap: wrap; gap: 28px; align-items: center; justify-content: space-between; position: relative; overflow: hidden; border-radius: var(--r-card); }
 .co-band__main { flex: 1 1 420px; min-width: 0; display: flex; flex-direction: column; gap: 12px; position: relative; }
-.co-band .t-eyebrow { color: var(--navy-deep); }
+.co-band .t-eyebrow { color: var(--navy-deep); border-color: var(--navy-deep); }
+.co-band .t-eyebrow::before { background: var(--navy-deep); }
+.co-band a.btn::after { content: none; }   /* botón navy sobre banda cian: sin celda (la flecha va en el texto) */
 .co-band__title { line-height: .96; color: var(--navy-deep); }
 .co-band__text { font-size: 17px; line-height: 1.6; max-width: 560px; }
 .co-band .btn { background: var(--navy-deep); border-color: var(--navy-deep); color: var(--text); }

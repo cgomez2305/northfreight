@@ -40,6 +40,91 @@
     if (window.requestIdleCallback) window.requestIdleCallback(init, { timeout: 1000 }); else setTimeout(init, 200);
   })();
 
+  /* ---- Widget "Start in WhatsApp" (hero del home): pestañas (quién eres) + chips (en qué ayudamos) => mensaje y enlace wa.me.
+     No se guarda ni se envía ningún dato. Sin JS el botón conserva el enlace por defecto de la ruta y los controles siguen ocultos. ---- */
+  (function () {
+    var w = d.querySelector('[data-wa-widget]');
+    if (!w) return;
+    var ui = w.querySelector('[data-wa-ui]'), note = w.querySelector('[data-wa-note]'), msg = w.querySelector('[data-wa-msg]'), go = w.querySelector('[data-wa-open]');
+    var panel = w.querySelector('[role="tabpanel"]'), base = w.getAttribute('data-wa-base');
+    var tabs = $$('[role="tab"]', w), chips = $$('[data-svc]', w);
+    if (!ui || !msg || !go || !base || !tabs.length) return;
+    function text() {
+      var who = (tabs.filter(function (t) { return t.getAttribute('aria-selected') === 'true'; })[0] || tabs[0]).getAttribute('data-who');
+      var svc = chips.filter(function (c) { return c.getAttribute('aria-pressed') === 'true'; }).map(function (c) { return c.getAttribute('data-svc'); });
+      var list = svc.length > 1 ? svc.slice(0, -1).join(', ') + ' and ' + svc[svc.length - 1] : (svc[0] || '');
+      return 'Hi, ' + who + " and I'd like " + (list ? 'help with ' + list : 'to talk about dispatch') + ' with NorthStar.';
+    }
+    function sync() {
+      var t = text();
+      msg.textContent = t;
+      go.setAttribute('href', base + '?text=' + encodeURIComponent(t).replace(/'/g, '%27'));
+    }
+    function pick(tab, focus) {
+      tabs.forEach(function (t) {
+        var on = t === tab;
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+        t.tabIndex = on ? 0 : -1;
+      });
+      if (panel) panel.setAttribute('aria-labelledby', tab.id);
+      if (focus) tab.focus();
+      sync();
+    }
+    tabs.forEach(function (t, i) {
+      t.addEventListener('click', function () { pick(t, false); });
+      t.addEventListener('keydown', function (e) {
+        var n = null;
+        if (e.key === 'ArrowRight') n = (i + 1) % tabs.length;
+        else if (e.key === 'ArrowLeft') n = (i - 1 + tabs.length) % tabs.length;
+        else if (e.key === 'Home') n = 0;
+        else if (e.key === 'End') n = tabs.length - 1;
+        if (n === null) return;
+        e.preventDefault();
+        pick(tabs[n], true);
+      });
+    });
+    chips.forEach(function (c) {
+      c.addEventListener('click', function () {
+        c.setAttribute('aria-pressed', c.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+        sync();
+      });
+    });
+    ui.hidden = false;
+    if (note) note.hidden = true;
+    sync();
+  })();
+
+  /* ---- Video de fondo opcional del hero (assets/video/hero.mp4|webm, ver ns_hero_video()). El atributo data-hero-video solo existe si los archivos están.
+     Se monta tras `load` + idle, solo en >=1025px, sin prefers-reduced-motion ni saveData; si falla o no carga, queda la foto. ---- */
+  (function () {
+    var bg = d.querySelector('[data-hero-video]');
+    if (!bg || !window.matchMedia) return;
+    function start() {
+      var conn = navigator.connection || {};
+      if (conn.saveData || window.matchMedia('(prefers-reduced-motion: reduce)').matches || !window.matchMedia('(min-width: 1025px)').matches) return;
+      var v = d.createElement('video'), webm = bg.getAttribute('data-webm'), mp4 = bg.getAttribute('data-mp4');
+      if (!v.canPlayType) return;
+      v.className = 'hero__video';
+      v.muted = true; v.defaultMuted = true; v.loop = true; v.playsInline = true; v.preload = 'none';
+      v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.setAttribute('aria-hidden', 'true'); v.tabIndex = -1;
+      v.setAttribute('poster', bg.getAttribute('data-poster') || '');
+      [[webm, 'video/webm'], [mp4, 'video/mp4']].forEach(function (s) {
+        if (!s[0] || !v.canPlayType(s[1])) return;
+        var el = d.createElement('source'); el.src = s[0]; el.type = s[1]; v.appendChild(el);
+      });
+      if (!v.firstChild) return;
+      var done = false;
+      function drop() { if (done) return; done = true; bg.classList.remove('has-video'); if (v.parentNode) v.parentNode.removeChild(v); }
+      v.addEventListener('error', drop, true);
+      v.addEventListener('playing', function () { if (!done) bg.classList.add('has-video'); });
+      bg.appendChild(v);
+      v.preload = 'auto';
+      try { var p = v.play(); if (p && p.catch) p.catch(drop); } catch (e) { drop(); }
+    }
+    function later() { if (window.requestIdleCallback) window.requestIdleCallback(start, { timeout: 2500 }); else setTimeout(start, 400); }
+    if (d.readyState === 'complete') later(); else window.addEventListener('load', later);
+  })();
+
   /* ---- Mega menús ---- */
   (function () {
     var header = d.getElementById('site-header');

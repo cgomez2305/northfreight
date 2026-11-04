@@ -3,7 +3,7 @@
  * Layout del sitio. Contrato: recibe $route, $cfg y $content (HTML de la página ya renderizado). No imprime H1
  * (lo pone cada página, normalmente con partial('hero')).
  *
- * Claves de ruta que lee: title, meta, path, template, status, schema, wa, og, motion (GSAP + ScrollTrigger + motion.js/css), css (grupos de CSS; anula el mapa plantilla => grupo), cta (false => sin bloque CTA final).
+ * Claves de ruta que lee: title, meta, path, template, status, schema, wa, og, motion (GSAP + ScrollTrigger + motion.js/css), css (grupos de CSS; anula el mapa plantilla => grupo), cta (false => sin bloque CTA final), cta_image ('base' de assets/img | '' | false: foto de fondo del CTA; por defecto CTA_IMAGE).
  * Orden: head (SEO, OG, fuentes, CSS, JSON-LD) → skip link → opsbar + header (nav, megas, menú móvil) →
  *        <main id="main"> → cta → footer → mbar → scripts.
  */
@@ -101,7 +101,7 @@ $jsByTemplate = ['tool-rpm' => 'calc-rpm.js', 'tool-ifta' => 'calc-ifta.js', 'bl
 <main id="main"<?= $ctaOn ? ' class="has-cta"' : '' ?>>
 <?= $content ?>
 </main>
-<?php if ($ctaOn): partial('cta', ['wa' => $wa]); endif; ?>
+<?php if ($ctaOn): $ctaBase = array_key_exists('cta_image', $route) ? $route['cta_image'] : CTA_IMAGE; partial('cta', ['wa' => $wa, 'image' => $ctaBase ? ['base' => (string) $ctaBase, 'alt' => ''] : null]); endif; ?>
 <?php partial('footer', ['wa' => $wa]); ?>
 <?php partial('mbar', ['wa' => $wa]); ?>
 <?php partial('wa-float', ['wa' => $wa]); ?>

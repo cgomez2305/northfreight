@@ -1,7 +1,8 @@
 <?php
 /**
  * Footer: logo + descripción · Services · Company · Talk to the desk; fila inferior © año, MC#/USDOT (ph), Privacy, Terms.
- * WhatsApp, teléfono y correo siempre visibles como texto. Ancla #footer-nav (alternativa sin JS al menú móvil).
+ * WhatsApp, teléfono y correo siempre visibles como texto, con icono (bloque de contacto). "Back to top" apunta a #site-header (la cabecera).
+ * Ancla #footer-nav (alternativa sin JS al menú móvil).
  * Dirección (NAP) opcional: solo si ADDRESS está definida (org_address()).
  * Params: wa(string|null).
  */
@@ -45,8 +46,14 @@ $addr = org_address();   // NAP: solo se imprime si ADDRESS está definida en co
     </nav>
     <div class="footer__col">
       <span class="footer__head t-meta">Talk to the desk</span>
-      <a class="foot__link" href="<?= e(wa($wa)) ?>" rel="noopener">WhatsApp <?= e(cfg('phone')) ?></a>
-      <a class="foot__link" href="mailto:<?= e($email) ?>"><?= e($email) ?></a>
+      <a class="foot__contact" href="<?= e(wa($wa)) ?>" rel="noopener">
+        <span class="foot__ico"><?= ns_icon('whatsapp', 18) ?></span>
+        <span class="foot__ctext"><span class="t-meta">WhatsApp</span><span class="foot__cval"><?= e(cfg('phone')) ?></span></span>
+      </a>
+      <a class="foot__contact" href="mailto:<?= e($email) ?>">
+        <span class="foot__ico"><?= ns_icon('mail', 18) ?></span>
+        <span class="foot__ctext"><span class="t-meta">Email</span><span class="foot__cval foot__cval--mail"><?= e($email) ?></span></span>
+      </a>
       <?php if ($addr): ?>
       <address class="foot__addr">
         <?php if (isset($addr['street'])): ?><span><?= e($addr['street']) ?></span><?php endif; ?>
@@ -63,6 +70,7 @@ $addr = org_address();   // NAP: solo se imprime si ADDRESS está definida en co
       <?php if ($legalId !== ''): ?><span><?= $legalId ?></span><?php endif; ?>
       <?php if (route_is_live('/privacy-policy/')): ?><a class="foot__link" href="<?= e(url('/privacy-policy/')) ?>">Privacy</a><?php endif; ?>
       <?php if (route_is_live('/terms/')): ?><a class="foot__link" href="<?= e(url('/terms/')) ?>">Terms</a><?php endif; ?>
+      <a class="foot__top" href="#site-header">Back to top <span class="arrow" aria-hidden="true">→</span></a>
     </span>
   </div>
 </footer>

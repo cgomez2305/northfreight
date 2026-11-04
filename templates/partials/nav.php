@@ -27,7 +27,7 @@ $hasResources = cfg('show_resources') && ($m['tools'] || $m['templates'] || $m['
     <?php endforeach; ?>
   </div>
   <div class="nav__actions">
-    <a class="btn btn--primary btn--sm hide-m" href="<?= e(wa($wa)) ?>" rel="noopener"><?= ns_icon('whatsapp') ?>WhatsApp us</a>
+    <a class="btn btn--primary btn--sm hide-m" href="<?= e(wa($wa)) ?>" rel="noopener">WhatsApp us</a>
     <button type="button" class="nav__burger" data-menu-open aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu"><?= ns_icon('menu', 20, 'icon--open') ?><?= ns_icon('close', 20, 'icon--close') ?></button>
     <a class="nav__burger nav__burger--link" href="#footer-nav" aria-label="Go to the site menu"><?= ns_icon('menu', 20) ?></a>
   </div>

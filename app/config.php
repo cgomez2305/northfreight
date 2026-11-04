@@ -74,6 +74,8 @@ ns_default('HERO_HEADLINES', [
     'A' => 'Incidents are handled with evidence. And operations, as a team.',
     'B' => 'Booked. Tracked. Documented.',
 ]);
+// Foto de fondo del CTA final (assets/img/<base>-{640,1024,1600}.webp + .jpg). '' = panel liso. Una ruta puede anularla con 'cta_image' => 'base' | '' | false.
+ns_default('CTA_IMAGE', 'dry-van-trailer-highway-dusk');
 ns_default('SHOW_RESOURCES', true);         // Resources y Blog en nav/footer (activos desde Fase 1)
 ns_default('SHOW_ON_SHIFT', true);          // barra "On shift" + relojes (replica la maqueta; revisar al confirmar horario)
 ns_default('SHOW_EQUIPMENT_CHIPS', false);  // chips "By equipment" del mega menú

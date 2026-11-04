@@ -30,6 +30,10 @@
   --hero-fade-m: linear-gradient(180deg, rgba(4, 16, 31, 0) 52%, var(--bg) 100%);            /* móvil: la foto se funde con el fondo */
   --card-fade: linear-gradient(0deg, rgba(4, 16, 31, .96) 0%, rgba(4, 16, 31, .92) 36%, rgba(4, 16, 31, .5) 60%, rgba(4, 16, 31, 0) 100%);   /* tarjetas con texto sobre foto (carril de la home) */
   --arrow-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12h15M13 6l6 6-6 6'/%3E%3C/svg%3E");
+  --arrow-ne: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2304132A' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 17L17 7M8 7h9v9'/%3E%3C/svg%3E");   /* flecha ↗ en navy-deep: celda de los botones primarios */
+  --btn-cell: rgba(4, 19, 42, .14);        /* celda circular del botón primario (sobre cian) */
+  --glass-strong: rgba(10, 29, 51, .88);   /* widget de WhatsApp del hero: más opaco que el menú para sostener AA sobre la foto */
+  --cta-veil: linear-gradient(180deg, rgba(4, 16, 31, .8) 0%, rgba(4, 16, 31, .74) 50%, rgba(4, 16, 31, .86) 100%);   /* CTA final con foto: texto centrado, contraste medido ≥ 4,5:1 */
   --ph-bg: #FFF3B0;            /* marca de placeholder (solo staging) */
 
   /* Tipografía */
