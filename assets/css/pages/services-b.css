@@ -148,3 +148,10 @@ a.trio__in:focus-visible { outline-offset: 8px; border-radius: var(--r-card); }
   .prail__m .prail__on { position: absolute; inset: -1px; display: grid; place-items: center; border-radius: var(--r-pill); background: var(--cyan); color: var(--navy-deep); opacity: 0; transform: scale(.82); }
   .prail__line + .prail__m .prail__on { opacity: 1; transform: none; }   /* el 01 ya está encendido: la primera fila arranca en su sitio */
 }
+/* Tramo estrecho (1025 a 1180): riel de 28 px y hueco de 20, así las filas pierden 48 px de ancho (no 68) y su texto no se corta */
+@media (min-width: 1025px) and (max-width: 1180px) and (min-height: 700px) {
+  .js-motion .prows-wrap { grid-template-columns: 28px minmax(0, 1fr); column-gap: 20px; }
+  .prail__line { left: 13px; top: 14px; bottom: 14px; }
+  .prail__m { top: calc(var(--k) * (100% - 28px)); width: 28px; height: 28px; }
+  .prail__m b { font-size: 10px; letter-spacing: .02em; }
+}
