@@ -156,29 +156,28 @@
 .home-file { margin-top: clamp(40px, 6vw, 72px); }
 .fshow { position: relative; margin: 0; overflow: hidden; padding: 24px 20px 0; background: var(--panel); border: 1px solid var(--hairline); border-radius: var(--r-panel); perspective: 1200px; }
 .fshow__sheets { display: grid; grid-template-columns: minmax(0, 340px); justify-content: center; }
-.fsheet { grid-area: 1 / 1; margin-top: calc(var(--i) * 80px); height: 300px; display: flex; flex-direction: column; gap: 14px; padding: 22px 22px 0; background: var(--text-2); border-radius: var(--r-tile) var(--r-tile) 0 0; color: var(--navy-deep); transform-origin: 50% 100%; overflow: hidden; isolation: isolate; }
+.fsheet { grid-area: 1 / 1; margin-top: calc(var(--i) * 80px); height: 300px; display: flex; flex-direction: column; gap: 14px; padding: 22px 22px 0; background: var(--panel-2); border: 1px solid var(--hairline-strong); border-bottom: 0; border-radius: var(--r-tile) var(--r-tile) 0 0; color: var(--text); transform-origin: 50% 100%; overflow: hidden; isolation: isolate; }
 .fsheet > * { flex: none; }
-.fsheet--2 { background: var(--text); }
 .fsheet__label { font-family: var(--font-head); font-weight: 700; font-size: clamp(30px, 3vw, 38px); line-height: 1; letter-spacing: -.01em; }
-.fsheet__rule { height: 3px; width: 100%; background: var(--navy-deep); }
+.fsheet__rule { height: 2px; width: 100%; background: var(--cyan); }
 .fsheet__cols { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.fsheet__cols i { height: 26px; border: 1px solid var(--text-3); border-radius: 6px; }
+.fsheet__cols i { height: 26px; border: 1px solid var(--hairline-strong); border-radius: 6px; background: var(--cyan-tint); }
 .fsheet__lines { display: flex; flex-direction: column; gap: 9px; }
 .fsheet__lines i { height: 6px; border-radius: var(--r-pill); background: var(--text-3); opacity: .55; }
 .fsheet__lines i:nth-child(2) { width: 82%; } .fsheet__lines i:nth-child(3) { width: 91%; } .fsheet__lines i:nth-child(4) { width: 56%; }
 .fsheet--2 .fsheet__lines i:nth-child(2) { width: 68%; } .fsheet--3 .fsheet__lines i:nth-child(3) { width: 74%; }
 .fsheet__sign { margin-top: 14px; }
-.fsheet__sign i { display: block; width: 46%; height: 2px; background: var(--cyan); }
-.fshow__tray { position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: -110px -20px 0; height: 110px; padding: 0 clamp(20px, 3vw, 40px); background: var(--panel-2); border-top: 1px solid var(--hairline-strong); border-radius: var(--r-card) var(--r-card) 0 0; }
+.fsheet__sign i { display: block; width: 46%; height: 2px; background: var(--text-3); opacity: .55; }
+.fshow__tray { position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: -72px -20px 0; height: 72px; padding: 0 clamp(20px, 3vw, 40px); background: var(--bg); border-top: 1px solid var(--cyan-line); border-radius: var(--r-card) var(--r-card) 0 0; }
 .fshow__t { display: inline-flex; align-items: center; gap: 10px; color: var(--text); }
 .fshow__t::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--cyan); }
 .fshow__ex { color: var(--text-3); }
 @media (min-width: 1025px) {
   .fshow { padding: 44px 56px 0; }
   .fshow__sheets { grid-template-columns: repeat(3, minmax(0, 352px)); gap: 28px; }
-  .fsheet { grid-area: auto; margin-top: 0; height: 400px; padding: 28px 28px 0; gap: 16px; }
+  .fsheet { grid-area: auto; margin-top: 0; height: 364px; padding: 28px 28px 0; gap: 16px; }
   .fsheet__sign { margin-top: 18px; }
-  .fshow__tray { margin: -130px -56px 0; height: 130px; padding: 0 56px; }
+  .fshow__tray { margin: -88px -56px 0; height: 88px; padding: 0 56px; }
 }
 
 /* ---- 03 Why a desk: tres tarjetas apiladas (foto arriba, texto debajo); con html.js-motion y >=1025px (alto >=700px) se convierte en el sticky de motion.css ---- */

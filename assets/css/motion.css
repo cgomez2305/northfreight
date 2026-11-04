@@ -24,6 +24,9 @@
   .js-motion .curtain__pin { position: sticky; top: var(--cur-o); height: var(--cur-p); }
   .js-motion .curtain__frame { height: 100%; aspect-ratio: auto; }
   .js-motion .curtain + .curtain-next { position: relative; z-index: 2; margin-top: calc(var(--cur-p) * -1); min-height: var(--cur-p); display: flex; flex-direction: column; justify-content: center; }
+  /* Variante corta (/how-it-works/): la foto fijada mide como mucho 480 px y el panel de después arranca pegado a su borde inferior (recorrido = alto de la foto), así se ajusta a su contenido en vez de estirarse a toda la ventana y no queda hueco bajo la foto */
+  .js-motion .curtain--short, .js-motion .curtain--short + .curtain-next { --cur-p: min(calc(100vh - var(--cur-o) - 16px), 480px); --cur-p: min(calc(100svh - var(--cur-o) - 16px), 480px); }
+  .js-motion .curtain--short { height: calc(var(--cur-p) * 2); }
 }
 
 /* ---- Relleno de texto (data-textfill, >=1025px): cada palabra parte de opacidad .5 (AA medido) y motion.js la sube a 1 ---- */
