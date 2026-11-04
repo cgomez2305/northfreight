@@ -22,7 +22,7 @@ partial('hero', [
     'ctas'  => [
         ['label' => 'Talk to a dispatcher', 'href' => wa($route['wa']), 'wa' => true, 'arrow' => true],
     ],
-    'image' => ['base' => 'nf-hero-dry-van', 'alt' => 'White semi truck pulling a dry van trailer along a highway under an overcast dusk sky', 'pos' => '70% 50%', 'sizes' => '(min-width:1025px) 1350px, (min-width:761px) 100vw, 580px'],
+    'image' => ['base' => 'nf-hero-dry-van', 'alt' => 'White semi truck pulling a dry van trailer along a highway under an overcast dusk sky', 'pos' => '70% 50%'],
 ]);
 
 // Resumen "In short" (SEO/GEO): editable aquí. Solo información que ya está en el copy de esta página; sin cifras, tarifas ni promesas nuevas.
