@@ -12,7 +12,7 @@ define('NS_KIT_LOADED', true);
 /**
  * Texto con marcas: escapa con phtext() ({{ph:X}} => ph()) y convierte
  * {hl}…{/hl} => <span class="hl">…</span>, {br} => <br> y {pill:base} => pastilla de foto decorativa dentro del titular
- * (<span class="hpill" aria-hidden="true">, alt vacío: no cambia el título accesible; solo si assets/img/<base>-640.webp existe; usa <base>-320.webp si existe: la pastilla mide ≤122 px y 320 px bastan incluso en retina). Nada de HTML crudo.
+ * (<span class="hpill" aria-hidden="true">, alt vacío: no cambia el título accesible; solo si assets/img/<base>-640.webp existe; usa <base>-pill-320.webp si existe: la pastilla mide ≤122 px y 320 px bastan incluso en retina). Nada de HTML crudo.
  */
 function ns_rich(string $s): string
 {
@@ -22,7 +22,9 @@ function ns_rich(string $s): string
             if (!is_file(NS_ROOT . '/assets/img/' . $m[1] . '-640.webp')) {
                 return '';
             }
-            return '<span class="hpill" aria-hidden="true">' . ns_img(['base' => $m[1], 'alt' => '', 'widths' => is_file(NS_ROOT . '/assets/img/' . $m[1] . '-320.webp') ? [320] : [640], 'sizes' => '160px']) . '</span>';
+            return '<span class="hpill" aria-hidden="true">' . (is_file(NS_ROOT . '/assets/img/' . $m[1] . '-pill-320.webp')
+                ? ns_img(['base' => $m[1] . '-pill', 'alt' => '', 'widths' => [320], 'sizes' => '160px'])
+                : ns_img(['base' => $m[1], 'alt' => '', 'widths' => [640], 'sizes' => '160px'])) . '</span>';
         }, $out);
     }
     return $out;
