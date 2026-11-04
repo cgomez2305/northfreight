@@ -387,4 +387,42 @@
     d.addEventListener('focusin', function (e) { if (isOpen && !menu.contains(e.target)) (closeBtn || menu).focus(); });
     onMq(function () { if (!mq.matches) close(); });
   })();
+
+  /* ---- Captación de leads: atribución de primera parte y evento de analítica ----
+     (1) Al aterrizar guarda utm_*, referrer (sin query) y landing en localStorage (30 días; sin cookies) y los vuelca al campo oculto [data-attr-field] de los formularios de solicitud ([data-attr-form]).
+         Sin JS o sin localStorage el lead entra sin atribución (válido). La política de privacidad debe mencionarlo.
+     (2) En la página de gracias ([data-lead-event]) emite generate_lead (gtag o dataLayer) y Lead (Meta) SOLO si esas herramientas ya existen en la página: no se carga ningún script de terceros. */
+  (function () {
+    var KEY = 'ns_attr', DAY = 864e5, keys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'];
+    var store = null, rec = null, now = Date.now();
+    try { store = window.localStorage; } catch (e) { store = null; }
+    try { rec = JSON.parse(store.getItem(KEY) || 'null'); } catch (e) { rec = null; }
+    if (rec && (!rec.t || now - rec.t > 30 * DAY)) rec = null;
+    var q = {};
+    try {
+      var sp = new URLSearchParams(location.search);
+      keys.forEach(function (k) { var v = sp.get(k); if (v) q[k] = v.slice(0, 100); });
+    } catch (e) { /* sin URLSearchParams */ }
+    var hasUtm = Object.keys(q).length > 0;
+    if (!rec || (hasUtm && !keys.some(function (k) { return rec[k]; }))) {
+      rec = { t: now, first_seen: new Date(now).toISOString(), landing: (location.pathname || '/').slice(0, 300), referrer: (d.referrer || '').split('?')[0].split('#')[0].slice(0, 300) };
+      keys.forEach(function (k) { rec[k] = q[k] || ''; });
+      try { store.setItem(KEY, JSON.stringify(rec)); } catch (e) { /* sin almacenamiento: vale para esta página */ }
+    }
+    $$('[data-attr-field]').forEach(function (f) {
+      var out = {};
+      ['first_seen', 'landing', 'referrer'].concat(keys).forEach(function (k) { out[k] = rec[k] || ''; });
+      f.value = JSON.stringify(out);
+    });
+    var ev = d.querySelector('[data-lead-event]');
+    if (ev) {
+      window.addEventListener('load', function () {
+        var type = ev.getAttribute('data-lead-type') || '', mark = 'ns_lead_evt';
+        try { if (sessionStorage.getItem(mark) === location.search) return; sessionStorage.setItem(mark, location.search); } catch (e) { /* se emite igualmente */ }
+        if (typeof window.gtag === 'function') window.gtag('event', 'generate_lead', { lead_type: type });
+        else if (window.dataLayer && typeof window.dataLayer.push === 'function') window.dataLayer.push({ event: 'generate_lead', lead_type: type });
+        if (typeof window.fbq === 'function') window.fbq('track', 'Lead', { content_name: type });
+      });
+    }
+  })();
 })();

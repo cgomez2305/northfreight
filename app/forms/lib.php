@@ -149,6 +149,30 @@ function ns_csrf_age(mixed $token): ?int
     return ($age >= -60 && $age <= NS_CSRF_TTL) ? max(0, $age) : null;
 }
 
+// --- Pagina de gracias de las solicitudes (sin sesion): parametro firmado "ts.perfil.hmac", valido 7 dias ----------------------------------
+
+const NS_THANKS_TTL = 604800;   // 7 dias: el usuario puede recargar o volver a abrirla
+
+/** Token para /careers/thank-you/?t=… (perfil = owner-operator | small-fleet | company-driver). No lleva datos personales. */
+function ns_lead_thanks_token(string $profile, ?int $ts = null): string
+{
+    $ts ??= time();
+    return $ts . '.' . $profile . '.' . substr(hash_hmac('sha256', 'thanks|' . $ts . '|' . $profile, ns_secret()), 0, 32);
+}
+
+/** Perfil de un token valido y vigente, o null (token ausente, manipulado, caducado o de un perfil desconocido). */
+function ns_lead_thanks_profile(mixed $token): ?string
+{
+    if (!is_string($token) || !preg_match('/^(\d{9,11})\.(owner-operator|small-fleet|company-driver)\.([a-f0-9]{32})$/', $token, $m)) {
+        return null;
+    }
+    $age = time() - (int) $m[1];
+    if ($age < -60 || $age > NS_THANKS_TTL) {
+        return null;
+    }
+    return hash_equals(substr(hash_hmac('sha256', 'thanks|' . $m[1] . '|' . $m[2], ns_secret()), 0, 32), $m[3]) ? $m[2] : null;
+}
+
 // --- Cliente / limite por IP -----------------------------------------------------------------------
 
 /** Hash corto de la IP con sal (nunca se guarda la IP en claro). REMOTE_ADDR: no se confia en X-Forwarded-For. */
@@ -301,7 +325,11 @@ function ns_form_guard(array $in, string $form): array
 /** Campo de la plantilla donde mostrar un error general del formulario. */
 function ns_general_field(string $form): string
 {
-    return $form === 'download' ? 'format' : 'message';
+    return match ($form) {
+        'download' => 'format',
+        'lead'     => 'form',
+        default    => 'message',
+    };
 }
 
 /**

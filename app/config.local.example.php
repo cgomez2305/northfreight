@@ -66,3 +66,14 @@ define('RATE_LIMIT', 5);
 // robots.txt de producción: bots de entrenamiento de IA (GPTBot, ClaudeBot, Google-Extended, Applebot-Extended, CCBot).
 // 'allow' (defecto) | 'block'. Los bots de búsqueda/respuesta de IA siempre se permiten.
 // define('AI_TRAINING_BOTS', 'allow');
+
+// --- Captación de conductores (/careers/*) ---
+// Los leads se guardan en storage/leads/AAAA-MM.jsonl (fuera de web, 0600) y se avisa por correo (mismo SMTP de arriba; sin SMTP queda en storage/mail.log).
+// Para convertirlos a CSV: `php bin/leads-export.php --out=leads.csv` (ver el encabezado del script).
+// Webhook opcional: cada lead se envía también por POST JSON (timeout 4 s; si falla se registra en storage/error.log y el usuario no lo nota).
+// define('LEAD_WEBHOOK_URL', 'https://hooks.example.com/northstar-leads');
+// Años mínimos de experiencia para marcar `qualified` (CDL estándar Sí + inglés Sí o Básico + años >= este valor). El usuario nunca ve el resultado.
+// define('LEAD_MIN_YEARS', 1);
+// Reservados para la analítica (§10). NADA los carga todavía: los eventos generate_lead / Lead solo salen si la página ya trae gtag/fbq.
+// define('GA_ID', '');
+// define('META_PIXEL_ID', '');

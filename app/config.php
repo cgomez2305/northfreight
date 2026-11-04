@@ -66,6 +66,20 @@ ns_default('SMTP_PASS', '');
 ns_default('SMTP_SECURE', 'ssl');                 // 'ssl' (465) | 'tls' (587)
 ns_default('MAIL_TO', EMAIL);                     // destino de los envíos del formulario
 
+// --- Captación de conductores / leads (/careers/*) -------------------------------------------------------------------
+// Cada solicitud se guarda como una línea JSON en storage/leads/AAAA-MM.jsonl (sin base de datos) y avisa por correo.
+// LEAD_WEBHOOK_URL (opcional, en config.local.php): si existe, cada lead se envía también por POST JSON (cURL, timeout 4 s; un fallo nunca rompe la respuesta al usuario).
+ns_default('LEAD_WEBHOOK_URL', '');
+// Años mínimos de experiencia para marcar un lead como `qualified` (junto con CDL estándar = Sí e inglés Sí/Básico). PENDIENTE (cliente): confirmar el número.
+ns_default('LEAD_MIN_YEARS', 1);
+// Analítica: reservados para cuando Carlos elija herramienta (§10). HOY NO SE CARGA NINGÚN SCRIPT DE TERCEROS: los eventos (generate_lead / Lead) solo se emiten si ya existen gtag/fbq en la página.
+ns_default('GA_ID', '');
+ns_default('META_PIXEL_ID', '');
+// Consentimiento (TCPA) del formulario de solicitud. OPCIONAL para el usuario (la casilla va SIN marcar y no condiciona el envío). Cada lead guarda el texto exacto, la versión, la fecha UTC y la IP.
+// Si se cambia el texto, crea CONSENT_TEXT_V2 y sube CONSENT_VERSION: no reescribas el V1 (los leads antiguos lo citan). TEXTO PENDIENTE DE REVISIÓN DEL ABOGADO.
+ns_default('CONSENT_VERSION', 'v1');
+ns_default('CONSENT_TEXT_V1', 'I agree that NorthStar Freight Solutions LLC may contact me about my application and its services at the phone number and email I provided, by phone call, text message (SMS) and email, including messages sent with an automated system. Message and data rates may apply. Consent is not a condition of applying or of buying any service. I can opt out at any time by replying STOP or by telling the dispatch desk.');
+
 // --- Flags de contenido (§10) -------------------------------------------
 // Hero del home: 'B' = "Booked. Tracked. Documented." (actual)
 //                'A' = "Incidents are handled with evidence. And operations, as a team." (PDF)
@@ -90,6 +104,12 @@ ns_default('WA_MESSAGES', [
     'tracking'    => "Hi, I'd like help tracking my loads.",
     'backoffice'  => "Hi, I'd like help with my trucking back office.",
     'post'        => "Hi, I read your article and want to talk about dispatch.",
+    'careers'       => "Hi, I'd like to know how I can work with NorthStar.",
+    'careers-owner' => "Hi, I'm an owner-operator and I'd like to talk about partnering with NorthStar.",
+    'driver'        => "Hi, I'm a CDL-A driver and I'd like to ask about openings with NorthStar.",
+    'thanks-owner'  => "Hi, I'm an owner-operator and I just sent my application on the NorthStar website.",
+    'thanks-fleet'  => "Hi, I run a small fleet and I just sent my application on the NorthStar website.",
+    'thanks-driver' => "Hi, I'm a CDL-A driver and I just sent my application on the NorthStar website.",
     'equip-box'        => 'Hi, I run a box truck and I would like to talk about dispatch.',
     'equip-hotshot'    => 'Hi, I run a hotshot and I would like to talk about dispatch.',
     'equip-flatbed'    => 'Hi, I run a flatbed and I would like to talk about dispatch.',

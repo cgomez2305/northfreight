@@ -152,16 +152,31 @@ if ($route === null) {
 $isDraft = ($route['status'] ?? 'live') !== 'live';
 if (!is_production() || $isDraft) {
     header('X-Robots-Tag: noindex, nofollow');
+} elseif (!empty($route['noindex'])) {
+    header('X-Robots-Tag: noindex, follow');   // apply / gracias: live pero fuera del indice (la meta robots del layout dice lo mismo)
 }
 header($isDraft ? 'Cache-Control: no-store' : (is_production() ? 'Cache-Control: public, max-age=300' : 'Cache-Control: no-cache'));
 header('X-Content-Type-Options: nosniff');
 header('Referrer-Policy: strict-origin-when-cross-origin');
 
+// --- Pagina de gracias de las solicitudes: solo con el token firmado de un envio real (sin sesiones); sin el, 303 al formulario ---
+if (($route['gate'] ?? '') === 'lead-thanks') {
+    header('Cache-Control: no-store');
+    header('X-Robots-Tag: noindex, nofollow');
+    $thanksProfile = ns_lead_thanks_profile($_GET['t'] ?? null);
+    if ($thanksProfile === null) {
+        header('Location: ' . url('/careers/apply/'), true, 303);
+        exit;
+    }
+    $route['thanks_profile'] = $thanksProfile;
+}
+
 // --- Formularios: lista blanca de handlers (app/forms/<handler>.php) ---
-// El handler sale de $route['form'] ('contact' | 'download'); si la ruta aun no lo declara, respaldo por ruta.
-$formHandlers = ['contact', 'download'];
+// El handler sale de $route['form'] ('contact' | 'download' | 'lead'); si la ruta aun no lo declara, respaldo por ruta.
+$formHandlers = ['contact', 'download', 'lead'];
 $formByPath = [
     '/contact/'                                => 'contact',
+    '/careers/apply/'                          => 'lead',
     '/resources/bol-template/'                 => 'download',
     '/resources/dispatcher-carrier-agreement/' => 'download',
 ];
