@@ -66,8 +66,12 @@ function ns_icon(string $name, int $size = 18, string $class = ''): string
 }
 
 /**
- * <picture> responsive sobre assets/img/{base}-{ancho}.webp + {base}.jpg.
- * $o: base (sin extensión), alt, sizes, class, eager(bool), widths(array, por defecto los que existan).
+ * <picture> responsive sobre {dir}/{base}-{ancho}.webp (+ {base}.jpg de respaldo si existe).
+ * $o: base (sin extensión), alt, sizes, class, eager(bool), widths(array, por defecto los que existan), dir ('img' por defecto; 'video' para los fotogramas de assets/video),
+ *     art(array de ['media'=>…, 'base'=>…, 'sizes'=>…, 'widths'=>…?]: recortes alternativos que se emiten ANTES de la fuente normal; el primero cuya media coincida gana).
+ * `sizes` debe describir el ANCHO que ocupa la imagen una vez recortada con object-fit: cover (marco, margen de .px y alto incluidos), no solo el ancho del marco: con marcos
+ * más altos que la foto manda el alto, y un `sizes` corto hace elegir una variante demasiado pequeña (se ve pixelada). Regla: ancho útil = max(ancho marco, alto imagen × proporción foto).
+ * Las variantes no se ampliaron nunca: solo existen anchos ≤ al de la foto de origen.
  */
 function ns_img(array $o): string
 {
@@ -76,22 +80,53 @@ function ns_img(array $o): string
     if ($base === '') {
         return '';
     }
-    $dir = NS_ROOT . '/assets/img/';
-    $widths = $o['widths'] ?? [490, 640, 1024, 1280, 1600];   // se ignoran los que no existan en disco
-    $set = [];
-    foreach ($widths as $w) {
-        if (is_file($dir . "$base-$w.webp")) {
-            $set[] = asset("img/$base-$w.webp") . " {$w}w";
+    $dirName = ($o['dir'] ?? 'img') === 'video' ? 'video' : 'img';
+    $dir = NS_ROOT . '/assets/' . $dirName . '/';
+    // Sin `widths` se usan todas las variantes que existan en disco ({base}-{ancho}.webp), de menor a mayor
+    $found = static function (string $b, string $d): array {
+        $ws = [];
+        foreach (glob($d . $b . '-[0-9]*.webp') ?: [] as $f) {
+            if (preg_match('/-(\d+)\.webp$/', $f, $m)) {
+                $ws[] = (int) $m[1];
+            }
         }
+        sort($ws);
+        return $ws;
+    };
+    $widths = $o['widths'] ?? $found($base, $dir);
+    $srcset = static function (string $b, array $ws, string $d, string $dn): array {
+        $set = [];
+        foreach ($ws as $w) {
+            if (is_file($d . "$b-$w.webp")) {
+                $set[] = asset("$dn/$b-$w.webp") . " {$w}w";
+            }
+        }
+        return $set;
+    };
+    $set = $srcset($base, $widths, $dir, $dirName);
+    $jpg = is_file($dir . "$base.jpg") ? "$dirName/$base.jpg" : null;
+    $key = $dirName . '/' . $base;
+    $best = 0;
+    if (!isset($dims[$key])) {
+        $ref = $jpg !== null ? $dir . "$base.jpg" : '';
+        foreach ($ref === '' ? $widths : [] as $cand) {   // sin JPG: las medidas salen de la variante más grande
+            if (is_file($dir . "$base-$cand.webp") && ($ref === '' || $cand > $best)) {
+                $ref = $dir . "$base-$cand.webp";
+                $best = $cand;
+            }
+        }
+        $g = $ref !== '' ? @getimagesize($ref) : false;
+        $dims[$key] = $g ? [$g[0], $g[1]] : [0, 0];
     }
-    $jpg = is_file($dir . "$base.jpg") ? "img/$base.jpg" : null;
-    if ($jpg !== null && !isset($dims[$base])) {
-        $g = @getimagesize($dir . "$base.jpg");
-        $dims[$base] = $g ? [$g[0], $g[1]] : [0, 0];
-    }
-    [$w, $h] = $dims[$base] ?? [0, 0];
+    [$w, $h] = $dims[$key];
     $eager = !empty($o['eager']);
     $out = '<picture>';
+    foreach ((array) ($o['art'] ?? []) as $a) {
+        $as = $srcset((string) $a['base'], $a['widths'] ?? $found((string) $a['base'], $dir), $dir, $dirName);
+        if ($as) {
+            $out .= '<source type="image/webp" media="' . e($a['media']) . '" srcset="' . e(implode(', ', $as)) . '" sizes="' . e($a['sizes'] ?? ($o['sizes'] ?? '100vw')) . '">';
+        }
+    }
     if ($set) {
         $out .= '<source type="image/webp" srcset="' . e(implode(', ', $set)) . '" sizes="' . e($o['sizes'] ?? '100vw') . '">';
     }
@@ -105,8 +140,8 @@ function ns_img(array $o): string
 
 /**
  * Video de fondo del hero del home: devuelve ['mp4'=>url,'webm'=>url,'poster'=>url] solo con los archivos que existan en assets/video/{nombre}.{mp4,webm}
- * y {nombre}-poster.webp (vacío si no hay mp4/webm: queda la foto). main.js lo monta tras `load` + idle, solo en >=1025px, sin prefers-reduced-motion ni saveData;
- * si falla, la foto sigue. Activo con assets/video/hero.mp4 (muted, sin audio, bucle con fundido, 1,7 MB); hero.webm es opcional.
+ * y {nombre}-poster-1920.webp (vacío si no hay mp4/webm: queda la foto). main.js lo monta tras `load` + idle, solo en >=1025px, sin prefers-reduced-motion ni saveData;
+ * si falla, la foto sigue. Activo con assets/video/hero.mp4 (muted, sin audio, bucle con fundido, 1920×1080); hero.webm es opcional.
  */
 function ns_hero_video(string $name = 'hero'): array
 {
@@ -119,8 +154,8 @@ function ns_hero_video(string $name = 'hero'): array
             $out[$ext] = asset("video/$name.$ext");
         }
     }
-    if ($out && is_file(NS_ROOT . "/assets/video/$name-poster.webp")) {
-        $out['poster'] = asset("video/$name-poster.webp");
+    if ($out && is_file(NS_ROOT . "/assets/video/$name-poster-1920.webp")) {
+        $out['poster'] = asset("video/$name-poster-1920.webp");
     }
     return $out;
 }

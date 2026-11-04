@@ -60,10 +60,10 @@
       scrollTrigger: { trigger: hero, start: 'top top', end: function () { return '+=' + Math.round(vh()); }, pin: true, scrub: 0.6, anticipatePin: 1, invalidateOnRefresh: true }
     });
     tl.fromTo(bg, { scale: 1, y: 0 }, { scale: 0.86, y: 36, transformOrigin: '50% 50%' }, 0)   // y: baja el borde superior de la foto por debajo de la píldora del menú
-      .fromTo(img, { yPercent: 0, scale: 1.12 }, { yPercent: -6, scale: 1.04, transformOrigin: '0% 62%' }, 0)
+      .fromTo(img, { yPercent: 0 }, { yPercent: -2 }, 0)   // sin escala: el fotograma 1920×1080 ya se amplía ~0,8× en 1440×900
       .fromTo(main, { y: 0 }, { y: -140 }, 0)
       .fromTo(main, { opacity: 1 }, { opacity: 0, duration: 0.6 }, 0);
-    if (vid) tl.fromTo(vid, { yPercent: 0, scale: 1.12 }, { yPercent: -6, scale: 1.04, transformOrigin: '0% 62%' }, 0);   // video de fondo opcional: sigue a la foto
+    if (vid) tl.fromTo(vid, { yPercent: 0 }, { yPercent: -2 }, 0);   // video de fondo opcional: sigue a la foto
     if (wa) tl.fromTo(wa, { y: 0, opacity: 1 }, { y: -90, opacity: 0, duration: 0.5 }, 0);   // el widget de WhatsApp se desvanece con el texto
     if (l1) tl.fromTo(l1, { x: 0 }, { x: -48 }, 0);
     if (l2) tl.fromTo(l2, { x: 0 }, { x: 48 }, 0);
@@ -94,8 +94,8 @@
         scrollTrigger: { trigger: card, containerAnimation: move, start: 'left 92%', end: 'left 52%', scrub: true }
       });
       if (photo) {
-        g.fromTo(photo, { xPercent: -13 }, {
-          xPercent: -2, ease: 'none',
+        g.fromTo(photo, { xPercent: -10 }, {
+          xPercent: -1, ease: 'none',
           scrollTrigger: { trigger: card, containerAnimation: move, start: 'left right', end: 'right left', scrub: true }
         });
       }
@@ -139,7 +139,7 @@
     for (var i = 1; i < n; i++) {
       var t = i - 0.25;
       tl.fromTo(photos[i], { opacity: 0 }, { opacity: 1, duration: 0.5 }, t);    // la foto nueva entra por encima de la anterior
-      if (imgs[i]) tl.fromTo(imgs[i], { scale: 1.08 }, { scale: 1, duration: 0.5 }, t);
+      if (imgs[i]) tl.fromTo(imgs[i], { scale: 1.03 }, { scale: 1, duration: 0.5 }, t);
       tl.fromTo(nums[i], { opacity: 0, yPercent: 24 }, { opacity: 1, yPercent: 0, duration: 0.5 }, t);
       tl.to(nums[i - 1], { opacity: 0, yPercent: -24, duration: 0.5 }, t);
       tl.to(items[i - 1], { opacity: DIM, duration: 0.5 }, t);
@@ -163,13 +163,13 @@
     };
   }
 
-  /* ---- Escena 3: parallax de fotos. La imagen (120 % del alto del marco) se desplaza mientras el marco cruza la ventana ---- */
+  /* ---- Escena 3: parallax de fotos. La imagen (110 % del alto del marco) se desplaza mientras el marco cruza la ventana ---- */
   function photoScene(rail) {
     $('.px').forEach(function (px) {
       var img = one('img', px);
       if (!img || (rail && px.closest('.home-cards')) || !sees(px)) return; // las del carril se mueven en horizontal (escena 2); las ocultas (foto del FAQ en <1025px) no necesitan trigger
-      g.fromTo(img, { y: 0, yPercent: -0.4 }, {
-        yPercent: -16.2, ease: 'none',
+      g.fromTo(img, { y: 0, yPercent: -0.3 }, {
+        yPercent: -8.8, ease: 'none',
         scrollTrigger: { trigger: px, start: 'top bottom', end: 'bottom top', scrub: true }
       });
     });
@@ -306,12 +306,12 @@
     });
   }
 
-  /* ---- Banda de video (home): la capa con póster y video se desplaza ±10 % del marco mientras la banda cruza la ventana; no toca el bucle ---- */
+  /* ---- Banda de video (home): la capa con póster y video se desplaza ±4 % de su alto (110 % del marco) mientras la banda cruza la ventana; no toca el bucle ---- */
   function vbandScene() {
     $('.vband__media').forEach(function (m) {
       var layer = one('.vband__layer', m);
       if (!layer || !sees(m)) return;
-      g.fromTo(layer, { yPercent: -7 }, { yPercent: 7, ease: 'none', scrollTrigger: { trigger: m, start: 'top bottom', end: 'bottom top', scrub: true } });
+      g.fromTo(layer, { yPercent: -4 }, { yPercent: 4, ease: 'none', scrollTrigger: { trigger: m, start: 'top bottom', end: 'bottom top', scrub: true } });
     });
   }
 

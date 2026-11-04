@@ -27,8 +27,9 @@ $waChips = ['Load booking', 'Load tracking', 'Back office'];
 // Video de fondo del hero (assets/video/hero.mp4, opcional hero.webm). main.js lo activa tras load + idle solo en >=1025px; sin él queda la foto. Ver ns_hero_video() en kit.php.
 $heroVideo = ns_hero_video('hero');
 
-// Tamaño de las fotos de las tarjetas de servicio (carril ≥1025px: ancho de tarjeta clamp(320px,40vw,600px) + 18 % de parallax)
-$railSizes = '(min-width:1025px) 700px, (min-width:641px) 33vw, 100vw';
+// Ancho útil de las fotos de las tarjetas de servicio. Carril ≥1025px: la foto manda por el ALTO de la tarjeta (≤540 px, cover) → ~540 × 1,5 = 810 px de foto, no el ancho de la tarjeta.
+// Tarjetas apiladas (marco 4:3 + .px 110 %): ancho útil ≈ 1,24 × el ancho del marco.
+$railSizes = '(min-width:1025px) 820px, (min-width:641px) 42vw, 124vw';
 
 $services = [
     ['num' => '01', 'title' => 'Dispatch & load booking',
@@ -99,7 +100,8 @@ $figures = [
 ?>
 <!-- HERO: foto protagonista (degradado solo desde la izquierda y abajo) + titular + widget de WhatsApp. El <video> va vacío y sin descarga (preload none, sin src): main.js le pone la fuente tras load + idle en >=1025px y entra con un fundido sobre la foto (que sigue siendo el LCP) -->
 <section class="hero hero--home" id="top">
-  <div class="hero__bg"<?= $heroVideo ? ' data-hero-video data-mp4="' . e($heroVideo['mp4'] ?? '') . '" data-webm="' . e($heroVideo['webm'] ?? '') . '" data-poster="' . e($heroVideo['poster'] ?? '') . '"' : '' ?>><?= ns_img(['base' => 'truck-oncoming-dusk-mirror', 'alt' => 'Semi truck approaching at dusk, seen from a car’s side mirror', 'eager' => true, 'sizes' => '100vw']) ?><?php if ($heroVideo): ?><video class="hero__video" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video><?php endif; ?></div>
+  <div class="hero__bg"<?= $heroVideo ? ' data-hero-video data-mp4="' . e($heroVideo['mp4'] ?? '') . '" data-webm="' . e($heroVideo['webm'] ?? '') . '" data-poster="' . e($heroVideo['poster'] ?? '') . '"' : '' ?>><?= ns_img(['dir' => 'video', 'base' => 'hero-poster', 'widths' => [1280, 1920], 'alt' => 'Aerial view of trucks and cars on a busy highway lined with trees at sunset', 'eager' => true, 'sizes' => '100vw',
+        'art' => [['media' => '(max-width:1024px)', 'base' => 'hero-poster-sq', 'widths' => [640, 1080], 'sizes' => '100vw']]]) ?><?php if ($heroVideo): ?><video class="hero__video" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video><?php endif; ?></div>
   <div class="container hero__in">
     <div class="hero__main">
       <h1 class="eyebrow home-kicker"><?= e($route['h1']) ?></h1>
@@ -200,7 +202,8 @@ $figures = [
       <ol class="why__list">
         <?php foreach ($why as $i => [$n, $title, $text, $photo, $path, $linkLabel]): ?>
         <li class="why__item<?= $i === 0 ? ' is-on' : '' ?>">
-          <figure class="why__photo"><?= ns_img(['base' => $photo, 'alt' => '', 'sizes' => '(min-width:1025px) 440px, (min-width:641px) 33vw, 100vw']) ?></figure>
+          <figure class="why__photo"><?= ns_img(['base' => $photo, 'alt' => '', 'sizes' => '(min-width:641px) 33vw, 100vw',
+            'art' => [['media' => '(min-width:1025px)', 'base' => $photo . '-tall', 'sizes' => '440px']]]) ?></figure>
           <div class="why__body">
             <span class="why__n t-meta" aria-hidden="true"><?= e($n) ?></span>
             <h3 class="head t-h3"><?= e($title) ?></h3>
@@ -222,7 +225,8 @@ $figures = [
       <?php foreach ($steps as [$n, $title, $text, $photo]): ?>
       <li class="home-step">
         <span class="home-step__line" aria-hidden="true"><i></i></span>
-        <figure class="home-step__photo px"><?= ns_img($photo + ['sizes' => '(min-width:1025px) 300px, (min-width:641px) 50vw, 100vw']) ?></figure>
+        <figure class="home-step__photo px"><?= ns_img($photo + ['sizes' => '(min-width:641px) 50vw, 100vw',
+            'art' => [['media' => '(min-width:1025px)', 'base' => $photo['base'] . '-tall', 'sizes' => '360px']]]) ?></figure>
         <span class="home-step__n" aria-hidden="true"><?= e($n) ?></span>
         <h3 class="head t-h3"><span class="sr-only">Step <?= e($n) ?>: </span><?= e($title) ?></h3>
         <p class="t-card"><?= e($text) ?></p>
@@ -298,4 +302,4 @@ $figures = [
 
 <!-- 07 FAQ -->
 <?php partial('faq', ['items' => route_faq_items($route), 'eyebrow' => '07 · FAQ', 'title' => 'Truck dispatch questions carriers ask us.', 'pre_cta' => true,
-    'image' => ['base' => 'warehouse-sunlight-dock', 'alt' => 'Sunlight streaming into a warehouse loading bay']]); ?>
+    'image' => ['base' => 'warehouse-sunlight-dock-tall', 'alt' => 'Sunlight streaming into a warehouse loading bay', 'sizes' => '(min-width:1025px) 560px, 0px']]); ?>

@@ -61,7 +61,7 @@ partial('summary', [
       ]); ?>
     </div>
     <div class="sa-media px">
-      <?= ns_img(['base' => 'dry-van-trailers-loading-docks', 'alt' => 'Dry van trailers backed into warehouse loading docks', 'sizes' => '(min-width:1025px) 600px, 100vw']) ?>
+      <?= ns_img(['base' => 'dry-van-trailers-loading-docks', 'alt' => 'Dry van trailers backed into warehouse loading docks', 'sizes' => '(min-width:1025px) 640px, (min-width:641px) 100vw, 640px']) ?>
     </div>
   </div>
 </section>

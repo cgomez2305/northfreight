@@ -28,7 +28,7 @@ $hasTop = !empty($icon) || !empty($icon_html) || !empty($num);
 ?>
 <?php if ($wrap): ?><div class="card-wrap"><?php endif; ?>
 <<?= $el ?> class="<?= e($cls) ?>"<?= $isLink ? ' href="' . e($href) . '"' : '' ?>>
-  <?php if ($image): ?><figure class="card__photo<?= ($px ?? true) ? ' px' : '' ?>"><?= ns_img(['base' => $image['base'], 'alt' => $image['alt'] ?? '', 'sizes' => $image['sizes'] ?? '(min-width:1025px) 410px, (min-width:641px) 33vw, 100vw']) ?></figure><?php endif; ?>
+  <?php if ($image): ?><figure class="card__photo<?= ($px ?? true) ? ' px' : '' ?>"><?= ns_img(['base' => $image['base'], 'alt' => $image['alt'] ?? '', 'sizes' => $image['sizes'] ?? '(min-width:1025px) 500px, (min-width:641px) 42vw, 124vw']) ?></figure><?php endif; ?>
   <?php if ($hasTop && (!empty($icon) || !empty($icon_html))): ?>
   <div class="card__top">
     <span class="card__icon" aria-hidden="true"><?= !empty($icon_html) ? $icon_html : ns_icon($icon, 26) ?></span>

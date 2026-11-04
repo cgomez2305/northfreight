@@ -12,7 +12,7 @@ $email = (string) cfg('email');
 $image = !empty($image['base']) ? $image : null;
 ?>
 <section class="cta on-dark<?= $image ? ' cta--photo' : '' ?>" aria-labelledby="cta-title">
-  <?php if ($image): ?><div class="cta__bg px" aria-hidden="true"><?= ns_img(['base' => (string) $image['base'], 'alt' => '', 'sizes' => '100vw']) ?></div><?php endif; ?>
+  <?php if ($image): ?><div class="cta__bg px" aria-hidden="true"><?= ns_img(['base' => (string) $image['base'], 'alt' => '', 'sizes' => '(min-width:761px) 100vw, 250vw']) ?></div><?php endif; ?>
   <div class="container cta__in">
     <div class="cta__main">
       <img class="cta__mark" src="<?= e(asset('img/isotype-white.svg')) ?>" alt="" width="56" height="56">
