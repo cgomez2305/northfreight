@@ -28,8 +28,8 @@ $waChips = ['Load booking', 'Load tracking', 'Back office'];
 $heroVideo = ns_hero_video('hero');
 
 // Ancho útil de las fotos de las tarjetas de servicio. Carril ≥1025px: la foto manda por el ALTO de la tarjeta (≤540 px, cover) → ~540 × 1,5 = 810 px de foto, no el ancho de la tarjeta.
-// Tarjetas apiladas (marco 4:3 + .px 110 %): ancho útil ≈ 1,24 × el ancho del marco.
-$railSizes = '(min-width:1025px) 820px, (min-width:641px) 42vw, 124vw';
+// Tarjetas apiladas (marco 4:3 + .px 110 %): ancho útil real ≈ 1,24 × el ancho del marco; en móvil se declara a propósito calc(100vw - 72px) (~0,9×) para que a DPR 2 siga eligiendo la variante de 640 (ampliación x1,26, dentro del límite x1,6) y el peso y el LCP móviles no suban.
+$railSizes = '(min-width:1025px) 820px, (min-width:641px) 42vw, calc(100vw - 72px)';
 
 $services = [
     ['num' => '01', 'title' => 'Dispatch & load booking',
@@ -98,10 +98,12 @@ $figures = [
     ['0', 'forms before you talk to us'],
 ];
 ?>
-<!-- HERO: foto protagonista (degradado solo desde la izquierda y abajo) + titular + widget de WhatsApp. El <video> va vacío y sin descarga (preload none, sin src): main.js le pone la fuente tras load + idle en >=1025px y entra con un fundido sobre la foto (que sigue siendo el LCP) -->
+<!-- HERO: foto protagonista (degradado solo desde la izquierda y abajo) + titular + widget de WhatsApp. El <video> va vacío y sin descarga (preload none, sin src): main.js le pone la fuente tras load + idle en >=1025px y entra con un fundido sobre la foto (que sigue siendo el LCP). La foto es el primer fotograma del propio video (assets/video/hero-poster-*.webp, 1920×1080; recortes hero-poster-m-* en ≤760 px y hero-poster-sq-* en 761 a 1024 px), así que el paso foto → video no se ve -->
 <section class="hero hero--home" id="top">
   <div class="hero__bg"<?= $heroVideo ? ' data-hero-video data-mp4="' . e($heroVideo['mp4'] ?? '') . '" data-webm="' . e($heroVideo['webm'] ?? '') . '" data-poster="' . e($heroVideo['poster'] ?? '') . '"' : '' ?>><?= ns_img(['dir' => 'video', 'base' => 'hero-poster', 'widths' => [1280, 1920], 'alt' => 'Aerial view of trucks and cars on a busy highway lined with trees at sunset', 'eager' => true, 'sizes' => '100vw',
-        'art' => [['media' => '(max-width:1024px)', 'base' => 'hero-poster-sq', 'widths' => [640, 1080], 'sizes' => '100vw']]]) ?><?php if ($heroVideo): ?><video class="hero__video" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video><?php endif; ?></div>
+        'art' => [
+            ['media' => '(max-width:760px)', 'base' => 'hero-poster-m', 'sizes' => '250px'],   // móvil: recorte 1,17:1 (el marco es 366×312); se declara 250 px a propósito (440 w a DPR ≤1,75: ampliación x1,46; 640 w a DPR 2: x1,14; 948 w a DPR 3) para no subir el LCP móvil
+            ['media' => '(max-width:1024px)', 'base' => 'hero-poster-sq', 'widths' => [640, 1080], 'sizes' => '100vw']]]) ?><?php if ($heroVideo): ?><video class="hero__video" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video><?php endif; ?></div>
   <div class="container hero__in">
     <div class="hero__main">
       <h1 class="eyebrow home-kicker"><?= e($route['h1']) ?></h1>
@@ -202,7 +204,7 @@ $figures = [
       <ol class="why__list">
         <?php foreach ($why as $i => [$n, $title, $text, $photo, $path, $linkLabel]): ?>
         <li class="why__item<?= $i === 0 ? ' is-on' : '' ?>">
-          <figure class="why__photo"><?= ns_img(['base' => $photo, 'alt' => '', 'sizes' => '(min-width:641px) 33vw, 100vw',
+          <figure class="why__photo"><?= ns_img(['base' => $photo, 'alt' => '', 'sizes' => '(min-width:901px) 33vw, (min-width:641px) 100vw, calc(100vw - 72px)',
             'art' => [['media' => '(min-width:1025px)', 'base' => $photo . '-tall', 'sizes' => '440px']]]) ?></figure>
           <div class="why__body">
             <span class="why__n t-meta" aria-hidden="true"><?= e($n) ?></span>
@@ -225,7 +227,7 @@ $figures = [
       <?php foreach ($steps as [$n, $title, $text, $photo]): ?>
       <li class="home-step">
         <span class="home-step__line" aria-hidden="true"><i></i></span>
-        <figure class="home-step__photo px"><?= ns_img($photo + ['sizes' => '(min-width:641px) 50vw, 100vw',
+        <figure class="home-step__photo px"><?= ns_img($photo + ['sizes' => '(min-width:641px) 50vw, calc(100vw - 72px)',
             'art' => [['media' => '(min-width:1025px)', 'base' => $photo['base'] . '-tall', 'sizes' => '360px']]]) ?></figure>
         <span class="home-step__n" aria-hidden="true"><?= e($n) ?></span>
         <h3 class="head t-h3"><span class="sr-only">Step <?= e($n) ?>: </span><?= e($title) ?></h3>

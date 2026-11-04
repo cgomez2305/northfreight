@@ -24,7 +24,7 @@ foreach ([640, 1280, 1920] as $pw) {
 <div class="vband">
   <figure class="vband__media" data-vband data-mp4="<?= e(asset("video/$video.mp4")) ?>">
     <div class="vband__layer">
-      <img class="vband__poster" src="<?= e(asset("video/$video-poster-1920.webp")) ?>" srcset="<?= e(implode(', ', $set)) ?>" sizes="(min-width:761px) 100vw, 480px" alt="<?= e($alt ?? '') ?>"<?= $g ? ' width="' . $g[0] . '" height="' . $g[1] . '"' : '' ?> loading="lazy" decoding="async">
+      <img class="vband__poster" src="<?= e(asset("video/$video-poster-1920.webp")) ?>" srcset="<?= e(implode(', ', $set)) ?>" sizes="(min-width:761px) 100vw, 320px" alt="<?= e($alt ?? '') ?>"<?= $g ? ' width="' . $g[0] . '" height="' . $g[1] . '"' : '' ?> loading="lazy" decoding="async">
       <video class="vband__video" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video>
     </div>
     <figcaption class="vband__card"><p class="vband__text"><?= ns_rich($text ?? '') ?></p></figcaption>

@@ -12,7 +12,7 @@ define('NS_KIT_LOADED', true);
 /**
  * Texto con marcas: escapa con phtext() ({{ph:X}} => ph()) y convierte
  * {hl}…{/hl} => <span class="hl">…</span>, {br} => <br> y {pill:base} => pastilla de foto decorativa dentro del titular
- * (<span class="hpill" aria-hidden="true">, alt vacío: no cambia el título accesible; solo si assets/img/<base>-640.webp existe). Nada de HTML crudo.
+ * (<span class="hpill" aria-hidden="true">, alt vacío: no cambia el título accesible; solo si assets/img/<base>-640.webp existe; usa <base>-320.webp si existe: la pastilla mide ≤122 px y 320 px bastan incluso en retina). Nada de HTML crudo.
  */
 function ns_rich(string $s): string
 {
@@ -22,7 +22,7 @@ function ns_rich(string $s): string
             if (!is_file(NS_ROOT . '/assets/img/' . $m[1] . '-640.webp')) {
                 return '';
             }
-            return '<span class="hpill" aria-hidden="true">' . ns_img(['base' => $m[1], 'alt' => '', 'widths' => [640], 'sizes' => '160px']) . '</span>';
+            return '<span class="hpill" aria-hidden="true">' . ns_img(['base' => $m[1], 'alt' => '', 'widths' => is_file(NS_ROOT . '/assets/img/' . $m[1] . '-320.webp') ? [320] : [640], 'sizes' => '160px']) . '</span>';
         }, $out);
     }
     return $out;
@@ -71,7 +71,8 @@ function ns_icon(string $name, int $size = 18, string $class = ''): string
  *     art(array de ['media'=>…, 'base'=>…, 'sizes'=>…, 'widths'=>…?]: recortes alternativos que se emiten ANTES de la fuente normal; el primero cuya media coincida gana).
  * `sizes` debe describir el ANCHO que ocupa la imagen una vez recortada con object-fit: cover (marco, margen de .px y alto incluidos), no solo el ancho del marco: con marcos
  * más altos que la foto manda el alto, y un `sizes` corto hace elegir una variante demasiado pequeña (se ve pixelada). Regla: ancho útil = max(ancho marco, alto imagen × proporción foto).
- * Las variantes no se ampliaron nunca: solo existen anchos ≤ al de la foto de origen.
+ * En móvil se declara a propósito algo por DEBAJO del ancho útil (calc(100vw - 72px)): a DPR ≤2 elige la variante de 640 (ampliación ≈ x1,26, límite x1,6) y el peso y el LCP móviles no suben; el escritorio sí pide la variante que da ≤ x1,10 en 1x.
+ * Las variantes no se ampliaron nunca: solo existen anchos ≤ al de la foto de origen (el ancho nativo puede ser cualquiera; se detectan en disco).
  */
 function ns_img(array $o): string
 {
@@ -104,17 +105,17 @@ function ns_img(array $o): string
         return $set;
     };
     $set = $srcset($base, $widths, $dir, $dirName);
+    // Variante más grande en disco: es el `src` de respaldo y da el width/height del <img> (sirve cualquier ancho nativo: 1122, 1448, 1914…). Sin variantes WebP cae al {base}.jpg.
+    $maxW = 0;
+    foreach ($widths as $cand) {
+        if ((int) $cand > $maxW && is_file($dir . "$base-$cand.webp")) {
+            $maxW = (int) $cand;
+        }
+    }
     $jpg = is_file($dir . "$base.jpg") ? "$dirName/$base.jpg" : null;
     $key = $dirName . '/' . $base;
-    $best = 0;
     if (!isset($dims[$key])) {
-        $ref = $jpg !== null ? $dir . "$base.jpg" : '';
-        foreach ($ref === '' ? $widths : [] as $cand) {   // sin JPG: las medidas salen de la variante más grande
-            if (is_file($dir . "$base-$cand.webp") && ($ref === '' || $cand > $best)) {
-                $ref = $dir . "$base-$cand.webp";
-                $best = $cand;
-            }
-        }
+        $ref = $maxW > 0 ? $dir . "$base-$maxW.webp" : ($jpg !== null ? $dir . "$base.jpg" : '');
         $g = $ref !== '' ? @getimagesize($ref) : false;
         $dims[$key] = $g ? [$g[0], $g[1]] : [0, 0];
     }
@@ -130,7 +131,7 @@ function ns_img(array $o): string
     if ($set) {
         $out .= '<source type="image/webp" srcset="' . e(implode(', ', $set)) . '" sizes="' . e($o['sizes'] ?? '100vw') . '">';
     }
-    $src = $jpg !== null ? asset($jpg) : ($set ? preg_replace('/ \d+w$/', '', end($set)) : '');
+    $src = $maxW > 0 ? asset("$dirName/$base-$maxW.webp") : ($jpg !== null ? asset($jpg) : '');
     $out .= '<img src="' . e($src) . '" alt="' . e($o['alt'] ?? '') . '"'
         . ($w ? ' width="' . $w . '" height="' . $h . '"' : '')
         . ($eager ? ' fetchpriority="high"' : ' loading="lazy"') . ' decoding="async"'

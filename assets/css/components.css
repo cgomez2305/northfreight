@@ -259,9 +259,12 @@ a.card:hover .card__icon, .card--hover:hover .card__icon { background: var(--cya
 .cta__actions { position: relative; flex: 1 1 340px; max-width: 440px; display: flex; flex-direction: column; gap: 12px; }
 /* Con foto (param image): foto de fondo oscurecida con --cta-veil (contraste del texto medido) y contenido centrado */
 .cta--photo { background: var(--bg); }
+@media (min-width: 1025px) { .cta--photo { background: var(--panel); border: 1px solid var(--hairline); } }   /* con la foto a 1000 px el panel se lee por los lados */
 .cta__bg { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
 .cta__bg picture { display: block; width: 100%; height: 100%; }
-.cta__bg img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 34%; }
+.cta__bg img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 34%; }   /* sin .px: a alto completo la foto de 1280 px no se amplía más de lo necesario */
+/* ≥1025px la foto ocupa como mucho 1000 px y se funde con el panel por los lados: a 1000 px (alto ~675) la foto de 1280×853 se amplía x0,79 (x1,58 en retina); a todo el ancho del panel (~1410 px) serían x1,10 y x2,2 */
+@media (min-width: 1025px) { .cta--photo .cta__bg { inset: 0; width: min(100%, 1000px); margin-inline: auto; -webkit-mask-image: var(--cta-edge-mask); mask-image: var(--cta-edge-mask); } }
 .cta__bg::after { content: ""; position: absolute; inset: 0; background: var(--cta-veil); }
 .cta--photo .cta__in { z-index: 1; flex-direction: column; align-items: center; justify-content: center; gap: 40px; text-align: center; }
 .cta--photo .cta__main { flex: none; align-items: center; }

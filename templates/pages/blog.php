@@ -78,7 +78,7 @@ $chips = ['all' => 'All', 'dispatch' => 'Dispatch', 'relay' => 'Amazon Relay', '
             'title'   => $p['title'],
             'text'    => $p['excerpt'],
             'cta'     => 'Read',
-            'image'   => !$isLink && !empty($p['image']) ? $p['image'] + ['sizes' => '(min-width:1025px) 500px, (min-width:641px) 42vw, 124vw'] : null,
+            'image'   => !$isLink && !empty($p['image']) ? $p['image'] + ['sizes' => '(min-width:1025px) 500px, (min-width:641px) 42vw, calc(100vw - 72px)'] : null,
         ]); ?>
       </li>
       <?php endforeach; ?>

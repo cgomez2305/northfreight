@@ -13,7 +13,7 @@
  *  tagline string  frase corta bajo el titular
  *  lead    string  entrada
  *  ctas    array   [['label','href','variant'=>'primary|ghost','icon'=>'arrow|whatsapp|null','arrow'=>bool (→ de texto, solo en ghost: los primarios ya llevan la celda de flecha ↗ por CSS)],…]
- *  image   array   ['base'=>'red-semi-dry-van-open-road','alt'=>'…','ratio'=>(sin uso),'small'=>bool (máx. 490px de ancho: fotos de 490px),'sizes'=>'…'] foto a la derecha (radio 24; en móvil debajo del texto)
+ *  image   array   ['base'=>'red-semi-dry-van-open-road','alt'=>'…','small'=>bool (máx. 490px de ancho: fotos de 490px),'sizes'=>'…'] foto a la derecha (radio 24; en móvil debajo del texto)
  *  aside   string  HTML ya renderizado (tarjeta de datos / vista previa de documento); va tras la imagen si hay ambas
  *  stack   bool    true => sin columna derecha, H1 hasta 980px
  *  cls     string  clase extra en <section>
@@ -47,7 +47,7 @@ $ctas = $ctas ?? [];
     <?php if ($image || $aside !== ''): ?>
     <div class="hero__aside">
       <?php if ($image): ?>
-      <figure class="hero__photo px<?= !empty($image['small']) ? ' hero__photo--s' : '' ?>"><?= ns_img(['base' => $image['base'], 'alt' => $image['alt'] ?? '', 'eager' => true, 'sizes' => $image['sizes'] ?? '(min-width:1025px) 700px, calc(124vw - 100px)']) ?></figure>
+      <figure class="hero__photo px<?= !empty($image['small']) ? ' hero__photo--s' : '' ?>"><?= ns_img(['base' => $image['base'], 'alt' => $image['alt'] ?? '', 'eager' => true, 'sizes' => $image['sizes'] ?? '(min-width:1025px) 700px, calc(100vw - 72px)']) ?></figure>
       <?php endif; ?>
       <?= $aside ?>
     </div>

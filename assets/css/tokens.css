@@ -34,6 +34,7 @@
   --btn-cell: rgba(4, 19, 42, .14);        /* celda circular del botón primario (sobre cian) */
   --glass-strong: rgba(10, 29, 51, .88);   /* widget de WhatsApp del hero: más opaco que el menú para sostener AA sobre la foto */
   --cta-veil: radial-gradient(ellipse 75% 105% at 50% 50%, rgba(4, 16, 31, .87) 0%, rgba(4, 16, 31, .84) 52%, rgba(4, 16, 31, .4) 100%);   /* CTA final con foto (nocturna, truck-night-rain-headlights): más opaco detrás del texto centrado (contraste medido >= 5,5:1 también en el cian grande) y más foto en los bordes */
+  --cta-edge-mask: linear-gradient(90deg, transparent 0, #000 14%, #000 86%, transparent 100%);   /* máscara de alfa: la foto del CTA se funde con el panel por los lados (≥1025px) */
   --ph-bg: #FFF3B0;            /* marca de placeholder (solo staging) */
 
   /* Tipografía */
