@@ -7,10 +7,6 @@
 .sb-split__text { flex: 1 1 440px; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
 .sb-link { display: inline-flex; align-items: center; align-self: flex-start; min-height: 44px; gap: 6px; font-weight: 700; color: var(--cyan); text-decoration: none; }
 .sb-link:hover { color: var(--text); }
-.sb-media { flex: 1 1 380px; min-width: 0; position: relative; min-height: 300px; }
-.sb-media__clip { position: absolute; inset: 0; overflow: hidden; background: var(--bg); border-radius: var(--r-card); overflow: hidden; }
-.sb-media__clip picture { display: block; width: 100%; height: 100%; }
-.sb-media__clip img { width: 100%; height: 100%; object-fit: cover; display: block; }
 /* ---- Tracking ---- */
 .sb-tr-hero .hero__lead { max-width: 560px; }
 .sb-tr-card { padding: clamp(20px, 3vw, 32px); gap: 16px; }
@@ -33,18 +29,6 @@
 /* ---- How it works ---- */
 .sb-hw-hero .hero__lead { max-width: 620px; }
 .sb-hw-hero .hero__title { max-width: 960px; }
-.sb-hw-wrap { max-width: calc(1100px + 2 * var(--gutter)); }
-/* Pasos verticales: paradas numeradas unidas por una línea fina estática (un tramo por paso, de centro a centro). */
-.sb-hw-steps { display: flex; flex-direction: column; margin-left: 31px; position: relative; }
-.sb-hw-step:not(:last-child)::before { content: ""; position: absolute; left: 31px; top: 32px; bottom: -32px; width: 1px; background: var(--hairline-strong); }
-.sb-hw-step { position: relative; display: flex; gap: clamp(18px, 3vw, 32px); align-items: flex-start; margin-left: -33px; padding-bottom: 48px; }
-.sb-hw-step:last-child { padding-bottom: 0; }
-.sb-hw-step__num { position: relative; z-index: 1; flex: none; width: 64px; height: 64px; display: flex; align-items: center; justify-content: center; background: var(--bg); color: var(--cyan); border: 1px solid var(--hairline-strong); border-radius: var(--r-pill); font-family: var(--font-mono); font-weight: 500; font-size: 17px; letter-spacing: .05em; }
-.sb-hw-step__num--end { background: var(--cyan); border-color: var(--cyan); }
-.sb-hw-step__num--end .star { color: var(--navy-deep); }
-.sb-hw-step__body { display: flex; flex-direction: column; gap: 10px; padding-top: 6px; min-width: 0; }
-.sb-hw-step__title { font-size: clamp(28px, 3.2vw, 40px); line-height: 1; color: var(--text); }
-.sb-hw-step__body p { max-width: 680px; }
 .sb-hw-item { flex-direction: row; align-items: center; gap: 14px; }
 .sb-hw-item__text { font-family: var(--font-head); font-weight: 700; font-size: 24px; line-height: 1.1; letter-spacing: -.01em; color: var(--text); }
 .card--dark .sb-hw-item__text { color: var(--text); }

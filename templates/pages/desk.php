@@ -1,9 +1,9 @@
 <?php
 /**
  * /our-desk/ — maqueta Desk.html.
- * Orden: hero (texto + capítulos | fachada de video) · The team (4 tarjetas, app/data/team.php) · Three rules (3 tarjetas altas) · How we work · What you can count on (filas W/01..W/04) · CTA final (layout).
+ * Orden: hero fotográfico (patrón A: la fachada del video es la foto; título, meta y capítulos en una tarjeta de vidrio) · The team (4 tarjetas, app/data/team.php) · Three rules (3 tarjetas altas) · How we work · What you can count on (filas W/01..W/04) · CTA final (layout).
  * Rules y filas reutilizan afirmaciones que ya están en el sitio; ninguna lleva foto.
- * La portada del video es foto stock: sin texto encima salvo el botón de play (el pie va debajo).
+ * La portada del video es una foto de marca: el botón de play es lo único que va encima del video; el texto va sobre el degradado del hero.
  */
 require_once NS_ROOT . '/templates/partials/kit.php';
 
@@ -33,25 +33,36 @@ $reasons = [
     ['A team, not a single dispatcher', 'Dispatch, tracking and back office presented as one team.', '/how-it-works/'],
 ];
 ?>
-<section class="hero on-dark sb-dk-hero">
-  <div class="container hero__in">
-    <div class="hero__main">
-      <?php partial('breadcrumbs', ['route' => $route]); ?>
-      <h1 class="hero__title t-h1">Built by dispatchers. <span class="hl">Run as a team.</span></h1>
-      <p class="hero__lead t-lead">At NorthStar, behind every load there are people coordinating information, decisions and follow-up. We want you to know who we are and how we work with you.</p>
-      <?php partial('video', ['part' => 'chapters', 'id' => 'desk', 'chapters' => $chapters, 'chapters_label' => 'Jump to a chapter']); ?>
-    </div>
-    <div class="hero__aside">
-      <?php partial('video', [
-          'part'  => 'player',
-          'id'    => 'desk',
-          'image' => ['base' => 'nf-dispatch-room-maps', 'alt' => 'Dispatch room at night with monitors showing route maps and an empty chair'],
-          'title' => 'Meet the desk {hl}· 3 chapters{/hl}',
-          'meta'  => 'Video · 3 to 4 min',
-      ]); ?>
-    </div>
-  </div>
-</section>
+<?php
+// Hero fotográfico (patrón A): la fachada del video ES la foto del hero (marco `hero__pic`, play centrado); el título del video, su meta y los 3 capítulos van en una tarjeta de vidrio abajo a la derecha.
+ob_start();
+partial('video', [
+    'part'  => 'player',
+    'id'    => 'desk',
+    'image' => ['base' => 'nf-dispatch-room-maps', 'alt' => 'Dispatch room at night with monitors showing route maps and an empty chair'],
+    'cls'   => 'hero__pic',
+    'foot'  => false,
+    'pos'   => '60% 50%',
+    'sizes' => '(min-width:1025px) 1160px, (min-width:761px) 100vw, calc(100vw - 72px)',
+]);
+$bg = ob_get_clean();
+ob_start(); ?>
+<div class="hero__glass">
+  <p class="head video__title"><?= ns_rich('Meet the desk {hl}· 3 chapters{/hl}') ?></p>
+  <span class="video__meta">Video · 3 to 4 min</span>
+  <?php partial('video', ['part' => 'chapters', 'id' => 'desk', 'chapters' => $chapters, 'chapters_label' => 'Jump to a chapter']); ?>
+</div>
+<?php $aside = ob_get_clean();
+
+partial('hero', [
+    'route' => $route,
+    'cls'   => 'sb-dk-hero',
+    'h1'    => 'Built by dispatchers. {hl}Run as a team.{/hl}',
+    'lead'  => 'At NorthStar, behind every load there are people coordinating information, decisions and follow-up. We want you to know who we are and how we work with you.',
+    'bg'    => $bg,
+    'aside' => $aside,
+]);
+?>
 
 <section class="section" aria-labelledby="dk-team">
   <div class="container stack sb-dk-stack">

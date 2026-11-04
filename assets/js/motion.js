@@ -4,7 +4,8 @@
    prefers-reduced-motion; si algo falla se revierte todo y la página queda completa y estática.
    Sistema común (se activa por clases que ya existen en los partials, nada por página):
      hero interno (.hero) · bandas y paneles (.section--surface, .section--dark, .home-relay, .cta, .footer, .co-band) · rejillas 3D por filas
-     (.g2 a .g6, .blog-grid) · titulares de sección (.t-h2, .t-h2-s) · marcos de foto (.px) con parallax y escala · cifras (entradas una vez).
+     (.g2 a .g6, .blog-grid) · titulares de sección (.t-h2, .t-h2-s) · marcos de foto (.px) con parallax y escala · cifras (entradas una vez) ·
+     patrón B (foto ancha con tarjeta solapada: la tarjeta sube con desfase respecto a la foto) · patrón C (filas apiladas con sticky: la fila cubierta se escala a .955 y su foto se atenúa).
    Solo home: hero fijado (también se desvanece el widget de WhatsApp y sigue el video de fondo), carril horizontal fijado de servicios, sticky "Why a desk" (pin ~2,1 alturas: numeral, foto con crossfade e ítem activo),
    líneas de progreso del onboarding (scaleX con scrub) y parallax de la banda de video. Móvil (<1025 px): parallax de fotos, líneas, cifras y entrada de bandas, sin pines ni 3D.
    Nunca se anima ningún input, select, textarea ni resultado aria-live. Estilos que necesitan: assets/css/motion.css. */
@@ -197,7 +198,7 @@
   /* ---- Hero interno (todas las páginas internas, sin pin, solo escritorio): mientras sale de la pantalla el panel se aleja ---- */
   function heroInt() {
     $('.hero:not(.hero--home)').forEach(function (hero) {
-      var main = one('.hero__main', hero), video = one('.video', hero);
+      var main = one('.hero__main', hero), video = one('.video:not(.hero__pic)', hero);   // el marco del hero fotográfico (Our desk) no se escala: crearía un contexto de apilamiento y dejaría el play bajo el degradado
       // herramientas con la calculadora dentro del hero: nada de escalar el panel (arrastraría los campos); solo sube y se atenúa el bloque de texto
       if (hasField(hero) || hasLive(hero)) {
         if (main && !main.querySelector('input, select, textarea, [aria-live]')) {
@@ -256,7 +257,7 @@
   function headScene(rail) {
     var done = [];
     $('.t-h2, .t-h2-s').forEach(function (h) {
-      if (h.closest('.hero, .cta, .blog-feat, .home-cards') || (rail && h.closest('.home-services, .home-why'))) return;
+      if (h.closest('.hero, .cta, .blog-feat, .home-cards, .pcard__card, .pband') || (rail && h.closest('.home-services, .home-why'))) return;
       var par = h.parentElement, box = h.closest('.section-head') || (par && !par.matches('.container, .section, section, main') ? par : h);
       if (done.indexOf(box) >= 0 || box.querySelector('input, select, textarea')) return;
       done.push(box);
@@ -273,9 +274,40 @@
     });
   }
 
-  /* ---- Cifras y pasos (home: onboarding y 4/1/0; How it works): entrada una vez, .7 s, escalonada por fila ---- */
+  /* ---- Patrón B (foto ancha con tarjeta solapada, también el destacado del blog): la tarjeta sube 80 px con scrub y un recorrido más largo que el de la foto (que entra escalando, ver mediaScene):
+     el desfase entre las dos da la profundidad. Solo transform ---- */
+  function pcardScene() {
+    $('.pcard__in, .blog-feat').forEach(function (box) {
+      var card = one('.pcard__card, .blog-feat__body', box);
+      if (!card || !sees(box)) return;
+      g.fromTo(card, { y: 80 }, { y: 0, ease: 'none', scrollTrigger: { trigger: box, start: 'top 92%', end: 'top 22%', scrub: 0.6, onToggle: wc(card) } });
+    });
+  }
+
+  /* ---- Patrón C (filas apiladas, >=1025px y >=700px de alto): las filas se apilan con position: sticky (motion.css) y la que queda cubierta por la siguiente se escala a .955 y su foto se atenúa a .45
+     mientras la siguiente sube hasta su posición de parada. Un trigger por fila cubierta. Solo transform y opacity ---- */
+  function rowsScene() {
+    var hh = parseFloat(getComputedStyle(root).getPropertyValue('--header-h')) || 96;
+    var stop = function (i) { return Math.round(hh + 8 + i * 14); };
+    $('.prows').forEach(function (ol) {
+      var rows = $('.prow', ol);
+      if (rows.length < 2 || !sees(ol)) return;
+      rows.forEach(function (row, i) {
+        if (i === rows.length - 1) return;
+        var inner = one('.prow__in', row), photo = inner && one('.prow__photo', inner);
+        if (!inner) return;
+        // la fila sigue opaca (si no, las de debajo se transparentan): se atenúa solo la foto, que deja ver el fondo --bg de la fila
+        var tl = g.timeline({ defaults: { ease: 'none', duration: 1 },
+          scrollTrigger: { trigger: rows[i + 1], start: function () { return 'top ' + (stop(i) + inner.offsetHeight); }, end: function () { return 'top ' + stop(i + 1); }, scrub: true, invalidateOnRefresh: true, onToggle: wc(inner) } });
+        tl.fromTo(inner, { scale: 1 }, { scale: 0.955, transformOrigin: '50% 0' }, 0);
+        if (photo) tl.fromTo(photo, { opacity: 1 }, { opacity: 0.45 }, 0);
+      });
+    });
+  }
+
+  /* ---- Cifras y pasos (home: onboarding y 4/1/0): entrada una vez, .7 s, escalonada por fila ---- */
   function enterScene() {
-    $('.home-steps, .home-figures, .sb-hw-steps').forEach(function (ul) {
+    $('.home-steps, .home-figures').forEach(function (ul) {
       var list = A.slice.call(ul.children).filter(function (el) { return sees(el) && el.getBoundingClientRect().top > vh() * 0.9; });
       rowsOf(list, ul.matches('.home-steps') ? 80 : 24).forEach(function (row) {   // las columnas del onboarding llevan desfase vertical (0/20/40/60 px) y cuentan como una fila
         var par = row.els[0].parentElement;
@@ -332,6 +364,8 @@
       undo.push(gridScene(!!c.rail));
       headScene(!!c.rail);
       mediaScene();
+      pcardScene();
+      if (c.rail) rowsScene();
     }
     enterScene();
     bandScene(!!c.desk);

@@ -7,9 +7,6 @@
 .sa-split__text--wide { flex-basis: 440px; }
 .sa-split__list { flex: 1 1 380px; min-width: 0; margin: 0; padding: 0; }
 .sa-split .section-head { gap: 16px; }
-.sa-media { flex: 1 1 380px; min-width: 0; position: relative; min-height: 320px; overflow: hidden; border-radius: var(--r-card); background: var(--bg); }
-.sa-media picture { position: absolute; inset: 0; display: block; }
-.sa-media img { width: 100%; height: 100%; object-fit: cover; display: block; }
 /* ---- Relay: enlaces a guías ---- */
 .sa-guides { padding-block: clamp(56px, 8vw, 96px) clamp(40px, 5vw, 56px); }
 .sa-guides__in { display: flex; flex-wrap: wrap; gap: 14px; }

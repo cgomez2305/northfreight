@@ -1,7 +1,7 @@
 <?php
 /**
  * /load-tracking/ — maqueta Tracking.html.
- * Orden: hero (texto + "Desk log" de ejemplo) · What we log · Evidencia (texto + foto) · CTA final (lo imprime el layout).
+ * Orden: hero (texto + "Desk log" de ejemplo, sin foto) · What we log · Evidencia (foto ancha con tarjeta solapada, patrón B) · CTA final (lo imprime el layout).
  */
 require_once NS_ROOT . '/templates/partials/kit.php';
 
@@ -59,19 +59,11 @@ partial('summary', [
   </div>
 </section>
 
-<section class="section section--surface" aria-labelledby="tr-proof">
-  <div class="container sb-split">
-    <div class="sb-split__text">
-      <?php partial('section-head', ['eyebrow' => 'Proof, not promises', 'title' => 'Incidents are handled with evidence', 'id' => 'tr-proof']); ?>
-      <p class="t-body c-slate">When a broker questions a late arrival or detention, the record is already there: time, place and photos. Your claim starts with proof, not with a phone call.</p>
-      <?php if (route_is_live('/trucking-back-office/')): ?>
-      <a class="sb-link" href="<?= e(url('/trucking-back-office/')) ?>">How our back office uses this evidence <span class="arrow" aria-hidden="true">→</span></a>
-      <?php endif; ?>
-    </div>
-    <div class="sb-media">
-      <div class="sb-media__clip px">
-        <?= ns_img(['base' => 'nf-highway-side-mirror-night', 'alt' => 'Night highway with trucks seen in a truck’s side mirror', 'sizes' => '(min-width:1025px) 760px, (min-width:641px) 100vw, 640px']) ?>
-      </div>
-    </div>
-  </div>
-</section>
+<?php partial('photo-card', [
+    'id'      => 'tr-proof',
+    'eyebrow' => 'Proof, not promises',
+    'title'   => 'Incidents are handled with evidence',
+    'lead'    => 'When a broker questions a late arrival or detention, the record is already there: time, place and photos. Your claim starts with proof, not with a phone call.',
+    'image'   => ['base' => 'nf-highway-side-mirror-night', 'alt' => 'Night highway with trucks seen in a truck’s side mirror', 'pos' => '70% 50%'],
+    'link'    => route_is_live('/trucking-back-office/') ? ['label' => 'How our back office uses this evidence', 'href' => url('/trucking-back-office/')] : null,
+]); ?>

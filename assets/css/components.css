@@ -158,11 +158,44 @@ a.btn--primary:hover::after, a.btn--navy:hover::after, a.btn--primary:focus-visi
 .hero__eyebrow { margin: 0; }
 .hero__lead { max-width: 620px; color: var(--text-2); }
 .hero__ctas { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
-.hero__photo { position: relative; margin: 0; overflow: hidden; background: var(--bg); border-radius: var(--r-card); aspect-ratio: 4 / 3; }
-.hero__photo--s { width: 100%; max-width: 490px; margin-inline: auto 0; }
-.hero__photo picture { display: block; width: 100%; height: 100%; }
-.hero__photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
-@media (max-width: 1024px) { .hero__photo--s { margin-inline: 0; } }
+/* Heros internos: ancho del contenedor (1280), igual con y sin foto, para que no salten entre páginas */
+.hero--int { width: min(calc(100% - 2 * var(--inset)), var(--max)); margin-inline: auto; }
+
+/* ---- PATRÓN A · hero fotográfico (layout photo del partial hero): la foto es el marco. Va anclada a la derecha del panel (90 % del ancho, con máscara en su borde izquierdo) y el texto abajo a la izquierda sobre degradado;
+   así la foto nunca se amplía por encima de x1,6 en retina aunque el master mida 1448 px. ≥1025px: texto sobre foto con degradado medido (AA). <1025px: la foto arriba, el texto debajo sobre --bg, sin superponer. ---- */
+.hero--photo { background: var(--bg); border: 1px solid var(--hairline); }
+.hero__pic { position: relative; margin: 0; overflow: hidden; background: var(--bg); aspect-ratio: 4 / 3; }
+.hero__pic picture { display: block; width: 100%; height: 100%; }
+.hero__pic img { width: 100%; height: 100%; object-fit: cover; object-position: var(--pos, 50% 50%); display: block; }
+.hero__pic::after { content: ""; position: absolute; inset: 0; background: var(--hero-fade-top), var(--hero-fade-m); pointer-events: none; }
+.hero--photo .hero__in { gap: 0; padding-top: 0; margin-top: -44px; padding-bottom: clamp(36px, 6vw, 56px); align-items: flex-start; }
+.hero--photo .hero__crumbs { flex: 1 1 100%; margin-bottom: 20px; }
+.hero--photo .hero__main { flex: 1 1 100%; gap: 20px; }
+.hero--photo .hero__aside { flex: 1 1 100%; margin-top: 28px; }
+.hero--photo .hero__title { font-size: clamp(48px, 11.5vw, 84px); }
+.hero--photo .crumbs ol { display: inline-flex; padding: 8px 16px; background: var(--glass-bg); border: 1px solid var(--hairline-strong); border-radius: var(--r-pill); }
+.hero--photo .sa-sheet { background: var(--glass-strong); }
+@media (min-width: 761px) and (max-width: 1024px) { .hero__pic { aspect-ratio: 16 / 9; } }
+@media (min-width: 1025px) {
+  .hero--photo { min-height: clamp(520px, 74vh, 640px); display: flex; }   /* ≤640: la foto (110 % del alto por el parallax) no pasa de ~704 px de alto y los masters 16:9 no superan x1,6 en retina */
+  .hero__pic { position: absolute; top: 0; right: 0; bottom: 0; width: 90%; aspect-ratio: auto; }
+  .hero__pic picture { -webkit-mask-image: var(--photo-mask); mask-image: var(--photo-mask); }   /* la máscara va en el <picture> (no en .hero__pic) para no crear un contexto de apilamiento que dejaría el botón de play del video bajo el degradado */
+  .hero__pic::after { content: none; }
+  .hero--photo::after { content: ""; position: absolute; inset: 0; z-index: 0; background: var(--hero-fade-top), var(--photo-fade-bottom), var(--photo-fade-left); pointer-events: none; }
+  .hero--photo .hero__in { flex: 1 1 auto; max-width: none; display: grid; grid-template-columns: minmax(0, 1fr) 380px; grid-template-rows: auto 1fr; align-items: end; gap: 0 40px; margin-top: 0; padding-top: 84px; padding-bottom: 44px; }
+  .hero--photo .hero__crumbs { grid-column: 1 / -1; grid-row: 1; justify-self: start; margin: 0; }
+  .hero--photo .hero__main { grid-column: 1; grid-row: 2; max-width: 780px; gap: 22px; }
+  .hero--photo .hero__aside { grid-column: 2; grid-row: 2; margin: 0; }
+  .hero--photo .hero__title { font-size: clamp(56px, 6.6vw, 92px); }
+  .hero--photo .hero__lead { color: var(--text); max-width: 560px; }
+  .hero--photo .t-tagline { color: var(--text); }
+  .hero--photo .hero__in { pointer-events: none; }   /* la rejilla del texto cubre todo el hero: deja pasar el clic al botón de play del video de fondo */
+  .hero--photo .hero__crumbs, .hero--photo .hero__main, .hero--photo .hero__aside { pointer-events: auto; }
+  .hero__pic.video .video__play { left: 46%; top: 28%; }   /* el play queda en la zona libre sobre el titular (nunca debajo del texto) */
+  .hero--photo.is-playing .hero__in, .hero--photo.is-playing::after { display: none; }
+  .hero--photo.is-playing .hero__pic { width: 100%; }
+  .hero--photo.is-playing .hero__pic picture { -webkit-mask-image: none; mask-image: none; }
+}
 
 /* ---- Cabecera de sección ---- */
 .has-cta > :is(.section--surface, .section--dark):last-child { margin-bottom: var(--inset); }
@@ -360,3 +393,101 @@ body:has(.mobile-menu:not([hidden])) .wa-float, body.menu-open .wa-float { displ
 .field { display: flex; flex-direction: column; gap: 10px; font-family: var(--font-mono); font-weight: 500; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--text-2); }
 /* Dentro de un hero (panel) las tarjetas de datos van sin fondo propio: sin panel dentro de panel */
 .hero .data-card { background: transparent; border-color: var(--hairline-strong); }
+
+/* ---- PATRÓN B · foto ancha con tarjeta solapada (partial photo-card). Foto 16:9 a 128 px del borde del contenedor y tarjeta --panel que la solapa por abajo (y sobresale hacia fuera): la foto es la protagonista.
+   `flip` pone la tarjeta a la derecha (cuando el sujeto de la foto está a la izquierda). <1025px: foto arriba y tarjeta debajo con un solape pequeño. ---- */
+.pcard__in { position: relative; display: flex; flex-direction: column; }
+.pcard__photo { position: relative; margin: 0; overflow: hidden; border-radius: var(--r-panel); background: var(--bg); aspect-ratio: 4 / 3; }
+.pcard__photo picture { display: block; width: 100%; height: 100%; }
+.pcard__photo img { width: 100%; height: 100%; object-fit: cover; object-position: var(--pos, 50% 50%); display: block; }
+.pcard__card { position: relative; z-index: 2; display: flex; flex-direction: column; gap: 18px; margin: -56px 12px 0; padding: clamp(24px, 3vw, 40px); background: var(--panel); border: 1px solid var(--hairline-strong); border-radius: var(--r-card); }
+.pcard__card .section-head { gap: 16px; }
+.pcard__card .t-h2 { font-size: clamp(34px, 8vw, 46px); }
+.pcard__pill { position: absolute; right: 20px; bottom: 20px; z-index: 1; display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 22px; background: var(--glass-strong); border: 1px solid var(--hairline-strong); border-radius: var(--r-pill); color: var(--text); font-weight: 600; font-size: 15px; text-decoration: none; transition: background-color var(--t-fast), border-color var(--t-fast); }
+.pcard__pill:hover { background: var(--panel-2); border-color: var(--cyan-line); color: var(--text); }
+@media (min-width: 761px) and (max-width: 1024px) { .pcard__photo { aspect-ratio: 16 / 9; } .pcard__card { margin-inline: 32px; } }
+@media (min-width: 1025px) {
+  .pcard__in { padding-bottom: 56px; }
+  .pcard__photo { width: calc(100% - 128px); margin-left: auto; aspect-ratio: 16 / 9; max-height: 640px; }
+  .pcard__card { position: absolute; left: 0; bottom: 0; width: min(540px, 46%); margin: 0; }
+  .pcard__card .t-h2 { font-size: clamp(34px, 3.4vw, 46px); }
+  .pcard--flip .pcard__photo { margin-left: 0; margin-right: auto; }
+  .pcard--flip .pcard__card { left: auto; right: 0; }
+  .pcard--flip .pcard__pill { right: auto; left: 20px; }
+}
+
+/* ---- PATRÓN C · filas de servicio apiladas (partial photo-rows). Cada fila es una tarjeta-foto grande: foto anclada a la derecha con máscara, cuadrado de vidrio con icono arriba a la izquierda, número, título y texto abajo a la izquierda sobre degradado
+   (--row-fade). ≥1025px y ≥700px de alto con html.js-motion: las filas se apilan con position: sticky y motion.js escala y atenúa la que cubre la siguiente. <1025px y sin JS: lista normal; en móvil la foto va arriba y el texto debajo. ---- */
+.prows { display: flex; flex-direction: column; gap: 16px; }
+.prow__in { position: relative; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--hairline); border-radius: var(--r-panel); background: var(--panel); color: var(--text); text-decoration: none; }
+a.prow__in:hover { color: var(--text); border-color: var(--cyan-line); }
+.prow__photo { position: relative; margin: 0; aspect-ratio: 4 / 3; overflow: hidden; background: var(--bg); }
+.prow__photo picture { display: block; width: 100%; height: 100%; }
+.prow__photo img { width: 100%; height: 100%; object-fit: cover; object-position: var(--pos, 50% 50%); display: block; }
+.prow__icon { position: absolute; top: 18px; left: 18px; z-index: 2; width: 52px; height: 52px; display: grid; place-items: center; background: var(--glass-strong); border: 1px solid var(--hairline-strong); border-radius: var(--r-tile); color: var(--cyan-light); }
+.prow__body { position: relative; z-index: 2; display: flex; flex-direction: column; gap: 10px; padding: 22px 22px 26px; }
+.prow__n { color: var(--cyan-light); }
+.prow__title { font-size: clamp(32px, 8vw, 44px); line-height: .95; color: var(--text); }
+.prow__text { max-width: 560px; font-size: 17px; line-height: 1.55; color: var(--text-2); }
+.prow__go { position: absolute; right: 18px; bottom: 22px; z-index: 2; width: 52px; height: 52px; display: grid; place-items: center; border-radius: var(--r-pill); background: var(--cyan); color: var(--navy-deep); transition: background-color var(--t-fast); }
+a.prow__in:hover .prow__go { background: var(--cyan-light); }
+@media (min-width: 761px) and (max-width: 1024px) { .prow__photo { aspect-ratio: 16 / 9; } .prow__body { padding: 26px 32px 32px; } .prow__go { right: 28px; bottom: 30px; } }
+@media (min-width: 1025px) {
+  .prows { gap: 24px; }
+  .prow__in { height: clamp(400px, 52vh, 500px); justify-content: flex-end; background: var(--bg); }
+  .prow__photo { position: absolute; top: 0; right: 0; bottom: 0; width: 90%; aspect-ratio: auto; -webkit-mask-image: var(--photo-mask); mask-image: var(--photo-mask); }
+  .prow__in::after { content: ""; position: absolute; inset: 0; z-index: 1; background: var(--row-fade); pointer-events: none; }
+  .prow__icon { top: 28px; left: 28px; width: 56px; height: 56px; }
+  .prow__body { max-width: 640px; padding: 0 clamp(28px, 3vw, 44px) clamp(28px, 3vw, 44px); gap: 12px; }
+  .prow__text { color: var(--text); }
+  .prow__title { font-size: clamp(40px, 4vw, 56px); }
+  .prow__go { right: 28px; bottom: 28px; }
+}
+
+/* ---- PATRÓN D · banda fotográfica (partial photo-band): foto ancha con la frase ya afirmada abajo a la izquierda sobre degradado y, a la derecha, chips o un botón pill de vidrio. Misma construcción que el hero fotográfico. <1025px: foto arriba y texto debajo. ---- */
+.pband { position: relative; display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--hairline); border-radius: var(--r-panel); background: var(--bg); }
+.pband__photo { position: relative; margin: 0; overflow: hidden; aspect-ratio: 4 / 3; background: var(--bg); }
+.pband__photo picture { display: block; width: 100%; height: 100%; }
+.pband__photo img { width: 100%; height: 100%; object-fit: cover; object-position: var(--pos, 50% 50%); display: block; }
+.pband__body { position: relative; z-index: 2; display: flex; flex-direction: column; gap: 24px; padding: 24px 22px 30px; }
+.pband__body .section-head { gap: 16px; }
+.pband__body .t-h2 { font-size: clamp(38px, 10vw, 56px); }
+.pband__chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.pband__side { display: flex; flex-wrap: wrap; align-items: flex-end; }
+.pband__chip { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 10px 18px 10px 14px; background: var(--glass-strong); border: 1px solid var(--hairline-strong); border-radius: var(--r-pill); font-weight: 600; font-size: 15px; line-height: 1.25; color: var(--text); }
+.pband__chip--end { background: var(--cyan); border-color: var(--cyan); color: var(--navy-deep); }
+.pband__chip .arrow { color: var(--cyan-light); }
+.pband__chips--flow { gap: 6px; }
+.pband__chips--flow .pband__chip { padding-left: 16px; }
+.pband__chips--flow .pband__chip:not(:first-child) { padding-left: 12px; }
+.pband__chips--flow .pband__chip--end .arrow { color: var(--navy-deep); }
+.pband__pill { position: static; }
+@media (min-width: 761px) and (max-width: 1024px) { .pband__photo { aspect-ratio: 16 / 9; } .pband__body { padding: 28px 32px 34px; } }
+@media (min-width: 1025px) {
+  .pband { min-height: clamp(500px, 46vw, 600px); justify-content: flex-end; }
+  .pband__photo { position: absolute; top: 0; right: 0; bottom: 0; width: 90%; aspect-ratio: auto; -webkit-mask-image: var(--photo-mask); mask-image: var(--photo-mask); }
+  .pband::after { content: ""; position: absolute; inset: 0; z-index: 1; background: var(--photo-fade-bottom), var(--photo-fade-left); pointer-events: none; }
+  .pband__body { max-width: 680px; gap: 26px; padding: 0 clamp(32px, 4vw, 56px) clamp(32px, 4vw, 52px); }
+  .pband__body .t-h2 { font-size: clamp(40px, 4.4vw, 60px); }
+  
+}
+
+/* ---- Video dentro de los patrones (fachada = foto del marco; el play queda centrado, el título y la meta pasan a una tarjeta de vidrio) ---- */
+.hero__pic.video .video__frame { position: absolute; inset: 0; aspect-ratio: auto; border-radius: 0; }
+.pcard__photo.video { display: flex; flex-direction: column; aspect-ratio: auto; max-height: none; background: var(--panel); border: 1px solid var(--hairline); }
+.pcard__photo.video .video__frame { aspect-ratio: 4 / 3; border-radius: 0; }
+.pcard__photo.video .video__foot { margin: 0; padding: 18px 22px 76px; border-top: 0; }
+.pcard__photo.video .video__title { font-size: 24px; }
+@media (min-width: 761px) and (max-width: 1024px) { .pcard__photo.video .video__frame { aspect-ratio: 16 / 9; } }
+@media (min-width: 1025px) {
+  .pcard__photo.video { display: block; aspect-ratio: 16 / 9; background: var(--bg); border: 0; }
+  .pcard__photo.video .video__frame { position: absolute; inset: 0; aspect-ratio: auto; }
+  .pcard__photo.video .video__foot { position: absolute; right: 20px; bottom: 20px; z-index: 2; width: min(400px, calc(100% - 40px)); flex-direction: column; align-items: flex-start; gap: 6px; padding: 18px 22px; background: var(--glass-strong); border: 1px solid var(--hairline-strong); border-radius: var(--r-card); }
+  .pcard__photo.video .video__title { font-size: 26px; }
+}
+.hero__glass { display: flex; flex-direction: column; gap: 14px; padding: 20px 22px; background: var(--glass-strong); border: 1px solid var(--hairline-strong); border-radius: var(--r-card); }
+.hero__glass .video__title { font-size: 26px; }
+.pcard__after { margin-top: 28px; }
+.pcard__after .video__chapters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.pcard__after .video__chapters-label { grid-column: 1 / -1; }
+@media (max-width: 1024px) { .pcard__after .video__chapters { grid-template-columns: minmax(0, 1fr); } }

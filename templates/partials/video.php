@@ -11,6 +11,9 @@
  *  theme   'dark' (defecto, sobre navy) | 'light'
  *  part    'all' (defecto: fachada + pie + capítulos) | 'player' (solo fachada+pie) | 'chapters' (solo la lista, p. ej. en otra columna)
  *  id      string  id del contenedor (defecto "video"); enlaza capítulos y reproductor aunque estén en columnas distintas
+ *  cls     string  clase extra en el contenedor .video (patrones: `pcard__photo` = foto ancha del patrón B, `hero__pic` = marco del hero fotográfico)
+ *  foot    bool    false => sin pie (título + meta) debajo de la fachada (en el hero fotográfico el título va en la tarjeta de vidrio)
+ *  pos     string  object-position de la portada ("70% 50%")  ·  sizes string  atributo sizes de la portada
  * Hooks JS: [data-video] (contenedor; con part=chapters lleva data-video-for="<id>") · button.video__play[data-video-play]
  *           · botones .chapter[data-t="m:ss"][aria-pressed] dentro de .video__chapters · estado: .is-active + aria-pressed="true".
  *           El reproductor se monta dentro de .video__frame.
@@ -38,17 +41,19 @@ $chaptersHtml = static function () use ($chapters, $chapters_label, $id): void {
   </div>
 <?php };
 ?>
-<div class="video<?= $theme ?>" data-video id="<?= e($part === 'chapters' ? $id . '-chapters' : $id) ?>"<?= !empty($src) ? ' data-video-src="' . e($src) . '"' : '' ?><?= $part === 'chapters' ? ' data-video-for="' . e($id) . '"' : '' ?>>
+<div class="video<?= $theme ?><?= !empty($cls) ? ' ' . e($cls) : '' ?>"<?= !empty($pos) ? ' style="--pos:' . e($pos) . '"' : '' ?> data-video id="<?= e($part === 'chapters' ? $id . '-chapters' : $id) ?>"<?= !empty($src) ? ' data-video-src="' . e($src) . '"' : '' ?><?= $part === 'chapters' ? ' data-video-for="' . e($id) . '"' : '' ?>>
   <?php if ($showChapters && $part === 'chapters') { $chaptersHtml(); } ?>
   <?php if ($showPlayer): ?>
   <div class="video__frame px">
-    <?= ns_img(['base' => $image['base'], 'alt' => $image['alt'] ?? '', 'sizes' => '(min-width:1025px) 700px, calc(100vw - 72px)']) ?>
+    <?= ns_img(['base' => $image['base'], 'alt' => $image['alt'] ?? '', 'sizes' => $sizes ?? '(min-width:1025px) 700px, calc(100vw - 72px)']) ?>
     <button type="button" class="video__play" data-video-play aria-label="Play the video"><?= ns_icon('play', 28) ?></button>
   </div>
+  <?php if (($foot ?? true) !== false): ?>
   <div class="video__foot">
     <p class="head video__title"><?= ns_rich($title ?? '') ?></p>
     <?php if (!empty($meta)): ?><span class="video__meta"><?= e($meta) ?></span><?php endif; ?>
   </div>
+  <?php endif; ?>
   <?php endif; ?>
   <?php if ($showChapters && $part === 'all'): ?><div class="video__after"><?php $chaptersHtml(); ?></div><?php endif; ?>
 </div>

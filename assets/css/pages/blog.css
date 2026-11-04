@@ -8,13 +8,21 @@
 .blog-byline img { width: 22px; height: 22px; display: block; }
 /* ---- Índice: tarjeta destacada ---- */
 .blog-featured { padding-block: clamp(24px, 3vw, 40px) clamp(56px, 8vw, 96px); }
-.blog-feat { display: flex; flex-wrap: wrap; background: var(--panel); color: var(--text); text-decoration: none; border-radius: var(--r-card); overflow: hidden; border: 1px solid var(--hairline); transition: translate var(--t-fast), border-color var(--t-fast); }
-.blog-feat:hover { translate: 0 -2px; border-color: var(--hairline-strong); }
-.blog-feat:focus-visible { outline-offset: 3px; }
-.blog-feat__media { flex: 1 1 420px; min-height: 300px; position: relative; overflow: hidden; display: block; background: var(--bg); }
-.blog-feat__media picture { position: absolute; inset: 0; display: block; }
-.blog-feat__media img { width: 100%; height: 100%; object-fit: cover; display: block; }
-.blog-feat__body { flex: 1 1 420px; min-width: 0; padding: clamp(24px, 4vw, 48px); display: flex; flex-direction: column; gap: 16px; justify-content: center; box-sizing: border-box; }
+/* Destacado: patrón B (foto ancha 16:9 y tarjeta --panel que la solapa por abajo a la izquierda; en <1025px, foto arriba y tarjeta debajo con un solape pequeño). Todo el bloque es un enlace. */
+.blog-feat { position: relative; display: flex; flex-direction: column; color: var(--text); text-decoration: none; transition: translate var(--t-fast); }
+.blog-feat:hover { translate: 0 -2px; }
+.blog-feat:focus-visible { outline-offset: 6px; border-radius: var(--r-panel); }
+.blog-feat__media { position: relative; display: block; overflow: hidden; aspect-ratio: 4 / 3; border-radius: var(--r-panel); background: var(--bg); }
+.blog-feat__media picture { display: block; width: 100%; height: 100%; }
+.blog-feat__media img { width: 100%; height: 100%; object-fit: cover; object-position: var(--pos, 50% 50%); display: block; }
+.blog-feat__body { position: relative; z-index: 2; margin: -56px 12px 0; padding: clamp(24px, 3vw, 40px); display: flex; flex-direction: column; gap: 16px; background: var(--panel); border: 1px solid var(--hairline-strong); border-radius: var(--r-card); box-sizing: border-box; transition: border-color var(--t-fast); }
+.blog-feat:hover .blog-feat__body { border-color: var(--cyan-line); }
+@media (min-width: 761px) and (max-width: 1024px) { .blog-feat__media { aspect-ratio: 16 / 9; } .blog-feat__body { margin-inline: 32px; } }
+@media (min-width: 1025px) {
+  .blog-feat { padding-bottom: 56px; }
+  .blog-feat__media { width: calc(100% - 128px); margin-left: auto; aspect-ratio: 16 / 9; max-height: 640px; }
+  .blog-feat__body { position: absolute; left: 0; bottom: 0; width: min(580px, 48%); margin: 0; }
+}
 .blog-feat__meta { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
 .blog-feat__badge { padding: 6px 12px; background: var(--cyan); border-radius: var(--r-pill); color: var(--navy-deep); letter-spacing: .1em; }
 .blog-feat__cat { color: var(--cyan); letter-spacing: .1em; }

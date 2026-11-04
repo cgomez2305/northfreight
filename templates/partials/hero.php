@@ -13,8 +13,10 @@
  *  tagline string  frase corta bajo el titular
  *  lead    string  entrada
  *  ctas    array   [['label','href','variant'=>'primary|ghost','icon'=>'arrow|whatsapp|null','arrow'=>bool (→ de texto, solo en ghost: los primarios ya llevan la celda de flecha ↗ por CSS)],…]
- *  image   array   ['base'=>'nf-cab-interior-cyan-night','alt'=>'…','small'=>bool (máx. 490px de ancho: solo para fotos pequeñas),'sizes'=>'…'] foto a la derecha (radio 24; en móvil debajo del texto)
- *  aside   string  HTML ya renderizado (tarjeta de datos / vista previa de documento); va tras la imagen si hay ambas
+ *  image   array   ['base'=>'nf-cab-interior-cyan-night','alt'=>'…','pos'=>'70% 50%' (object-position), 'sizes'=>'…' (ancho útil del cover: max(ancho del marco, alto de la foto ≈ 704 px × proporción); las fotos 16:9 o más anchas necesitan sizes mayor y, en móvil, el marco 4:3 manda por el alto)] PATRÓN A (hero fotográfico): la foto es el marco del hero (ancho del contenedor, radio 32), anclada a la derecha
+ *                  del panel con `.px`; el texto va abajo a la izquierda sobre degradado (--photo-fade-*) y las migas arriba como chip. En <1025px la foto va arriba y el texto debajo, sin superponer.
+ *  aside   string  HTML ya renderizado. Con `image` es una tarjeta de vidrio abajo a la derecha (solo copy ya afirmado: ficha de equipo, puntos del resumen); sin `image`, columna derecha como siempre (Desk log, vista previa de documento)
+ *  bg      string  HTML ya renderizado que sustituye a la foto (la fachada del video en Our desk: el marco ya lleva su <picture> y el botón de play)
  *  stack   bool    true => sin columna derecha, H1 hasta 980px
  *  cls     string  clase extra en <section>
  */
@@ -25,13 +27,18 @@ $size = ($size ?? 'h1') === 'h1-long' ? 't-h1-long' : 't-h1';
 $h1tag = ($h1_tag ?? 'h1') === 'p' ? 'p' : 'h1';
 $image = $image ?? null;
 $aside = $aside ?? '';
-$stack = !empty($stack) || (!$image && $aside === '');
+$bg = (string) ($bg ?? '');
+$photo = !empty($image['base']) || $bg !== '';
+$stack = !$photo && (!empty($stack) || $aside === '');
 $ctas = $ctas ?? [];
 ?>
-<section class="hero hero--int on-dark<?= $stack ? ' hero--stack' : '' ?><?= !empty($cls) ? ' ' . e($cls) : '' ?>">
+<section class="hero hero--int on-dark<?= $photo ? ' hero--photo' : '' ?><?= $stack ? ' hero--stack' : '' ?><?= !empty($cls) ? ' ' . e($cls) : '' ?>">
+  <?php if ($bg !== ''): ?><?= $bg ?>
+  <?php elseif ($photo): ?><div class="hero__pic px"<?= !empty($image['pos']) ? ' style="--pos:' . e($image['pos']) . '"' : '' ?>><?= ns_img(['base' => $image['base'], 'alt' => $image['alt'] ?? '', 'eager' => true, 'sizes' => $image['sizes'] ?? '(min-width:1025px) 1160px, (min-width:761px) 100vw, calc(100vw - 72px)']) ?></div><?php endif; ?>
   <div class="container hero__in">
+    <?php if ($photo): ?><div class="hero__crumbs"><?php if (isset($crumbs)): partial('breadcrumbs', ['crumbs' => $crumbs]); elseif (isset($route)): partial('breadcrumbs', ['route' => $route]); endif; ?></div><?php endif; ?>
     <div class="hero__main">
-      <?php if (isset($crumbs)): partial('breadcrumbs', ['crumbs' => $crumbs]); elseif (isset($route)): partial('breadcrumbs', ['route' => $route]); endif; ?>
+      <?php if (!$photo): if (isset($crumbs)): partial('breadcrumbs', ['crumbs' => $crumbs]); elseif (isset($route)): partial('breadcrumbs', ['route' => $route]); endif; endif; ?>
       <?php if (!empty($eyebrow)): ?><p class="hero__eyebrow t-eyebrow"><span><?= ns_rich($eyebrow) ?></span></p><?php endif; ?>
       <<?= $h1tag ?> class="hero__title <?= $size ?>"><?= $h1html ?></<?= $h1tag ?>>
       <?php if (!empty($tagline)): ?><p class="t-tagline"><?= ns_rich($tagline) ?></p><?php endif; ?>
@@ -44,13 +51,8 @@ $ctas = $ctas ?? [];
       </div>
       <?php endif; ?>
     </div>
-    <?php if ($image || $aside !== ''): ?>
-    <div class="hero__aside">
-      <?php if ($image): ?>
-      <figure class="hero__photo px<?= !empty($image['small']) ? ' hero__photo--s' : '' ?>"><?= ns_img(['base' => $image['base'], 'alt' => $image['alt'] ?? '', 'eager' => true, 'sizes' => $image['sizes'] ?? '(min-width:1025px) 770px, calc(100vw - 72px)']) ?></figure>
-      <?php endif; ?>
-      <?= $aside ?>
-    </div>
+    <?php if ($aside !== ''): ?>
+    <div class="hero__aside"><?= $aside ?></div>
     <?php endif; ?>
   </div>
 </section>

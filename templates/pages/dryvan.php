@@ -22,7 +22,7 @@ partial('hero', [
     'ctas'  => [
         ['label' => 'Talk to a dispatcher', 'href' => wa($route['wa']), 'wa' => true, 'arrow' => true],
     ],
-    'image' => ['base' => 'nf-white-truck-cyan-horizon-r43', 'alt' => 'White semi truck pulling a dry van trailer at dusk under a cyan horizon'],
+    'image' => ['base' => 'nf-white-truck-cyan-horizon', 'alt' => 'White semi truck pulling a dry van trailer at dusk under a cyan horizon', 'pos' => '70% 50%', 'sizes' => '(min-width:1025px) 1350px, (min-width:761px) 100vw, 580px'],
 ]);
 
 // Resumen "In short" (SEO/GEO): editable aquí. Solo información que ya está en el copy de esta página; sin cifras, tarifas ni promesas nuevas.

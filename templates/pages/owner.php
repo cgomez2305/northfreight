@@ -1,7 +1,7 @@
 <?php
 /**
  * /dispatch-for-owner-operators/ — Owner.html. Disponibles: $route, $cfg y helpers.
- * Orden: hero con foto · What you get (g5) · Why owner-operators work with us · FAQ (pre-CTA). El CTA final lo pone el layout.
+ * Orden: hero fotográfico (patrón A) · What you get (g5) · Why owner-operators work with us (banda fotográfica, patrón D) · FAQ (pre-CTA). El CTA final lo pone el layout.
  */
 require_once NS_ROOT . '/templates/partials/kit.php';
 
@@ -28,7 +28,7 @@ partial('hero', [
         ['label' => 'Talk to a dispatcher', 'href' => wa($route['wa']), 'wa' => true, 'arrow' => true],
         ['label' => 'How we onboard', 'href' => url('/how-it-works/'), 'variant' => 'ghost'],
     ],
-    'image'   => ['base' => 'nf-cab-interior-cyan-night', 'alt' => 'Truck cab at night with a phone on the dashboard and a highway ahead'],
+    'image'   => ['base' => 'nf-cab-interior-cyan-night', 'alt' => 'Truck cab at night with a phone on the dashboard and a highway ahead', 'pos' => '62% 50%'],
 ]);
 
 // Resumen "In short" (SEO/GEO): editable aquí. Solo información que ya está en el copy de esta página; sin cifras, tarifas ni promesas nuevas.
@@ -52,22 +52,14 @@ partial('summary', [
   </div>
 </section>
 
-<section class="section section--surface" aria-labelledby="owner-control">
-  <div class="container sa-split">
-    <div class="sa-split__text">
-      <?php partial('section-head', [
-          'id' => 'owner-control',
-          'eyebrow' => 'Why owner-operators work with us',
-          'title' => 'You stay in control.',
-          'lead' => 'You approve every load. We tell you what we booked and why, and you can reach the desk on WhatsApp at any time.',
-      ]); ?>
-    </div>
-    <ul class="check-list sa-split__list">
-      <?php foreach ($control as $c): ?>
-        <li><?= ns_star(16) ?><?= e($c) ?></li>
-      <?php endforeach; ?>
-    </ul>
-  </div>
-</section>
+<?php partial('photo-band', [
+    'id'      => 'owner-control',
+    'eyebrow' => 'Why owner-operators work with us',
+    'title'   => 'You stay in control.',
+    'lead'    => 'You approve every load. We tell you what we booked and why, and you can reach the desk on WhatsApp at any time.',
+    'image'   => ['base' => 'nf-lone-truck-blue-twilight', 'alt' => 'Lone white semi truck parked on a wet lot under a blue twilight sky', 'pos' => '60% 55%'],
+    'chips'   => $control,
+    'chips_label' => 'What staying in control means',
+]); ?>
 
 <?php partial('faq', ['items' => route_faq_items($route), 'title' => 'Owner-operator dispatch questions', 'pre_cta' => true]); ?>

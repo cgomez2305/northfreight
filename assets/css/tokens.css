@@ -29,6 +29,11 @@
   --hero-fade-top: linear-gradient(180deg, rgba(4, 16, 31, .5) 0%, rgba(4, 16, 31, 0) 22%);   /* detrás de la píldora del menú */
   --hero-fade-m: linear-gradient(180deg, rgba(4, 16, 31, 0) 52%, var(--bg) 100%);            /* móvil: la foto se funde con el fondo */
   --card-fade: linear-gradient(0deg, rgba(4, 16, 31, .96) 0%, rgba(4, 16, 31, .92) 36%, rgba(4, 16, 31, .5) 60%, rgba(4, 16, 31, 0) 100%);   /* tarjetas con texto sobre foto (carril de la home) */
+  /* Marcos fotográficos (hero interno, foto ancha con tarjeta, filas apiladas, banda): la foto va anclada a la derecha del marco y la franja izquierda (donde va el texto) queda en --bg bajo el velo; esta máscara funde el borde izquierdo de la foto para que no se vea el corte. */
+  --photo-mask: linear-gradient(90deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, .55) 9%, rgba(0, 0, 0, 1) 24%);
+  --photo-fade-left: linear-gradient(90deg, rgba(4, 16, 31, .95) 0%, rgba(4, 16, 31, .92) 38%, rgba(4, 16, 31, .78) 52%, rgba(4, 16, 31, .42) 66%, rgba(4, 16, 31, .12) 78%, rgba(4, 16, 31, 0) 88%);
+  --photo-fade-bottom: linear-gradient(0deg, rgba(4, 16, 31, .86) 0%, rgba(4, 16, 31, .5) 24%, rgba(4, 16, 31, 0) 52%);
+  --row-fade: linear-gradient(0deg, rgba(4, 16, 31, .96) 0%, rgba(4, 16, 31, .88) 30%, rgba(4, 16, 31, .35) 58%, rgba(4, 16, 31, 0) 80%), linear-gradient(90deg, rgba(4, 16, 31, .9) 0%, rgba(4, 16, 31, .5) 42%, rgba(4, 16, 31, 0) 70%);   /* filas apiladas: texto abajo a la izquierda */
   --arrow-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M4 12h15M13 6l6 6-6 6'/%3E%3C/svg%3E");
   --arrow-ne: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2304132A' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 17L17 7M8 7h9v9'/%3E%3C/svg%3E");   /* flecha ↗ en navy-deep: celda de los botones primarios */
   --btn-cell: rgba(4, 19, 42, .14);        /* celda circular del botón primario (sobre cian) */

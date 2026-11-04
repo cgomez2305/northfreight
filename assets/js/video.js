@@ -72,6 +72,8 @@
       el.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;border:0;background:var(--navy-deep)';
       $$('picture, img, [data-video-play]', frame).forEach(function (n) { n.remove(); });
       frame.appendChild(el);
+      var hero = box.closest && box.closest('.hero--photo');
+      if (hero) hero.classList.add('is-playing');   // hero fotográfico: el video ocupa todo el marco y el texto se retira
       el.tabIndex = -1;
       el.focus({ preventScroll: true });
     }

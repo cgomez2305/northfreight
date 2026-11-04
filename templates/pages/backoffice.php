@@ -1,7 +1,7 @@
 <?php
 /**
  * /trucking-back-office/ — maqueta BackOffice.html.
- * Orden: hero (con estrella) · Included (5 tarjetas) · One team (Book → Track → Document → Get paid) · CTA final (layout).
+ * Orden: hero fotográfico (patrón A) · Included (5 tarjetas) · One team (banda fotográfica, patrón D: Book → Track → Document → Get paid) · CTA final (layout).
  */
 require_once NS_ROOT . '/templates/partials/kit.php';
 
@@ -21,7 +21,7 @@ partial('hero', [
     'tagline' => 'The work behind the load, done right.',
     'lead'    => 'Paperwork organized, settlements prepared and disputes followed until they close.',
     'ctas'    => [['label' => 'Talk to the desk', 'href' => wa($route['wa']), 'wa' => true, 'arrow' => true]],
-    'image'   => ['base' => 'nf-desk-rain-window-night', 'alt' => 'Desk at night with a lamp, a stack of paper and a laptop beside a rain-covered window'],
+    'image'   => ['base' => 'nf-desk-rain-window-night', 'alt' => 'Desk at night with a lamp, a stack of paper and a laptop beside a rain-covered window', 'pos' => '60% 50%'],
 ]);
 
 // Resumen "In short" (SEO/GEO): editable aquí. Solo información que ya está en el copy de esta página; sin cifras, tarifas ni promesas nuevas.
@@ -46,19 +46,14 @@ partial('summary', [
   </div>
 </section>
 
-<section class="section section--surface" aria-labelledby="bo-team">
-  <div class="container sb-split">
-    <div class="sb-split__text">
-      <?php partial('section-head', ['eyebrow' => 'One team', 'title' => 'Dispatch and back office, one team', 'id' => 'bo-team']); ?>
-      <p class="t-body c-slate">Because the same desk books and tracks the load, the back office already has every document it needs.</p>
-    </div>
-    <ol class="sb-bo-flow" aria-label="From booking to payment">
-      <?php foreach ($flow as $i => $step): ?>
-      <li class="sb-bo-flow__item">
-        <?php if ($i > 0): ?><span class="sb-bo-flow__arrow arrow" aria-hidden="true">→</span><?php endif; ?>
-        <span class="sb-bo-flow__step<?= $i === count($flow) - 1 ? ' sb-bo-flow__step--end' : '' ?>"><?= e($step) ?></span>
-      </li>
-      <?php endforeach; ?>
-    </ol>
-  </div>
-</section>
+<?php partial('photo-band', [
+    'id'      => 'bo-team',
+    'eyebrow' => 'One team',
+    'title'   => 'Dispatch and back office, one team',
+    'lead'    => 'Because the same desk books and tracks the load, the back office already has every document it needs.',
+    'image'   => ['base' => 'nf-contracts-amber-cyan', 'alt' => 'Open binder with a pen and paperwork under an amber lamp', 'pos' => '70% 60%'],
+    'chips'   => $flow,
+    'chips_label' => 'From booking to payment',
+    'chips_arrow' => true,
+    'chips_end'   => true,
+]); ?>

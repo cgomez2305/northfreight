@@ -118,10 +118,6 @@
 }
 
 /* ---- 04 Team + video ---- */
-.home-team .split { align-items: flex-start; gap: 48px clamp(40px, 6vw, 88px); }
-.home-team .split > .home-team__text { flex-basis: 380px; display: flex; flex-direction: column; gap: 22px; }
-.home-team .split > .home-team__video { flex-basis: 520px; }
-.home-team .video__chapters-label { margin-bottom: 4px; }
 
 /* ---- 05 Evidence: chips con los documentos + desk log de ejemplo ---- */
 .home-evidence { align-items: flex-start; gap: 56px clamp(40px, 6vw, 96px); }

@@ -317,13 +317,18 @@ Las 36 piezas están en `assets/img/nf-*` (WebP + JPG; masters fuera del repo). 
 | `nf-dispatch-room-wide-night` | Home: fachada del video "Meet the desk" |
 | `nf-freight-dock-loop` | Home: póster de la banda de video (primer fotograma de `assets/video/freight-dock.mp4`) |
 | `nf-dock-door-amber-night` | Home: foto del FAQ (4:5 nativo) |
-| `nf-cab-interior-cyan-night` | Hero de Owner-operators |
-| `nf-hitching-trailer-rain` · `nf-tablet-cab-night-yard` | Amazon Relay: hero y bloque "Why Relay needs a dedicated desk" |
-| `nf-white-truck-cyan-horizon` (`-r43`) | Hero de Dry van; además OG por defecto y pastilla del home |
-| `nf-route-map-night-trucks` (`-r43`) | Hero de How it works y tarjeta relacionada |
-| `nf-desk-rain-window-night` | Hero de Trucking back office |
-| `nf-dispatch-room-maps` | Our desk: fachada del video del hero |
-| `nf-highway-side-mirror-night` | Load tracking: bloque "Proof, not promises" y tarjeta relacionada |
+| `nf-cab-interior-cyan-night` | Hero fotográfico de Owner-operators |
+| `nf-lone-truck-blue-twilight` | Owner-operators: banda fotográfica "You stay in control." (y Hotshot, draft) |
+| `nf-trailer-dock-night-mist` | Amazon Relay: hero fotográfico |
+| `nf-hitching-trailer-rain` | Amazon Relay: foto ancha de "Why Relay needs a dedicated desk" |
+| `nf-trailer-dock-dusk` · `nf-dock-waiting-clock` · `nf-tablet-cab-night-yard` · `nf-clipboard-on-truck-hood` · `nf-logistics-desk-cyan` | Amazon Relay: filas apiladas A a E de "What we manage" |
+| `nf-white-truck-cyan-horizon` | Hero fotográfico de Dry van (master completo); además OG por defecto y pastilla del home |
+| `nf-route-map-night-trucks` | Hero fotográfico de How it works (master completo) y tarjeta relacionada |
+| `nf-hands-map-keys` · `nf-signing-clipboard-night` · `nf-white-truck-rainy-highway` · `nf-trailer-rows-aerial` | How it works: filas apiladas de los 4 pasos (las mismas fotos del onboarding del home) |
+| `nf-desk-rain-window-night` | Hero fotográfico de Trucking back office |
+| `nf-contracts-amber-cyan` | Trucking back office: banda fotográfica "One team" |
+| `nf-dispatch-room-maps` | Our desk: la fachada del video es la foto del hero fotográfico |
+| `nf-highway-side-mirror-night` | Load tracking: foto ancha con tarjeta solapada "Proof, not promises" y tarjeta relacionada |
 | `nf-trailer-dock-night-wide` | Mega menú de Services: tarjeta de Amazon Relay |
 | `nf-vintage-calculator-night-road` · `nf-clipboard-on-truck-hood` · `nf-tablet-cab-night-yard` · `nf-dock-waiting-clock` | Portadas del blog: costes, requisitos de Relay, load board, lumper y detention |
 | `nf-calculator-map-dashboard` · `nf-fuel-nozzle-truck-stop` · `nf-shipping-form-clipboard` · `nf-contracts-amber-cyan` · `nf-cards-fan-key-fob` | Tarjetas de recursos: rate per mile, IFTA, BOL, agreement, glosario |

@@ -17,10 +17,14 @@ No queda ninguna foto de stock (Pixabay ni del andamiaje inicial) ni ningún vid
 | `nf-highway-dusk-white-trucks-sq-{640,941}` | 1672×941 | 1:1, 941×941, x 666 a 1607 | Hero del home 761 a 1024 px |
 | `nf-{phone-chat-dashboard,archive-aisle-cyan,dispatch-room-maps,hands-map-keys,signing-clipboard-night,white-truck-rainy-highway,trailer-rows-aerial}-tall-{480,640,819}` | 1536×1024 | 4:5, 819×1024, a alto completo | Sticky "Why a desk" (3) y onboarding (4) en ≥1025 px |
 | `nf-truck-lights-rain-front-pill-320`, `nf-white-truck-cyan-horizon-pill-320` | 1672×941 y 1734×907 | 2,125:1 (640×301 y 760×358) reducido a 320 px | Pastillas del H2 "Three fronts" |
-| `nf-white-truck-cyan-horizon-r43-{640,1024,1209}` | 1734×907 | 4:3, 1209×907, x 525 a 1734 | Hero de Dry van |
-| `nf-route-map-night-trucks-r43-{640,1024,1255}` | 1672×941 | 4:3, 1255×941, x 417 a 1672 | Hero de How it works |
 | `nf-lone-truck-rain-night-m-{480,658}` | 1914×822 | 4:5, 658×822, x 1202 a 1860 | CTA final en móvil |
 | `og-default.jpg` | `nf-white-truck-cyan-horizon` | 1200×630 (1,905:1) con velo, isotipo, "NORTHSTAR" y la frase de siempre | Imagen al compartir |
+
+## Fase H (heroes y marcos fotográficos)
+
+- Se retiran los recortes 4:3 `-r43` de Dry van y How it works: los heros fotográficos usan ahora el master completo (`nf-white-truck-cyan-horizon`, `nf-route-map-night-trucks`, srcset hasta el ancho nativo).
+- Se recupera `nf-trailer-dock-night-mist` (1536×1024, sin recorte; WebP 640/1024/1280/1536 + JPG) como foto del hero de Amazon Relay: el sujeto queda a la derecha y la zona izquierda oscura sirve al texto. `nf-hitching-trailer-rain` pasa a la foto ancha de "Why Relay needs a dedicated desk".
+- Marcos grandes (hero fotográfico, filas apiladas, banda): la foto va anclada a la derecha del marco con el 90 % del ancho (máscara en su borde izquierdo, bajo el degradado del texto), de modo que un master de 1448 px de ancho nunca se amplía por encima de x1,6 en retina dentro del marco de 1280 px.
 
 ## Videos (Night Freight)
 

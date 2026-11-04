@@ -73,3 +73,8 @@
   .js-motion .why__body .t-h3 { font-size: 26px; }
   .js-motion .why__body .t-card { font-size: 15px; line-height: 1.45; }
 }
+
+/* ---- Patrón C (filas apiladas, photo-rows): ≥1025px y ≥700px de alto las filas se apilan con position: sticky (top = --header-h + 8px + --i × 14px); motion.js escala y atenúa la fila cubierta. Sin html.js-motion queda una lista normal. ---- */
+@media (min-width: 1025px) and (min-height: 700px) {
+  .js-motion .prow { position: sticky; top: calc(var(--header-h) + 8px + var(--i, 0) * 14px); }
+}

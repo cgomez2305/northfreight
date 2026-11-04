@@ -244,22 +244,21 @@ $figures = [
   </div>
 </section>
 
-<!-- 04 TEAM + VIDEO -->
-<section class="section section--surface home-team" aria-labelledby="team-title">
-  <div class="container split">
-    <div class="home-team__text">
-      <span class="t-eyebrow">05 · The desk behind the load</span>
-      <h2 class="t-h2" id="team-title">Built by dispatchers.<br><span class="hl">Run as a team.</span></h2>
-      <p class="t-body c-slate">Behind every trip there are people coordinating information, decisions and follow-up. Meet the team, hear how we work, and jump straight to the topic you care about.</p>
-      <?php partial('video', ['part' => 'chapters', 'id' => 'desk', 'chapters' => $chapters, 'chapters_label' => 'Jump to a chapter']); ?>
-    </div>
-    <div class="home-team__video">
-      <?php partial('video', ['part' => 'player', 'id' => 'desk',
-          'image' => ['base' => 'nf-dispatch-room-wide-night', 'alt' => 'Dispatch room at night with rows of monitors showing glowing route maps, with a highway seen through the windows'],
-          'title' => 'A load doesn’t dispatch itself. {hl}There’s a team behind it.{/hl}', 'meta' => 'Video · 3 to 4 min']); ?>
-    </div>
-  </div>
-</section>
+<!-- 05 TEAM + VIDEO: patrón B (foto ancha con tarjeta solapada). La fachada del video es la foto; el título y la meta del video van en una tarjeta de vidrio dentro de la foto y los 3 capítulos en 3 columnas debajo. -->
+<?php
+ob_start();
+partial('video', ['part' => 'chapters', 'id' => 'desk', 'chapters' => $chapters, 'chapters_label' => 'Jump to a chapter']);
+$chaptersHtml = ob_get_clean();
+partial('photo-card', [
+    'id'      => 'team-title',
+    'cls'     => 'home-team',
+    'eyebrow' => '05 · The desk behind the load',
+    'title'   => 'Built by dispatchers.{br}{hl}Run as a team.{/hl}',
+    'lead'    => 'Behind every trip there are people coordinating information, decisions and follow-up. Meet the team, hear how we work, and jump straight to the topic you care about.',
+    'image'   => ['base' => 'nf-dispatch-room-wide-night', 'alt' => 'Dispatch room at night with rows of monitors showing glowing route maps, with a highway seen through the windows', 'pos' => '50% 50%'],
+    'video'   => ['id' => 'desk', 'title' => 'A load doesn’t dispatch itself. {hl}There’s a team behind it.{/hl}', 'meta' => 'Video · 3 to 4 min'],
+    'after'   => $chaptersHtml,
+]); ?>
 
 <!-- 05 EVIDENCE -->
 <section class="section" aria-labelledby="evidence-title">
