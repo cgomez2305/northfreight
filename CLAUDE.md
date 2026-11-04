@@ -52,7 +52,8 @@ Opcional (fase 2): un script `bin/build.php` que pre-renderiza todas las rutas a
 ├── index.php              # front controller: resuelve la ruta y renderiza
 ├── robots.txt
 ├── composer.json          # solo phpmailer/phpmailer
-├── bin/build-assets.php   # build de CSS (ver §2); bloqueado en la web
+├── bin/build-assets.php   # build de CSS y JS (ver §2); bloqueado en la web
+├── bin/leads-export.php   # convierte storage/leads/*.jsonl a CSV (CLI, bloqueado en la web)
 ├── app/
 │   ├── config.php         # constantes del sitio (marca, teléfono, correo, dominio, WhatsApp)
 │   ├── routes.php         # mapa URL → plantilla + meta + schema + estado (live/draft)
@@ -107,6 +108,7 @@ Opcional (fase 2): un script `bin/build.php` que pre-renderiza todas las rutas a
 │   ├── js/
 │   │   ├── dist/          # *.min.js generados por el build (se commitean; ver §2)
 │   │   ├── main.js        # nav, mega menús, pop-up móvil, relojes, formulario
+│   │   ├── apply.js       # asistente multipaso de /careers/apply/ (solo esa ruta)
 │   │   ├── calc-rpm.js
 │   │   ├── calc-ifta.js
 │   │   ├── blog-filter.js
@@ -313,6 +315,11 @@ Una URL por intención de búsqueda, rutas cortas a un nivel, sin `/services/`. 
 | `/our-desk/` | desk | marca (E-E-A-T, video) | — | — | Diseñada |
 | `/contact/` | contact | truck dispatch company near me | 50 | 20 | Diseñada |
 | `/privacy-policy/` · `/terms/` | legal | — | — | — | Diseñadas (texto pendiente de abogado) |
+| `/careers/` | careers | truck driver jobs · owner operator partnerships (hub; aclara que es una alianza de dispatch, no una oferta de empleo) | — | — | Fase P (live en staging) |
+| `/careers/owner-operators/` | careers-owner | owner operator jobs · partner with a dispatcher (NO apunta a "dispatch services for owner operators": esa es `/dispatch-for-owner-operators/`) | 5.400 | — | Fase P |
+| `/careers/apply/` | apply | formulario multipaso; `noindex, follow`, fuera de sitemap y llms | — | — | Fase P |
+| `/careers/thank-you/` | thanks | `noindex`; exige un token HMAC de 7 días (sin él, 303 a apply) | — | — | Fase P |
+| `/careers/cdl-a-drivers/` + vacantes | cdl-hub · job | company drivers CDL-A; `draft` mientras `app/data/jobs.php` esté vacío; cada vacante activa genera su ruta, su `JobPosting` y su entrada de sitemap | 33.100 / 14.800 | — | Sistema listo, sin vacantes |
 
 ### 7.2 Recursos (fase 1 — decisión de Carlos: se construye la maqueta completa, Resources y Blog activos)
 
@@ -440,6 +447,9 @@ Medidos con la auditoría sobre las 22 rutas live (staging). Se pintan con `ph()
 | `hours · time zone`, `other confirmed types` | Contact |
 | `date`, `Business address`, `Cookie and analytics tools…`, `Limitation of liability clause…` | Privacy y Terms (texto del abogado) |
 | `Publish date` | los 4 artículos del blog |
+| `Minimum driving experience`, `Authority and insurance needed`, `Equipment types accepted`, `Documents to have ready` | `/careers/` (requisitos; la sección desaparece en producción) |
+| `YOUR FEE`, `confirm requirements: authority, insurance, equipment and documents` | FAQ de `/careers/` |
+| `YOUR FEE`, `confirm equipment types`, `confirm other equipment types`, `confirm whether the desk works with new authorities and what it needs`, párrafo "Our dispatch fee is [YOUR FEE]" | `/careers/owner-operators/` |
 | `NorthStar pricing model…` | artículo de costes |
 | `Current minimum limits — verify on relay.amazon.com…` | artículo de requisitos de Relay |
 
@@ -459,6 +469,7 @@ Antes de publicar en producción: auditar las rutas con `ENV=production` y compr
 | **Formulario de contacto** | `POST /contact/` → `app/forms/contact.php` (la ruta declara `'form' => 'contact'`). Token CSRF **sin sesión** (HMAC con `APP_SECRET`, válido 2 h; así no hay cookies que rompan la caché de LiteSpeed), honeypot `website`, tiempo mínimo 3 s, límite por IP (5/hora, hash en `storage/ratelimit/`), validación servidor, PHPMailer por SMTP con credenciales de `app/config.local.php`. Sin credenciales guarda el mensaje en `storage/mail.log` y responde éxito. Éxito → 303 a `/contact/?sent=1`; errores → 422 en la misma página. Campos: name, company, MC#, trucks, equipment, message. **Sin campo de email/teléfono de respuesta (así es la maqueta): pendiente de decidir con Carlos.** |
 | **Descargas (BOL, agreement)** | `'form' => 'download'` → `app/forms/download.php`: nombre + correo + formato → entrega `assets/downloads/<archivo>` con `Content-Disposition` y avisa por correo; si el archivo no existe devuelve 422 con mensaje claro (no 500) y registra la solicitud en `storage/downloads.log`. |
 | **Newsletter del blog** | Solo maquetado. Conectar cuando el cliente elija herramienta. |
+| **Solicitud de conductores (fase P)** | `POST /careers/apply/` → `app/forms/lead.php` (`'form' => 'lead'`): CSRF sin sesión, honeypot, tiempo mínimo, límite por IP, validación y saneado en servidor, cabeceras de correo seguras, límite de 64 KB. Cada lead se guarda como línea JSON en `storage/leads/AAAA-MM.jsonl` (dir 0750, archivo 0600; sin base de datos), avisa por correo (sin SMTP queda en `storage/mail.log`) y, si existe `LEAD_WEBHOOK_URL` en `config.local.php`, se envía por POST JSON (timeout 4 s; un fallo nunca rompe la respuesta). Campos: id, created_at UTC, perfil, qualified (CDL estándar Sí + inglés Sí o Básico + años ≥ `LEAD_MIN_YEARS`, hoy 1 provisional), contacto, equipo, años, autoridad, `consent` (texto exacto `CONSENT_TEXT_V1`, versión, fecha, IP y user agent solo si lo dio; casilla OPCIONAL y sin marcar), atribución (utm_*, referrer, landing, first_seen de `localStorage` 30 días, sin cookie) y `ip_hash`. Nunca se pregunta nacionalidad ni estatus migratorio y nunca se rechaza en pantalla (siempre el mismo 303 de gracias). Éxito → 303 a `/careers/thank-you/?t=<token>`. Perfil company driver solo con vacantes activas. Analítica: `dataLayer`/`gtag`/`fbq` solo si existen (no se carga ningún script de terceros; `GA_ID` y `META_PIXEL_ID` reservados). Exportar: `php bin/leads-export.php [--month=AAAA-MM] [--profile=] [--qualified=1|0] [--since=] [--out=]` (CSV con BOM y protección contra fórmulas). |
 
 JavaScript: GSAP en todas las rutas (descarga diferida), módulos pequeños, `defer`, cada uno se carga solo en la página que lo usa (`main.js` en todas). El sitio funciona y se lee sin JS.
 
@@ -484,6 +495,8 @@ Decisiones de diseño/estrategia por cerrar:
 5. **Hero del home bajo el PDF:** cambiar los chips por "Coordinated loads · Organized information · Constant follow-up" si se elige la opción A.
 
 Pendientes de SEO/GEO que dependen del cliente (la parte técnica ya está lista, ver §7.6): fechas reales de publicación de los 4 artículos (`published` en `posts.php`), `LEGAL_NAME`/`ADDRESS`/`FOUNDING_DATE`/`SAME_AS` (perfiles oficiales), ficha de Google Business Profile, decidir `AI_TRAINING_BOTS`, validar los textos "In short", enviar el sitemap a Search Console y pasar `ENV` a `production`.
+
+Pendientes de la fase P (Careers, 2026-11-04): destino de los leads (correo, webhook o CRM); valor real de `LEAD_MIN_YEARS`; requisitos reales para aplicar, equipos que despachan y si se trabaja con autoridades nuevas; vacantes reales de company drivers (si no hay, la ruta sigue en draft); revisión legal de `CONSENT_TEXT_V1` (TCPA), de la declaración EEO (solo aparece con vacantes) y de las preguntas de elegibilidad (CDL estándar del estado de residencia, inglés 49 CFR 391.11); la política de privacidad debe mencionar `localStorage` de atribución y la IP guardada como prueba de consentimiento; validar el uso de "jobs" en title, meta y H1 del hub; la FAQ "What happens after I apply?" afirma que el desk contacta al solicitante (confirmar el compromiso). "Careers" está en la píldora del header solo desde 1440 px (por debajo, en el pop-up móvil y el footer); sin páginas de estado, `/es/`, pilar `/truck-dispatch-services/` ni `/dispatch-services/...` (decisión: el home es el pilar y los equipos mantienen sus URLs de un nivel). Hub y owner-operators llevan 15 ScrollTriggers.
 
 Pendientes técnicos conocidos:
 - ~~Rehacer la tarjeta destacada del mega menú de Services sin texto sobre la foto.~~ Hecho (foto arriba, texto debajo).
