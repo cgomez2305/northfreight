@@ -14,6 +14,9 @@ use Captacion\Env;
 
 final class Notifications
 {
+    /** Segundos sin pasada del cron de la cola para avisar (el cron corre cada minuto). */
+    public const CRON_STALE = 180;
+
     /** @return list<array{key:string,kind:string,title:string,meta:string,href:string,read:bool}> ordenados por importancia */
     public static function all(int $userId): array
     {
@@ -39,6 +42,17 @@ final class Notifications
                 'href' => '/#cola',
             ];
         }
+        $over = Tasks::overdueCount();
+        if ($over > 0) {
+            $oldest = Db::one('SELECT id, due_at FROM tasks WHERE deleted_at IS NULL AND done_at IS NULL AND due_at IS NOT NULL AND due_at < ? ORDER BY due_at ASC LIMIT 1', [Clock::now()]);
+            $maxId = (int) Db::value('SELECT MAX(id) FROM tasks WHERE deleted_at IS NULL AND done_at IS NULL AND due_at IS NOT NULL AND due_at < ?', [Clock::now()]);
+            $items[] = [
+                'key' => 'tasks_overdue:' . $over . ':' . $maxId, 'kind' => 'warn',
+                'title' => $over === 1 ? '1 tarea vencida' : $over . ' tareas vencidas',
+                'meta' => 'La más antigua venció ' . Fmt::ago((string) $oldest['due_at']),
+                'href' => '/tareas?tab=overdue',
+            ];
+        }
         if (!Telegram::configured()) {
             $items[] = ['key' => 'telegram_unconfigured', 'kind' => 'warn', 'title' => 'Telegram sin configurar', 'meta' => 'Las alertas de leads calientes no llegarán a tu teléfono', 'href' => '/#cola'];
         }
@@ -54,7 +68,7 @@ final class Notifications
         }
         $cron = Settings::get('cron.process_jobs');
         $at = is_array($cron) && isset($cron['at']) ? Clock::parse((string) $cron['at']) : null;
-        if ($at === null || Clock::time() - $at > 300) {
+        if ($at === null || Clock::time() - $at > self::CRON_STALE) {
             $items[] = [
                 'key' => 'cron_stale:' . ($at === null ? 'never' : 'late'), 'kind' => 'warn', 'title' => $at === null ? 'El cron de la cola nunca se ha ejecutado' : 'El cron de la cola no corre',
                 'meta' => $at === null ? 'Crea la tarea de cron de process_jobs.php' : 'Última pasada ' . Fmt::ago((string) $cron['at']), 'href' => '/#cola',

@@ -1,6 +1,6 @@
 <?php
 /**
- * Front controller del panel (subdominio captacion.). Rutas: / (dashboard), /leads, /leads/{id}, /leads/{id}/{accion}, /leads/bulk, /leads/export, /ajax/search, /ajax/notifications/read, /login, /login/2fa, /logout.
+ * Front controller del panel (subdominio captacion.). Rutas: / (dashboard), /pipeline, /tareas, /config, /actividad, /leads, /leads/{id}, /leads/{id}/{accion}, /leads/bulk, /leads/export, /ajax/search, /ajax/notifications/read, /login, /login/2fa, /logout.
  * setup.php y api/lead.php son puntos de entrada propios. Cualquier otra ruta: 404.
  */
 
@@ -14,6 +14,7 @@ use Captacion\Controllers\DashboardController;
 use Captacion\Controllers\LeadActionsController;
 use Captacion\Controllers\LeadsController;
 use Captacion\Controllers\PipelineController;
+use Captacion\Controllers\TareasController;
 use Captacion\Services\Storage;
 
 error_reporting(E_ALL);
@@ -67,6 +68,12 @@ switch (true) {
         PipelineController::cards();
     case $path === '/ajax/pipeline/move':
         PipelineController::move();
+    case $path === '/tareas':
+        TareasController::index();
+    case $path === '/tareas/new':
+        TareasController::create();
+    case preg_match('#^/tareas/(\d{1,12})/([a-z]{4,8})$#', $path, $m) === 1:
+        TareasController::handle((int) $m[1], $m[2]);
     case $path === '/login':
         AuthController::login();
     case $path === '/login/2fa':

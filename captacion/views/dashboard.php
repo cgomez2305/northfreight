@@ -211,7 +211,7 @@ $days = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domin
             <li><span class="today__ic<?= (int) $t['priority'] === 1 ? ' today__ic--hi' : '' ?>"><?= Ui::icon('check-circle') ?></span><span class="today__t"><?php if ($t['lead_id']): ?><a href="/leads/<?= $e($t['lead_id']) ?>"><?= $e($t['title']) ?></a><small><?= $e(Fmt::name($t)) ?></small><?php else: ?><?= $e($t['title']) ?><?php endif; ?></span><time class="mono<?= $late ? ' is-late' : '' ?>"><?= $late ? $e(Fmt::date($t['due_at'])) : $e(Fmt::et($t['due_at'])->format('H:i')) . ' ET' ?></time></li>
           <?php endforeach; ?>
         </ul>
-        <?php if ($today['more'] > 0): ?><p class="foot-note">y <?= $e($today['more']) ?> tarea<?= $today['more'] === 1 ? '' : 's' ?> más, en las fichas de sus leads.</p><?php endif; ?>
+        <?php if ($today['more'] > 0): ?><p class="foot-note">y <?= $e($today['more']) ?> tarea<?= $today['more'] === 1 ? '' : 's' ?> más · <a href="/tareas">Ver todas las tareas</a></p><?php endif; ?>
       <?php endif; ?>
     </div>
   </section>
