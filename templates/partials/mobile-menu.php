@@ -45,6 +45,7 @@ $showRes = cfg('show_resources') && $resources;
       <span class="t-meta mobile-menu__label">Talk to the desk</span>
       <a class="btn btn--primary btn--between" href="<?= e(wa($wa)) ?>" rel="noopener">WhatsApp a dispatcher</a>
       <a class="btn btn--ghost btn--card btn--between" href="<?= e(tel()) ?>">Call <?= e(cfg('phone')) ?></a>
+      <a class="mobile-menu__mail" href="mailto:<?= e((string) cfg('email')) ?>"><?= e((string) cfg('email')) ?></a>
     </div>
   </div>
 </div>

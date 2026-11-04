@@ -4,7 +4,7 @@
  * (lo pone cada página, normalmente con partial('hero')).
  *
  * Claves de ruta que lee: title, meta, path, template, status, schema, wa, og, motion (GSAP + ScrollTrigger + motion.js/css), css (grupos de CSS; anula el mapa plantilla => grupo), cta (false => sin bloque CTA final), cta_image ('base' de assets/img | '' | false: foto de fondo del CTA; por defecto CTA_IMAGE).
- * Orden: head (SEO, OG, fuentes, CSS, JSON-LD) → skip link → opsbar + header (nav, megas, menú móvil) →
+ * Orden: head (SEO, OG, fuentes, CSS, JSON-LD) → skip link → header (tres islas: logo · nav · acciones; megas y menú móvil) →
  *        <main id="main"> → cta → footer → mbar → scripts.
  */
 require_once __DIR__ . '/partials/kit.php';
@@ -90,7 +90,6 @@ $jsByTemplate = ['tool-rpm' => 'calc-rpm.js', 'tool-ifta' => 'calc-ifta.js', 'bl
 <body<?= $ctaOn ? '' : ' class="no-cta"' ?>>
 <a class="skip-link" href="#main">Skip to content</a>
 <div class="site-top on-dark">
-<?php partial('opsbar'); ?>
 <header class="header" id="site-header">
 <?php partial('nav', ['route' => $route, 'wa' => $wa]); ?>
 <?php partial('mega-services'); ?>

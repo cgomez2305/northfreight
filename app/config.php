@@ -77,7 +77,7 @@ ns_default('HERO_HEADLINES', [
 // Foto de fondo del CTA final (assets/img/<base>-{640,1024,1280}.webp + .jpg). '' = panel liso. Una ruta puede anularla con 'cta_image' => 'base' | '' | false.
 ns_default('CTA_IMAGE', 'nf-lone-truck-rain-night');
 ns_default('SHOW_RESOURCES', true);         // Resources y Blog en nav/footer (activos desde Fase 1)
-ns_default('SHOW_ON_SHIFT', true);          // barra "On shift" + relojes (replica la maqueta; revisar al confirmar horario)
+ns_default('SHOW_ON_SHIFT', true);          // chip "On shift · ET hh:mm" de la isla de acciones del header (revisar al confirmar horario)
 ns_default('SHOW_EQUIPMENT_CHIPS', false);  // chips "By equipment" del mega menú
 
 // --- Mensajes de WhatsApp por página -------------------------------------

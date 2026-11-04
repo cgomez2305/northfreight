@@ -60,7 +60,9 @@
   --prose: 720px;              /* ancho de lectura de artículos y legales */
   --tile-pad: 22px;
   --btn-h: 56px;
-  --header-h: 96px;            /* pill (64) + márgenes: offsets de anclas y bloques sticky */
+  --hdr-h: 56px;               /* alto de cada isla del header (≤1024px: 52) */
+  --hdr-mt: 24px;              /* hueco sobre las islas en el flujo (≤1024px: 16); pegadas al scroll quedan a 12 (≤1024px: 8) */
+  --header-h: 80px;            /* sticky top (12) + isla (56) + 12: offsets de anclas y bloques sticky (≤1024px: 72) */
 
   /* Formas */
   --r-card: 24px;
@@ -77,3 +79,4 @@
   --z-mbar: 50;
   --z-modal: 100;
 }
+@media (max-width: 1024px) { :root { --hdr-h: 52px; --hdr-mt: 16px; --header-h: 72px; } }

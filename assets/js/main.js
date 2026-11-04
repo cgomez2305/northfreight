@@ -1,4 +1,4 @@
-/* NorthStar Freight — main.js: relojes de la ops bar, mega menús y pop-up móvil. Mejora progresiva: sin JS el sitio funciona. */
+/* NorthStar Freight — main.js: reloj del header, pastilla y compactación del header, mega menús y pop-up móvil. Mejora progresiva: sin JS el sitio funciona. */
 (function () {
   'use strict';
   var d = document;
@@ -9,9 +9,9 @@
   };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || d).querySelectorAll(s)); };
 
-  /* ---- Relojes (ops bar) ---- */
+  /* ---- Reloj del chip del header (span[data-t="et"]; si hubiera más zonas con data-t, también las rellena) ---- */
   (function () {
-    var els = $$('.opsbar [data-t]');
+    var els = $$('[data-t]');
     if (!els.length || typeof Intl === 'undefined' || !Intl.DateTimeFormat) return;
     var zones = { et: 'America/New_York', ct: 'America/Chicago', mt: 'America/Denver', pt: 'America/Los_Angeles' };
     var fmt = {}, timer;
@@ -31,6 +31,7 @@
     function init() { // crear los 4 Intl.DateTimeFormat es lo más caro de main.js: fuera del camino del primer pintado
       try {
         Object.keys(zones).forEach(function (k) {
+          if (!els.some(function (el) { return el.getAttribute('data-t') === k; })) return;
           fmt[k] = new Intl.DateTimeFormat('en-US', { timeZone: zones[k], hour: '2-digit', minute: '2-digit', hourCycle: 'h23' });
         });
       } catch (e) { return; }
@@ -38,6 +39,64 @@
       next();
     }
     if (window.requestIdleCallback) window.requestIdleCallback(init, { timeout: 1000 }); else setTimeout(init, 200);
+  })();
+
+  /* ---- Header: compactación al hacer scroll (.is-scrolled en el <header> pasados ~80 px; un centinela + IntersectionObserver, sin listener de scroll) ---- */
+  (function () {
+    var header = d.getElementById('site-header');
+    if (!header) return;
+    function set(on) { header.classList.toggle('is-scrolled', on); }
+    if ('IntersectionObserver' in window) {
+      var s = d.createElement('div');
+      s.setAttribute('aria-hidden', 'true');
+      s.style.cssText = 'position:absolute;top:0;left:0;width:1px;height:80px;pointer-events:none;visibility:hidden';
+      d.body.appendChild(s);
+      new IntersectionObserver(function (es) { set(!es[es.length - 1].isIntersecting); }).observe(s);
+    } else {
+      var tick = false;
+      window.addEventListener('scroll', function () {
+        if (tick) return;
+        tick = true;
+        requestAnimationFrame(function () { tick = false; set((window.pageYOffset || 0) > 80); });
+      }, { passive: true });
+    }
+  })();
+
+  /* ---- Pastilla de la navegación: una sola pastilla (--cyan-tint) que se desliza (transform) al ítem con hover/foco, al abierto o al de la página actual ---- */
+  (function () {
+    var box = d.querySelector('.nav__links'), pill = box && box.querySelector('.nav__pill');
+    if (!box || !pill) return;
+    var items = $$('.nav__link, .nav__trigger', box), over = null;
+    if (!items.length) return;
+    function rest() {
+      return items.filter(function (i) { return i.getAttribute('aria-expanded') === 'true'; })[0]
+        || items.filter(function (i) { return i.getAttribute('aria-current') === 'page'; })[0] || null;
+    }
+    function put(el, snap) {
+      if (!el || !el.offsetWidth) { pill.classList.remove('is-on'); return; }
+      var first = !pill.classList.contains('is-on');
+      if (snap || first) pill.classList.add('snap');
+      pill.style.setProperty('--pill-x', el.offsetLeft + 'px');
+      pill.style.setProperty('--pill-w', el.offsetWidth + 'px');
+      pill.classList.add('is-on');
+      if (snap || first) { void pill.offsetWidth; pill.classList.remove('snap'); }
+    }
+    function sync(snap) { put(over || rest(), snap); }
+    box.classList.add('has-pill');
+    items.forEach(function (i) {
+      i.addEventListener('pointerenter', function (e) { if (e.pointerType === 'mouse') { over = i; sync(); } });
+      i.addEventListener('focus', function () { over = i; sync(); });
+      i.addEventListener('blur', function () { over = null; sync(); });
+    });
+    box.addEventListener('pointerleave', function () { over = null; sync(); });
+    if (window.MutationObserver) {
+      var mo = new MutationObserver(function () { sync(); });
+      items.forEach(function (i) { mo.observe(i, { attributes: true, attributeFilter: ['aria-expanded'] }); });
+    }
+    window.addEventListener('resize', function () { sync(true); });
+    if (d.fonts && d.fonts.ready) d.fonts.ready.then(function () { sync(true); });
+    onMq(function () { sync(true); });
+    sync(true);
   })();
 
   /* ---- Widget "Start in WhatsApp" (hero del home): pestañas (quién eres) + chips (en qué ayudamos) => mensaje y enlace wa.me.
