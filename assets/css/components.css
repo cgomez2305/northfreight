@@ -49,19 +49,23 @@ a.btn--primary:hover::after, a.btn--navy:hover::after, a.btn--primary:focus-visi
 .hdr { height: var(--hdr-h); display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 12px; align-items: center; }
 .hdr__island { position: relative; height: var(--hdr-h); display: flex; align-items: center; border: 1px solid var(--hairline); border-radius: var(--r-pill); pointer-events: auto; }
 .hdr__island::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none; background: var(--glass-bg); -webkit-backdrop-filter: blur(var(--glass-blur)); backdrop-filter: blur(var(--glass-blur)); }
-@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .hdr__island::before { background: var(--panel); } }
-@media (prefers-reduced-transparency: reduce) { .hdr__island::before { background: var(--panel); -webkit-backdrop-filter: none; backdrop-filter: none; } }
+/* Al hacer scroll las islas pasan a vidrio más opaco: el texto de la página que pasa por debajo no compite con el de la cabecera */
+.is-scrolled .hdr__island::before { background: var(--glass-strong); }
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .header .hdr__island::before { background: var(--panel); } }
+@media (prefers-reduced-transparency: reduce) { .header .hdr__island::before { background: var(--panel); -webkit-backdrop-filter: none; backdrop-filter: none; } }
 .hdr__brand { justify-self: start; padding: 0 20px 0 9px; }
 .hdr__brand .logo__mark { width: 38px; height: 38px; }
 .hdr__brand .logo { gap: 10px; }
 .hdr__act { justify-self: end; gap: 0; padding: 0 3px; }
+.hdr__act .btn { flex: none; white-space: nowrap; }
 /* Chip del desk: punto + "On shift" + reloj ET (main.js rellena el reloj) */
 .hdr__desk { margin: 0 14px 0 0; padding-left: 14px; display: none; align-items: center; gap: 9px; white-space: nowrap; font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--text-2); }
 .hdr__dot { width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); flex: none; }
 .hdr__clk { font-variant-numeric: tabular-nums; padding-left: 10px; border-left: 1px solid var(--hairline-strong); line-height: 1; }
 .hdr__clk strong { color: var(--text); font-weight: 500; }
-@media (min-width: 1181px) { .hdr__desk { display: flex; } .hdr__on { display: none; } }
-@media (min-width: 1300px) { .hdr__on { display: inline; } }
+/* El chip solo aparece cuando cabe en su columna (columna = (ancho - nav 557 - 24) / 2): reloj con punto desde 1210px, con "On shift" desde 1360px */
+@media (min-width: 1210px) { .hdr__desk { display: flex; } .hdr__on { display: none; } .hdr__clk { padding-left: 0; border-left: 0; } }
+@media (min-width: 1360px) { .hdr__on { display: inline; } .hdr__clk { padding-left: 10px; border-left: 1px solid var(--hairline-strong); } }
 /* Navegación: solo el ancho de sus enlaces. La pastilla (span.nav__pill) la mueve main.js entre ítems con transform; sin JS el ítem activo lleva su propio fondo */
 .nav { justify-self: center; padding: 0 5px; }
 .nav__links { position: relative; display: flex; gap: 2px; align-items: center; }
