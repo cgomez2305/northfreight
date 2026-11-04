@@ -64,12 +64,13 @@ final class Catalog
         'fmcsa' => 'Consulta a FMCSA', 'disqualified' => 'Descartado automáticamente', 'alert_sent' => 'Alerta enviada', 'consent_revoked' => 'Consentimiento revocado',
         'stage_changed' => 'Cambio de etapa', 'note_added' => 'Nota añadida', 'note_edited' => 'Nota editada', 'note_deleted' => 'Nota eliminada', 'task_created' => 'Tarea creada',
         'task_done' => 'Tarea completada', 'call_logged' => 'Llamada registrada', 'reopened_manual' => 'Lead reabierto', 'a3_cancelled' => 'Segunda alerta cancelada',
+        'task_reopened' => 'Tarea reabierta', 'task_snoozed' => 'Tarea pospuesta', 'task_edited' => 'Tarea editada', 'task_deleted' => 'Tarea eliminada',
     ];
 
     /** Grupo de filtro de la linea de tiempo de cada tipo de evento. */
     public const EVENT_GROUPS = [
         'call_logged' => 'contact', 'stage_changed' => 'stage', 'reopened_manual' => 'stage', 'reopened' => 'stage',
-        'note_added' => 'note', 'note_edited' => 'note', 'note_deleted' => 'note', 'task_created' => 'task', 'task_done' => 'task',
+        'note_added' => 'note', 'note_edited' => 'note', 'note_deleted' => 'note', 'task_created' => 'task', 'task_done' => 'task', 'task_reopened' => 'task', 'task_snoozed' => 'task', 'task_edited' => 'task', 'task_deleted' => 'task',
     ];
 
     /** Etiquetas del desglose de la puntuacion (las de Scoring van sin acentos). */

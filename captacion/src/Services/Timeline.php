@@ -124,6 +124,16 @@ final class Timeline
                 $tone = 'good';
                 $detail = (string) ($p['title'] ?? '');
                 break;
+            case 'task_reopened':
+            case 'task_edited':
+            case 'task_deleted':
+                $icon = 'calendar';
+                $detail = (string) ($p['title'] ?? '');
+                break;
+            case 'task_snoozed':
+                $icon = 'clock';
+                $detail = (string) ($p['title'] ?? '') . (!empty($p['to']) ? ' · nueva fecha ' . Fmt::dateTime((string) $p['to']) : '');
+                break;
             case 'consent_revoked':
                 $icon = 'shield';
                 $tone = 'bad';

@@ -363,6 +363,7 @@ foreach ($arrivals as $ts) {
         }
         $ev($leadId, 'stage_changed', $t, array_filter(['from' => $prevStage, 'to' => $s, 'pipeline' => $pipeline, 'reason' => $reason]), $userId);
         $prevStage = $s;
+        Db::run('UPDATE leads SET stage_changed_at = ? WHERE id = ?', [Clock::at($t), $leadId]);
     }
     if ($firstContact !== null && $rnd() < .38) {
         for ($i = mt_rand(1, 2); $i > 0; $i--) {

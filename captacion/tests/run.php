@@ -22,6 +22,7 @@ $root = dirname(__DIR__);
 require $root . '/src/bootstrap.php';
 require __DIR__ . '/lib/T.php';
 require __DIR__ . '/lib/Infra.php';
+require __DIR__ . '/lib/Panel.php';
 
 use Captacion\Db;
 use Captacion\Env;

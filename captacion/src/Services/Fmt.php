@@ -16,11 +16,20 @@ final class Fmt
     private const MONTHS = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
     private const DAYS = ['lun', 'mar', 'mié', 'jue', 'vie', 'sáb', 'dom'];
 
-    private static ?\DateTimeZone $tz = null;
+    /** @var array<string,\DateTimeZone> */
+    private static array $tzs = [];
 
+    /** Zona de visualizacion (Configuracion > Horario y zona; por defecto America/New_York). */
     public static function tz(): \DateTimeZone
     {
-        return self::$tz ??= new \DateTimeZone(self::TZ);
+        $name = Display::timezone();
+        return self::$tzs[$name] ??= new \DateTimeZone($name);
+    }
+
+    /** Abreviatura de la zona que se muestra junto a las horas ("ET"). */
+    public static function zone(): string
+    {
+        return Display::zoneLabel();
     }
 
     /** DateTimeImmutable en ET a partir de un 'Y-m-d H:i:s' en UTC (o de un timestamp). */
@@ -37,7 +46,7 @@ final class Fmt
     public static function dateTime(?string $utc, bool $withZone = true): string
     {
         $d = self::et($utc);
-        return $d === null ? '—' : (int) $d->format('j') . ' ' . self::MONTHS[(int) $d->format('n') - 1] . ', ' . $d->format('H:i') . ($withZone ? ' ET' : '');
+        return $d === null ? '—' : (int) $d->format('j') . ' ' . self::MONTHS[(int) $d->format('n') - 1] . ', ' . $d->format('H:i') . ($withZone ? ' ' . self::zone() : '');
     }
 
     /** "3 nov 2026" (con el anio solo si no es el actual). */

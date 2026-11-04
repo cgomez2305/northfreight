@@ -13,6 +13,7 @@ use Captacion\Controllers\AuthController;
 use Captacion\Controllers\DashboardController;
 use Captacion\Controllers\LeadActionsController;
 use Captacion\Controllers\LeadsController;
+use Captacion\Controllers\PipelineController;
 use Captacion\Services\Storage;
 
 error_reporting(E_ALL);
@@ -60,6 +61,12 @@ switch (true) {
         AjaxController::search();
     case $path === '/ajax/notifications/read':
         AjaxController::notificationsRead();
+    case $path === '/pipeline':
+        PipelineController::index();
+    case $path === '/ajax/pipeline/cards':
+        PipelineController::cards();
+    case $path === '/ajax/pipeline/move':
+        PipelineController::move();
     case $path === '/login':
         AuthController::login();
     case $path === '/login/2fa':

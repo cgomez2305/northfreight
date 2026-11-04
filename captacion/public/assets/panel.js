@@ -139,5 +139,5 @@
  bs.forEach(function (b) { b.addEventListener('click', function () { var g = b.getAttribute('data-g'); bs.forEach(function (x) { var on = x === b; x.classList.toggle('is-on', on); x.setAttribute('aria-pressed', on ? 'true' : 'false'); }); items.forEach(function (i) { i.hidden = g !== 'all' && i.getAttribute('data-g') !== g; }); }); });
  });
  var ck = $('[data-clock]');
- if (ck && window.Intl) { var f = new Intl.DateTimeFormat('en-GB', { timeZone: 'America/New_York', hour: '2-digit', minute: '2-digit', hour12: false }); var tick = function () { ck.textContent = f.format(new Date()); }; tick(); setInterval(tick, 20000); }
+ if (ck && window.Intl) { var f = new Intl.DateTimeFormat('en-GB', { timeZone: ck.getAttribute('data-tz') || 'America/New_York', hour: '2-digit', minute: '2-digit', hour12: false }); var tick = function () { ck.textContent = f.format(new Date()); }; tick(); setInterval(tick, 20000); }
 })();

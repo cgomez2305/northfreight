@@ -68,8 +68,8 @@ $isEmptyDb = $grandTotal === 0;
   <label class="field"><span>Equipo</span><select name="eq"><option value="">Todos</option><?php foreach (Catalog::EQUIPMENT as $k => $l): ?><option value="<?= $e($k) ?>"<?= ($f['eq'] ?? '') === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
   <label class="field"><span>Estado (EE. UU.)</span><select name="us"><option value="">Todos</option><?php foreach ($facets['states'] as $k): ?><option value="<?= $e($k) ?>"<?= ($f['us'] ?? '') === $k ? ' selected' : '' ?>><?= $e($k) ?> · <?= $e(UsStates::NAMES[$k] ?? '') ?></option><?php endforeach; ?></select></label>
   <label class="field"><span>Idioma</span><select name="lg"><option value="">Todos</option><?php foreach (Catalog::LANGS as $k => $l): ?><option value="<?= $e($k) ?>"<?= ($f['lg'] ?? '') === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
-  <label class="field"><span>Desde (ET)</span><input type="date" name="from" value="<?= $e($f['from'] ?? '') ?>"></label>
-  <label class="field"><span>Hasta (ET)</span><input type="date" name="to" value="<?= $e($f['to'] ?? '') ?>"></label>
+  <label class="field"><span>Desde (<?= $e(Fmt::zone()) ?>)</span><input type="date" name="from" value="<?= $e($f['from'] ?? '') ?>"></label>
+  <label class="field"><span>Hasta (<?= $e(Fmt::zone()) ?>)</span><input type="date" name="to" value="<?= $e($f['to'] ?? '') ?>"></label>
   <label class="check check--f"><input type="checkbox" name="ct" value="none"<?= isset($f['ct']) ? ' checked' : '' ?>><span>Solo sin contactar</span></label>
   <div class="filters__a"><button class="btn btn--primary btn--sm" type="submit"><span class="btn__t">Aplicar</span></button><?php if ($nFilters > 0 || isset($f['t'])): ?><a class="btn btn--ghost btn--sm" href="/leads">Limpiar</a><?php endif; ?></div>
 </form>

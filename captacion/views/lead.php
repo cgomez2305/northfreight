@@ -108,7 +108,7 @@ $loc = trim(($lead['city'] ? $lead['city'] . ', ' : '') . ($lead['state'] ?? '')
         <form class="addrow" method="post" action="/leads/<?= $e($id) ?>/task">
           <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>">
           <label class="field field--grow"><span>Nueva tarea</span><input type="text" name="title" required maxlength="190" placeholder="Ej. Pedir copia del seguro"></label>
-          <label class="field"><span>Para (hora ET)</span><input type="datetime-local" name="due"></label>
+          <label class="field"><span>Para (hora <?= $e(Fmt::zone()) ?>)</span><input type="datetime-local" name="due"></label>
           <label class="field"><span>Prioridad</span><select name="priority"><?php foreach (Catalog::PRIORITIES as $k => $l): ?><option value="<?= $e($k) ?>"<?= $k === 2 ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
           <button class="btn btn--secondary" type="submit"><?= Ui::icon('plus') ?>Añadir</button>
         </form>

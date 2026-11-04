@@ -23,7 +23,7 @@ $days = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domin
 <div class="page-head">
   <div>
     <h1 class="h1"><?= $e($greeting) ?></h1>
-    <p class="sub">Así va la captación de NorthStar · <?= $e(Fmt::weekdayShort((int) $nowEt->format('N'))) ?> <?= $e(Fmt::dayLabel($nowEt)) ?>, <?= $e($nowEt->format('H:i')) ?> ET</p>
+    <p class="sub">Así va la captación de NorthStar · <?= $e(Fmt::weekdayShort((int) $nowEt->format('N'))) ?> <?= $e(Fmt::dayLabel($nowEt)) ?>, <?= $e($nowEt->format('H:i')) ?> <?= $e(Fmt::zone()) ?></p>
   </div>
   <div class="page-head__a">
     <div class="seg" role="group" aria-label="Periodo">

@@ -10,6 +10,7 @@ use Captacion\Middleware\SecurityHeaders;
 use Captacion\Models\User;
 use Captacion\Services\Notifications;
 use Captacion\Services\Session;
+use Captacion\Services\Tasks;
 use Captacion\View;
 
 abstract class Responder
@@ -95,9 +96,50 @@ abstract class Responder
         $hot = (int) Db::value("SELECT COUNT(*) FROM leads WHERE deleted_at IS NULL AND temperature = 'hot' AND first_contact_at IS NULL AND stage = 'new'");
         self::html($view, $vars + [
             'shell' => true, 'user' => $user, 'csrf' => Session::csrf(), 'active' => $active, 'crumbs' => $crumbs, 'bell' => $notes,
-            'unread' => Notifications::unread($notes), 'hotBadge' => $hot, 'flash' => self::takeFlash(),
+            'unread' => Notifications::unread($notes), 'hotBadge' => $hot, 'overdueBadge' => Tasks::overdueCount(), 'isAdmin' => ($user['role'] ?? '') === 'admin', 'flash' => self::takeFlash(),
             'sysOk' => !array_filter($notes, static fn($n) => in_array($n['kind'], ['bad', 'warn'], true)),
         ], $status);
+    }
+
+    /** Solo administradores: el resto ve una pagina 403 (los viewers no ven ni la barra lateral de administracion). */
+    protected static function requireAdmin(array $user): void
+    {
+        if (($user['role'] ?? '') !== 'admin') {
+            self::html('message', ['title' => 'Sin permiso', 'heading' => 'Sin permiso', 'text' => 'Esta sección es solo para administradores.'], 403);
+        }
+    }
+
+    /** Las cuentas de solo lectura (viewer) no escriben: en paginas se avisa y se vuelve a $back. */
+    protected static function requireWriter(array $user, string $back): void
+    {
+        if (($user['role'] ?? '') === 'viewer') {
+            self::flash(false, 'Tu cuenta es de solo lectura.');
+            self::redirect($back);
+        }
+    }
+
+    /**
+     * Endpoint JSON con escritura: POST, sesion, CSRF en X-CSRF-Token y cuerpo JSON de hasta 4 KB (o $max).
+     * @return array{0:array,1:array} [usuario, cuerpo]
+     */
+    protected static function jsonPost(int $max = 4096): array
+    {
+        if (strtoupper((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET')) !== 'POST') {
+            self::json(['ok' => false, 'error' => 'method'], 405, ['Allow: POST']);
+        }
+        $user = self::userJson();
+        if (!Session::checkCsrf($_SERVER['HTTP_X_CSRF_TOKEN'] ?? null)) {
+            self::json(['ok' => false, 'error' => 'csrf'], 403);
+        }
+        $raw = (string) file_get_contents('php://input', false, null, 0, $max + 1);
+        if (strlen($raw) > $max) {
+            self::json(['ok' => false, 'error' => 'too_large'], 413);
+        }
+        $body = $raw === '' ? [] : json_decode($raw, true);
+        if (!is_array($body)) {
+            self::json(['ok' => false, 'error' => 'invalid'], 400);
+        }
+        return [$user, $body];
     }
 
     protected static function notFound(): never

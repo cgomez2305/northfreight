@@ -19,6 +19,9 @@ $brand = '<a class="brand" href="/" aria-label="NorthStar Captación, ir al dash
 <link rel="preload" href="/assets/fonts/barlow-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/fonts.css?v=<?= $e($assetV('fonts.css')) ?>">
 <link rel="stylesheet" href="/assets/panel.css?v=<?= $e($assetV('panel.css')) ?>">
+<?php foreach (($css ?? []) as $sheet): if (preg_match('/^[a-z0-9-]{2,24}$/', (string) $sheet) !== 1) { continue; } ?>
+<link rel="stylesheet" href="/assets/<?= $e($sheet) ?>.css?v=<?= $e($assetV($sheet . '.css')) ?>">
+<?php endforeach; ?>
 <script nonce="<?= $e($nonce) ?>">document.documentElement.classList.add('js')</script>
 </head>
 <?php if (!$shell): ?>
@@ -41,10 +44,17 @@ $brand = '<a class="brand" href="/" aria-label="NorthStar Captación, ir al dash
       <p class="side__group">Principal</p>
       <a class="nav-i<?= $active === 'dashboard' ? ' is-on' : '' ?>" href="/"<?= $active === 'dashboard' ? ' aria-current="page"' : '' ?>><?= Ui::icon('dashboard') ?>Dashboard</a>
       <a class="nav-i<?= $active === 'leads' ? ' is-on' : '' ?>" href="/leads"<?= $active === 'leads' ? ' aria-current="page"' : '' ?>><?= Ui::icon('users') ?>Leads</a>
+      <a class="nav-i<?= $active === 'pipeline' ? ' is-on' : '' ?>" href="/pipeline"<?= $active === 'pipeline' ? ' aria-current="page"' : '' ?>><?= Ui::icon('columns') ?>Pipeline</a>
+      <a class="nav-i<?= $active === 'tareas' ? ' is-on' : '' ?>" href="/tareas"<?= $active === 'tareas' ? ' aria-current="page"' : '' ?>><?= Ui::icon('list-check') ?>Tareas<?php if ($overdueBadge > 0): ?><span class="badge badge--late" title="Tareas vencidas"><?= $e($overdueBadge) ?><span class="sr"> vencidas</span></span><?php endif; ?></a>
       <p class="side__group">Atajos</p>
       <a class="nav-i" href="/leads?t=hot&amp;ct=none"><?= Ui::icon('zap') ?>Calientes pendientes<?php if ($hotBadge > 0): ?><span class="badge badge--hot"><?= $e($hotBadge) ?></span><?php endif; ?></a>
       <a class="nav-i" href="/leads?from=<?= $e(\Captacion\Services\Fmt::et(\Captacion\Clock::time())->format('Y-m-d')) ?>"><?= Ui::icon('inbox') ?>Llegaron hoy</a>
       <a class="nav-i" href="/leads?t=disqualified"><?= Ui::icon('flag') ?>Descartados</a>
+      <?php if ($isAdmin): ?>
+      <p class="side__group">Administración</p>
+      <a class="nav-i<?= $active === 'config' ? ' is-on' : '' ?>" href="/config"<?= $active === 'config' ? ' aria-current="page"' : '' ?>><?= Ui::icon('gear') ?>Configuración</a>
+      <a class="nav-i<?= $active === 'actividad' ? ' is-on' : '' ?>" href="/actividad"<?= $active === 'actividad' ? ' aria-current="page"' : '' ?>><?= Ui::icon('activity') ?>Actividad</a>
+      <?php endif; ?>
     </nav>
     <div class="side__foot">
       <a class="sys" href="/#cola">
@@ -81,7 +91,7 @@ $brand = '<a class="brand" href="/" aria-label="NorthStar Captación, ir al dash
         <button class="search-btn" type="button" data-search aria-haspopup="dialog" aria-keyshortcuts="Control+K Meta+K /">
           <?= Ui::icon('search') ?><span class="search-btn__t">Buscar leads, teléfono, USDOT…</span><span class="kbds" aria-hidden="true"><kbd data-mod>Ctrl</kbd><kbd>K</kbd></span>
         </button>
-        <span class="clock" title="Hora del este de EE. UU.">ET <time data-clock><?= $e(\Captacion\Services\Fmt::et(\Captacion\Clock::time())->format('H:i')) ?></time></span>
+        <span class="clock" title="Hora en <?= $e(\Captacion\Services\Display::timezone()) ?>"><?= $e(\Captacion\Services\Fmt::zone()) ?> <time data-clock data-tz="<?= $e(\Captacion\Services\Display::timezone()) ?>"><?= $e(\Captacion\Services\Fmt::et(\Captacion\Clock::time())->format('H:i')) ?></time></span>
         <div class="dd" data-dd data-notes>
           <button class="icon-btn" type="button" aria-expanded="false" aria-controls="dd-notes" aria-haspopup="dialog" aria-label="Avisos<?= $unread > 0 ? ', ' . $unread . ' sin leer' : '' ?>">
             <?= Ui::icon('bell') ?><span class="icon-btn__n" data-unread<?= $unread > 0 ? '' : ' hidden' ?>><?= $e($unread) ?></span>
@@ -119,7 +129,8 @@ $brand = '<a class="brand" href="/" aria-label="NorthStar Captación, ir al dash
 <nav class="tabbar" aria-label="Acceso rápido">
   <a class="tab<?= $active === 'dashboard' ? ' is-on' : '' ?>" href="/"><?= Ui::icon('dashboard') ?><span>Inicio</span></a>
   <a class="tab<?= $active === 'leads' ? ' is-on' : '' ?>" href="/leads"><?= Ui::icon('users') ?><span>Leads</span></a>
-  <button class="tab" type="button" data-search><?= Ui::icon('search') ?><span>Buscar</span></button>
+  <a class="tab<?= $active === 'pipeline' ? ' is-on' : '' ?>" href="/pipeline"><?= Ui::icon('columns') ?><span>Pipeline</span></a>
+  <a class="tab<?= $active === 'tareas' ? ' is-on' : '' ?>" href="/tareas"><?= Ui::icon('list-check') ?><span>Tareas</span><?php if ($overdueBadge > 0): ?><i class="tab__n"><?= $e($overdueBadge) ?></i><?php endif; ?></a>
   <button class="tab" type="button" data-nav-open aria-controls="side"><?= Ui::icon('menu') ?><span>Menú</span></button>
 </nav>
 <?php endif; ?>
@@ -143,5 +154,8 @@ $brand = '<a class="brand" href="/" aria-label="NorthStar Captación, ir al dash
   </form>
 </dialog>
 <script nonce="<?= $e($nonce) ?>" src="/assets/panel.js?v=<?= $e($assetV('panel.js')) ?>" defer data-csrf="<?= $e($csrf) ?>"></script>
+<?php foreach (($js ?? []) as $script): if (preg_match('/^[a-z0-9-]{2,24}$/', (string) $script) !== 1) { continue; } ?>
+<script nonce="<?= $e($nonce) ?>" src="/assets/<?= $e($script) ?>.js?v=<?= $e($assetV($script . '.js')) ?>" defer data-csrf="<?= $e($csrf) ?>"></script>
+<?php endforeach; ?>
 </body>
 </html>

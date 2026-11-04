@@ -119,7 +119,7 @@ final class LeadActions
                     : '«' . $stages[$to] . '» solo se alcanza en orden (desde la etapa anterior). Confirma el salto si es lo que quieres.');
             }
             $now = Clock::now();
-            $u = ['stage' => $to];
+            $u = ['stage' => $to, 'stage_changed_at' => $now];
             $firstContactSet = false;
             if ($to === 'lost') {
                 $u += ['lost_reason' => $reason, 'lost_at' => $now];
@@ -200,7 +200,7 @@ final class LeadActions
                 return self::fail('Solo se reabren los leads perdidos o descartados.');
             }
             $to = $lead['first_contact_at'] !== null ? 'contacted' : 'new';
-            Db::update('leads', $leadId, ['stage' => $to, 'lost_reason' => null, 'lost_at' => null]);
+            Db::update('leads', $leadId, ['stage' => $to, 'stage_changed_at' => Clock::now(), 'lost_reason' => null, 'lost_at' => null]);
             self::event($leadId, 'reopened_manual', ['from_reason' => $lead['lost_reason'], 'to' => $to], $userId);
             ActivityLog::record('lead_reopen', $userId, 'lead', $leadId, ['to' => $to]);
             return self::ok('Lead reabierto en «' . Catalog::stageLabel((string) $lead['pipeline'], $to) . '».');

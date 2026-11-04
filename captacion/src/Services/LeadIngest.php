@@ -133,7 +133,7 @@ final class LeadIngest
         $attempt = (int) $existing['attempt'];
         if ($reopen) {
             $attempt++;
-            $updates += ['stage' => 'new', 'lost_reason' => null, 'lost_at' => null, 'first_contact_at' => null, 'attempt' => $attempt, 'source' => $source];
+            $updates += ['stage' => 'new', 'stage_changed_at' => $now, 'lost_reason' => null, 'lost_at' => null, 'first_contact_at' => null, 'attempt' => $attempt, 'source' => $source];
         }
         $merged = array_merge($existing, $updates);
         $merged['fmcsa_data'] = is_array($merged['fmcsa_data'] ?? null) ? $merged['fmcsa_data'] : Db::decode($merged['fmcsa_data'] ?? null);

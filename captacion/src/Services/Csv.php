@@ -29,8 +29,8 @@ final class Csv
     public static function leads(array $rows): string
     {
         $out = "\xEF\xBB\xBF" . self::line([
-            'ID', 'Recibido (ET)', 'Nombre', 'Perfil', 'Teléfono', 'Correo', 'Estado', 'Idioma', 'Equipo', 'Camiones', 'Años de experiencia', 'USDOT',
-            'Puntuación', 'Temperatura', 'Etapa', 'Motivo de pérdida', 'Fuente', 'Página de llegada', 'Primer contacto (ET)',
+            'ID', 'Recibido (' . Fmt::zone() . ')', 'Nombre', 'Perfil', 'Teléfono', 'Correo', 'Estado', 'Idioma', 'Equipo', 'Camiones', 'Años de experiencia', 'USDOT',
+            'Puntuación', 'Temperatura', 'Etapa', 'Motivo de pérdida', 'Fuente', 'Página de llegada', 'Primer contacto (' . Fmt::zone() . ')',
         ]);
         foreach ($rows as $r) {
             $out .= self::line([
