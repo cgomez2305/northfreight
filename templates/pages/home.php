@@ -66,7 +66,7 @@ $why = [
 // 04 Onboarding: foto decorativa por paso (alt descriptivo corto)
 $steps = [
     ['01', 'We learn your operation', 'Trucks, equipment, lanes, drivers and the accounts you already run, including Amazon Relay.',
-     ['base' => 'nf-hands-map-keys', 'alt' => 'Two hands resting on a route map beside a truck key and a notebook']],
+     ['base' => 'nf-hands-map-keys', 'alt' => 'Hands gathered around a folded route map with a truck key and a notebook beside it']],
     ['02', 'We define scope & contacts', 'Who approves loads, how we report, and which tasks the desk owns from day one.',
      ['base' => 'nf-signing-clipboard-night', 'alt' => 'Hand signing a form on a clipboard at night, with a trailer out of focus behind']],
     ['03', 'We run the day-to-day', 'Booking, tracking and documenting every load, with updates where you already work: WhatsApp.',
@@ -255,7 +255,7 @@ $figures = [
     </div>
     <div class="home-team__video">
       <?php partial('video', ['part' => 'player', 'id' => 'desk',
-          'image' => ['base' => 'nf-dispatch-room-wide-night', 'alt' => 'Dispatch room at night with rows of monitors showing route maps and empty chairs'],
+          'image' => ['base' => 'nf-dispatch-room-wide-night', 'alt' => 'Dispatch room at night with rows of monitors showing glowing route maps, with a highway seen through the windows'],
           'title' => 'A load doesn’t dispatch itself. {hl}There’s a team behind it.{/hl}', 'meta' => 'Video · 3 to 4 min']); ?>
     </div>
   </div>
