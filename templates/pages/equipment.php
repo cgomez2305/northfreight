@@ -99,7 +99,7 @@ partial('hero', [
         <li><?= ns_star(14) ?><span><?= e($n) ?></span></li>
         <?php endforeach; ?>
       </ul>
-      <a class="btn btn--navy btn--card sa-need__btn" href="<?= e(url('/contact/')) ?>">Send your details</a>
+      <a class="btn btn--navy btn--card sa-need__btn" href="<?= e(url('/contact/')) ?>"><span class="btn__t">Send your details</span></a>
     </aside>
   </div>
 </section>

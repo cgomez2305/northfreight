@@ -82,7 +82,6 @@ summary::-webkit-details-marker { display: none; }
 .g5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 
 @media (max-width: 1024px) {
-  .hide-tab { display: none !important; }
   .g4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .g5 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
   .g5 > * { grid-column: span 2; }
@@ -102,5 +101,5 @@ summary::-webkit-details-marker { display: none; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
   .btn:hover, .card:hover, a.card:hover { transform: none !important; translate: none !important; }
-  a.btn--primary:hover::after, a.btn--navy:hover::after, a.sb-dk-row__in:hover .sb-dk-row__go { rotate: none !important; }
+  a.idx__row:hover .idx__go { rotate: none !important; }
 }

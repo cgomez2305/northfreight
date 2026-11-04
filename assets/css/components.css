@@ -6,7 +6,7 @@
 .icon--fill { fill: currentColor; stroke: none; }
 
 /* ---- Botones (píldora) ---- */
-.btn { --px: 28px; --cell: 40px; position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: var(--btn-h); padding: 0 var(--px); border: 1px solid transparent; border-radius: var(--r-pill); font-family: var(--font-body); font-size: 17px; font-weight: 600; line-height: 1.2; text-align: center; text-decoration: none; cursor: pointer; transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast), translate var(--t-fast); }
+.btn { --px: 28px; --cell: 40px; --g: 10px; position: relative; display: inline-flex; align-items: center; justify-content: center; gap: var(--g); min-height: var(--btn-h); padding: 0 var(--px); border: 1px solid transparent; border-radius: var(--r-pill); font-family: var(--font-body); font-size: 17px; font-weight: 600; line-height: 1.2; text-align: center; text-decoration: none; cursor: pointer; transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast), translate var(--t-fast); }
 .btn:hover { translate: 0 -2px; }
 .btn:active { translate: 0 0; }
 .btn:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
@@ -15,15 +15,25 @@
 .btn--primary:focus-visible, .btn--navy:focus-visible { outline-color: var(--text); }
 .btn--ghost, .btn--mail { background: transparent; border-color: var(--hairline-strong); color: var(--text); font-weight: 500; }
 .btn--ghost:hover, .btn--mail:hover { border-color: var(--text-2); color: var(--text); }
-.btn--sm { --px: 22px; --cell: 34px; min-height: 48px; font-size: 16px; gap: 8px; }
+.btn--sm { --px: 22px; --cell: 34px; --g: 8px; min-height: 48px; font-size: 16px; }
 .btn--lg { --px: 32px; --cell: 44px; min-height: 60px; font-size: 18px; }
 .btn--card { --cell: 38px; min-height: 52px; }
 .btn--between { justify-content: space-between; }
-.btn--contact { --px: 32px; --cell: 52px; justify-content: space-between; gap: 16px; min-height: 76px; }
+.btn--contact { --px: 32px; --cell: 52px; --g: 16px; justify-content: space-between; min-height: 76px; }
 .btn--mail { justify-content: flex-start; min-height: 66px; padding: 0 32px; }
-/* Celda de flecha: los enlaces primarios (no los botones de formulario) llevan un círculo a la derecha con ↗; al hover gira 45° y apunta a la derecha */
-a.btn--primary::after, a.btn--navy::after { content: ""; flex: none; width: var(--cell); height: var(--cell); margin: 0 calc(8px - var(--px)) 0 6px; border-radius: var(--r-pill); background: var(--arrow-ne) center / 18px no-repeat, var(--btn-cell); rotate: 0deg; transition: rotate var(--t-fast); }
-a.btn--primary:hover::after, a.btn--navy:hover::after, a.btn--primary:focus-visible::after, a.btn--navy:focus-visible::after { rotate: 45deg; }
+/* Celda ↗: al hover o foco la de la derecha se encoge y otra crece a la izquierda del texto (.btn__t), que se corre; solo scale y translate (con movimiento reducido solo cambia el color) */
+a.btn--primary::after, a.btn--navy::after, :is(.btn--primary, .btn--navy) > .btn__t::before { content: ""; flex: none; width: var(--cell); height: var(--cell); border-radius: var(--r-pill); background: var(--arrow-ne) center / 18px no-repeat, var(--btn-cell); }
+a.btn--primary::after, a.btn--navy::after { margin: 0 calc(8px - var(--px)) 0 6px; transition: scale .16s ease-out; }
+:is(.btn--primary, .btn--navy) > .btn__t { position: relative; transition: translate .45s cubic-bezier(.34, 1.45, .64, 1); }
+:is(.btn--primary, .btn--navy) > .btn__t::before { position: absolute; top: 50%; right: calc(100% + var(--g)); margin-top: calc(var(--cell) / -2); scale: 0; transition: scale .3s cubic-bezier(.34, 1.45, .64, 1) .08s; }
+:is(.btn--primary, .btn--navy):is(:hover, :focus-visible) > .btn__t { translate: calc(var(--cell) + var(--g) - 6px) 0; }
+:is(.btn--primary, .btn--navy):is(:hover, :focus-visible) > .btn__t::before { scale: 1; }
+a.btn--primary:is(:hover, :focus-visible)::after, a.btn--navy:is(:hover, :focus-visible)::after { scale: 0; }
+@media (prefers-reduced-motion: reduce) {
+  :is(.btn--primary, .btn--navy) > .btn__t { translate: none !important; }
+  :is(.btn--primary, .btn--navy) > .btn__t::before { scale: 0 !important; }
+  a.btn--primary::after, a.btn--navy::after { scale: 1 !important; }
+}
 .btn--between::after { margin-left: auto; }
 .btn__stack { display: flex; flex-direction: column; gap: 4px; min-width: 0; text-align: left; }
 .btn__label { font-family: var(--font-mono); text-transform: uppercase; letter-spacing: .1em; font-size: 11px; font-weight: 500; }
@@ -238,6 +248,16 @@ a.btn--primary:hover::after, a.btn--navy:hover::after, a.btn--primary:focus-visi
 .section-head__main { display: flex; flex-direction: column; gap: 16px; max-width: 800px; }
 .section-head__lead { max-width: 440px; color: var(--text-2); }
 .section-head .t-h2, .section-head .t-h2-s { color: var(--text); }
+/* Cabecera en índice (count): móvil apilada; escritorio con eyebrow y cuenta a la izquierda y el H2 a la derecha */
+.section-head--idx { max-width: none; gap: 24px; }
+.section-head__side { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.section-head__body { display: flex; flex-direction: column; gap: 16px; min-width: 0; max-width: 820px; }
+.section-head__count { font-family: var(--font-head); font-weight: 700; font-size: 40px; line-height: .9; letter-spacing: -.01em; color: var(--text-3); font-variant-numeric: tabular-nums; }
+@media (min-width: 1025px) {
+  .section-head--idx { display: grid; grid-template-columns: minmax(0, .26fr) minmax(0, 1fr); gap: var(--gutter); align-items: start; padding-top: 28px; border-top: 1px solid var(--hairline); }
+  .section-head__side { flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: 28px; }
+  .section-head__count { font-size: clamp(56px, 5.6vw, 80px); }
+}
 
 
 /* ---- Tarjetas: borde fino. Sobre --bg llevan fondo --panel; dentro de un panel (hero, bandas) van sin fondo propio ---- */

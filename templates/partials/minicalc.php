@@ -39,6 +39,6 @@ $fields = [
       <p class="mcalc__row"><span>All-in rate per mile</span><span class="mono" data-out="rpmAll">—</span></p>
     </div>
     <noscript><p class="mcalc__note">This calculator needs JavaScript to work out the numbers.</p></noscript>
-    <a class="btn btn--primary btn--card" href="<?= e(url('/resources/rate-per-mile-calculator/')) ?>">Open the full calculator</a>
+    <a class="btn btn--primary btn--card" href="<?= e(url('/resources/rate-per-mile-calculator/')) ?>"><span class="btn__t">Open the full calculator</span></a>
   </div>
 </div>

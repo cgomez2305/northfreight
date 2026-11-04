@@ -4,8 +4,9 @@
    prefers-reduced-motion; si algo falla se revierte todo y la página queda completa y estática.
    Sistema común (se activa por clases que ya existen en los partials, nada por página):
      hero interno (.hero) · bandas y paneles (.section--surface, .section--dark, .home-relay, .cta, .footer, .co-band) · rejillas 3D por filas
-     (.g2 a .g6, .blog-grid) · titulares de sección (.t-h2, .t-h2-s) · marcos de foto (.px) con parallax y escala · cifras (entradas una vez) ·
-     patrón B (foto ancha con tarjeta solapada: la tarjeta sube con desfase respecto a la foto) · patrón C (filas apiladas con sticky: la fila cubierta se escala a .955 y su foto se atenúa).
+     (.g2 a .g6, .blog-grid; las .g4 entran en ola) · titulares de sección (.t-h2, .t-h2-s) · marcos de foto (.px) con parallax y escala · cifras (entradas una vez) ·
+     patrón B (foto ancha con tarjeta solapada: la tarjeta sube con desfase respecto a la foto) · patrón C (filas apiladas con sticky: la fila cubierta se escala a .955 y su foto se atenúa) ·
+     cortina fotográfica (.curtain: foto sticky que la sección .curtain-next cubre; la imagen interior se desplaza con scrub) · relleno de texto ([data-textfill] .w: opacidad .5 a 1 por palabra, >=1025px).
    Solo home: hero fijado (también se desvanece el widget de WhatsApp y sigue el video de fondo), carril horizontal fijado de servicios, sticky "Why a desk" (pin ~2,1 alturas: numeral, foto con crossfade e ítem activo),
    líneas de progreso del onboarding (scaleX con scrub) y parallax de la banda de video. Móvil (<1025 px): parallax de fotos, líneas, cifras y entrada de bandas, sin pines ni 3D.
    Nunca se anima ningún input, select, textarea ni resultado aria-live. Estilos que necesitan: assets/css/motion.css. */
@@ -217,10 +218,10 @@
   }
 
   /* ---- Bandas y paneles grandes (CTA final, footer, paneles de sección, banda de Relay): entran subiendo; en móvil solo y + opacidad ---- */
-  function bandScene(desk) {
+  function bandScene(desk, curtain) {
     var all = $('.section--surface, .section--dark, .home-relay, .cta, .footer, .co-band');
     all.forEach(function (el) {
-      if (hasLive(el) || (el.parentElement && el.parentElement.closest('.section--surface, .section--dark, .home-relay, .cta, .footer, .co-band'))) return;
+      if (hasLive(el) || (curtain && el.classList.contains('curtain-next')) || (el.parentElement && el.parentElement.closest('.section--surface, .section--dark, .home-relay, .cta, .footer, .co-band'))) return;
       g.fromTo(el, desk ? { scale: 0.94, y: 60 } : { y: 40, opacity: 0.95 }, {
         scale: 1, y: 0, opacity: 1, ease: 'none', transformOrigin: '50% 50%',
         scrollTrigger: desk
@@ -234,7 +235,7 @@
   function gridScene(rail) {
     var undo = [];
     $('.g2, .g3, .g4, .g5, .g6, .blog-grid').forEach(function (grid) {
-      if (grid.closest('.hero, .footer, [data-calc], form') || (rail && grid.matches('.home-cards')) || hasField(grid)) return;
+      if (grid.closest('.hero, .footer, [data-calc], form') || (rail && grid.matches('.home-cards')) || hasField(grid) || grid.matches('.g4')) return;   // las .g4 entran en ola (waveScene)
       var items = A.slice.call(grid.children).filter(sees);
       if (!items.length) return;
       var prev = grid.style.perspective; grid.style.perspective = '1200px';
@@ -251,6 +252,21 @@
       });
     });
     return function () { undo.forEach(function (f) { f(); }); };
+  }
+
+  /* ---- Rejillas de cuatro columnas (.g4, solo escritorio): entrada en ola. Un trigger por rejilla; cada columna recorre más distancia que la anterior (y 32/64/96/128 a 0)
+     y llega a la vez, así el borde superior dibuja una diagonal que se nivela. Solo transform y opacity; opacidad inicial .95 (contraste AA, igual que las rejillas 3D) ---- */
+  function waveScene() {
+    $('.g4').forEach(function (grid) {
+      if (grid.closest('.hero, .footer, [data-calc], form') || hasField(grid)) return;
+      var items = A.slice.call(grid.children).filter(sees);
+      if (items.length < 2) return;
+      g.fromTo(items, { y: function (i) { return 32 * (i + 1); }, opacity: 0.95 }, {
+        y: 0, opacity: 1, ease: 'none',
+        scrollTrigger: { trigger: grid, start: 'top 92%', end: 'top 45%', scrub: true, invalidateOnRefresh: true,
+          onToggle: function (self) { items.forEach(function (el) { el.style.willChange = self.isActive ? 'transform, opacity' : ''; }); } }
+      });
+    });
   }
 
   /* ---- Titulares de sección (solo escritorio): la cabecera entera sube 40 px (titular, eyebrow y lead juntos: no se solapan) ---- */
@@ -302,6 +318,28 @@
         tl.fromTo(inner, { scale: 1 }, { scale: 0.955, transformOrigin: '50% 0' }, 0);
         if (photo) tl.fromTo(photo, { opacity: 1 }, { opacity: 0.45 }, 0);
       });
+    });
+  }
+
+  /* ---- Cortina fotográfica (>=1025px y >=700px de alto): la foto queda fijada por CSS (sticky, motion.css) mientras la sección siguiente (.curtain-next) sube y la tapa. Un solo trigger por cortina:
+     la imagen interior (110 % del marco) se desplaza de -0,3 % a -8,8 % de su alto (yPercent, igual que .px) a lo largo de todo el recorrido del wrapper. Solo transform ---- */
+  function curtainScene() {
+    $('[data-curtain]').forEach(function (wrap) {
+      var img = one('.curtain__frame img', wrap);
+      if (!img || !sees(wrap)) return;
+      g.fromTo(img, { yPercent: -0.3 }, { yPercent: -8.8, ease: 'none',
+        scrollTrigger: { trigger: wrap, start: 'top bottom', end: 'bottom bottom', scrub: true, onToggle: wc(img) } });
+    });
+  }
+
+  /* ---- Relleno de texto (>=1025px): cada palabra ([data-textfill] .w, la parte el helper PHP ns_words) sube de opacidad .5 a 1 con el scroll, una tras otra. Un solo trigger por bloque; solo opacity.
+     Opacidad inicial .5 (no .3): --text a .5 sobre --bg mantiene AA. Sin esta escena el texto se ve completo (el CSS solo lo atenúa bajo html.js-motion) ---- */
+  function textScene() {
+    $('[data-textfill]').forEach(function (el) {
+      var words = $('.w', el);
+      if (words.length < 2 || !sees(el)) return;
+      g.fromTo(words, { opacity: 0.5 }, { opacity: 1, ease: 'none', stagger: 0.12,
+        scrollTrigger: { trigger: el, start: 'top 80%', end: 'bottom 58%', scrub: true } });
     });
   }
 
@@ -362,13 +400,15 @@
     if (c.desk) {
       heroInt();
       undo.push(gridScene(!!c.rail));
+      waveScene();
       headScene(!!c.rail);
       mediaScene();
       pcardScene();
-      if (c.rail) rowsScene();
+      if (c.rail) { rowsScene(); curtainScene(); }
+      textScene();
     }
     enterScene();
-    bandScene(!!c.desk);
+    bandScene(!!c.desk, !!c.rail);
     return function () { undo.forEach(function (f) { f(); }); };
   }
 

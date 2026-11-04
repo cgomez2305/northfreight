@@ -94,7 +94,7 @@ partial('hero', [
         <h2 class="t-h2-s co-band__title" id="res-band">Let the desk handle your paperwork</h2>
         <p class="co-band__text">Rate cons, BOLs, PODs and settlements organized per load by the same team that books and tracks it.</p>
       </div>
-      <a class="btn btn--navy btn--block-m" href="<?= e(url('/trucking-back-office/')) ?>">See back-office services <span class="arrow" aria-hidden="true">→</span></a>
+      <a class="btn btn--navy btn--block-m" href="<?= e(url('/trucking-back-office/')) ?>"><span class="btn__t">See back-office services <span class="arrow" aria-hidden="true">→</span></span></a>
     </div>
   </div>
 </section>

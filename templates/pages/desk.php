@@ -1,7 +1,7 @@
 <?php
 /**
  * /our-desk/ — maqueta Desk.html.
- * Orden: hero fotográfico (patrón A: la fachada del video es la foto; título, meta y capítulos en una tarjeta de vidrio) · The team (4 tarjetas, app/data/team.php) · Three rules (3 tarjetas altas) · How we work · What you can count on (filas W/01..W/04) · CTA final (layout).
+ * Orden: hero fotográfico (patrón A: la fachada del video es la foto; título, meta y capítulos en una tarjeta de vidrio) · The team (4 tarjetas, app/data/team.php) · Three rules (3 tarjetas altas) · How we work · What you can count on (índice con vista previa, partial index-list, W/01..W/04) · CTA final (layout).
  * Rules y filas reutilizan afirmaciones que ya están en el sitio; ninguna lleva foto.
  * La portada del video es una foto de marca: el botón de play es lo único que va encima del video; el texto va sobre el degradado del hero.
  */
@@ -27,10 +27,10 @@ $rules = [
 ];
 // Filas numeradas (W/01..W/04): título y frase de apoyo ya existentes; cada fila enlaza a la página donde se explica.
 $reasons = [
-    ['You approve every load', 'Who approves loads, how we report, and which tasks the desk owns from day one.', '/dispatch-for-owner-operators/'],
-    ['One channel for every update', 'Updates you can follow, in one channel.', '/load-tracking/'],
-    ['A record of every load', 'Rate cons, BOLs, PODs and receipts filed per load.', '/trucking-back-office/'],
-    ['A team, not a single dispatcher', 'Dispatch, tracking and back office presented as one team.', '/how-it-works/'],
+    ['You approve every load', 'Who approves loads, how we report, and which tasks the desk owns from day one.', '/dispatch-for-owner-operators/', ['base' => 'nf-hero-owner-operators', 'pos' => '50% 50%']],
+    ['One channel for every update', 'Updates you can follow, in one channel.', '/load-tracking/', ['base' => 'nf-check-tracking-mirror', 'pos' => '68% 50%']],
+    ['A record of every load', 'Rate cons, BOLs, PODs and receipts filed per load.', '/trucking-back-office/', ['base' => 'nf-hero-back-office', 'pos' => '40% 50%']],
+    ['A team, not a single dispatcher', 'Dispatch, tracking and back office presented as one team.', '/how-it-works/', ['base' => 'nf-hero-how-it-works', 'pos' => '30% 50%']],
 ];
 ?>
 <?php
@@ -92,7 +92,7 @@ partial('hero', [
 
 <section class="section sb-dk-rules" aria-labelledby="dk-rules">
   <div class="container stack sb-dk-stack">
-    <?php partial('section-head', ['eyebrow' => 'How the desk behaves', 'title' => 'Three rules we work by', 'id' => 'dk-rules']); ?>
+    <?php partial('section-head', ['eyebrow' => 'How the desk behaves', 'title' => 'Three rules we work by', 'id' => 'dk-rules', 'count' => count($rules)]); ?>
     <ol class="g3 sb-dk-rulelist">
       <?php foreach ($rules as $i => [$title, $text]): ?>
       <li class="sb-dk-rule<?= $i === 0 ? ' sb-dk-rule--on' : '' ?>">
@@ -122,18 +122,7 @@ partial('hero', [
 
 <section class="section sb-dk-why pre-cta" aria-labelledby="dk-why">
   <div class="container stack sb-dk-stack">
-    <?php partial('section-head', ['eyebrow' => 'Working with the desk', 'title' => 'What you can count on', 'id' => 'dk-why']); ?>
-    <ol class="sb-dk-rows">
-      <?php foreach ($reasons as $i => [$title, $text, $path]): $live = route_is_live($path); ?>
-      <li class="sb-dk-row">
-        <<?= $live ? 'a href="' . e(url($path)) . '"' : 'div' ?> class="sb-dk-row__in">
-          <span class="sb-dk-row__n t-meta">W/<?= sprintf('%02d', $i + 1) ?></span>
-          <span class="head sb-dk-row__title"><?= e($title) ?></span>
-          <span class="sb-dk-row__text"><?= e($text) ?></span>
-          <span class="sb-dk-row__go" aria-hidden="true"><span class="arrow">→</span></span>
-        </<?= $live ? 'a' : 'div' ?>>
-      </li>
-      <?php endforeach; ?>
-    </ol>
+    <?php partial('section-head', ['eyebrow' => 'Working with the desk', 'title' => 'What you can count on', 'id' => 'dk-why', 'count' => count($reasons)]); ?>
+    <?php partial('index-list', ['label' => 'What you can count on', 'items' => array_map(static fn(array $r, int $i): array => ['n' => 'W/' . sprintf('%02d', $i + 1), 'title' => $r[0], 'text' => $r[1], 'href' => route_is_live($r[2]) ? url($r[2]) : '', 'image' => $r[3]], $reasons, array_keys($reasons))]); ?>
   </div>
 </section>

@@ -46,7 +46,7 @@ partial('summary', [
 ?>
 <section class="section" aria-labelledby="relay-manage">
   <div class="container stack">
-    <?php partial('section-head', ['id' => 'relay-manage', 'eyebrow' => 'Inside your Relay account', 'title' => 'What we manage in your Amazon Relay account']); ?>
+    <?php partial('section-head', ['id' => 'relay-manage', 'eyebrow' => 'Inside your Relay account', 'title' => 'What we manage in your Amazon Relay account', 'count' => count($manage)]); ?>
     <?php partial('photo-rows', ['label' => 'What we manage in your Amazon Relay account', 'items' => array_map(static fn(array $m): array => ['tag' => $m[0], 'title' => $m[1], 'text' => $m[2], 'icon' => $m[3], 'image' => $m[4]], $manage)]); ?>
   </div>
 </section>

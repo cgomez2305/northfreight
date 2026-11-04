@@ -30,6 +30,21 @@ function ns_rich(string $s): string
     return $out;
 }
 
+/**
+ * ns_rich() con cada palabra del texto envuelta en <span class="w"> (para el relleno de texto por scroll, motion.js `textScene`). Las etiquetas que genera ns_rich() no se tocan y los espacios
+ * entre palabras siguen siendo texto normal, así que el texto accesible, el copiado y el JSON-LD/extracción de buscadores no cambian (los <span> en línea no fragmentan la lectura).
+ */
+function ns_words(string $s): string
+{
+    $parts = preg_split('/(<[^>]*>)/', ns_rich($s), -1, PREG_SPLIT_DELIM_CAPTURE);
+    foreach ($parts as $i => $p) {
+        if ($p !== '' && $p[0] !== '<') {
+            $parts[$i] = preg_replace('/\S+/u', '<span class="w">$0</span>', $p);
+        }
+    }
+    return implode('', $parts);
+}
+
 /** Estrella NorthStar (§5.5). Color por CSS (.star => currentColor; por defecto cian). */
 function ns_star(int $size = 16, string $class = ''): string
 {

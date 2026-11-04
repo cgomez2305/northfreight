@@ -196,6 +196,25 @@
     if (d.readyState === 'complete') later(); else window.addEventListener('load', later);
   })();
 
+  /* ---- Índice con vista previa ([data-idx], partial index-list): el cursor o el foco en una fila la activa (.is-on) y muestra su foto (fundido de opacidad en CSS). .is-live atenúa las demás filas (solo >=1025px) ---- */
+  (function () {
+    $$('[data-idx]').forEach(function (box) {
+      var items = $$('.idx__item', box), pvs = $$('.idx__pv', box);
+      if (items.length < 2) return;
+      var cur = 0;
+      function set(i) {
+        if (i === cur) return; cur = i;
+        items.forEach(function (it, k) { it.classList.toggle('is-on', k === i); });
+        pvs.forEach(function (p, k) { p.classList.toggle('is-on', k === i); });
+      }
+      items.forEach(function (it, i) {
+        it.addEventListener('mouseenter', function () { set(i); });
+        it.addEventListener('focusin', function () { set(i); });
+      });
+      box.classList.add('is-live');
+    });
+  })();
+
   /* ---- Mega menús ---- */
   (function () {
     var header = d.getElementById('site-header');

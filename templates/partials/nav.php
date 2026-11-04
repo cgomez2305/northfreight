@@ -36,7 +36,7 @@ $hasResources = cfg('show_resources') && ($m['tools'] || $m['templates'] || $m['
     <?php if (cfg('show_on_shift')): ?>
     <p class="hdr__desk"><span class="hdr__dot" aria-hidden="true"></span><span class="hdr__on"><span class="sr-only">Dispatch desk </span>On shift</span><span class="hdr__clk">ET <strong data-t="et">--:--</strong></span></p>
     <?php endif; ?>
-    <a class="btn btn--primary btn--sm hide-m" href="<?= e(wa($wa)) ?>" rel="noopener">WhatsApp us</a>
+    <a class="btn btn--primary btn--sm hide-m" href="<?= e(wa($wa)) ?>" rel="noopener"><span class="btn__t">WhatsApp us</span></a>
     <button type="button" class="nav__burger" data-menu-open aria-label="Open menu" aria-expanded="false" aria-controls="mobile-menu"><?= ns_icon('menu', 20, 'icon--open') ?><?= ns_icon('close', 20, 'icon--close') ?></button>
     <a class="nav__burger nav__burger--link" href="#footer-nav" aria-label="Go to the site menu"><?= ns_icon('menu', 20) ?></a>
   </div>

@@ -27,7 +27,7 @@ $callout = static function () use ($route): void { ?>
     <span class="t-meta blog-callout__tag">Talk to the desk</span>
     <p class="head blog-callout__title">Rather have a dispatcher handle this?</p>
   </div>
-  <a class="btn btn--primary btn--card btn--block-m" href="<?= e(wa($route['wa'] ?? null)) ?>" rel="noopener">WhatsApp the desk</a>
+  <a class="btn btn--primary btn--card btn--block-m" href="<?= e(wa($route['wa'] ?? null)) ?>" rel="noopener"><span class="btn__t">WhatsApp the desk</span></a>
 </aside>
 <?php };
 

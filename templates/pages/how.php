@@ -50,9 +50,12 @@ partial('trio', ['label' => 'Booked, tracked, documented', 'items' => [
   </div>
 </section>
 
-<?php partial('stage-table', ['eyebrow' => 'From booking to settlement', 'title' => 'A load, stage by stage', 'id' => 'hw-stages']); ?>
+<?php partial('stage-table', ['eyebrow' => 'From booking to settlement', 'title' => 'A load, stage by stage', 'id' => 'hw-stages', 'count' => count(data('stages'))]); ?>
 
-<section class="section section--surface" aria-labelledby="hw-expect">
+<!-- CORTINA: foto grande fijada que el panel "What you can expect" (curtain-next) cubre al subir (≥1025px con JS); sin JS o en móvil, foto normal -->
+<?php partial('curtain', ['image' => ['base' => 'nf-check-tracking-mirror', 'alt' => 'Rain-streaked truck side mirror reflecting a white trailer on a wet highway at dusk', 'pos' => '70% 50%']]); ?>
+
+<section class="section section--surface curtain-next" aria-labelledby="hw-expect">
   <div class="container stack sb-gap-32">
     <?php partial('section-head', ['title' => 'What you can expect from the desk', 'id' => 'hw-expect']); ?>
     <ul class="g3">

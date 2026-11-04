@@ -34,7 +34,7 @@ $uid = 'tabs-' . preg_replace('/[^a-z0-9-]/', '', strtolower((string) ($id ?? 'x
           <h3 class="head t-h3 tabp__title"><?= e((string) ($it['title'] ?? $it['label'])) ?></h3>
           <?= ns_checks((array) $it['points']) ?>
           <div class="tabp__ctas">
-            <a class="btn btn--primary btn--card" href="<?= e(wa($it['wa'] ?? null)) ?>" rel="noopener">Talk to a dispatcher</a>
+            <a class="btn btn--primary btn--card" href="<?= e(wa($it['wa'] ?? null)) ?>" rel="noopener"><span class="btn__t">Talk to a dispatcher</span></a>
             <?php if ($link): ?><a class="btn btn--ghost btn--card" href="<?= e((string) $link['href']) ?>"><?= e((string) $link['label']) ?> <span class="arrow" aria-hidden="true">→</span></a><?php endif; ?>
           </div>
         </div>

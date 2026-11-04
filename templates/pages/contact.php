@@ -20,7 +20,7 @@ $equip  = (string) ($old['equipment'] ?? '');
 
 ob_start(); ?>
 <a class="btn btn--primary btn--contact" href="<?= e(wa($route['wa'])) ?>" rel="noopener">
-  <span class="btn__stack"><span class="btn__label t-meta">WhatsApp</span><span class="btn__num"><?= e($cfg['phone']) ?></span></span>
+  <span class="btn__stack btn__t"><span class="btn__label t-meta">WhatsApp</span><span class="btn__num"><?= e($cfg['phone']) ?></span></span>
 </a>
 <a class="btn btn--mail" href="mailto:<?= e($email) ?>">
   <span class="btn__stack"><span class="btn__label t-meta">Email</span><span class="btn__mail"><?= e($email) ?></span></span>

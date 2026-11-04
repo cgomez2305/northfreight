@@ -49,7 +49,7 @@ foreach ($paths as $path) {
   <div class="container dblock__in">
     <div class="dblock__head">
       <?php partial('section-head', ['id' => $id ?? '', 'eyebrow' => $eyebrow ?? '', 'title' => $title ?? '', 'lead' => $lead ?? '']); ?>
-      <?php if (!empty($btn['href'])): ?><a class="btn btn--primary btn--card" href="<?= e((string) $btn['href']) ?>"><?= e((string) $btn['label']) ?></a><?php endif; ?>
+      <?php if (!empty($btn['href'])): ?><a class="btn btn--primary btn--card" href="<?= e((string) $btn['href']) ?>"><span class="btn__t"><?= e((string) $btn['label']) ?></span></a><?php endif; ?>
     </div>
     <div class="dblock__list">
       <a class="dfeat" href="<?= e(url($feat['path'])) ?>">

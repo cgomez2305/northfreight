@@ -115,7 +115,7 @@ $figures = [
       <?php endif; ?>
       <p class="hero__lead t-lead">NorthStar is your remote dispatch and back-office desk. We book Amazon Relay and dry van freight, follow every load to delivery, and keep the paperwork that protects your pay. That is how incidents get handled with evidence and operations run as a team.</p>
       <div class="hero__ctas">
-        <a class="btn btn--primary btn--lg" href="<?= e($waHref) ?>" rel="noopener">Talk to a dispatcher</a>
+        <a class="btn btn--primary btn--lg" href="<?= e($waHref) ?>" rel="noopener"><span class="btn__t">Talk to a dispatcher</span></a>
         <a class="btn btn--ghost btn--lg" href="<?= e(url('/how-it-works/')) ?>">See how we onboard</a>
       </div>
       <ul class="tags eyebrow" aria-label="What we cover">
@@ -140,13 +140,14 @@ $figures = [
           <p class="hero-wa__msg" data-wa-msg></p>
         </div>
       </div>
-      <a class="btn btn--primary btn--card hero-wa__go" href="<?= e($waHref) ?>" rel="noopener" data-wa-open>Open WhatsApp</a>
+      <a class="btn btn--primary btn--card hero-wa__go" href="<?= e($waHref) ?>" rel="noopener" data-wa-open><span class="btn__t">Open WhatsApp</span></a>
     </div>
   </div>
 </section>
 
 <?php partial('summary', [
     'variant' => 'lead',
+    'textfill' => true,   // relleno de texto palabra a palabra con el scroll (motion.js textScene): usado una sola vez; quitar esta línea lo desactiva
     'text'    => 'NorthStar is a remote truck dispatch company for owner-operators and small fleets. Our trucking dispatch services cover load booking on Amazon Relay and dry van, load tracking from pickup to POD and back-office work, all from one dispatch desk.',
     'points'  => [
         'Amazon Relay and dry van booking',
@@ -199,14 +200,17 @@ $figures = [
     ],
 ]); ?>
 
+<!-- CORTINA: foto grande fijada que el panel de Amazon Relay (curtain-next) cubre al subir (≥1025px con JS); sin JS o en móvil, foto normal -->
+<?php partial('curtain', ['image' => ['base' => 'nf-blog-relay-load-board', 'alt' => 'Truck cab at night with a rugged tablet on the dashboard mount, a clipboard with a pen and a lit warehouse yard beyond the windshield', 'pos' => '50% 55%']]); ?>
+
 <!-- 03 AMAZON RELAY -->
-<section class="home-relay" aria-labelledby="relay-title">
+<section class="home-relay curtain-next" aria-labelledby="relay-title">
   <div class="container home-relay__in">
     <div class="home-relay__main">
       <span class="t-eyebrow">03 · Specialty</span>
       <h2 class="t-h2" id="relay-title">Amazon Relay dispatch for <span class="hl">carriers who move fast.</span></h2>
       <p class="t-body home-relay__lead">Relay rewards carriers who move fast and keep clean records. Our desk watches the load board for you, books the blocks that fit your trucks and follows performance and disputes inside your account.</p>
-      <a class="btn btn--primary home-relay__btn" href="<?= e(url('/amazon-relay-dispatch/')) ?>">Amazon Relay dispatch</a>
+      <a class="btn btn--primary home-relay__btn" href="<?= e(url('/amazon-relay-dispatch/')) ?>"><span class="btn__t">Amazon Relay dispatch</span></a>
     </div>
     <div class="g2 home-relay__grid">
       <?php foreach ($relay as $i => [$tag, $title, $text]): partial('card', ['tag' => $tag, 'title' => $title, 'text' => $text, 'cls' => 'home-rcard' . ($i === 3 ? ' home-rcard--accent' : '')]); endforeach; ?>
