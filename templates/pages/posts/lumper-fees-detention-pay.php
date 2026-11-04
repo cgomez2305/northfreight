@@ -45,3 +45,4 @@ $related = [
 
 <h2 class="t-prose-h2" id="settlement">Putting it on the settlement</h2>
 <p>Send lumper receipts and detention records with the POD, not weeks later. Late paperwork is the easiest claim for a broker to deny. A <a href="<?= e(url('/trucking-back-office/')) ?>">trucking back office</a> that files everything per load keeps these claims from slipping.</p>
+<?php partial('minicalc', ['id' => 'lumper-rpm', 'title' => 'Try it: what does a load leave per mile?']); ?>

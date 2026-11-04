@@ -1,7 +1,7 @@
 <?php
 /**
  * /load-tracking/ — maqueta Tracking.html.
- * Orden: hero (texto + "Desk log" de ejemplo, sin foto) · What we log · Evidencia (foto ancha con tarjeta solapada, patrón B) · CTA final (lo imprime el layout).
+ * Orden: hero (texto + "Desk log" de ejemplo, sin foto) · What we log · Evidencia (foto ancha con tarjeta solapada y lista de comprobación, patrón B) · CTA final (lo imprime el layout).
  */
 require_once NS_ROOT . '/templates/partials/kit.php';
 
@@ -65,5 +65,6 @@ partial('summary', [
     'title'   => 'Incidents are handled with evidence',
     'lead'    => 'When a broker questions a late arrival or detention, the record is already there: time, place and photos. Your claim starts with proof, not with a phone call.',
     'image'   => ['base' => 'nf-highway-side-mirror-night', 'alt' => 'Night highway with trucks seen in a truck’s side mirror', 'pos' => '70% 50%'],
+    'extra'   => ns_checks(['Rate confirmation filed with the load', 'Evidence on file for detention and disputes', 'Updates on WhatsApp, where you already work', 'A record of every load'], 'What the desk keeps on file'),
     'link'    => route_is_live('/trucking-back-office/') ? ['label' => 'How our back office uses this evidence', 'href' => url('/trucking-back-office/')] : null,
 ]); ?>

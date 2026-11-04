@@ -13,6 +13,7 @@
  *   parent     (opcional) ruta padre para las migas; sin parent: Home > esta página
  *   crumbs     (opcional) migas completas [[label, path], …] (incluye Home); anula a 'parent' en la miga visible y en el JSON-LD
  *   cta        (opcional) false => el layout no imprime el bloque CTA final
+ *   css / js   (opcional) listas de grupos de CSS (assets/css/pages/*.css) y módulos JS (assets/js/*.js) que anulan los de la plantilla (solo lo que esa página usa)
  *   motion     (opcional) true => carga GSAP + ScrollTrigger + motion.js + motion.css (escenas de scroll y parallax de fotos)
  *   faq        clave de app/data/faq.php (o null)
  *   extras     doc (legal), equip (equipment), slug (post)
@@ -197,6 +198,7 @@ return [
     '/resources/' => [
         'template'   => 'resources',
         'motion'     => true,
+        'js'         => ['calc-rpm.js'],   // mini calculadora de rate per mile (partial minicalc); su CSS va en company.css y blog.css
         'title'      => 'Free Trucking Resources for Owner-Operators | NorthStar', // TODO verificar con doc de copy
         'meta'       => 'Free trucking tools, templates and guides from a dispatch desk: IFTA and rate per mile calculators, BOL template, agreement, glossary and blog.', // TODO
         'h1'         => 'Free trucking resources from the desk',
@@ -303,6 +305,7 @@ return [
     '/blog/how-much-does-truck-dispatch-cost/' => [
         'template'   => 'post',
         'motion'     => true,
+        'js'         => ['calc-rpm.js'],
         'slug'       => 'how-much-does-truck-dispatch-cost',
         'title'      => 'How Much Does Truck Dispatch Service Cost? | NorthStar', // TODO verificar con doc de copy
         'meta'       => 'Dispatch fees explained: percentage of the gross, flat weekly or per load. See what each model costs an owner-operator and what should be included.', // TODO
@@ -351,6 +354,7 @@ return [
     '/blog/lumper-fees-detention-pay/' => [
         'template'   => 'post',
         'motion'     => true,
+        'js'         => ['calc-rpm.js'],
         'slug'       => 'lumper-fees-detention-pay',
         'title'      => 'Lumper Fees & Detention Pay: Get Paid for Both | NorthStar', // TODO verificar con doc de copy
         'meta'       => 'Lumper fees and detention pay: what to document at the dock so lumper receipts and detention hours show up on your settlement.', // TODO

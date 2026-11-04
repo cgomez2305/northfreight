@@ -2,7 +2,7 @@
 /**
  * Footer: logo + descripción · Services · Company · Talk to the desk; fila inferior © año, MC#/USDOT (ph), Privacy, Terms.
  * WhatsApp, teléfono y correo siempre visibles como texto, con icono (bloque de contacto). "Back to top" apunta a #site-header (la cabecera).
- * Ancla #footer-nav (alternativa sin JS al menú móvil).
+ * Ancla #footer-nav (alternativa sin JS al menú móvil). Debajo de la fila legal, el wordmark gigante "NORTHSTAR" recortado por abajo (.footer__mark, decorativo).
  * Dirección (NAP) opcional: solo si ADDRESS está definida (org_address()).
  * Params: wa(string|null).
  */
@@ -72,5 +72,12 @@ $addr = org_address();   // NAP: solo se imprime si ADDRESS está definida en co
       <?php if (route_is_live('/terms/')): ?><a class="foot__link" href="<?= e(url('/terms/')) ?>">Terms</a><?php endif; ?>
       <a class="foot__top" href="#site-header">Back to top <span class="arrow" aria-hidden="true">→</span></a>
     </span>
+  </div>
+  <!-- Wordmark gigante: decorativo (aria-hidden, sin enlaces), recortado por abajo por el borde del panel. Tamaño en cqw del propio contenedor: llena el ancho del contenido de 360 a 1920. El texto va en pseudo-elementos (::before NORTH, ::after STAR) para que no cuente como texto de la página (contraste, lectores, copiar). -->
+  <div class="footer__mark" aria-hidden="true">
+    <div class="footer__mark-in">
+      <span class="footer__sub">Freight Solutions</span>
+      <span class="footer__word"></span>
+    </div>
   </div>
 </footer>

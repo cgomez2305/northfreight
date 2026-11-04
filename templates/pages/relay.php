@@ -2,7 +2,7 @@
 /**
  * /amazon-relay-dispatch/ — Relay.html (diferencial). Disponibles: $route, $cfg y helpers.
  * Orden: hero fotográfico (patrón A) · In short · What we manage (A a E: filas apiladas con foto, patrón C) · Why Relay needs a dedicated desk (foto ancha con tarjeta solapada, patrón B) ·
- * Guides for Relay carriers (2 enlaces a artículos) · FAQ (pre-CTA). El CTA final lo pone el layout.
+ * Guides for Relay carriers (bloque "From the desk": destacado + 2 filas, sustituye a la tira de 2 enlaces) · FAQ (pre-CTA). El CTA final lo pone el layout.
  */
 require_once NS_ROOT . '/templates/partials/kit.php';
 
@@ -61,14 +61,20 @@ partial('summary', [
 ]); ?>
 
 <?php if ($guides): ?>
-<section class="sa-guides" aria-labelledby="relay-guides">
-  <div class="container sa-guides__in">
-    <h2 class="t-eyebrow sa-guides__label" id="relay-guides">Guides for Relay carriers</h2>
-    <?php foreach ($guides as $g): ?>
-      <a class="sa-guides__link" href="<?= e(url($g[0])) ?>"><?= e($g[1]) ?> <span class="arrow" aria-hidden="true">→</span></a>
-    <?php endforeach; ?>
-  </div>
-</section>
+<?php partial('desk-block', [
+    'id'      => 'relay-guides',
+    'eyebrow' => 'From the desk',
+    'title'   => 'Guides for Relay carriers',
+    'lead'    => 'How the Relay load board works, what Relay requires from carriers and what dispatch costs, in plain language.',
+    'btn'     => ['label' => 'All articles', 'href' => url('/blog/')],
+    'paths'   => ['/blog/amazon-relay-load-board/', '/blog/amazon-relay-requirements/', '/blog/how-much-does-truck-dispatch-cost/'],
+    // las fotos propias de esos artículos ya están en las filas de arriba: aquí llevan otra (sin repetir foto en la página)
+    'exclude' => array_merge(array_map(static fn(array $m): string => $m[4]['base'], $manage), ['nf-trailer-dock-night-mist', 'nf-hitching-trailer-rain']),
+    'alt'     => [
+        '/blog/amazon-relay-load-board/'   => ['nf-cab-interior-cyan-night', 'Truck cab at night with a phone on the dashboard and a highway ahead'],
+        '/blog/amazon-relay-requirements/' => ['nf-shipping-form-clipboard', 'Clipboard with a blank shipping form under a cool light'],
+    ],
+]); ?>
 <?php endif; ?>
 
 <section class="section sa-faq-after pre-cta" aria-labelledby="faq-title">

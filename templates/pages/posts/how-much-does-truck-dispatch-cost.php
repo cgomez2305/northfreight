@@ -34,6 +34,7 @@ $pricing = ph('NorthStar pricing model: percentage, flat fee or plan details to 
   <p class="blog-stat"><span class="mono blog-stat__k">4 LOADS / WEEK</span><span class="head blog-stat__v">$800</span></p>
 </div>
 <p>Then put that fee next to what the dispatcher actually does for you: hours of load-board searching, broker calls, rate negotiation, check calls and paperwork. Our <a href="<?= e(url('/resources/rate-per-mile-calculator/')) ?>">rate per mile calculator</a> helps you see what each load leaves after fuel and fees.</p>
+<?php partial('minicalc', ['id' => 'cost-rpm', 'title' => 'Try it: what does your load pay per mile?']); ?>
 <?php $callout(); ?>
 
 <h2 class="t-prose-h2" id="included">What the fee should include</h2>

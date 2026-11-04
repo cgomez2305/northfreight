@@ -3,10 +3,6 @@
 .sb-gap-32 .section-head { max-width: none; }
 .sb-bo-hero .hero__title, .sb-hw-hero .hero__title, .sb-ct-hero .hero__title { line-height: .9; }
 .sb-cells > li { display: flex; }
-.sb-split { display: flex; flex-wrap: wrap; gap: 40px; align-items: center; }
-.sb-split__text { flex: 1 1 440px; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
-.sb-link { display: inline-flex; align-items: center; align-self: flex-start; min-height: 44px; gap: 6px; font-weight: 700; color: var(--cyan); text-decoration: none; }
-.sb-link:hover { color: var(--text); }
 /* ---- Tracking ---- */
 .sb-tr-hero .hero__lead { max-width: 560px; }
 .sb-tr-card { padding: clamp(20px, 3vw, 32px); gap: 16px; }
@@ -21,11 +17,6 @@
 .sb-bo-hero .hero__main { gap: 24px; }
 .sb-bo-hero .hero__title { max-width: 900px; }
 .sb-bo-hero .t-tagline { color: var(--text); }
-.sb-bo-flow { flex: 1 1 380px; min-width: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
-.sb-bo-flow__item { display: flex; align-items: center; gap: 10px; }
-.sb-bo-flow__arrow { color: var(--cyan); font-weight: 700; }
-.sb-bo-flow__step { display: block; padding: 14px 22px; background: var(--panel); color: var(--text); border: 1px solid var(--hairline); border-radius: var(--r-pill); font-family: var(--font-head); font-weight: 700; font-size: 22px; line-height: 1.1; }
-.sb-bo-flow__step--end { background: var(--cyan); border-color: var(--cyan); color: var(--navy-deep); }
 /* ---- How it works ---- */
 .sb-hw-hero .hero__lead { max-width: 620px; }
 .sb-hw-hero .hero__title { max-width: 960px; }
@@ -99,7 +90,7 @@ a.sb-dk-row__in:focus-visible { outline-offset: 4px; border-radius: var(--r-tile
 }
 .sb-cells .card__title { text-wrap: wrap; }
 /* La maqueta deja line-height normal en estos H3 */
-.sb-bo-job .card__title, .sb-dk-value .card__title, .sb-dk-person__name { line-height: normal; }
+.sb-dk-value .card__title, .sb-dk-person__name { line-height: normal; }
 
 /* ---- Tabla "A load, stage by stage" (partial stage-table): panel con filas de borde fino; <=760px cada fila es una tarjeta ---- */
 .stage { background: var(--panel); border: 1px solid var(--hairline); border-radius: var(--r-card); padding: clamp(6px, 1vw, 12px) clamp(14px, 2.4vw, 32px); }
@@ -121,4 +112,18 @@ a.sb-dk-row__in:focus-visible { outline-offset: 4px; border-radius: var(--r-tile
   .stage__table td::before { content: attr(data-label); display: block; margin-bottom: 4px; font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--text-3); }
   .stage__table tbody th { width: auto; }
 }
+
+/* ---- Triada de iconos sin tarjeta (partial trio): how it works (Booked / Tracked / Documented) y contacto (WhatsApp / Email / Short form) ---- */
+.trio-sec { padding-block: clamp(48px, 6vw, 88px) 0; }
+.trio { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 36px clamp(24px, 4vw, 64px); margin: 0; padding: 0; list-style: none; }
+.trio__in { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; color: inherit; text-decoration: none; }
+.trio__icon { display: grid; place-items: center; width: 64px; height: 64px; border: 1px solid var(--hairline-strong); border-radius: var(--r-tile); background: var(--panel); color: var(--cyan-light); transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast); }
+.trio__icon .icon { stroke-width: 1.6; }
+.trio__title { font-size: clamp(30px, 3vw, 40px); line-height: .98; letter-spacing: -.01em; color: var(--text); }
+.trio__text { max-width: 36ch; font-size: 17px; line-height: 1.55; color: var(--text-2); }
+.trio__cta { margin-top: 2px; font-weight: 600; color: var(--cyan); transition: color var(--t-fast); }
+a.trio__in:hover .trio__icon { background: var(--cyan); border-color: var(--cyan); color: var(--navy-deep); }
+a.trio__in:hover .trio__cta { color: var(--cyan-light); }
+a.trio__in:focus-visible { outline-offset: 8px; border-radius: var(--r-card); }
+@media (max-width: 640px) { .trio { grid-template-columns: minmax(0, 1fr); } }
 

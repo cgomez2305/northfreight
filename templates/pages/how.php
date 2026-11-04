@@ -1,7 +1,7 @@
 <?php
 /**
  * /how-it-works/ — maqueta How.html.
- * Orden: hero fotográfico (patrón A) · 4 pasos (filas apiladas con foto, patrón C; los títulos siguen siendo H2) · A load, stage by stage (partial stage-table) · What you can expect from the desk · CTA final (layout).
+ * Orden: hero fotográfico (patrón A) · In short · triada Booked / Tracked / Documented (iconos sin tarjeta) · 4 pasos (filas apiladas con foto, patrón C; los títulos siguen siendo H2) · A load, stage by stage (partial stage-table) · What you can expect from the desk · CTA final (layout).
  */
 require_once NS_ROOT . '/templates/partials/kit.php';
 
@@ -35,6 +35,13 @@ partial('summary', [
         'A team, not a single dispatcher',
     ],
 ]);
+
+// Triada bajo el hero: las tres palabras del titular del home con el copy que ya describe cada una (servicios del home y del resumen). Sin H2 nuevos: los títulos son <p>.
+partial('trio', ['label' => 'Booked, tracked, documented', 'items' => [
+    ['icon' => 'route',      'title' => 'Booked',     'text' => 'We search, negotiate and book freight on Amazon Relay and dry van lanes.'],
+    ['icon' => 'locate',     'title' => 'Tracked',    'text' => 'Every trip followed from pickup to POD, with ETAs, arrivals and departures logged.'],
+    ['icon' => 'file-check', 'title' => 'Documented', 'text' => 'Paperwork organized and kept on file, so settlements and disputes start with evidence.'],
+]]);
 ?>
 
 <section class="section" aria-label="The four steps">

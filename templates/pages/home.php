@@ -1,7 +1,7 @@
 <?php
 /**
  * Home (/) — replica de la maqueta index.html. Disponibles: $route, $cfg y los helpers.
- * Orden: hero (video de fondo + widget "Start in WhatsApp") · 01 Services · 02 Amazon Relay · 03 Why a desk (sticky con crossfade) · 04 Onboarding (fotos y líneas de progreso) · 05 Team + video · 06 Evidence · banda de video · 07 FAQ (+ CTA del layout).
+ * Orden: hero (video de fondo + widget "Start in WhatsApp") · 01 Services · 02 Choose your setup (pestañas) · 03 Amazon Relay · 04 Why a desk (sticky con crossfade) · 05 Onboarding (fotos y líneas de progreso) · 06 Team + video · 07 Evidence · banda de video · 08 From the desk (blog) · 09 FAQ (+ CTA del layout).
  * El <h1> es el eyebrow pequeño (como la maqueta); el titular grande es un <p>. Estilos en assets/css/pages/home.css.
  */
 require_once NS_ROOT . '/templates/partials/kit.php';
@@ -176,11 +176,34 @@ $figures = [
   </div>
 </section>
 
-<!-- 02 AMAZON RELAY -->
+<!-- 02 CHOOSE YOUR SETUP: pestañas (Owner-operator · Small fleet · Amazon Relay carrier). Cada panel = foto 16:9 con tarjeta solapada, 3 puntos ya afirmados en la página de destino, enlace y WhatsApp con el mensaje de esa variante. -->
+<?php partial('tabs', [
+    'id'      => 'setup-title',
+    'eyebrow' => '02 · Your setup',
+    'title'   => 'Choose your setup',
+    'lead'    => 'Pick the one that looks like your operation. Each opens WhatsApp with a ready message.',
+    'label'   => 'Choose your setup',
+    'items'   => [
+        ['label' => 'Owner-operator', 'title' => 'Owner-operator', 'wa' => 'owner',
+         'points' => ['You approve every load', 'Updates on WhatsApp, where you already work', 'Arrival timestamps and photos kept on file'],
+         'image' => ['base' => 'nf-lone-truck-blue-twilight', 'alt' => 'Lone white semi truck parked on a wet lot under a blue twilight sky', 'pos' => '60% 100%'],
+         'link' => ['label' => 'Dispatch for owner-operators', 'href' => url('/dispatch-for-owner-operators/')]],
+        ['label' => 'Small fleet', 'title' => 'Small fleet', 'wa' => "Hi, I run a small fleet and I'd like to talk about dispatch with NorthStar.",
+         'points' => ['A team, not a single dispatcher', 'New drivers set up and ready to roll on day one', 'Who approves loads, how we report and which tasks the desk owns'],
+         'image' => ['base' => 'nf-white-fleet-blue-hour', 'alt' => 'Five white semi trucks lined up in a lot at blue hour beside a street lamp', 'pos' => '50% 70%'],
+         'link' => ['label' => 'See how we onboard', 'href' => url('/how-it-works/')]],
+        ['label' => 'Amazon Relay carrier', 'title' => 'Amazon Relay carrier', 'wa' => 'relay',
+         'points' => ['Block and load booking', 'Trip and arrival records', 'Scorecard follow-up and disputes filed with evidence'],
+         'image' => ['base' => 'nf-loading-dock-blue-hour', 'alt' => 'Open loading dock door glowing cyan under a blue-hour sky', 'pos' => '50% 55%'],
+         'link' => ['label' => 'Amazon Relay dispatch', 'href' => url('/amazon-relay-dispatch/')]],
+    ],
+]); ?>
+
+<!-- 03 AMAZON RELAY -->
 <section class="home-relay" aria-labelledby="relay-title">
   <div class="container home-relay__in">
     <div class="home-relay__main">
-      <span class="t-eyebrow">02 · Specialty</span>
+      <span class="t-eyebrow">03 · Specialty</span>
       <h2 class="t-h2" id="relay-title">Amazon Relay dispatch for <span class="hl">carriers who move fast.</span></h2>
       <p class="t-body home-relay__lead">Relay rewards carriers who move fast and keep clean records. Our desk watches the load board for you, books the blocks that fit your trucks and follows performance and disputes inside your account.</p>
       <a class="btn btn--primary home-relay__btn" href="<?= e(url('/amazon-relay-dispatch/')) ?>">Amazon Relay dispatch</a>
@@ -196,7 +219,7 @@ $figures = [
 <section class="section home-why" aria-labelledby="why-title">
   <div class="why__pin">
     <div class="container">
-      <?php partial('section-head', ['eyebrow' => '03 · Why a desk', 'title' => 'A team, not a single dispatcher', 'id' => 'why-title']); ?>
+      <?php partial('section-head', ['eyebrow' => '04 · Why a desk', 'title' => 'A team, not a single dispatcher', 'id' => 'why-title']); ?>
     </div>
     <div class="container why">
       <div class="why__nums" aria-hidden="true">
@@ -223,7 +246,7 @@ $figures = [
 <!-- 04 ONBOARDING: columnas con foto, línea fina arriba y línea cian que se rellena con el scroll (motion.js); desfase vertical escalonado en escritorio -->
 <section class="section home-onboarding" aria-labelledby="onboarding-title">
   <div class="container stack">
-    <?php partial('section-head', ['eyebrow' => '04 · Onboarding', 'title' => 'How we plug into your operation.', 'id' => 'onboarding-title']); ?>
+    <?php partial('section-head', ['eyebrow' => '05 · Onboarding', 'title' => 'How we plug into your operation.', 'id' => 'onboarding-title']); ?>
     <ol class="home-steps">
       <?php foreach ($steps as [$n, $title, $text, $photo]): ?>
       <li class="home-step">
@@ -252,7 +275,7 @@ $chaptersHtml = ob_get_clean();
 partial('photo-card', [
     'id'      => 'team-title',
     'cls'     => 'home-team',
-    'eyebrow' => '05 · The desk behind the load',
+    'eyebrow' => '06 · The desk behind the load',
     'title'   => 'Built by dispatchers.{br}{hl}Run as a team.{/hl}',
     'lead'    => 'Behind every trip there are people coordinating information, decisions and follow-up. Meet the team, hear how we work, and jump straight to the topic you care about.',
     'image'   => ['base' => 'nf-dispatch-room-wide-night', 'alt' => 'Dispatch room at night with rows of monitors showing glowing route maps, with a highway seen through the windows', 'pos' => '50% 50%'],
@@ -264,7 +287,7 @@ partial('photo-card', [
 <section class="section" aria-labelledby="evidence-title">
   <div class="container split home-evidence">
     <div class="home-evidence__text">
-      <?php partial('section-head', ['eyebrow' => '06 · Proof, not promises', 'title' => 'Incidents are handled with evidence.', 'id' => 'evidence-title',
+      <?php partial('section-head', ['eyebrow' => '07 · Proof, not promises', 'title' => 'Incidents are handled with evidence.', 'id' => 'evidence-title',
           'lead' => 'When a broker questions detention, a lumper fee or a late arrival, the answer is already on file. Here is what our desk keeps for every load.']); ?>
       <ul class="home-docs" aria-label="Documents the desk keeps for every load">
         <?php foreach ($docs as $i => $d): ?>
@@ -302,6 +325,16 @@ partial('photo-card', [
     'text'   => 'Every load leaves a record: rate confirmation, check-call log, arrival timestamps, BOL and POD.',
 ]); ?>
 
-<!-- 07 FAQ -->
-<?php partial('faq', ['items' => route_faq_items($route), 'eyebrow' => '07 · FAQ', 'title' => 'Truck dispatch questions carriers ask us.', 'pre_cta' => true,
+<!-- 08 FROM THE DESK: artículo destacado + 2 filas (datos de app/data/posts.php; sin fechas mientras `published` esté vacío) -->
+<?php partial('desk-block', [
+    'id'      => 'desk-guides',
+    'eyebrow' => '08 · From the desk',
+    'title'   => 'Guides from the desk',
+    'lead'    => 'Practical guides on what dispatch costs, how Amazon Relay works and how to get paid for every hour at the dock.',
+    'btn'     => ['label' => 'All articles', 'href' => url('/blog/')],
+    'paths'   => ['/blog/how-much-does-truck-dispatch-cost/', '/blog/amazon-relay-requirements/', '/blog/lumper-fees-detention-pay/'],
+]); ?>
+
+<!-- 09 FAQ -->
+<?php partial('faq', ['items' => route_faq_items($route), 'eyebrow' => '09 · FAQ', 'title' => 'Truck dispatch questions carriers ask us.', 'pre_cta' => true,
     'image' => ['base' => 'nf-dock-door-amber-night', 'alt' => 'Open loading dock door glowing under an amber lamp at night', 'sizes' => '(min-width:1025px) 660px, 0px']]); ?>

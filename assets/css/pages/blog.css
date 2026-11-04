@@ -108,3 +108,24 @@ details[open] > summary > .blog-plus { transform: rotate(45deg); }
 .blog-related .card__code { letter-spacing: .06em; color: var(--cyan); }
 .blog-related .card--dark .card__code { color: var(--cyan-light); }
 .blog-related .card__text { flex: 1; }
+
+/* ---- Mini calculadora de rate per mile (partial minicalc): /resources/ y los artículos de costes y de lumper/detention (mismo bloque en company.css y blog.css: así no hay una petición de CSS extra). Solo tokens. No se anima.
+   Los selectores de párrafo llevan el prefijo .mcalc para ganar a `.blog-prose p` dentro de los artículos. ---- */
+.mcalc { display: grid; gap: 28px; margin: 0; padding: clamp(22px, 3vw, 36px); background: var(--panel); border: 1px solid var(--hairline); border-radius: var(--r-card); }
+.blog-prose .mcalc { margin: 40px 0; }
+.mcalc__main, .mcalc__result { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.mcalc .mcalc__label { margin: 0; color: var(--text-3); font-family: var(--font-mono); font-size: 11px; line-height: 1.2; }
+.mcalc .mcalc__label--cyan { color: var(--cyan-light); }
+.mcalc .mcalc__title { margin: 0; font-size: clamp(28px, 3vw, 36px); line-height: 1; color: var(--text); }
+.mcalc__form { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.mcalc__field { min-width: 0; gap: 8px; }
+.mcalc__msg { font-family: var(--font-body); font-size: 13px; letter-spacing: 0; text-transform: none; color: var(--text-2); }
+.mcalc .mcalc__note { margin: 0; font-size: 14px; line-height: 1.5; color: var(--text-3); }
+.mcalc__out { display: flex; flex-direction: column; gap: 6px; }
+.mcalc .mcalc__big-label { margin: 0; font-size: 12px; line-height: 1.3; letter-spacing: .08em; text-transform: uppercase; color: var(--text-2); }
+.mcalc .mcalc__big { margin: 0; font-family: var(--font-head); font-weight: 900; font-size: clamp(52px, 7vw, 76px); line-height: .9; letter-spacing: -.02em; color: var(--cyan-light); }
+.mcalc .mcalc__row { display: flex; justify-content: space-between; gap: 12px; margin: 0; padding-top: 12px; border-top: 1px solid var(--hairline); font-size: 16px; line-height: 1.4; color: var(--text-2); }
+.mcalc .mcalc__row .mono { font-weight: 500; color: var(--text); }
+.mcalc__result .btn { align-self: flex-start; }
+@media (min-width: 1025px) { .mcalc--wide { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: 48px; align-items: start; } }
+@media (max-width: 640px) { .mcalc__form { grid-template-columns: minmax(0, 1fr); } .mcalc__result .btn { align-self: stretch; } }

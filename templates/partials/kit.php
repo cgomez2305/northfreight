@@ -37,7 +37,7 @@ function ns_star(int $size = 16, string $class = ''): string
         . '" viewBox="0 0 249 249" aria-hidden="true" focusable="false"><path d="M127 0L98 100L0 123L99 149L122 249L153 148L249 125L150 98Z"/></svg>';
 }
 
-/** Iconos de trazo (24x24, currentColor). Nombres: arrow whatsapp phone chevron close menu play calc trend doc doc-down check mail truck pin plus book. */
+/** Iconos de trazo (24x24, currentColor). Nombres: arrow whatsapp phone chevron close menu play calc trend doc doc-down check mail truck pin plus book route locate file-check form. */
 function ns_icon(string $name, int $size = 18, string $class = ''): string
 {
     static $paths = [
@@ -58,6 +58,10 @@ function ns_icon(string $name, int $size = 18, string $class = ''): string
         'pin'      => '<path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
         'plus'     => '<path d="M12 5v14M5 12h14"/>',
         'book'     => '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5M8 7h7"/>',
+        'route'      => '<circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h6.5a3.5 3.5 0 0 0 0-7h-5a3.5 3.5 0 0 1 0-7H16"/>',
+        'locate'     => '<circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>',
+        'file-check' => '<path d="M6 3h9l4 4v14H6z"/><path d="M14 3v5h5M9 14.5l2.2 2.2L15 12.5"/>',
+        'form'       => '<rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h4"/>',
     ];
     if ($name === 'star') {
         return ns_star($size, $class);
@@ -217,4 +221,47 @@ function ns_menu(): array
         $m['equipment'] = [];
     }
     return $m;
+}
+
+
+/**
+ * Miniatura (foto 3:2 de Night Freight) de una ruta destino, para filas y tarjetas de recurso/artículo/servicio: [base, alt] o null.
+ * Los artículos y recursos leen su foto de app/data/posts.php; las páginas de servicio, de su hero. Un mismo `$exclude` (bases ya usadas en la página) evita repetir foto dentro de una página:
+ * si la foto de la ruta ya está usada, se devuelve la alternativa de `$alt` (['/ruta/' => ['base','alt']]) o null.
+ */
+function ns_thumb(string $path, array $exclude = [], array $alt = []): ?array
+{
+    static $svc = [
+        '/amazon-relay-dispatch/'            => ['nf-trailer-dock-night-mist', 'White semi truck with a dry van trailer parked at a misty warehouse dock at night'],
+        '/dispatch-for-owner-operators/'     => ['nf-cab-interior-cyan-night', 'Truck cab at night with a phone on the dashboard and a highway ahead'],
+        '/trucking-back-office/'             => ['nf-desk-rain-window-night', 'Desk at night with a lamp, a stack of paper and a laptop beside a rain-covered window'],
+        '/load-tracking/'                    => ['nf-highway-side-mirror-night', 'Night highway with trucks seen in a truck’s side mirror'],
+        '/how-it-works/'                     => ['nf-route-map-night-trucks', 'Glowing route lines over a dark map with trucks on a night highway'],
+        '/dry-van-dispatch/'                 => ['nf-white-truck-cyan-horizon', 'White semi truck pulling a dry van trailer at dusk under a cyan horizon'],
+        '/blog/'                             => ['nf-loading-dock-blue-hour', 'Open loading dock door glowing cyan under a blue-hour sky'],
+        '/resources/ifta-calculator/'        => ['nf-fuel-nozzle-truck-stop', 'Fuel nozzle at a truck stop at night with a semi truck parked behind'],
+        '/resources/dispatcher-carrier-agreement/' => ['nf-contracts-amber-cyan', 'Open binder with a pen and paperwork under an amber lamp'],
+    ];
+    $found = null;
+    foreach (data('posts') as $p) {
+        if (($p['path'] ?? '') === $path && !empty($p['image']['base'])) {
+            $found = [(string) $p['image']['base'], (string) ($p['image']['alt'] ?? '')];
+            break;
+        }
+    }
+    $found = $found ?? ($svc[$path] ?? null);
+    if ($found !== null && in_array($found[0], $exclude, true)) {
+        $found = $alt[$path] ?? null;
+    }
+    return $found;
+}
+
+/** Lista de comprobación con checks circulares cian (panel con foto, patrón B). $items: textos ya afirmados en el sitio. */
+function ns_checks(array $items, string $label = ''): string
+{
+    $out = '<ul class="checks"' . ($label !== '' ? ' aria-label="' . e($label) . '"' : '') . '>';
+    foreach ($items as $it) {
+        $out .= '<li class="checks__item"><span class="checks__dot" aria-hidden="true">' . ns_icon('check', 14) . '</span><span>' . e((string) $it) . '</span></li>';
+    }
+    return $out . '</ul>';
 }

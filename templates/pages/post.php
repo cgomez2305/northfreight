@@ -135,18 +135,19 @@ partial('hero', [
 <section class="section section--surface blog-related" aria-labelledby="related-title">
   <div class="container stack">
     <?php partial('section-head', ['eyebrow' => 'Keep reading', 'title' => 'Related from the desk', 'id' => 'related-title']); ?>
-    <div class="g3">
-      <?php foreach ($related as $r): ?>
-      <?php partial('card', [
-          'variant' => 'link',
-          'href'    => url($r['href']),
-          'code'    => $r['code'],
-          'title'   => $r['title'],
-          'text'    => $r['text'],
-          'cta'     => 'Open',
-          'cls'     => !empty($r['dark']) ? 'card--dark' : '',
-      ]); ?>
-      <?php endforeach; ?>
+    <div class="rlist">
+      <?php $used = []; foreach ($related as $r):
+          $t = ns_thumb($r['href'], $used);
+          if ($t) { $used[] = $t[0]; }
+          partial('row-card', [
+              'href'  => url($r['href']),
+              'title' => $r['title'],
+              'text'  => $r['text'],
+              'chips' => [ucfirst(strtolower((string) $r['code']))],
+              'dark'  => !empty($r['dark']),
+              'image' => $t ? ['base' => $t[0], 'alt' => $t[1]] : null,
+          ]);
+      endforeach; ?>
     </div>
   </div>
 </section>

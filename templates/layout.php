@@ -49,6 +49,9 @@ $gsap = !empty($route['motion']) && $jsFile('motion.js');
 // JS (solo si el archivo existe). main.js en todo; módulos por plantilla.
 $scripts = [];
 $jsByTemplate = ['tool-rpm' => 'calc-rpm.js', 'tool-ifta' => 'calc-ifta.js', 'blog' => 'blog-filter.js', 'home' => 'video.js', 'desk' => 'video.js'];
+// La ruta puede anular el mapa con 'js' => ['calc-rpm.js', …] (módulos que solo necesita esa página, p. ej. la mini calculadora de /resources/ y de dos artículos).
+$jsList = isset($route['js']) ? (array) $route['js'] : (isset($jsByTemplate[$template]) ? [$jsByTemplate[$template]] : []);
+$jsList = array_values(array_filter($jsList, static fn($j): bool => is_string($j) && preg_match('/^[a-z0-9-]+\.js$/', $j) === 1 && $jsFile($j)));
 ?><!doctype html>
 <html lang="en-US">
 <head>
@@ -110,8 +113,8 @@ $jsByTemplate = ['tool-rpm' => 'calc-rpm.js', 'tool-ifta' => 'calc-ifta.js', 'bl
 <?php if ($gsap): ?>
 <script src="<?= e(asset('js/motion.js')) ?>" data-gsap="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" data-gsap-sri="sha512-7eHRwcbYkK4d9g/6tD/mhkf++eoTHwpNM9woBxtPUBWm67zeAfFC+HrdoE2GanKeocly/VxeLvIqwvCdk7qScg==" data-st="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" data-st-sri="sha512-onMTRKJBKz8M1TnqqDuGBlowlH0ohFzMXYRNebz+yOcc5TQr/zAKsthzhuv0hiyUKEiQEQXEynnXCvNTOk50dg==" defer></script>
 <?php endif; ?>
-<?php if (isset($jsByTemplate[$template]) && $jsFile($jsByTemplate[$template])): ?>
-<script src="<?= e(asset('js/' . $jsByTemplate[$template])) ?>" defer></script>
-<?php endif; ?>
+<?php foreach ($jsList as $j): ?>
+<script src="<?= e(asset('js/' . $j)) ?>" defer></script>
+<?php endforeach; ?>
 </body>
 </html>

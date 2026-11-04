@@ -1,34 +1,45 @@
 <?php
 /**
  * /resources/ — hub de recursos (Resources.html): hero con 6 iconos, Free tools, Templates, Learn y banda cian de cierre.
- * Secciones = las del mega menú de Resources. Tarjetas: company/res-card.php (solo rutas live).
+ * Secciones = las del mega menú de Resources + una mini calculadora de rate per mile. Filas: partial row-card (solo rutas live).
  */
 require_once NS_ROOT . '/templates/partials/kit.php';
 
 $bookSvg = '<svg class="icon" width="28" height="28" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5M8 7h7"/></svg>';
 
+// Filas-tarjeta (partial row-card): chips mono = tipo de recurso. Miniatura de ns_thumb() (kit.php) por ruta destino, sin repetir foto en la página.
 $tools = [
-    ['path' => '/resources/rate-per-mile-calculator/', 'icon' => 'trend', 'code' => 'TOOL · 01', 'title' => 'Rate per mile calculator',
+    ['path' => '/resources/rate-per-mile-calculator/', 'chips' => ['Free', 'Calculator'], 'title' => 'Rate per mile calculator',
      'text' => 'Loaded and all-in rate per mile, fuel cost and what is left after the trip. Know if a load pays before you say yes.'],
-    ['path' => '/resources/ifta-calculator/', 'icon' => 'calc', 'code' => 'TOOL · 02', 'title' => 'IFTA calculator',
+    ['path' => '/resources/ifta-calculator/', 'chips' => ['Free', 'Calculator'], 'title' => 'IFTA calculator',
      'text' => 'Miles and gallons by state, your fleet MPG and the net taxable gallons for your quarterly IFTA return.'],
 ];
 $templates = [
-    ['path' => '/resources/bol-template/', 'icon' => 'doc-down', 'code' => 'TEMPLATE · PDF + WORD', 'title' => 'Bill of lading template', 'dark' => true,
+    ['path' => '/resources/bol-template/', 'chips' => ['Template', 'PDF + Word'], 'title' => 'Bill of lading template', 'dark' => true,
      'text' => 'A clean, printable BOL with every field brokers and receivers expect. It is the same one our desk files on every load.'],
-    ['path' => '/resources/dispatcher-carrier-agreement/', 'icon' => 'doc', 'code' => 'TEMPLATE · WORD', 'title' => 'Dispatcher-carrier agreement',
+    ['path' => '/resources/dispatcher-carrier-agreement/', 'chips' => ['Template', 'Word'], 'title' => 'Dispatcher-carrier agreement',
      'text' => 'What a fair dispatch contract covers: scope, fees, your right to refuse loads and how to end it.'],
 ];
 $learn = [
-    ['path' => '/resources/glossary/', 'icon_svg' => $bookSvg, 'code' => 'GUIDE', 'title' => 'Trucking glossary',
+    ['path' => '/resources/glossary/', 'chips' => ['Guide'], 'title' => 'Trucking glossary',
      'text' => 'Deadhead, lumper, TONU, rate con: the terms you hear on every broker call.'],
-    ['path' => '/blog/amazon-relay-requirements/', 'code' => 'AMAZON RELAY', 'title' => 'Amazon Relay requirements',
+    ['path' => '/blog/amazon-relay-requirements/', 'chips' => ['Amazon Relay', 'Article'], 'title' => 'Amazon Relay requirements',
      'text' => 'Authority, insurance, equipment and the steps to get approved.'],
-    ['path' => '/blog/amazon-relay-load-board/', 'code' => 'AMAZON RELAY', 'title' => 'How the Relay load board works',
+    ['path' => '/blog/amazon-relay-load-board/', 'chips' => ['Amazon Relay', 'Article'], 'title' => 'How the Relay load board works',
      'text' => 'One-ways, round trips, blocks and how loads get booked.'],
-    ['path' => '/blog/', 'code' => 'BLOG', 'title' => 'All articles', 'dark' => true,
+    ['path' => '/blog/', 'chips' => ['Blog'], 'title' => 'All articles', 'dark' => true,
      'text' => 'Dispatch costs, detention, lumper fees and more from the desk.'],
 ];
+$rows = static function (array $list): void {
+    foreach ($list as $rc) {
+        if (!route_is_live($rc['path'])) {
+            continue;
+        }
+        $t = ns_thumb($rc['path']);
+        partial('row-card', ['href' => url($rc['path']), 'title' => $rc['title'], 'text' => $rc['text'], 'chips' => $rc['chips'], 'dark' => !empty($rc['dark']),
+            'image' => $t ? ['base' => $t[0], 'alt' => $t[1]] : null]);
+    }
+};
 
 ob_start(); ?>
 <div class="co-tiles" aria-hidden="true">
@@ -54,25 +65,25 @@ partial('hero', [
 <section class="section" aria-labelledby="res-tools">
   <div class="container stack">
     <?php partial('section-head', ['eyebrow' => 'Free tools', 'title' => 'Run the numbers before you book', 'id' => 'res-tools']); ?>
-    <div class="g2">
-      <?php foreach ($tools as $rc) { include __DIR__ . '/company/res-card.php'; } ?>
-    </div>
+    <div class="rlist"><?php $rows($tools); ?></div>
+  </div>
+</section>
+<section class="section co-quick" aria-labelledby="res-quick">
+  <div class="container stack">
+    <?php partial('section-head', ['eyebrow' => 'Try it', 'title' => 'Does the load pay? Try it here', 'id' => 'res-quick', 'lead' => 'Example values are filled in. Change them to your own load and read the result.']); ?>
+    <?php partial('minicalc', ['id' => 'res-rpm', 'cls' => 'mcalc--wide']); ?>
   </div>
 </section>
 <section class="section section--surface" aria-labelledby="res-templates">
   <div class="container stack">
     <?php partial('section-head', ['eyebrow' => 'Templates', 'title' => 'Paperwork, ready to use', 'id' => 'res-templates']); ?>
-    <div class="g2">
-      <?php foreach ($templates as $rc) { include __DIR__ . '/company/res-card.php'; } ?>
-    </div>
+    <div class="rlist"><?php $rows($templates); ?></div>
   </div>
 </section>
 <section class="section" aria-labelledby="res-learn">
   <div class="container stack">
     <?php partial('section-head', ['eyebrow' => 'Learn', 'title' => 'Guides written by dispatchers', 'id' => 'res-learn']); ?>
-    <div class="g4">
-      <?php $rcSizes = '(min-width:1025px) 300px, (min-width:641px) 50vw, calc(100vw - 72px)'; foreach ($learn as $rc) { include __DIR__ . '/company/res-card.php'; } ?>
-    </div>
+    <div class="rlist"><?php $rows($learn); ?></div>
   </div>
 </section>
 <section class="section co-bandsec" aria-labelledby="res-band">

@@ -1,7 +1,7 @@
 <?php
 /**
  * /contact/ — maqueta Contact.html.
- * Orden: hero (texto + WhatsApp / correo / horario) · formulario SECUNDARIO "Tell us about your trucks" · CTA final (layout).
+ * Orden: hero (texto + WhatsApp / correo / horario) · triada WhatsApp / Email / Short form (iconos sin tarjeta, cada columna es un enlace) · formulario SECUNDARIO "Tell us about your trucks" · CTA final (layout).
  * Formulario (CLAUDE.md §9): POST /contact/ -> app/forms/contact.php (lote D), PRG.
  * Campos EXACTOS: name, company, mc, trucks, equipment, message; honeypot "website"; form_ts; csrf.
  * Flash opcional ($flash): ['ok'=>bool|string, 'errors'=>[campo=>texto], 'old'=>[campo=>valor]]. Sin $flash no imprime mensajes.
@@ -37,6 +37,13 @@ partial('hero', [
     'lead'  => 'No forms first. Open WhatsApp with a ready message and a dispatcher replies. Tell us about your trucks, your lanes and what you need help with.',
     'aside' => $aside,
 ]);
+
+// Triada bajo el hero: los tres caminos para escribir, con copy ya afirmado en el sitio (hero de esta página y FAQ). Sin H2 nuevos: los títulos son <p>.
+partial('trio', ['label' => 'Ways to reach the desk', 'cls' => 'sb-ct-trio', 'items' => [
+    ['icon' => 'whatsapp', 'title' => 'WhatsApp', 'text' => 'No forms first. Open WhatsApp with a ready message and a dispatcher replies.', 'href' => wa($route['wa']), 'cta' => 'Open WhatsApp'],
+    ['icon' => 'mail',     'title' => 'Email',    'text' => 'Tell us about your trucks, your lanes and what you need help with.', 'href' => 'mailto:' . $email, 'cta' => 'Write to the desk'],
+    ['icon' => 'form',     'title' => 'Short form', 'text' => 'Prefer to write? Tell us about your trucks and we will tell you honestly if we are a fit.', 'href' => '#write', 'cta' => 'Go to the form'],
+]]);
 ?>
 
 <section class="section pre-cta" aria-labelledby="ct-title" id="write">

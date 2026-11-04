@@ -345,7 +345,7 @@ a.card:hover .card__icon, .card--hover:hover .card__icon { background: var(--cya
 }
 
 /* ---- Footer: panel grande redondeado ---- */
-.footer { margin: var(--inset); border-radius: var(--r-panel); background: var(--panel); color: var(--text-3); }
+.footer { margin: var(--inset); border-radius: var(--r-panel); background: var(--panel); color: var(--text-3); overflow: hidden; overflow: clip; }
 .footer__grid { max-width: var(--wrap); margin: 0 auto; padding: clamp(40px, 5vw, 64px) var(--gutter) 40px; gap: 32px; font-size: 16px; }
 @media (min-width: 1025px) { .footer__grid { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.4fr); gap: 32px clamp(32px, 4vw, 64px); } }
 .footer__col { display: flex; flex-direction: column; gap: 10px; }
@@ -374,6 +374,13 @@ nav.footer__col .foot__link { font-family: var(--font-mono); font-size: 12px; te
 @media (min-width: 761px) { .footer__bar { padding-right: max(var(--gutter), 76px); } }   /* deja libre el botón flotante de WhatsApp */
 @media (pointer: coarse) { .foot__link { display: inline-flex; align-items: center; min-height: 44px; } .footer__col { gap: 0; } }
 @media (max-width: 760px) { .footer { margin-bottom: 96px; } }
+/* Wordmark gigante (decorativo): NORTHSTAR en Barlow Condensed 900, STAR en cian, recortado por abajo por el borde del panel. Su tamaño va en cqw del propio contenedor (el ancho del contenido): llena el ancho de 360 a 1920 sin desbordar. */
+.footer__mark { max-width: var(--wrap); margin: 0 auto; padding: clamp(8px, 1.6vw, 24px) var(--gutter) 0; pointer-events: none; user-select: none; }
+.footer__mark-in { container-type: inline-size; }
+.footer__sub { display: block; margin-bottom: clamp(6px, 1.2cqw, 14px); font-family: var(--font-mono); font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--text-3); }
+.footer__word { display: block; height: .64em; margin-top: -.1em; overflow: hidden; font-family: var(--font-head); font-weight: 900; font-size: 19vw; font-size: 23.6cqw; line-height: .8; letter-spacing: -.02em; white-space: nowrap; color: var(--panel-2); }
+.footer__word::before { content: "NORTH"; }
+.footer__word::after { content: "STAR"; color: var(--cyan); opacity: .55; }
 
 /* ---- Resumen "In short" (SEO/GEO): bloque a ancho completo del contenedor, sin caja ---- */
 .summary { padding-block: clamp(48px, 6vw, 88px) 0; }
@@ -430,21 +437,21 @@ body:has(.mobile-menu:not([hidden])) .wa-float, body.menu-open .wa-float { displ
 
 /* ---- PATRÓN B · foto ancha con tarjeta solapada (partial photo-card). Foto 16:9 a 128 px del borde del contenedor y tarjeta --panel que la solapa por abajo (y sobresale hacia fuera): la foto es la protagonista.
    `flip` pone la tarjeta a la derecha (cuando el sujeto de la foto está a la izquierda). <1025px: foto arriba y tarjeta debajo con un solape pequeño. ---- */
-.pcard__in { position: relative; display: flex; flex-direction: column; }
-.pcard__photo { position: relative; margin: 0; overflow: hidden; border-radius: var(--r-panel); background: var(--bg); aspect-ratio: 4 / 3; }
-.pcard__photo picture { display: block; width: 100%; height: 100%; }
-.pcard__photo img { width: 100%; height: 100%; object-fit: cover; object-position: var(--pos, 50% 50%); display: block; }
-.pcard__card { position: relative; z-index: 2; display: flex; flex-direction: column; gap: 18px; margin: -56px 12px 0; padding: clamp(24px, 3vw, 40px); background: var(--panel); border: 1px solid var(--hairline-strong); border-radius: var(--r-card); }
+.pcard__in, .tabp { position: relative; display: flex; flex-direction: column; }
+.pcard__photo, .tabp__photo { position: relative; margin: 0; overflow: hidden; border-radius: var(--r-panel); background: var(--bg); aspect-ratio: 4 / 3; }
+.pcard__photo picture, .tabp__photo picture { display: block; width: 100%; height: 100%; }
+.pcard__photo img, .tabp__photo img { width: 100%; height: 100%; object-fit: cover; object-position: var(--pos, 50% 50%); display: block; }
+.pcard__card, .tabp__card { position: relative; z-index: 2; display: flex; flex-direction: column; gap: 18px; margin: -56px 12px 0; padding: clamp(24px, 3vw, 40px); background: var(--panel); border: 1px solid var(--hairline-strong); border-radius: var(--r-card); }
 .pcard__card .section-head { gap: 16px; }
-.pcard__card .t-h2 { font-size: clamp(34px, 8vw, 46px); }
+.pcard__card .t-h2, .tabp__title { font-size: clamp(34px, 8vw, 46px); }
 .pcard__pill { position: absolute; right: 20px; bottom: 20px; z-index: 1; display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 22px; background: var(--glass-strong); border: 1px solid var(--hairline-strong); border-radius: var(--r-pill); color: var(--text); font-weight: 600; font-size: 15px; text-decoration: none; transition: background-color var(--t-fast), border-color var(--t-fast); }
 .pcard__pill:hover { background: var(--panel-2); border-color: var(--cyan-line); color: var(--text); }
-@media (min-width: 761px) and (max-width: 1024px) { .pcard__photo { aspect-ratio: 16 / 9; } .pcard__card { margin-inline: 32px; } }
+@media (min-width: 761px) and (max-width: 1024px) { .pcard__photo, .tabp__photo { aspect-ratio: 16 / 9; } .pcard__card, .tabp__card { margin-inline: 32px; } }
 @media (min-width: 1025px) {
-  .pcard__in { padding-bottom: 56px; }
-  .pcard__photo { width: calc(100% - 128px); margin-left: auto; aspect-ratio: 16 / 9; max-height: 640px; }
-  .pcard__card { position: absolute; left: 0; bottom: 0; width: min(540px, 46%); margin: 0; }
-  .pcard__card .t-h2 { font-size: clamp(34px, 3.4vw, 46px); }
+  .pcard__in, .tabp { padding-bottom: 56px; }
+  .pcard__photo, .tabp__photo { width: calc(100% - 128px); margin-left: auto; aspect-ratio: 16 / 9; max-height: 640px; }
+  .pcard__card, .tabp__card { position: absolute; left: 0; bottom: 0; width: min(540px, 46%); margin: 0; }
+  .pcard__card .t-h2, .tabp__title { font-size: clamp(34px, 3.4vw, 46px); }
   .pcard--flip .pcard__photo { margin-left: 0; margin-right: auto; }
   .pcard--flip .pcard__card { left: auto; right: 0; }
   .pcard--flip .pcard__pill { right: auto; left: 20px; }
@@ -525,3 +532,112 @@ a.prow__in:hover .prow__go { background: var(--cyan-light); }
 .pcard__after .video__chapters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
 .pcard__after .video__chapters-label { grid-column: 1 / -1; }
 @media (max-width: 1024px) { .pcard__after .video__chapters { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---- Rejilla numerada con filete y círculo de flecha (partial numgrid): sin fondo de tarjeta. Es una .g3 (entrada 3D de las rejillas): 3 columnas ≥1025px, 2 de 641 a 1024px, 1 en móvil. La celda entera es el enlace (el círculo extiende su área). ---- */
+.ngrid { margin: 0; padding: 0; list-style: none; gap: 8px clamp(28px, 3.4vw, 56px); }
+.ngrid__item { position: relative; display: flex; flex-direction: column; gap: 14px; min-width: 0; padding: 22px 0 30px; border-top: 1px solid var(--hairline-strong); }
+.ngrid__n { font-family: var(--font-mono); font-weight: 500; font-size: 13px; letter-spacing: .1em; line-height: 1; color: var(--cyan-light); }
+.ngrid__title { font-size: clamp(30px, 3vw, 40px); line-height: .98; letter-spacing: -.01em; color: var(--text); }
+.ngrid__text { max-width: 38ch; font-size: 17px; line-height: 1.55; color: var(--text-2); }
+.ngrid__go { display: inline-grid; place-items: center; align-self: flex-start; width: 52px; height: 52px; margin-top: auto; border: 1px solid var(--hairline-strong); border-radius: var(--r-pill); color: var(--text); text-decoration: none; transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast); }
+.ngrid__text { margin-bottom: 10px; }
+.ngrid__go::after { content: ""; position: absolute; inset: 0; }
+.ngrid__go .arrow { font-size: 22px; transition: transform var(--t-fast); }
+.ngrid__item:hover .ngrid__go { background: var(--cyan); border-color: var(--cyan); color: var(--navy-deep); }
+.ngrid__item:hover .ngrid__go .arrow { transform: rotate(-45deg); }
+.ngrid__go:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+.ngrid__item--cta { border-top-color: var(--cyan); }
+.ngrid__item--cta .ngrid__n { color: var(--cyan); }
+.ngrid__item--cta .ngrid__go { background: var(--cyan); border-color: var(--cyan); color: var(--navy-deep); }
+.ngrid__item--cta:hover .ngrid__go { background: var(--cyan-light); border-color: var(--cyan-light); }
+@media (min-width: 641px) and (max-width: 1024px) { .ngrid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* ---- Lista de comprobación con checks circulares (panel con foto: tarjeta del patrón B y de las pestañas) ---- */
+.checks { display: flex; flex-direction: column; gap: 12px; margin: 0; padding: 0; list-style: none; }
+.checks__item { display: flex; align-items: flex-start; gap: 14px; font-size: 17px; font-weight: 500; line-height: 1.4; color: var(--text); }
+.checks__dot { flex: none; display: grid; place-items: center; width: 28px; height: 28px; margin-top: -2px; border: 1px solid var(--cyan-line); border-radius: var(--r-pill); background: var(--cyan-tint); color: var(--cyan-light); }
+.pcard__card .checks { margin-top: 4px; }
+
+/* ---- Fila-tarjeta horizontal (partial row-card): miniatura 3:2 a ras del borde izquierdo, chips mono, título, una línea y círculo de flecha. Un solo <a>. ≤760px: la miniatura va arriba a todo el ancho. ---- */
+.rcard { position: relative; display: flex; flex-direction: column; overflow: hidden; background: var(--panel); border: 1px solid var(--hairline); border-radius: var(--r-card); color: var(--text); text-decoration: none; transition: border-color var(--t-fast), background-color var(--t-fast); }
+.rcard:hover { border-color: var(--hairline-strong); color: var(--text); }
+.rcard--dark { background: var(--panel-2); border-color: var(--cyan-line); }
+.rcard--dark:hover { border-color: var(--cyan); }
+.rcard:focus-visible { outline-offset: 3px; }
+.rcard__photo { flex: none; margin: 0; aspect-ratio: 3 / 2; overflow: hidden; background: var(--bg); }
+.rcard__photo picture { display: block; width: 100%; height: 100%; }
+.rcard__photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.rcard__body { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; min-width: 0; padding: 20px 22px 24px; }
+.rcard__chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.rcard__chip { display: inline-flex; align-items: center; min-height: 26px; padding: 0 10px; border: 1px solid var(--hairline-strong); border-radius: var(--r-pill); font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--text-2); }
+.rcard--dark .rcard__chip { border-color: var(--cyan-line); color: var(--cyan-light); }
+.rcard__title { font-size: clamp(30px, 8vw, 38px); line-height: .98; letter-spacing: -.01em; color: var(--text); }
+.rcard__text { max-width: 60ch; font-size: 17px; line-height: 1.5; color: var(--text-2); }
+.rcard__go { position: absolute; right: 18px; bottom: 18px; display: grid; place-items: center; width: 48px; height: 48px; border: 1px solid var(--hairline-strong); border-radius: var(--r-pill); background: var(--panel); color: var(--text); transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast); }
+.rcard--dark .rcard__go { background: var(--panel-2); }
+.rcard__go .arrow { font-size: 20px; transition: transform var(--t-fast); }
+.rcard:hover .rcard__go { background: var(--cyan); border-color: var(--cyan); color: var(--navy-deep); }
+.rcard:hover .rcard__go .arrow { transform: rotate(-45deg); }
+.rcard__body { padding-right: 76px; }
+@media (min-width: 761px) {
+  .rcard { flex-direction: row; align-items: stretch; }
+  .rcard__photo { width: clamp(220px, 24%, 300px); aspect-ratio: auto; min-height: 180px; }
+  .rcard__body { flex: 1; justify-content: center; gap: 12px; padding: 26px 96px 26px clamp(24px, 2.6vw, 36px); }
+  .rcard__title { font-size: clamp(32px, 3vw, 40px); }
+  .rcard__go { top: 50%; right: 26px; bottom: auto; width: 52px; height: 52px; margin-top: -26px; }
+  .rcard--nophoto .rcard__body { padding-left: clamp(24px, 3vw, 40px); }
+}
+/* Fila compacta (bloque "From the desk"): miniatura más pequeña, título de 24px */
+.rcard--sm .rcard__body { gap: 8px; padding: 16px 64px 18px 18px; }
+.rcard--sm .rcard__title { font-size: 24px; line-height: 1.02; }
+.rcard--sm .rcard__go { right: 14px; bottom: 14px; width: 40px; height: 40px; }
+.rcard--sm .rcard__go .arrow { font-size: 18px; }
+@media (min-width: 761px) {
+  .rcard--sm .rcard__photo { width: 180px; min-height: 0; }
+  .rcard--sm .rcard__body { padding: 16px 64px 16px 20px; justify-content: center; }
+  .rcard--sm .rcard__go { top: 50%; right: 14px; bottom: auto; margin-top: -20px; }
+}
+
+/* ---- Bloque "From the desk" (partial desk-block): texto y botón a la izquierda; a la derecha el artículo destacado (foto arriba, texto debajo) y dos filas compactas ---- */
+.dblock__in { display: grid; gap: 40px; align-items: start; }
+.dblock__head { display: flex; flex-direction: column; align-items: flex-start; gap: 28px; }
+.dblock__list { display: grid; gap: 20px; min-width: 0; }
+.dblock__rows { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.dfeat { display: flex; flex-direction: column; gap: 16px; color: var(--text); text-decoration: none; }
+.dfeat__photo { margin: 0; aspect-ratio: 4 / 3; overflow: hidden; border-radius: var(--r-card); background: var(--panel); }
+.dfeat__photo picture { display: block; width: 100%; height: 100%; }
+.dfeat__photo img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s ease; }
+.dfeat:hover .dfeat__photo img { transform: scale(1.03); }
+.dfeat__body { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
+.dfeat__title { font-size: clamp(30px, 3.2vw, 42px); line-height: .98; letter-spacing: -.01em; color: var(--text); }
+.dfeat__text { font-size: 17px; line-height: 1.55; color: var(--text-2); }
+.dfeat__link { font-weight: 600; color: var(--cyan); }
+.dfeat:hover .dfeat__link { color: var(--cyan-light); }
+.dfeat:focus-visible { outline-offset: 4px; border-radius: var(--r-card); }
+@media (min-width: 1025px) {
+  .dblock__in { grid-template-columns: minmax(0, .85fr) minmax(0, 2.15fr); gap: 56px; }
+  .dblock__list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; }
+}
+@media (max-width: 1024px) { .dblock__list { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---- Pestañas "Choose your setup" (partial tabs): los paneles son la foto 16:9 con tarjeta solapada (geometría del patrón B, arriba). Sin JS se apilan y los botones no se ven; el script inline pone html.js-tabs antes del marcado. ---- */
+.tabs { display: flex; flex-direction: column; gap: 28px; }
+.tabs__list { display: none; flex-wrap: wrap; gap: 8px; }
+.js-tabs .tabs__list { display: flex; }
+.tabs__tab { min-height: 48px; padding: 0 24px; border: 1px solid var(--hairline-strong); border-radius: var(--r-pill); background: transparent; color: var(--text-2); font-family: var(--font-body); font-size: 16px; font-weight: 600; cursor: pointer; transition: background-color var(--t-fast), border-color var(--t-fast), color var(--t-fast); }
+.tabs__tab:hover { border-color: var(--text-2); color: var(--text); }
+.tabs__tab[aria-selected="true"] { background: var(--cyan); border-color: var(--cyan); color: var(--navy-deep); }
+.tabs__tab:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+.tabs__panel + .tabs__panel { margin-top: 24px; }
+.js-tabs .tabs__panel:not(.is-on) { display: none; }
+.js-tabs .tabs__panel + .tabs__panel { margin-top: 0; }
+.tabp__title { font-size: clamp(34px, 8vw, 46px); line-height: .95; color: var(--text); }
+.tabp__card { gap: 18px; }
+.tabp__ctas { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+@media (max-width: 640px) { .tabs__tab { flex: 1 1 auto; padding: 0 16px; } }
+
+
+/* Listas de filas-tarjeta (hub de recursos y relacionados de los artículos). Dentro de una banda --panel las filas van transparentes (sin panel dentro de panel). */
+.rlist { display: flex; flex-direction: column; gap: 14px; }
+.section--surface .rcard:not(.rcard--dark) { background: transparent; }
+.section--surface .rcard:not(.rcard--dark) .rcard__go { background: transparent; }

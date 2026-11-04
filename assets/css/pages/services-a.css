@@ -2,18 +2,6 @@
 /* ---- Hero: anchos de lead de la maqueta ---- */
 .sa-hero--lead560 .hero__lead { max-width: 560px; }
 .sa-hero--relay .hero__lead { max-width: 620px; }
-.sa-split { display: flex; flex-wrap: wrap; align-items: center; gap: 40px; }
-.sa-split__text { flex: 1 1 420px; min-width: 0; }
-.sa-split__text--wide { flex-basis: 440px; }
-.sa-split__list { flex: 1 1 380px; min-width: 0; margin: 0; padding: 0; }
-.sa-split .section-head { gap: 16px; }
-/* ---- Relay: enlaces a guías ---- */
-.sa-guides { padding-block: clamp(56px, 8vw, 96px) clamp(40px, 5vw, 56px); }
-.sa-guides__in { display: flex; flex-wrap: wrap; gap: 14px; }
-.sa-guides__label { flex: 1 1 100%; }
-.sa-guides__link { flex: 1 1 300px; min-height: 44px; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 22px 28px; background: var(--panel); color: var(--text); font-weight: 600; text-decoration: none; border: 1px solid var(--hairline); border-radius: var(--r-card); transition: background-color var(--t-fast), border-color var(--t-fast); }
-.sa-guides__link:hover { background: var(--panel-2); color: var(--text); border-color: var(--cyan-line); }
-.sa-guides__link:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
 .sa-faq-after { padding-top: clamp(40px, 6vw, 72px); }
 /* ---- DryVan: pasos numerados (ol de tarjetas) ---- */
 .sa-ol { margin: 0; padding: 0; list-style: none; }
@@ -47,6 +35,3 @@ a.sa-chip:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
 .sa-faq { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 40px 48px; }
 .sa-faq__head { flex: 1 1 320px; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
 .sa-faq__list { flex: 2 1 520px; min-width: 0; }
-/* ---- Lista de comprobación (Owner) ---- */
-.check-list { display: flex; flex-direction: column; gap: 10px; }
-.check-list li { position: relative; display: flex; gap: 14px; align-items: center; padding: 18px 22px; background: var(--panel); border: 1px solid var(--hairline); border-radius: var(--r-tile); font-weight: 600; color: var(--text); }

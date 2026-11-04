@@ -1,7 +1,8 @@
 <?php
 /**
  * /dispatch-for-owner-operators/ — Owner.html. Disponibles: $route, $cfg y helpers.
- * Orden: hero fotográfico (patrón A) · What you get (g5) · Why owner-operators work with us (banda fotográfica, patrón D) · FAQ (pre-CTA). El CTA final lo pone el layout.
+ * Orden: hero fotográfico (patrón A) · What you get (rejilla numerada con filete y círculo de flecha, 5 + celda CTA) · Why owner-operators work with us (foto ancha con tarjeta solapada y lista de comprobación, patrón B) ·
+ * Pestañas "Not running a single truck?" (Small fleet / Amazon Relay carrier) · FAQ (pre-CTA). El CTA final lo pone el layout.
  */
 require_once NS_ROOT . '/templates/partials/kit.php';
 
@@ -12,6 +13,12 @@ $gets = [
     ['04', 'Evidence on file', 'Arrival timestamps and photos ready when detention or a dispute comes up.'],
     ['05', 'Settlements prepared', 'So you see exactly what each load paid.'],
 ];
+// Cada círculo abre WhatsApp con un mensaje propio de esa línea (el contacto principal del sitio es WhatsApp, sin formulario previo).
+$getItems = array_map(static fn(array $g): array => [
+    'n' => $g[0], 'title' => $g[1], 'text' => $g[2],
+    'href' => wa("Hi, I'm an owner-operator and I'd like to talk about " . strtolower($g[1]) . ' with NorthStar.'),
+    'label' => 'Ask the desk about ' . strtolower($g[1]) . ' on WhatsApp',
+], $gets);
 $control = [
     'Every load approved by you',
     'Updates on WhatsApp, where you already work',
@@ -44,22 +51,35 @@ partial('summary', [
 <section class="section" aria-labelledby="owner-gets">
   <div class="container stack">
     <?php partial('section-head', ['id' => 'owner-gets', 'eyebrow' => 'What you get', 'title' => 'One dispatch desk behind your truck']); ?>
-    <div class="g5">
-      <?php foreach ($gets as $i => $g): ?>
-        <?php partial('card', ['variant' => $i === 4 ? 'dark' : 'light', 'num' => $g[0], 'title' => $g[1], 'text' => $g[2]]); ?>
-      <?php endforeach; ?>
-    </div>
+    <?php partial('numgrid', ['items' => $getItems, 'label' => 'What you get',
+        'cta' => ['title' => 'Talk to the desk', 'text' => 'No forms first. Open WhatsApp with a ready message and a dispatcher replies.', 'href' => wa($route['wa']), 'label' => 'Talk to a dispatcher on WhatsApp']]); ?>
   </div>
 </section>
 
-<?php partial('photo-band', [
+<?php partial('photo-card', [
     'id'      => 'owner-control',
     'eyebrow' => 'Why owner-operators work with us',
     'title'   => 'You stay in control.',
     'lead'    => 'You approve every load. We tell you what we booked and why, and you can reach the desk on WhatsApp at any time.',
-    'image'   => ['base' => 'nf-lone-truck-blue-twilight', 'alt' => 'Lone white semi truck parked on a wet lot under a blue twilight sky', 'pos' => '60% 55%'],
-    'chips'   => $control,
-    'chips_label' => 'What staying in control means',
+    'image'   => ['base' => 'nf-lone-truck-blue-twilight', 'alt' => 'Lone white semi truck parked on a wet lot under a blue twilight sky', 'pos' => '60% 100%'],
+    'extra'   => ns_checks($control, 'What staying in control means'),
+]); ?>
+
+<?php partial('tabs', [
+    'id'      => 'owner-setups',
+    'eyebrow' => 'Beyond one truck',
+    'title'   => 'Running more than one truck?',
+    'label'   => 'Choose your setup',
+    'items'   => [
+        ['label' => 'Small fleet', 'title' => 'Small fleet', 'wa' => "Hi, I run a small fleet and I'd like to talk about dispatch with NorthStar.",
+         'points' => ['A team, not a single dispatcher', 'New drivers set up and ready to roll on day one', 'Who approves loads, how we report and which tasks the desk owns'],
+         'image' => ['base' => 'nf-white-fleet-blue-hour', 'alt' => 'Five white semi trucks lined up in a lot at blue hour beside a street lamp', 'pos' => '50% 70%'],
+         'link' => ['label' => 'See how we onboard', 'href' => url('/how-it-works/')]],
+        ['label' => 'Amazon Relay carrier', 'title' => 'Amazon Relay carrier', 'wa' => 'relay',
+         'points' => ['Block and load booking', 'Trip and arrival records', 'Scorecard follow-up and disputes filed with evidence'],
+         'image' => ['base' => 'nf-loading-dock-blue-hour', 'alt' => 'Open loading dock door glowing cyan under a blue-hour sky', 'pos' => '50% 55%'],
+         'link' => ['label' => 'Amazon Relay dispatch', 'href' => url('/amazon-relay-dispatch/')]],
+    ],
 ]); ?>
 
 <?php partial('faq', ['items' => route_faq_items($route), 'title' => 'Owner-operator dispatch questions', 'pre_cta' => true]); ?>

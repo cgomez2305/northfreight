@@ -1,7 +1,7 @@
 <?php
 /**
  * /dry-van-dispatch/ — DryVan.html. Disponibles: $route, $cfg y helpers.
- * Orden: hero con foto · Every step of the dry van load (ol g3, 6 pasos) · FAQ sobre gris (pre-CTA). El CTA final lo pone el layout.
+ * Orden: hero con foto · Every step of the dry van load (ol g3, 6 pasos) · One desk behind every dry van load (foto ancha con tarjeta solapada y lista de comprobación, patrón B) · FAQ sobre gris (pre-CTA). El CTA final lo pone el layout.
  */
 require_once NS_ROOT . '/templates/partials/kit.php';
 
@@ -45,5 +45,15 @@ partial('summary', [
     </ol>
   </div>
 </section>
+
+<?php partial('photo-card', [
+    'id'      => 'dv-desk',
+    'flip'    => true,
+    'eyebrow' => 'How we work',
+    'title'   => 'One desk behind every dry van load',
+    'lead'    => 'The same desk books, tracks and documents every load, as one team.',
+    'image'   => ['base' => 'nf-loading-dock-blue-hour', 'alt' => 'Open loading dock door glowing cyan under a blue-hour sky', 'pos' => '50% 55%'],
+    'extra'   => ns_checks(['You approve every load', 'Updates on WhatsApp, where you already work', 'A record of every load', 'A team, not a single dispatcher'], 'What working with the desk means'),
+]); ?>
 
 <?php partial('faq', ['items' => route_faq_items($route), 'title' => 'Dry van dispatch questions', 'surface' => 'light', 'pre_cta' => true]); ?>
