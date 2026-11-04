@@ -29,6 +29,8 @@ $cssDist = ns_dist_css($css);
 // Movimiento: solo rutas con 'motion' => true cargan GSAP 3.12.5 + ScrollTrigger (cdnjs, versión fija con SRI) y motion.js/motion.css.
 // Todo lo que necesita html.js-motion lo añade motion.js solo si GSAP existe y no hay prefers-reduced-motion.
 $jsFile = static fn(string $f): bool => is_file(NS_ROOT . '/assets/js/' . $f);
+// URL de un JS propio: la versión minificada del build (assets/js/dist/*.min.js) si el manifiesto está al día con la fuente; si no, el archivo original.
+$jsUrl = static fn(string $f): string => ns_dist_js($f) ?? asset('js/' . $f);
 $gsap = !empty($route['motion']) && $jsFile('motion.js');
 // JS (solo si el archivo existe). main.js en todo; módulos por plantilla.
 $scripts = [];
@@ -94,13 +96,13 @@ $jsList = array_values(array_filter($jsList, static fn($j): bool => is_string($j
 <?php partial('mbar', ['wa' => $wa]); ?>
 <?php partial('wa-float', ['wa' => $wa]); ?>
 <?php if ($jsFile('main.js')): ?>
-<script src="<?= e(asset('js/main.js')) ?>" defer></script>
+<script src="<?= e($jsUrl('main.js')) ?>" defer></script>
 <?php endif; ?>
 <?php if ($gsap): ?>
-<script src="<?= e(asset('js/motion.js')) ?>" data-gsap="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" data-gsap-sri="sha512-7eHRwcbYkK4d9g/6tD/mhkf++eoTHwpNM9woBxtPUBWm67zeAfFC+HrdoE2GanKeocly/VxeLvIqwvCdk7qScg==" data-st="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" data-st-sri="sha512-onMTRKJBKz8M1TnqqDuGBlowlH0ohFzMXYRNebz+yOcc5TQr/zAKsthzhuv0hiyUKEiQEQXEynnXCvNTOk50dg==" defer></script>
+<script src="<?= e($jsUrl('motion.js')) ?>" data-gsap="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" data-gsap-sri="sha512-7eHRwcbYkK4d9g/6tD/mhkf++eoTHwpNM9woBxtPUBWm67zeAfFC+HrdoE2GanKeocly/VxeLvIqwvCdk7qScg==" data-st="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" data-st-sri="sha512-onMTRKJBKz8M1TnqqDuGBlowlH0ohFzMXYRNebz+yOcc5TQr/zAKsthzhuv0hiyUKEiQEQXEynnXCvNTOk50dg==" defer></script>
 <?php endif; ?>
 <?php foreach ($jsList as $j): ?>
-<script src="<?= e(asset('js/' . $j)) ?>" defer></script>
+<script src="<?= e($jsUrl($j)) ?>" defer></script>
 <?php endforeach; ?>
 </body>
 </html>

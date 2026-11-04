@@ -224,5 +224,72 @@
                 }
             ]
         }
+    },
+    "js": {
+        "tool": "esbuild",
+        "esbuild": "0.25.0",
+        "args": "--minify --target=es2017 --legal-comments=none",
+        "files": {
+            "blog-filter": {
+                "file": "js/dist/blog-filter.min.js",
+                "hash": "9c3ef284f2",
+                "bytes": 932,
+                "source": {
+                    "path": "js/blog-filter.js",
+                    "size": 1403,
+                    "crc32": "2c53e39b"
+                }
+            },
+            "calc-ifta": {
+                "file": "js/dist/calc-ifta.min.js",
+                "hash": "0e63997da1",
+                "bytes": 3038,
+                "source": {
+                    "path": "js/calc-ifta.js",
+                    "size": 5292,
+                    "crc32": "01278bcf"
+                }
+            },
+            "calc-rpm": {
+                "file": "js/dist/calc-rpm.min.js",
+                "hash": "454e497571",
+                "bytes": 1880,
+                "source": {
+                    "path": "js/calc-rpm.js",
+                    "size": 3447,
+                    "crc32": "7ef5110c"
+                }
+            },
+            "main": {
+                "file": "js/dist/main.min.js",
+                "hash": "3c8b3b3837",
+                "bytes": 11056,
+                "source": {
+                    "path": "js/main.js",
+                    "size": 19867,
+                    "crc32": "01dd37e1"
+                }
+            },
+            "motion": {
+                "file": "js/dist/motion.min.js",
+                "hash": "e638c84769",
+                "bytes": 14148,
+                "source": {
+                    "path": "js/motion.js",
+                    "size": 30290,
+                    "crc32": "388df32f"
+                }
+            },
+            "video": {
+                "file": "js/dist/video.min.js",
+                "hash": "89c21bfaa0",
+                "bytes": 2775,
+                "source": {
+                    "path": "js/video.js",
+                    "size": 4498,
+                    "crc32": "41de3bb5"
+                }
+            }
+        }
     }
 }

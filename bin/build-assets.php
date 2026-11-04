@@ -1,22 +1,29 @@
 <?php
 /**
- * Build de assets (CSS) sin servidor: concatena y minifica el CSS de cada familia de plantillas en UN archivo, assets/css/dist/<familia>.css,
- * y escribe app/assets-manifest.json (fuentes con tamaño y crc32, tamaño y hash corto de cada dist).
+ * Build de assets sin servidor: (1) concatena y minifica el CSS de cada familia de plantillas en UN archivo, assets/css/dist/<familia>.css;
+ * (2) minifica cada JS propio con esbuild en assets/js/dist/<nombre>.min.js; y escribe app/assets-manifest.json (fuentes con tamaño y crc32,
+ * tamaño y hash corto de cada dist).
  *
  * POR QUÉ: Hostinger solo ejecuta PHP y despliega por git (no corre builds). El build se corre en local y se COMMITEA su resultado (dist + manifiesto).
- * Sin dependencias: PHP 8.2+ puro (el minificador es conservador, ver ns_min_css()). templates/layout.php enlaza el dist de la ruta SOLO si el manifiesto
- * lo lista y todas sus fuentes (tamaño + crc32) y el dist (tamaño) coinciden con el disco; si no, cae a los archivos sueltos (app/assets.php).
- * Un CSS editado sin rebuild nunca rompe ni sirve CSS viejo: simplemente se vuelve a los 6 archivos separados hasta el siguiente build.
+ * Sin dependencias en el servidor. templates/layout.php enlaza el dist de la ruta SOLO si el manifiesto lo lista y todas sus fuentes (tamaño + crc32)
+ * y el dist (tamaño) coinciden con el disco; si no, cae a los archivos sueltos (app/assets.php: ns_dist_css y ns_dist_js).
+ * Un CSS o JS editado sin rebuild nunca rompe ni sirve código viejo: simplemente se vuelve a los archivos originales hasta el siguiente build.
  *
  * Uso (desde la raíz del repo):
- *   php bin/build-assets.php            genera/actualiza assets/css/dist/*.css y app/assets-manifest.json
- *   php bin/build-assets.php --check    no escribe nada: sale con código 1 si el dist o el manifiesto no están al día (para CI o antes de commitear)
+ *   php bin/build-assets.php                 genera/actualiza assets/css/dist/*.css, assets/js/dist/*.min.js y app/assets-manifest.json
+ *   php bin/build-assets.php --check         no escribe nada: sale con código 1 si el dist o el manifiesto no están al día (para CI o antes de commitear)
+ *   php bin/build-assets.php --require-js    falla (código 2) si no encuentra esbuild; sin esa opción, sin esbuild se deja el JS como esté y se avisa
+ *   php bin/build-assets.php --esbuild=RUTA  binario de esbuild a usar (o la variable de entorno ESBUILD)
  *
- * Flujo del equipo: editar assets/css/**.css -> php bin/build-assets.php -> git add assets/css/dist app/assets-manifest.json -> commit.
- * Las familias salen de app/routes.php (cada combinación distinta de fuentes que usa alguna ruta, incluida la 404 y los drafts).
+ * Flujo del equipo: editar assets/css/**.css o assets/js/*.js -> php bin/build-assets.php -> git add assets/css/dist assets/js/dist app/assets-manifest.json -> commit.
+ * Las familias de CSS salen de app/routes.php (cada combinación distinta de fuentes que usa alguna ruta, incluida la 404 y los drafts).
  *
- * JS: NO se minifica aquí (no hay una herramienta fiable instalada que el servidor ni el equipo tengan garantizada). Si el equipo acepta usar esbuild en local,
- * el comando medido es: esbuild assets/js/<archivo>.js --minify --target=es2017 --outfile=assets/js/dist/<archivo>.min.js (ver el reporte de la fase M).
+ * JS: esbuild SOLO como herramienta local de build (no hace falta en el servidor), sin bundle, sin renombrar propiedades, un archivo por archivo:
+ *   esbuild assets/js/<nombre>.js --minify --target=es2017 --legal-comments=none --banner:js="/* ... *\/" --outfile=assets/js/dist/<nombre>.min.js
+ * Búsqueda del binario, en este orden: --esbuild=RUTA, variable ESBUILD, `esbuild` en el PATH, node_modules/.bin/esbuild del repo (ignorado por git),
+ * `npx --no-install esbuild`. Para instalarlo sin tocar el repo: `mkdir -p ~/tools/esbuild && cd ~/tools/esbuild && npm i esbuild@0.25.0` y luego
+ * `ESBUILD=~/tools/esbuild/node_modules/.bin/esbuild php bin/build-assets.php`. El manifiesto anota la versión; con --check, si la versión local de esbuild
+ * es la misma, se reconstruye y se compara byte a byte; si no, se comprueba solo el manifiesto contra el disco (fuentes, tamaño y hash de cada .min.js).
  */
 
 declare(strict_types=1);
@@ -30,6 +37,7 @@ define('NS_ROOT', dirname(__DIR__));
 require NS_ROOT . '/app/helpers.php';   // carga config, rutas y app/assets.php
 
 const NS_DIST_DIR = 'css/dist';   // relativo a assets/
+const NS_JS_DIST_DIR = 'js/dist'; // relativo a assets/
 
 /** Ruta relativa de $to respecto al directorio $fromDir (ambas relativas a assets/, sin barra inicial). */
 function ns_rel_path(string $fromDir, string $to): string
@@ -251,6 +259,93 @@ foreach ($families as $name => $src) {
     }
     $manifest['css'][$name] = ['file' => $rel, 'hash' => substr(sha1($body), 0, 10), 'bytes' => strlen($body), 'sources' => $fs];
 }
+// ---- JS: minificado con esbuild (solo local) ----
+$check = in_array('--check', $argv, true);
+$requireJs = in_array('--require-js', $argv, true);
+
+/** Localiza esbuild (ver cabecera). Devuelve el comando listo para ejecutar o null. */
+function ns_find_esbuild(array $argv): ?string
+{
+    $cands = [];
+    foreach ($argv as $a) {
+        if (str_starts_with($a, '--esbuild=')) {
+            $cands[] = escapeshellarg(substr($a, 10));
+        }
+    }
+    if (($env = getenv('ESBUILD')) !== false && $env !== '') {
+        $cands[] = escapeshellarg($env);
+    }
+    $cands[] = 'esbuild';
+    if (is_file(NS_ROOT . '/node_modules/.bin/esbuild')) {
+        $cands[] = escapeshellarg(NS_ROOT . '/node_modules/.bin/esbuild');
+    }
+    $cands[] = 'npx --no-install esbuild';
+    foreach ($cands as $c) {
+        $out = [];
+        $code = 1;
+        exec($c . ' --version 2>/dev/null', $out, $code);
+        if ($code === 0 && isset($out[0]) && preg_match('/^\d+\.\d+\.\d+/', trim($out[0])) === 1) {
+            return $c;
+        }
+    }
+    return null;
+}
+
+/** Minifica un JS con esbuild y devuelve el código, o null si falla. */
+function ns_min_js(string $esbuild, string $name): ?string
+{
+    $banner = '/* NorthStar JS · ' . $name . ' · generado por bin/build-assets.php, no editar */';
+    $cmd = $esbuild . ' ' . escapeshellarg(NS_ROOT . '/assets/js/' . $name . '.js') . ' --minify --target=es2017 --legal-comments=none --log-level=error --banner:js=' . escapeshellarg($banner);
+    $out = [];
+    $code = 1;
+    exec($cmd, $out, $code);
+    return $code === 0 && $out ? implode("\n", $out) . "\n" : null;
+}
+
+$jsNames = [];
+foreach (glob(NS_ROOT . '/assets/js/*.js') ?: [] as $f) {
+    $jsNames[] = basename($f, '.js');
+}
+sort($jsNames);
+$esbuild = ns_find_esbuild($argv);
+$esVersion = null;
+if ($esbuild !== null) {
+    $o = [];
+    exec($esbuild . ' --version 2>/dev/null', $o);
+    $esVersion = trim($o[0] ?? '');
+}
+$oldManifest = ns_assets_manifest();
+$jsFiles = [];   // ruta relativa a assets/ => contenido
+$jsEntries = [];
+$jsNotes = [];
+$jsRebuild = $esbuild !== null && (!$check || ($oldManifest['js']['esbuild'] ?? null) === $esVersion);
+if ($esbuild === null && $requireJs) {
+    fwrite(STDERR, "No se encontró esbuild y se pidió --require-js. Ver la cabecera de bin/build-assets.php (--esbuild=RUTA, variable ESBUILD, PATH o npx).\n");
+    exit(2);
+}
+if ($jsRebuild) {
+    foreach ($jsNames as $n) {
+        $min = ns_min_js($esbuild, $n);
+        if ($min === null) {
+            fwrite(STDERR, "esbuild falló con assets/js/$n.js\n");
+            exit(2);
+        }
+        $rel = NS_JS_DIST_DIR . '/' . $n . '.min.js';
+        $fp = ns_asset_fingerprint('js/' . $n . '.js');
+        $jsFiles[$rel] = $min;
+        $jsEntries[$n] = ['file' => $rel, 'hash' => substr(sha1($min), 0, 10), 'bytes' => strlen($min), 'source' => ['path' => 'js/' . $n . '.js', 'size' => $fp['size'], 'crc32' => $fp['crc32']]];
+    }
+} else {
+    // Sin esbuild (o --check con otra versión): se conserva lo que ya hay en el manifiesto y se valida contra el disco.
+    $jsNotes[] = $esbuild === null
+        ? 'esbuild no disponible: el JS minificado se deja como está (usa --esbuild=RUTA o ESBUILD; --require-js falla si falta)'
+        : 'esbuild ' . $esVersion . ' distinto del del manifiesto (' . ($oldManifest['js']['esbuild'] ?? '?') . '): se comprueba solo el manifiesto contra el disco';
+    foreach ($oldManifest['js']['files'] ?? [] as $n => $e) {
+        $jsEntries[$n] = $e;
+    }
+}
+$manifest['js'] = ['tool' => 'esbuild', 'esbuild' => $jsRebuild ? $esVersion : ($oldManifest['js']['esbuild'] ?? null), 'args' => '--minify --target=es2017 --legal-comments=none', 'files' => $jsEntries];
+
 $manifestJson = json_encode($manifest, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n";
 $manifestFile = NS_ROOT . '/app/assets-manifest.json';
 $distDir = NS_ROOT . '/assets/' . NS_DIST_DIR;
@@ -263,7 +358,6 @@ foreach (is_dir($distDir) ? (scandir($distDir) ?: []) : [] as $f) {
     }
 }
 
-$check = in_array('--check', $argv, true);
 $problems = [];
 foreach ($files as $rel => $body) {
     $f = NS_ROOT . '/assets/' . $rel;
@@ -277,13 +371,51 @@ if (!is_file($manifestFile) || file_get_contents($manifestFile) !== $manifestJso
 foreach ($stale as $f) {
     $problems[] = "sobrante: assets/" . NS_DIST_DIR . "/$f";
 }
+// JS: contenido esperado (si se reconstruyó) o validación del manifiesto contra el disco (si no).
+$jsDistDir = NS_ROOT . '/assets/' . NS_JS_DIST_DIR;
+foreach ($jsFiles as $rel => $body) {
+    $f = NS_ROOT . '/assets/' . $rel;
+    if (!is_file($f) || file_get_contents($f) !== $body) {
+        $problems[] = "desactualizado: assets/$rel";
+    }
+}
+foreach ($jsNames as $n) {
+    $e = $jsEntries[$n] ?? null;
+    $fp = ns_asset_fingerprint('js/' . $n . '.js');
+    if (!is_array($e)) {
+        $problems[] = "sin minificar en el manifiesto: assets/js/$n.js";
+        continue;
+    }
+    if (($e['source']['size'] ?? null) !== $fp['size'] || ($e['source']['crc32'] ?? null) !== $fp['crc32']) {
+        $problems[] = "desactualizado: assets/js/$n.js cambió desde el último build (assets/" . ($e['file'] ?? '?') . ')';
+    }
+    $mf = NS_ROOT . '/assets/' . ($e['file'] ?? '');
+    if (!is_file($mf) || filesize($mf) !== ($e['bytes'] ?? -1) || substr(sha1((string) file_get_contents($mf)), 0, 10) !== ($e['hash'] ?? '')) {
+        $problems[] = 'falta o no coincide con el manifiesto: assets/' . ($e['file'] ?? '?');
+    }
+}
+$jsStale = [];
+foreach (is_dir($jsDistDir) ? (scandir($jsDistDir) ?: []) : [] as $f) {
+    if ($f !== '.' && $f !== '..' && !in_array(NS_JS_DIST_DIR . '/' . $f, array_column($jsEntries, 'file'), true)) {
+        $jsStale[] = $f;
+        $problems[] = "sobrante: assets/" . NS_JS_DIST_DIR . "/$f";
+    }
+}
+foreach ($jsEntries as $n => $e) {
+    if (!in_array($n, $jsNames, true)) {
+        $problems[] = "el manifiesto lista un JS que ya no existe: $n";
+    }
+}
 
 if ($check) {
     if ($problems) {
-        fwrite(STDERR, implode("\n", $problems) . "\nEl dist no está al día: corre `php bin/build-assets.php` y commitea assets/css/dist y app/assets-manifest.json.\n");
+        fwrite(STDERR, implode("\n", $problems) . "\nEl dist no está al día: corre `php bin/build-assets.php` y commitea assets/css/dist, assets/js/dist y app/assets-manifest.json.\n");
         exit(1);
     }
-    echo 'dist al día (' . count($files) . " archivos)\n";
+    echo 'dist al día (' . count($files) . ' CSS, ' . count($jsEntries) . " JS)\n";
+    foreach ($jsNotes as $note) {
+        echo "aviso: $note\n";
+    }
     exit(0);
 }
 
@@ -297,9 +429,32 @@ foreach ($files as $rel => $body) {
 foreach ($stale as $f) {
     unlink($distDir . '/' . $f);
 }
+if ($jsFiles) {
+    if (!is_dir($jsDistDir) && !mkdir($jsDistDir, 0775, true) && !is_dir($jsDistDir)) {
+        fwrite(STDERR, "No se puede crear $jsDistDir\n");
+        exit(2);
+    }
+    foreach ($jsFiles as $rel => $body) {
+        file_put_contents(NS_ROOT . '/assets/' . $rel, $body);
+    }
+    foreach ($jsStale as $f) {
+        unlink($jsDistDir . '/' . $f);
+    }
+}
 file_put_contents($manifestFile, $manifestJson);
 foreach ($manifest['css'] as $name => $e) {
     $gz = strlen((string) gzencode($files[$e['file']], 6));
     printf("%-26s %7d bytes  %6d gzip  ?v=%s  (%d fuentes)\n", $name, $e['bytes'], $gz, $e['hash'], count($e['sources']));
 }
 echo count($files) . ' archivos en assets/' . NS_DIST_DIR . "/, manifiesto en app/assets-manifest.json\n";
+foreach ($jsEntries as $n => $e) {
+    $src = (int) filesize(NS_ROOT . '/assets/js/' . $n . '.js');
+    $gzS = strlen((string) gzencode((string) file_get_contents(NS_ROOT . '/assets/js/' . $n . '.js'), 6));
+    $mf = NS_ROOT . '/assets/' . $e['file'];
+    $gzM = is_file($mf) ? strlen((string) gzencode((string) file_get_contents($mf), 6)) : 0;
+    printf("%-26s %7d -> %6d bytes  %6d -> %5d gzip  ?v=%s\n", $n . '.js', $src, $e['bytes'], $gzS, $gzM, $e['hash']);
+}
+foreach ($jsNotes as $note) {
+    echo "aviso: $note\n";
+}
+echo count($jsEntries) . ' JS en assets/' . NS_JS_DIST_DIR . "/\n";

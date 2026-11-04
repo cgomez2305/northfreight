@@ -111,3 +111,27 @@ function ns_dist_css(array $sources): ?array
     }
     return ['url' => '/assets/' . $e['file'] . '?v=' . $e['hash']];
 }
+
+/**
+ * Versión minificada vigente de un JS propio (assets/js/<archivo>), o null (=> usar el archivo original).
+ * Mismo mecanismo que el CSS: el manifiesto (sección "js") debe listar el archivo, su fuente debe coincidir con el disco (tamaño + crc32) y el
+ * .min.js debe existir con el tamaño registrado. Un JS editado sin rebuild nunca sirve código viejo: simplemente se vuelve al original.
+ *
+ * @return string|null  url lista para src (con ?v=hash del contenido minificado)
+ */
+function ns_dist_js(string $file): ?string
+{
+    $e = ns_assets_manifest()['js']['files'][basename($file, '.js')] ?? null;
+    if (!is_array($e) || !isset($e['file'], $e['hash'], $e['bytes'], $e['source']) || !is_array($e['source'])) {
+        return null;
+    }
+    $fp = ns_asset_fingerprint('js/' . $file);
+    if ($fp === null || ($e['source']['path'] ?? null) !== 'js/' . $file || ($e['source']['size'] ?? null) !== $fp['size'] || ($e['source']['crc32'] ?? null) !== $fp['crc32']) {
+        return null;
+    }
+    $min = NS_ROOT . '/assets/' . $e['file'];
+    if (!is_file($min) || filesize($min) !== $e['bytes']) {
+        return null;
+    }
+    return '/assets/' . $e['file'] . '?v=' . $e['hash'];
+}
