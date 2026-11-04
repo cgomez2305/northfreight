@@ -1,9 +1,10 @@
-# NorthStar Captación (mini-CRM) — fases 1 y 2
+# NorthStar Captación (mini-CRM) — fases Q1 y Q2a
 
 Aplicación PHP **aparte del sitio** (el sitio sigue sin base de datos) que capta, califica y da seguimiento a owner-operators, carriers pequeños y company drivers. La opera una sola persona (Carlos, ClikRank). Documento maestro: `sistema-captacion-choferes-northstar.md` v2.0.
 
 **Qué incluye esta entrega (Q1):** base (estructura, migraciones, usuarios, login con 2FA, sesiones, CSRF, límites, registro de actividad, cola `jobs` + cron), motor de captación (validar, antispam, deduplicar, FMCSA, puntuar, encolar), alertas de Telegram (A2/A3), revocación STOP (A15), integración en proceso con el formulario del sitio y un panel mínimo.
-**Qué NO incluye:** panel completo (kanban, ficha, reportes: Q2), WhatsApp/SMS/Cal.com/n8n (Q4), Meta y job boards (Q6), entrega a NorthStar y reportes (Q5).
+**Q2a (panel con identidad NorthStar):** sistema de diseño, shell, login/2FA restyled, dashboard con datos reales, bandeja de leads con filtros y acciones masivas, ficha del lead completa (etapas, notas, tareas, llamadas, consentimientos) y datos de demostración locales (ver §15).
+**Qué NO incluye todavía:** kanban, prospectos FMCSA, tareas/agenda como módulo, reportes y configuración (Q2b/Q3), WhatsApp/SMS/Cal.com/n8n (Q4), Meta y job boards (Q6), entrega a NorthStar y reportes (Q5).
 
 Sin dependencias nuevas: PHP 8.2+ (el servidor tiene 8.3), PDO MySQL, curl, sodium, openssl, mbstring. PHPMailer (el del sitio, `../vendor/`) solo si hay SMTP; el CRM funciona sin él.
 
@@ -25,18 +26,18 @@ JSONL del sitio ──bin/import-jsonl.php────────────�
                                           ▼
                      Telegram · FMCSA · correo (PHPMailer o storage/mail.log)
 
-Panel mínimo (captacion.northstarfreightsolutions.us): login + 2FA → estado de la cola, últimos 20 leads, ficha de solo lectura
+Panel (captacion.northstarfreightsolutions.us): login + 2FA → dashboard, bandeja de leads y ficha (ver §15)
 ```
 
 ### Estructura
 
 ```
 captacion/
-  public/            RAÍZ DEL SUBDOMINIO. index.php (panel), setup.php, api/lead.php, api/webhooks/ (vacío), assets/panel.css, .htaccess, robots.txt
+  public/            RAÍZ DEL SUBDOMINIO. index.php (panel), setup.php, api/lead.php, api/webhooks/ (vacío), assets/ (panel.css, fonts.css, panel.js, fonts/, isotipos), .htaccess, robots.txt
   src/               bootstrap.php, Env.php, Db.php, Clock.php, Migrator.php, View.php · Controllers/ · Models/ · Services/ · Middleware/   (namespace Captacion\)
-  views/             layout, login, twofa, setup, panel, lead, message
+  views/             layout (shell), _icons (sprite SVG), _auth_open/_auth_close, login, twofa, setup, message, dashboard, leads, lead
   db/                schema.sql (generado) · migrations/NNN_nombre.sql
-  bin/               migrate.php · import-jsonl.php        (solo CLI)
+  bin/               migrate.php · import-jsonl.php · seed-demo.php (SOLO local)        (solo CLI)
   cron/              process_jobs.php (cada minuto) · fmcsa_daily.php (stub documentado)
   config/            .env (NO versionado) · .env.example · disposable-domains.txt · .htaccess (Require all denied)
   storage/           logs, sesiones, locks, ratelimit (NO versionado, con .gitignore y .htaccess deny)
@@ -56,6 +57,7 @@ MySQL 8 y MariaDB 10.11 (`utf8mb4`, `utf8mb4_unicode_ci`, InnoDB, borrados lógi
 | `001_core.sql` | Todas las tablas del documento §13: `users`, `leads`, `lead_events`, `consents`, `prospects_fmcsa`, `tasks`, `appointments`, `messages`, `sequence_enrollments`, `referral_codes`, `referrals`, `job_postings`, `channel_costs`, `settings`, `jobs`, `activity_log` + los índices del documento (`leads(phone_e164)`, `leads(email)`, `leads(stage,temperature)`, `leads(source,created_at)`, `prospects_fmcsa(status,last_call_at)`, `jobs(status,run_at)`). |
 | `002_auth.sql` | `users.totp_confirmed_at`, `users.totp_last_step` (anti-reutilización), `users.password_algo`; tablas `recovery_codes` (solo hash) y `login_attempts`. |
 | `003_settings_seed.sql` | Pesos y umbrales de puntuación y los ajustes **provisionales** (ver §4). Deben coincidir con `Scoring::DEFAULTS` (lo comprueba `tests/run.php`). |
+| `004_panel.sql` | Q2a: tablas `lead_notes` (notas con borrado lógico) y `notification_reads` (avisos de la campana leídos, por usuario); `messages.duration_sec/user_id` (llamadas manuales); `jobs.status` admite `cancelled` (A3 anulada al contactar); `tasks.created_by`; índices `leads(deleted_at,created_at)`, `leads(temperature,first_contact_at,deleted_at)` y `leads(profile,created_at)`. |
 
 Columnas añadidas a `leads` respecto al documento (necesarias para esta fase): `site_lead_id` (UNIQUE, id `ld_…` del sitio: idempotencia), `phone_raw`, `authority_status`, `endorsements`, `contact_pref`, `best_time`, `job_slug`, `disqualified_reason`, `lost_at`, `attempt`, `updated_at`. `jobs` añade `dedupe_key` (UNIQUE), `started_at`, `finished_at`.
 
@@ -183,7 +185,7 @@ Telegram: `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID`. Sin ellas el job falla con 
 - **5 intentos fallidos cada 15 min por IP y por correo** (contraseña y 2FA cuentan); 429 con `Retry-After`; bloqueo registrado.
 - PDO con sentencias preparadas nativas, salida siempre escapada, errores PHP nunca en pantalla (van a `storage/error.log`).
 - Cabeceras: CSP `default-src 'none'; style-src 'self'; script-src 'self' 'nonce-…'; frame-ancestors 'none'; base-uri 'none'` (sin inline), `X-Frame-Options: DENY`, `Referrer-Policy: no-referrer`, `X-Content-Type-Options`, `X-Robots-Tag: noindex, nofollow, noarchive`, `Cache-Control: no-store`, HSTS bajo https; `robots.txt` Disallow.
-- `activity_log`: altas, logins, fallos, bloqueos, códigos de recuperación usados, logouts. (Exportaciones y cambios de datos se registran cuando existan, en Q2.)
+- `activity_log`: altas, logins, fallos, bloqueos, códigos de recuperación usados, logouts y, desde Q2a, cada exportación CSV, cambio de etapa (individual y masivo), nota, tarea, llamada registrada, reapertura y revocación de consentimiento.
 - **Sin cuentas por defecto.** `setup.php` solo funciona con `users` vacía **y** `SETUP_TOKEN` en el `.env` (token en un campo de formulario, nunca en la URL); la cuenta no se crea hasta confirmar un código TOTP válido; después responde 404 para siempre. No hace falta borrar el token (el chequeo de `users` lo bloquea), pero conviene vaciarlo del `.env`.
 - `/api/lead.php`: Bearer `INTERNAL_API_TOKEN` (≥ 32 caracteres; si falta, 503), `hash_equals`, 10 autenticaciones fallidas / 15 min y `API_RATE_LIMIT` (120) peticiones/h por IP, 64 KB máximo, sin CORS, sin datos personales en las respuestas.
 - El sitio principal devuelve 404/403 para todo `/captacion/` y `/cron/` (`.htaccess` raíz + `index.php`).
@@ -316,4 +318,66 @@ Necesita `mariadbd`/`mariadb-install-db` en el PATH. No toca ningún servidor re
 - Equipos que NorthStar despacha, estados de contratación y mínimo de experiencia de company drivers (§4).
 - Texto de consentimiento: revisión legal. **`CONSENT_TEXT_V1` cubre llamada, SMS y correo, no WhatsApp**; antes de que Q4 mande el WhatsApp A1 automático hay que ampliar el texto (nueva versión `v2`) o apoyarse en que el lead escribió primero.
 - Correo duplicado: el sitio avisa por correo y el CRM también (`email_notify`).
-- Fase Q2: panel completo (bandeja, kanban, ficha, tareas, notas, motivos de pérdida, configuración de pesos).
+- Fase Q2b/Q3: kanban, prospectos FMCSA, tareas y agenda como módulo, reportes, configuración (pesos, costos por canal, plantillas). Hoy los costos por canal no tienen pantalla: `channel_costs` se carga por SQL y el dashboard muestra «Sin costos cargados» mientras esté vacía.
+- CSS del panel: 50,9 KB sin comprimir (≈ 11 KB gzip) + 3,5 KB de `fonts.css`; el objetivo del brief era < 40 KB. JS: 14,6 KB.
+
+---
+
+## 15. Panel (Q2a): identidad, pantallas y operación
+
+### Rutas
+
+| Ruta | Qué es |
+|---|---|
+| `GET /` | Dashboard (`?p=today|week|month`, `?rq=` y `?rp=` para la tabla de leads recientes) |
+| `GET /leads` | Bandeja. Filtros por URL: `t` temperatura · `pf` perfil · `src` fuente · `st` etapa · `eq` equipo · `us` estado · `lg` idioma · `from`/`to` (ET, AAAA-MM-DD) · `q` texto · `ct=none` sin contactar · `fl=fmcsa_pending` · `sort` (created, score, name, stage) · `dir` · `page` · `per` (25/50/100). Todo se valida con lista blanca. |
+| `GET /leads/{id}` | Ficha (la misma URL que usan las alertas de Telegram) |
+| `POST /leads/{id}/{stage\|note\|note-edit\|note-delete\|task\|task-done\|call\|reopen\|revoke}` | Acciones de la ficha (sesión + CSRF + `activity_log`) |
+| `POST /leads/bulk` | Cambio masivo (`contacted`, `qualified` → Precalificado en el pipeline B, `lost`) o exportar la selección |
+| `POST /leads/export` | CSV (`scope=filters\|selection\|period`); UTF-8 con BOM y protección contra fórmulas (`= + - @` y tab se prefijan con `'`; también el `+` de los teléfonos) |
+| `POST /ajax/search` | Buscador global (JSON, cabecera `X-CSRF-Token`, 90 peticiones/min por usuario → 429) |
+| `POST /ajax/notifications/read` | Marca los avisos de la campana como leídos (guardado en `notification_reads`) |
+
+### Paleta (solo en `public/assets/panel.css`, `:root`)
+
+Derivada del navy y el cian del sitio, con neutros de tinte azul. Contrastes medidos (WCAG, texto):
+
+| Par | Contraste |
+|---|---|
+| Texto `#0A1B2E` / `#3B4D63` / `#586A80` sobre blanco | 17,4 / 8,7 / 5,5:1 |
+| Texto terciario `#586A80` sobre el lienzo `#F1F4F8` | 5,0:1 |
+| Enlaces y acentos `--cyan-ink #036E8A` sobre blanco / lienzo / tinte cian | 5,8 / 5,3 / 5,2:1 |
+| Blanco sobre navy `#0A1D33` (botón primario, píldora activa) | 17,0:1 |
+| Navy `#04101F` sobre cian `#06A6CC` (celda de flecha) | 6,7:1 |
+| Caliente `#9A3407` / tibio `#045F78` / frío `#394D7C` / descartado `#4E5F73` sobre su fondo | 6,3 / 6,2 / 7,0 / 5,6:1 |
+| OK `#17673C`, error `#B42318`, aviso `#8A4B0B` sobre su fondo | 6,1 / 5,8 / 6,1:1 |
+| Iniciales de los 8 avatares sobre su fondo | 5,7 a 8,1:1 |
+
+El cian `#06A6CC` solo va en rellenos, puntos y la línea de «company drivers» (`#0691B3`, 3,7:1 sobre blanco para gráficos). Los bordes de campos de formulario usan `#7D8EA5` (3,3:1). Foco: contorno de 2 px `--focus` (`#036E8A`). Significado constante: **temperatura** (caliente = único acento cálido, tibio = cian, frío = azul pizarra, descartado = gris) y **etapa** (punto de color en un chip neutro: gris → azul pizarra → cian → navy → verde al firmar → rojo apagado al perder).
+
+### Tipografía y marca
+
+Las del sitio, copiadas a `public/assets/fonts/` (woff2) con los respaldos de métricas ajustadas (`fonts.css`): Barlow (texto y números de UI), Barlow Condensed (títulos y cifras grandes de KPI), JetBrains Mono (rótulos, cabeceras de tabla, chips, ejes). Isotipo oscuro y claro en `public/assets/`. Botón primario navy con celda circular de flecha cian (solo `transform`), chips píldora, estrella de marca en estados vacíos y login.
+
+### Pantallas y comportamiento
+
+- **Shell**: barra lateral (Principal: Dashboard, Leads; Atajos: calientes pendientes, llegaron hoy, descartados; estado del sistema y usuario abajo), barra superior con migas, **buscador global** (`Ctrl/⌘ K` o `/`, panel de resultados con flechas/Enter, diálogo nativo `<dialog>`), reloj ET, **campana** (leads calientes sin contactar, trabajos fallidos, Telegram sin configurar, FMCSA pendiente/sin llave, cron detenido; la clave de cada aviso incluye su estado, así que uno resuelto y vuelto a ocurrir sale otra vez) y menú del usuario. En ≤ 1023 px la barra lateral es un cajón; en ≤ 760 px hay barra inferior (Inicio, Leads, Buscar, Menú) y la ficha trae su propia barra fija (Llamar, WhatsApp, Correo, Etapa).
+- **Dashboard**: 4 KPI (leads con sparkline y variación; calificados con anillo; calientes sin contactar con la espera del más antiguo; mediana de primera respuesta), selector Hoy / Semana / Mes (hoy se compara con ayer a la misma hora; semana y mes, con los 7 / 30 días previos), «Exportar CSV» del periodo, gráfico de líneas semanal / mensual / anual (las pestañas solo aparecen si hay datos para ellas), desglose por fuente (90 días) con una línea de insight solo si hay ≥ 10 leads y una fuente que crece (≥ 3 leads y ≥ 1 en el periodo previo), franja secundaria (12 semanas; el costo por lead dice «Sin costos cargados» mientras `channel_costs` esté vacía), tabla de leads recientes con búsqueda y paginación, mapa de calor de 13 semanas, lista «Hoy» y estado del sistema. Los cálculos de día/semana/mes son en hora ET; el agrupado por día se hace en PHP (no hace falta `CONVERT_TZ`).
+- **Bandeja**: pestañas por temperatura con conteos (respetan el resto de filtros), filtros con chips activos y URL compartible, orden por columnas, paginación, selección múltiple con barra de acciones, exportación, filas urgentes marcadas y tarjetas apiladas en móvil. Estados vacíos distintos para «no hay leads» (explica cómo llegan) y «ningún lead coincide».
+- **Ficha**: cabecera con nombre, perfil, temperatura, etapa, banderas y puntuación; Llamar (`tel:`), WhatsApp (`wa.me` con saludo en el idioma del lead; WhatsApp **no** está cubierto por `CONSENT_TEXT_V1`: es un mensaje manual), Correo, Registrar llamada, Cambiar etapa / Reabrir; datos de contacto; avance en el pipeline; tareas, notas (editar, borrado lógico), línea de tiempo unificada con filtros, puntuación desglosada, elegibilidad y operación, FMCSA con banderas rojas, atribución, consentimientos (texto, fecha, canal, revocar) y otros leads con el mismo teléfono o correo.
+
+### Reglas de etapa (doc §7) implementadas
+
+«Perdido»/«Descartado» exige motivo de la lista fija (y nota con «Otro»); «Contactado» y cualquier etapa posterior fija `first_contact_at` y **cancela** el job A3 pendiente (`jobs.status = 'cancelled'`); «Presentado» solo desde Calificado / Llamada agendada (A) o Precalificado (B); «Firmado»/«Contratado» solo desde Presentado; saltarse el orden o sacar un lead de Firmado/Contratado exige marcar el override; un lead perdido solo se reabre (vuelve a Nuevo o Contactado). Una llamada registrada como «Contestó» fija el primer contacto y pasa de Nuevo a Contactado. Todo va en transacción, con evento en la línea de tiempo y registro en `activity_log`.
+
+### Datos de demostración (solo local)
+
+```bash
+CAPTACION_ENV_FILE=/ruta/.env php captacion/bin/seed-demo.php --reset     # ~120 leads ficticios, 14 semanas
+```
+
+Se niega a correr si `APP_ENV` no es `local`, si `DB_HOST` no es 127.0.0.1/localhost, si `DB_NAME` no contiene `dev`, `demo` o `test` (o parece de Hostinger: `u123456_…`) o si `leads` tiene algún lead que no sea de demostración (`site_lead_id` = `demo_…`). Nombres genéricos, teléfonos 555-01XX y correos `example.com`. **Nunca se despliega ni se ejecuta contra la base real.**
+
+### Pruebas
+
+`php captacion/tests/run.php` (ahora con `11_panel_q2a`): dashboard contra datos conocidos y consistencia con la base, filtros/orden/paginación de la bandeja, transiciones de etapa y validaciones (ambos pipelines, masivo, A3 cancelada, llamadas, notas, tareas, reabrir, revocar), buscador, avisos y «leído», exportación CSV con protección contra fórmulas, y por HTTP: sin sesión, sin/ con CSRF, límite de uso y escapado en cada endpoint nuevo.

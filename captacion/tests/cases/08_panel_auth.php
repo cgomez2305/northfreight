@@ -76,7 +76,7 @@ return static function (array $ctx): void {
     T::ok(strlen($secret) === 32 && preg_match('/^[A-Z2-7]+$/', $secret) === 1, 'clave TOTP en base32 (32 caracteres) mostrada en grupos de 4');
     T::eq(count($codes), 10, 'se muestran 10 codigos de recuperacion');
     T::ok(str_contains($r['body'], 'otpauth://totp/') && str_contains($r['body'], rawurlencode('carlos@example.com')), 'enlace otpauth:// para el movil (correo en minusculas)');
-    T::ok(!str_contains($r['body'], '<img') && !str_contains($r['body'], '<canvas'), 'sin QR (solo texto y enlace)');
+    T::ok(!str_contains($r['body'], '<canvas') && !str_contains($r['body'], 'data:image') && !preg_match('/qr[-_ ]?code/i', $r['body']), 'sin QR (solo texto y enlace)');
     // Confirmar con codigo incorrecto
     $csrf2 = $csrfOf($r['body']);
     $bad = Totp::codeForStep(Totp::base32Decode($secret), Totp::stepAt(time()) + 10);
@@ -156,7 +156,7 @@ return static function (array $ctx): void {
     T::ok($r['status'] === 303 && Infra::header($r, 'location') === '/', '2FA con el codigo del paso anterior (ventana -1): entra');
     T::ok($sid2 !== $sid1 && $sid2 !== '', 'el ID de sesion se regenera otra vez al completar el login');
     $r = $get('/', $jar1);
-    T::ok($r['status'] === 200 && str_contains($r['body'], 'Hola, Carlos Test') && str_contains($r['body'], 'Cola de trabajos') && str_contains($r['body'], 'Últimos 20 leads') && str_contains($r['body'], 'Salir'), 'panel: saludo, cola, ultimos 20 leads y salir');
+    T::ok($r['status'] === 200 && str_contains($r['body'], 'Carlos') && str_contains($r['body'], 'ESTADO DEL SISTEMA') && str_contains($r['body'], 'LEADS RECIENTES') && str_contains($r['body'], 'Salir'), 'panel: saludo, estado del sistema, leads recientes y salir');
     T::ok(str_contains($r['body'], 'nunca') && str_contains($r['body'], 'Telegram sin configurar'), 'panel: avisa "cron nunca ejecutado" y "Telegram sin configurar"');
     T::ok(Db::value('SELECT last_login_at FROM users') !== null && $count('activity_log', "action = 'login_ok'") === 1, 'last_login_at y activity_log login_ok');
 
@@ -166,7 +166,7 @@ return static function (array $ctx): void {
     T::ok(str_contains($csp, "default-src 'none'") && str_contains($csp, "frame-ancestors 'none'") && str_contains($csp, "base-uri 'none'") && !str_contains($csp, 'unsafe-inline') && !str_contains($csp, 'unsafe-eval'), 'CSP estricta (default-src none, sin unsafe-inline/eval, frame-ancestors none)');
     T::ok(!preg_match("/style-src[^;]*'unsafe-inline'/", $csp) && str_contains($csp, "script-src 'self' 'nonce-"), 'CSP: scripts solo con nonce; estilos solo del propio origen');
     T::ok($h('x-frame-options') === 'DENY' && $h('referrer-policy') === 'no-referrer' && str_contains($h('x-robots-tag'), 'noindex') && $h('x-content-type-options') === 'nosniff' && str_contains($h('cache-control'), 'no-store'), 'X-Frame-Options DENY, Referrer-Policy, X-Robots-Tag noindex, nosniff, no-store');
-    T::ok(!str_contains($r['body'], '<script') && !preg_match('/\sstyle="/i', $r['body']) && !preg_match('/\son\w+="/i', $r['body']), 'HTML sin <script>, sin style= ni handlers on*= (compatible con la CSP)');
+    T::ok(preg_match('/<script(?![^>]*\bnonce=")/i', $r['body']) === 0 && !preg_match('/\sstyle="/i', $r['body']) && !preg_match('/\son\w+="/i', $r['body']), 'HTML: todo <script> lleva nonce, sin style= ni handlers on*= (compatible con la CSP)');
     T::ok(str_contains($r['body'], 'name="robots" content="noindex'), 'meta robots noindex');
     $rb = $get('/robots.txt');
     T::ok($rb['status'] === 200 && str_contains($rb['body'], 'Disallow: /'), 'robots.txt: Disallow /');
@@ -180,7 +180,7 @@ return static function (array $ctx): void {
     $r = $get('/', $jar1);
     T::ok(!str_contains($r['body'], '<script>alert(1)') && str_contains($r['body'], '&lt;script&gt;alert(1)&lt;/script&gt;'), 'escapado: el nombre con <script> sale como texto en la tabla de leads');
     $r = $get("/leads/$xssId", $jar1);
-    T::ok($r['status'] === 200 && !str_contains($r['body'], '<script>alert(1)') && str_contains($r['body'], 'Desglose de la puntuación'), 'ficha minima del lead: escapada y con el desglose de la puntuacion');
+    T::ok($r['status'] === 200 && !str_contains($r['body'], '<script>alert(1)') && str_contains($r['body'], 'PUNTUACIÓN DESGLOSADA'), 'ficha del lead: escapada y con el desglose de la puntuacion');
     T::eq($get("/leads/$xssId'", $jar1)['status'], 404, 'ficha con id mal formado: 404');
     T::eq($get('/leads/99999', $jar1)['status'], 404, 'ficha de un lead inexistente: 404');
     T::ok($get("/leads/$xssId", $fresh())['status'] === 303, 'ficha sin sesion: redirige a /login');
@@ -193,8 +193,8 @@ return static function (array $ctx): void {
     Queue::push('sms_backup_alert', [], null, 'x', 'parked', 'TODO');
     Queue::runBatch(['t_a' => static function (): void {}], 5);   // deja la marca de "ultima ejecucion"
     $r = $get('/', $jar1);
-    T::ok(str_contains($r['body'], 'error de prueba visible') && str_contains($r['body'], 'Fallidos') && str_contains($r['body'], 'hace ') && str_contains($r['body'], 'trabajo(s) fallido(s)'), 'panel: muestra fallidos con su error y la ultima ejecucion del cron');
-    T::ok(preg_match('/Pendientes<\/dt><dd>1<\/dd>/', $r['body']) === 1 && preg_match('/Registrados sin ejecutar<\/dt><dd>1<\/dd>/', $r['body']) === 1, 'panel: contadores de cola (1 pendiente, 1 parked)');
+    T::ok(str_contains($r['body'], 'error de prueba visible') && str_contains($r['body'], 'Trabajos fallidos') && (str_contains($r['body'], 'hace ') || str_contains($r['body'], '>ahora<')) && str_contains($r['body'], '1 trabajo fallido en la cola'), 'panel: muestra fallidos con su error y la ultima ejecucion del cron');
+    T::ok(str_contains($r['body'], '<b>1 / 0</b>'), 'panel: contador de cola (1 pendiente, 0 en curso)');
 
     // Logout con CSRF
     $r = $post('/logout', [], $jar1);
