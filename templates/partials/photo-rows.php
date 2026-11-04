@@ -30,7 +30,7 @@ $rail = !empty($rail) && count($items) > 1;
   <?php foreach ($items as $i => $it): $href = !empty($it['href']) ? (string) $it['href'] : ''; $img = $it['image'] ?? []; $el = $href !== '' ? 'a' : 'div'; ?>
   <li class="prow" style="--i:<?= (int) $i ?>">
     <<?= $el ?> class="prow__in"<?= $href !== '' ? ' href="' . e($href) . '"' : '' ?>>
-      <figure class="prow__photo"<?= !empty($img['pos']) ? ' style="--pos:' . e($img['pos']) . '"' : '' ?>><?= ns_img(['base' => (string) $img['base'], 'alt' => (string) ($img['alt'] ?? ''), 'sizes' => $img['sizes'] ?? '(min-width:1025px) 1152px, (min-width:761px) 100vw, calc(100vw - 40px)']) ?></figure>
+      <figure class="prow__photo"<?= !empty($img['pos']) ? ' style="--pos:' . e($img['pos']) . '"' : '' ?>><?= ns_img(['base' => (string) $img['base'], 'alt' => (string) ($img['alt'] ?? ''), 'sizes' => $img['sizes'] ?? '(min-width:1025px) 1152px, (min-width:761px) 100vw, (min-width:641px) calc(100vw - 40px), 65vw']) ?></figure>
       <?php if (!empty($it['icon'])): ?><span class="prow__icon" aria-hidden="true"><?= ns_icon((string) $it['icon'], 26) ?></span><?php endif; ?>
       <div class="prow__body">
         <span class="prow__n t-meta"><?= e((string) ($it['tag'] ?? ($it['n'] ?? ''))) ?></span>

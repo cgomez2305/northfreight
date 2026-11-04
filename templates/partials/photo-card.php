@@ -15,7 +15,7 @@ require_once __DIR__ . '/kit.php';
 $image = is_array($image ?? null) ? $image : [];
 $link = is_array($link ?? null) && !empty($link['href']) ? $link : null;
 $video = is_array($video ?? null) ? $video : null;
-$sizes = $image['sizes'] ?? '(min-width:1025px) 1152px, (min-width:761px) 100vw, 100vw';
+$sizes = $image['sizes'] ?? '(min-width:1025px) 1152px, (min-width:641px) 100vw, 65vw';
 ?>
 <section class="section pcard<?= !empty($cls) ? ' ' . e($cls) : '' ?>"<?= !empty($id) ? ' aria-labelledby="' . e($id) . '"' : '' ?>>
   <div class="container">

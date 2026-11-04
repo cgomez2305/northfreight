@@ -17,7 +17,7 @@ $link = is_array($link ?? null) && !empty($link['href']) ? $link : null;
 <section class="section pband-sec<?= !empty($cls) ? ' ' . e($cls) : '' ?>"<?= !empty($id) ? ' aria-labelledby="' . e($id) . '"' : '' ?>>
   <div class="container">
     <div class="pband">
-      <figure class="pband__photo"<?= !empty($image['pos']) ? ' style="--pos:' . e($image['pos']) . '"' : '' ?>><?= ns_img(['base' => (string) $image['base'], 'alt' => (string) ($image['alt'] ?? ''), 'sizes' => $image['sizes'] ?? '(min-width:1025px) 1152px, (min-width:761px) 100vw, calc(100vw - 40px)']) ?></figure>
+      <figure class="pband__photo"<?= !empty($image['pos']) ? ' style="--pos:' . e($image['pos']) . '"' : '' ?>><?= ns_img(['base' => (string) $image['base'], 'alt' => (string) ($image['alt'] ?? ''), 'sizes' => $image['sizes'] ?? '(min-width:1025px) 1152px, (min-width:761px) 100vw, (min-width:641px) calc(100vw - 40px), 65vw']) ?></figure>
       <div class="pband__body">
         <?php partial('section-head', ['id' => $id ?? '', 'eyebrow' => $eyebrow ?? '', 'title' => $title ?? '', 'lead' => $lead ?? '']); ?>
         <?php if ($chips || $link): ?>

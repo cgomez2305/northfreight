@@ -20,7 +20,7 @@ $hasVideo = preg_match('/^[a-z0-9-]+$/', $video) === 1 && is_file(NS_ROOT . "/as
 <div class="vband">
   <figure class="vband__media"<?= $hasVideo ? ' data-vband data-mp4="' . e(asset("video/$video.mp4")) . '"' : '' ?>>
     <div class="vband__layer">
-      <?= ns_img(['base' => (string) $image['base'], 'alt' => (string) ($image['alt'] ?? ''), 'class' => 'vband__poster', 'sizes' => '(min-width:761px) 100vw, calc(100vw - 72px)']) ?>
+      <?= ns_img(['base' => (string) $image['base'], 'alt' => (string) ($image['alt'] ?? ''), 'class' => 'vband__poster', 'sizes' => '(min-width:761px) 100vw, (min-width:641px) calc(100vw - 72px), calc(80vw - 32px)']) ?>
       <?php if ($hasVideo): ?><video class="vband__video" muted playsinline preload="none" aria-hidden="true" tabindex="-1"></video><?php endif; ?>
     </div>
     <figcaption class="vband__card"><p class="vband__text"><?= ns_rich($text ?? '') ?></p></figcaption>

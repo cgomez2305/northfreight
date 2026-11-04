@@ -34,7 +34,7 @@ $ctas = $ctas ?? [];
 ?>
 <section class="hero hero--int on-dark<?= $photo ? ' hero--photo' : '' ?><?= $stack ? ' hero--stack' : '' ?><?= !empty($cls) ? ' ' . e($cls) : '' ?>">
   <?php if ($bg !== ''): ?><?= $bg ?>
-  <?php elseif ($photo): ?><div class="hero__pic px"<?= !empty($image['pos']) ? ' style="--pos:' . e($image['pos']) . '"' : '' ?>><?= ns_img(['base' => $image['base'], 'alt' => $image['alt'] ?? '', 'eager' => true, 'sizes' => $image['sizes'] ?? '(min-width:1025px) 1160px, (min-width:761px) 100vw, calc(100vw - 72px)']) ?></div><?php endif; ?>
+  <?php elseif ($photo): ?><div class="hero__pic px"<?= !empty($image['pos']) ? ' style="--pos:' . e($image['pos']) . '"' : '' ?>><?= ns_img(['base' => $image['base'], 'alt' => $image['alt'] ?? '', 'eager' => true, 'sizes' => $image['sizes'] ?? '(min-width:1025px) 1160px, (min-width:761px) 100vw, (min-width:641px) calc(100vw - 72px), 65vw']) ?></div><?php endif; ?>
   <div class="container hero__in">
     <?php if ($photo): ?><div class="hero__crumbs"><?php if (isset($crumbs)): partial('breadcrumbs', ['crumbs' => $crumbs]); elseif (isset($route)): partial('breadcrumbs', ['route' => $route]); endif; ?></div><?php endif; ?>
     <div class="hero__main">

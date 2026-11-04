@@ -28,8 +28,8 @@ $waChips = ['Load booking', 'Load tracking', 'Back office'];
 $heroVideo = ns_hero_video('hero');
 
 // Ancho útil de las fotos de las tarjetas de servicio. Carril ≥1025px: la foto manda por el ALTO de la tarjeta (≤540 px, cover) → ~540 × 1,5 = 810 px de foto, no el ancho de la tarjeta.
-// Tarjetas apiladas (marco 4:3 + .px 110 %): ancho útil real ≈ 1,24 × el ancho del marco; en móvil se declara a propósito calc(100vw - 72px) (~0,9×) para que a DPR 2 siga eligiendo la variante de 640 (ampliación x1,26, dentro del límite x1,6) y el peso y el LCP móviles no suban.
-$railSizes = '(min-width:1025px) 820px, (min-width:641px) 42vw, calc(100vw - 72px)';
+// Tarjetas apiladas (marco 4:3 + .px 110 %): ancho útil real ≈ 1,24 × el ancho del marco; en móvil se declara a propósito 65vw (ver ns_img()): a DPR 2 elige la variante de 640 (x1,34) y a DPR 3 la de 768 (x1,4), dentro del límite x1,6.
+$railSizes = '(min-width:1025px) 700px, (min-width:641px) 42vw, calc(80vw - 32px)';   // escritorio: la tarjeta mide ~806 px, así que a 1x basta la variante de 768 (x1,05); en retina ns_sizes_retina() pide 455 px y elige 1024 (x1,57)
 
 $services = [
     ['num' => '01', 'title' => 'Dispatch & load booking',
@@ -235,8 +235,8 @@ $figures = [
       <ol class="why__list">
         <?php foreach ($why as $i => [$n, $title, $text, $photo, $path, $linkLabel]): ?>
         <li class="why__item<?= $i === 0 ? ' is-on' : '' ?>">
-          <figure class="why__photo"><?= ns_img(['base' => $photo, 'alt' => '', 'sizes' => '(min-width:901px) 33vw, (min-width:641px) 100vw, calc(100vw - 72px)',
-            'art' => [['media' => '(min-width:1025px)', 'base' => $photo . '-tall', 'sizes' => '440px']]]) ?></figure>
+          <figure class="why__photo"><?= ns_img(['base' => $photo, 'alt' => '', 'sizes' => '(min-width:901px) 33vw, (min-width:641px) 100vw, 65vw',
+            'art' => [['media' => '(min-width:1025px)', 'base' => $photo . '-tall', 'sizes' => '(min-width:1025px) 440px']]]) ?></figure>
           <div class="why__body">
             <span class="why__n t-meta" aria-hidden="true"><?= e($n) ?></span>
             <h3 class="head t-h3"><?= e($title) ?></h3>
@@ -258,8 +258,8 @@ $figures = [
       <?php foreach ($steps as [$n, $title, $text, $photo]): ?>
       <li class="home-step">
         <span class="home-step__line" aria-hidden="true"><i></i></span>
-        <figure class="home-step__photo px"><?= ns_img($photo + ['sizes' => '(min-width:641px) 50vw, calc(100vw - 72px)',
-            'art' => [['media' => '(min-width:1025px)', 'base' => $photo['base'] . '-tall', 'sizes' => '360px']]]) ?></figure>
+        <figure class="home-step__photo px"><?= ns_img($photo + ['sizes' => '(min-width:641px) 50vw, 65vw',
+            'art' => [['media' => '(min-width:1025px)', 'base' => $photo['base'] . '-tall', 'sizes' => '(min-width:1025px) 360px']]]) ?></figure>
         <span class="home-step__n" aria-hidden="true"><?= e($n) ?></span>
         <h3 class="head t-h3"><span class="sr-only">Step <?= e($n) ?>: </span><?= e($title) ?></h3>
         <p class="t-card"><?= e($text) ?></p>
@@ -362,7 +362,7 @@ partial('photo-card', [
 <!-- 09 FAQ -->
 <?php partial('faq', ['items' => route_faq_items($route), 'eyebrow' => '09 · FAQ', 'title' => 'Truck dispatch questions carriers ask us.', 'pre_cta' => true,
     // Foto del FAQ por tema (cada pregunta de app/data/faq.php lleva 'topic'): 0 costo, arranque y contrato · 1 Amazon Relay · 2 alcance · 3 con quién trabajamos. El tema 0 es la foto de siempre (4:5 nativo).
-    'image' => ['base' => 'nf-faq-dock-light-4x5', 'alt' => 'Open loading dock door under a warm wall light at dusk, with yellow bollards', 'sizes' => '(min-width:1025px) 660px, 0px', 'topics' => [
+    'image' => ['base' => 'nf-faq-dock-light-4x5', 'alt' => 'Open loading dock door under a warm wall light at dusk, with yellow bollards', 'sizes' => '(min-width:1025px) 500px, 0px', 'topics' => [
         ['base' => 'nf-faq-dock-light-4x5', 'alt' => 'Open loading dock door under a warm wall light at dusk, with yellow bollards'],
         ['base' => 'nf-check-tracking-mirror-tall', 'alt' => 'Rain-streaked truck side mirror reflecting a white trailer on a wet highway at dusk'],
         ['base' => 'nf-hero-back-office-tall', 'alt' => 'Office desk at night under a lamp, with forms in a tray, a stack of paper, a pen and an inked stamp'],

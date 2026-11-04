@@ -34,7 +34,7 @@ $chips = ['all' => 'All', 'dispatch' => 'Dispatch', 'relay' => 'Amazon Relay', '
   <div class="container">
     <a class="blog-feat" href="<?= e(url($featured['path'])) ?>">
       <span class="blog-feat__media px">
-        <?php if (!empty($featured['image'])): ?><?= ns_img($featured['image'] + ['sizes' => '(min-width:1025px) 1152px, 100vw']) ?><?php endif; ?>
+        <?php if (!empty($featured['image'])): ?><?= ns_img($featured['image'] + ['sizes' => '(min-width:1025px) 1152px, (min-width:641px) 100vw, calc(80vw - 32px)']) ?><?php endif; ?>
       </span>
       <span class="blog-feat__body">
         <span class="blog-feat__meta">
@@ -78,7 +78,7 @@ $chips = ['all' => 'All', 'dispatch' => 'Dispatch', 'relay' => 'Amazon Relay', '
             'title'   => $p['title'],
             'text'    => $p['excerpt'],
             'cta'     => 'Read',
-            'image'   => !empty($p['image']) ? $p['image'] + ['sizes' => '(min-width:1025px) 500px, (min-width:641px) 42vw, calc(100vw - 72px)'] : null,
+            'image'   => !empty($p['image']) ? $p['image'] + ['sizes' => '(min-width:1025px) 500px, (min-width:641px) 42vw, calc(80vw - 32px)'] : null,
         ]); ?>
       </li>
       <?php endforeach; ?>

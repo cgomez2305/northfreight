@@ -5,15 +5,16 @@
  */
 require_once NS_ROOT . '/templates/partials/kit.php';
 
+$rowSizes = '(min-width:1025px) 1000px, (min-width:761px) 100vw, (min-width:641px) calc(100vw - 40px), 65vw';   // la fila mide ~1089 px: a 1x basta la variante de 1024 (x1,06)
 $steps = [
     ['We learn your operation', 'Trucks, equipment, lanes, drivers, home time and the accounts you already run, including Amazon Relay.', 'pin',
-     ['base' => 'nf-onboarding-learn', 'alt' => 'Hands over a paper road map on a worn table, with a pen, truck keys and a notebook', 'pos' => '55% 50%']],
+     ['base' => 'nf-onboarding-learn', 'alt' => 'Hands over a paper road map on a worn table, with a pen, truck keys and a notebook', 'pos' => '55% 50%', 'sizes' => $rowSizes]],
     ['We define scope & contacts', 'Who approves loads, how and when we report, and which tasks the desk owns from day one.', 'doc',
-     ['base' => 'nf-onboarding-scope', 'alt' => 'Hand signing a form on a clipboard, with a trailer parked out of focus behind', 'pos' => '60% 45%']],
+     ['base' => 'nf-onboarding-scope', 'alt' => 'Hand signing a form on a clipboard, with a trailer parked out of focus behind', 'pos' => '60% 45%', 'sizes' => $rowSizes]],
     ['We run the day-to-day', 'Booking, tracking and documenting every load. You get updates on WhatsApp, where you already work.', 'truck',
-     ['base' => 'nf-onboarding-run', 'alt' => 'White semi truck with a dry van trailer driving past at dusk, with the background blurred by motion', 'pos' => '65% 55%']],
+     ['base' => 'nf-onboarding-run', 'alt' => 'White semi truck with a dry van trailer driving past at dusk, with the background blurred by motion', 'pos' => '65% 55%', 'sizes' => $rowSizes]],
     ['We review & improve', 'Regular reviews of lanes, rates and incidents to keep your trucks earning.', 'trend',
-     ['base' => 'nf-onboarding-review', 'alt' => 'Rows of white trailers parked in a truck yard beside a warehouse at dusk, with a tractor pulling through', 'pos' => '55% 50%']],
+     ['base' => 'nf-onboarding-review', 'alt' => 'Rows of white trailers parked in a truck yard beside a warehouse at dusk, with a tractor pulling through', 'pos' => '55% 50%', 'sizes' => $rowSizes]],
 ];
 $expect = ['One channel for every update', 'A record of every load', 'A team, not a single dispatcher'];
 

@@ -53,7 +53,7 @@ foreach ($paths as $path) {
     </div>
     <div class="dblock__list">
       <a class="dfeat" href="<?= e(url($feat['path'])) ?>">
-        <?php if (!empty($thumbs[$paths[0]])): $t = $thumbs[$paths[0]]; ?><figure class="dfeat__photo"><?= ns_img(['base' => $t[0], 'alt' => $t[1], 'sizes' => '(min-width:1025px) 480px, (min-width:641px) 50vw, calc(100vw - 40px)']) ?></figure><?php endif; ?>
+        <?php if (!empty($thumbs[$paths[0]])): $t = $thumbs[$paths[0]]; ?><figure class="dfeat__photo"><?= ns_img(['base' => $t[0], 'alt' => $t[1], 'sizes' => '(min-width:1025px) 480px, (min-width:641px) 50vw, 65vw']) ?></figure><?php endif; ?>
         <span class="dfeat__body">
           <span class="rcard__chips"><?php foreach ($meta($feat) as $c): ?><span class="rcard__chip"><?= e($c) ?></span><?php endforeach; ?></span>
           <h3 class="head dfeat__title"><?= e((string) $feat['title']) ?></h3>

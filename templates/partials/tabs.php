@@ -29,7 +29,7 @@ $uid = 'tabs-' . preg_replace('/[^a-z0-9-]/', '', strtolower((string) ($id ?? 'x
       </div>
       <?php foreach ($items as $i => $it): $img = $it['image'] ?? []; $link = is_array($it['link'] ?? null) && !empty($it['link']['href']) ? $it['link'] : null; ?>
       <div class="tabs__panel tabp<?= $i === 0 ? ' is-on' : '' ?>" role="tabpanel" id="<?= e($uid . '-p' . $i) ?>" aria-labelledby="<?= e($uid . '-t' . $i) ?>">
-        <figure class="tabp__photo"<?= !empty($img['pos']) ? ' style="--pos:' . e($img['pos']) . '"' : '' ?>><?= ns_img(['base' => (string) $img['base'], 'alt' => (string) ($img['alt'] ?? ''), 'sizes' => '(min-width:1025px) 1152px, (min-width:761px) 100vw, calc(100vw - 72px)']) ?></figure>
+        <figure class="tabp__photo"<?= !empty($img['pos']) ? ' style="--pos:' . e($img['pos']) . '"' : '' ?>><?= ns_img(['base' => (string) $img['base'], 'alt' => (string) ($img['alt'] ?? ''), 'sizes' => '(min-width:1025px) 1152px, (min-width:761px) 100vw, (min-width:641px) calc(100vw - 72px), 65vw']) ?></figure>
         <div class="tabp__card">
           <h3 class="head t-h3 tabp__title"><?= e((string) ($it['title'] ?? $it['label'])) ?></h3>
           <?= ns_checks((array) $it['points']) ?>

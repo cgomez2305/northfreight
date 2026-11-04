@@ -17,7 +17,7 @@ $h = in_array($h ?? 'h3', ['h3', 'h4', 'p'], true) ? ($h ?? 'h3') : 'h3';
 $sm = ($size ?? 'default') === 'sm';
 ?>
 <a class="rcard<?= !empty($dark) ? ' rcard--dark' : '' ?><?= $sm ? ' rcard--sm' : '' ?><?= $image ? '' : ' rcard--nophoto' ?>" href="<?= e((string) $href) ?>">
-  <?php if ($image): ?><figure class="rcard__photo"><?= ns_img(['base' => (string) $image['base'], 'alt' => (string) ($image['alt'] ?? ''), 'sizes' => $image['sizes'] ?? ($sm ? '(min-width:761px) 160px, calc(100vw - 72px)' : '(min-width:1025px) 300px, (min-width:761px) 260px, calc(100vw - 72px)')]) ?></figure><?php endif; ?>
+  <?php if ($image): ?><figure class="rcard__photo"><?= ns_img(['base' => (string) $image['base'], 'alt' => (string) ($image['alt'] ?? ''), 'sizes' => $image['sizes'] ?? ($sm ? '(min-width:761px) 160px, 65vw' : '(min-width:1025px) 300px, (min-width:761px) 260px, 65vw')]) ?></figure><?php endif; ?>
   <span class="rcard__body">
     <?php if ($chips): ?><span class="rcard__chips"><?php foreach ($chips as $c): ?><span class="rcard__chip"><?= e((string) $c) ?></span><?php endforeach; ?></span><?php endif; ?>
     <<?= $h ?> class="head rcard__title"><?= e((string) $title) ?></<?= $h ?>>

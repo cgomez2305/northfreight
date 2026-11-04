@@ -12,7 +12,7 @@ require_once NS_ROOT . '/templates/partials/kit.php';
 $rcImg = ns_thumb($rc['path']);
 ?>
 <a class="card co-res<?= $rcImg ? ' co-res--photo' : '' ?><?= $rcDark ? ' card--dark' : '' ?>" href="<?= e(url($rc['path'])) ?>">
-  <?php if ($rcImg): ?><figure class="co-res__photo"><?= ns_img(['base' => $rcImg[0], 'alt' => $rcImg[1], 'sizes' => $rcSizes ?? '(min-width:1025px) 560px, (min-width:641px) 50vw, calc(100vw - 72px)']) ?></figure><?php endif; ?>
+  <?php if ($rcImg): ?><figure class="co-res__photo"><?= ns_img(['base' => $rcImg[0], 'alt' => $rcImg[1], 'sizes' => $rcSizes ?? '(min-width:1025px) 560px, (min-width:641px) 50vw, 65vw']) ?></figure><?php endif; ?>
   <span class="co-res__top"><?php if (!empty($rc['icon_svg'])): ?><?= $rc['icon_svg'] ?><?php elseif (!empty($rc['icon'])): ?><?= ns_icon($rc['icon'], 28) ?><?php endif; ?><span class="card__code"><?= e($rc['code']) ?></span></span>
   <h3 class="head t-h3 card__title"><?= e($rc['title']) ?></h3>
   <p class="card__text t-card"><?= e($rc['text']) ?></p>

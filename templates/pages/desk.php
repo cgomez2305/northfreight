@@ -43,7 +43,7 @@ partial('video', [
     'cls'   => 'hero__pic',
     'foot'  => false,
     'pos'   => '60% 50%',
-    'sizes' => '(min-width:1025px) 1160px, (min-width:761px) 100vw, calc(100vw - 72px)',
+    'sizes' => '(min-width:1025px) 1160px, (min-width:761px) 100vw, (min-width:641px) calc(100vw - 72px), calc(80vw - 32px)',
 ]);
 $bg = ob_get_clean();
 ob_start(); ?>

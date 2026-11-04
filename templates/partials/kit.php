@@ -87,12 +87,32 @@ function ns_icon(string $name, int $size = 18, string $class = ''): string
 }
 
 /**
+ * Añade a un atributo `sizes` la rama de pantallas retina (≥1,5 dppx): delante de cada entrada con condición de ancho y tamaño en px o vw se inserta la misma condición
+ * `and (min-resolution:1.5dppx)` con el 65 % del tamaño. Motivo: el navegador elige la variante MÁS PEQUEÑA con ancho ≥ tamaño × DPR, y la regla del sitio permite x1,10 en 1x pero x1,6 en retina;
+ * con una sola cifra no se pueden cumplir las dos (a 1440 con DPR 2, un marco de 1152 px pedía 2304 y bajaba la de 2560 cuando 1600 cubre x1,44). Con 65 %, 2 × tamaño × 0,65 = 1,3 × marco: la variante elegida
+ * nunca amplía más de x1,54. Los navegadores sin soporte de `min-resolution` en `sizes` ignoran la entrada y siguen con la normal (sin riesgo). Las entradas sin condición (la última, p. ej. `65vw` en móvil,
+ * que ya va al 65 %) y las de 0px no se tocan. El orden de las entradas se conserva, así que la semántica de ancho no cambia.
+ */
+function ns_sizes_retina(string $sizes): string
+{
+    $out = [];
+    foreach (explode(',', $sizes) as $part) {
+        $part = trim($part);
+        if (preg_match('/^(\(min-width:\s*\d+px\))\s+(\d+(?:\.\d+)?)(px|vw)$/', $part, $m) === 1 && (float) $m[2] > 0) {
+            $out[] = $m[1] . ' and (min-resolution:1.5dppx) ' . rtrim(rtrim(number_format((float) $m[2] * 0.65, 1, '.', ''), '0'), '.') . $m[3];
+        }
+        $out[] = $part;
+    }
+    return implode(', ', $out);
+}
+
+/**
  * <picture> responsive sobre {dir}/{base}-{ancho}.webp (+ {base}.jpg de respaldo si existe).
  * $o: base (sin extensión), alt, sizes, class, eager(bool), widths(array, por defecto los que existan), dir ('img' por defecto; 'video' para fotogramas en assets/video, hoy sin uso),
  *     art(array de ['media'=>…, 'base'=>…, 'sizes'=>…, 'widths'=>…?]: recortes alternativos que se emiten ANTES de la fuente normal; el primero cuya media coincida gana).
  * `sizes` debe describir el ANCHO que ocupa la imagen una vez recortada con object-fit: cover (marco, margen de .px y alto incluidos), no solo el ancho del marco: con marcos
  * más altos que la foto manda el alto, y un `sizes` corto hace elegir una variante demasiado pequeña (se ve pixelada). Regla: ancho útil = max(ancho marco, alto imagen × proporción foto).
- * En móvil se declara a propósito algo por DEBAJO del ancho útil (calc(100vw - 72px)): a DPR ≤2 elige la variante de 640 (ampliación ≈ x1,26, límite x1,6) y el peso y el LCP móviles no suben; el escritorio sí pide la variante que da ≤ x1,10 en 1x. Desde la fase J los masters miden 3840 px (variantes 640 a 2560, y 3200 en heros y CTA): ningún marco se acerca ya al límite de ampliación.
+ * Variantes (fase N): 640, 768, 1024, 1280, 1600, 2048, 2560 (y 3200 en heros y CTA; los recortes `-tall`/`-m` añaden 480). El navegador elige la MÁS PEQUEÑA con ancho ≥ tamaño × DPR, y la regla del sitio es x1,10 máx. en 1x y x1,6 en retina: en móvil (≤640 px) se declara `65vw` en marcos que mandan por el ancho (≈ 0,65 × el marco: a DPR 2 elige 640 y a DPR 3 elige 768, ampliación x1,1 a x1,5) y `calc(80vw - 32px)` en los marcos 4:3 con foto 3:2 (card, video, banda, blog), donde manda el alto y el ancho útil es ≈ 1,24 × el marco (a DPR 3 eligen 1024: con 768 pasarían de x1,6), en escritorio el ancho útil del marco (1x) y `ns_sizes_retina()` añade solo la rama retina con el 65 % (a 1440 y DPR 2 un marco de 1152 baja la de 1600, no la de 2560). Los heros del home llevan `widths` y `sizes` propios y no pasan por aquí.
  * Las variantes no se ampliaron nunca: solo existen anchos ≤ al de la foto de origen (el ancho nativo puede ser cualquiera; se detectan en disco).
  */
 function ns_img(array $o): string
@@ -146,11 +166,11 @@ function ns_img(array $o): string
     foreach ((array) ($o['art'] ?? []) as $a) {
         $as = $srcset((string) $a['base'], $a['widths'] ?? $found((string) $a['base'], $dir), $dir, $dirName);
         if ($as) {
-            $out .= '<source type="image/webp" media="' . e($a['media']) . '" srcset="' . e(implode(', ', $as)) . '" sizes="' . e($a['sizes'] ?? ($o['sizes'] ?? '100vw')) . '">';
+            $out .= '<source type="image/webp" media="' . e($a['media']) . '" srcset="' . e(implode(', ', $as)) . '" sizes="' . e(ns_sizes_retina((string) ($a['sizes'] ?? ($o['sizes'] ?? '100vw')))) . '">';
         }
     }
     if ($set) {
-        $out .= '<source type="image/webp" srcset="' . e(implode(', ', $set)) . '" sizes="' . e($o['sizes'] ?? '100vw') . '">';
+        $out .= '<source type="image/webp" srcset="' . e(implode(', ', $set)) . '" sizes="' . e(ns_sizes_retina((string) ($o['sizes'] ?? '100vw'))) . '">';
     }
     // `src` de respaldo (solo lo usan navegadores sin <picture>): la variante más grande ≤1600 px, no la de 3200 (el width/height sí vienen de la mayor: fija la proporción)
     $srcW = 0;

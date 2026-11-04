@@ -45,7 +45,7 @@ $chaptersHtml = static function () use ($chapters, $chapters_label, $id): void {
   <?php if ($showChapters && $part === 'chapters') { $chaptersHtml(); } ?>
   <?php if ($showPlayer): ?>
   <div class="video__frame px">
-    <?= ns_img(['base' => $image['base'], 'alt' => $image['alt'] ?? '', 'sizes' => $sizes ?? '(min-width:1025px) 700px, calc(100vw - 72px)']) ?>
+    <?= ns_img(['base' => $image['base'], 'alt' => $image['alt'] ?? '', 'sizes' => $sizes ?? '(min-width:1025px) 700px, (min-width:641px) calc(100vw - 72px), calc(80vw - 32px)']) ?>
     <button type="button" class="video__play" data-video-play aria-label="Play the video"><?= ns_icon('play', 28) ?></button>
   </div>
   <?php if (($foot ?? true) !== false): ?>

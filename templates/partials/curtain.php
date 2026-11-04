@@ -15,6 +15,6 @@ if (empty($image['base'])) {
 <div class="curtain<?= !empty($short) ? ' curtain--short' : '' ?>" data-curtain>
   <div class="container curtain__pin">
     <figure class="curtain__frame"<?= !empty($image['pos']) ? ' style="--pos:' . e((string) $image['pos']) . '"' : '' ?>><?= ns_img(['base' => (string) $image['base'], 'alt' => (string) ($image['alt'] ?? ''),
-        'sizes' => $image['sizes'] ?? '(min-width:1281px) 1280px, (min-width:761px) calc(100vw - 96px), calc(100vw - 40px)']) ?></figure>
+        'sizes' => $image['sizes'] ?? '(min-width:1281px) 1280px, (min-width:761px) calc(100vw - 96px), (min-width:641px) calc(100vw - 40px), 65vw']) ?></figure>
   </div>
 </div>

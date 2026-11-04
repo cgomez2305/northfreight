@@ -12,8 +12,8 @@ $email = (string) cfg('email');
 $image = !empty($image['base']) ? $image : null;
 ?>
 <section class="cta on-dark<?= $image ? ' cta--photo' : '' ?>" aria-labelledby="cta-title">
-  <?php if ($image): $ctaM = (string) $image['base'] . '-m'; ?><div class="cta__bg" aria-hidden="true"><?= ns_img(['base' => (string) $image['base'], 'alt' => '', 'sizes' => '100vw',
-      'art' => is_file(NS_ROOT . '/assets/img/' . $ctaM . '-640.webp') ? [['media' => '(max-width:760px)', 'base' => $ctaM, 'sizes' => '100vw']] : []]) ?></div><?php endif; ?>
+  <?php if ($image): $ctaM = (string) $image['base'] . '-m'; ?><div class="cta__bg" aria-hidden="true"><?= ns_img(['base' => (string) $image['base'], 'alt' => '', 'sizes' => '(min-width:761px) 100vw, 65vw',
+      'art' => is_file(NS_ROOT . '/assets/img/' . $ctaM . '-640.webp') ? [['media' => '(max-width:760px)', 'base' => $ctaM, 'sizes' => '(min-width:641px) 100vw, 65vw']] : []]) ?></div><?php endif; ?>
   <div class="container cta__in">
     <div class="cta__main">
       <img class="cta__mark" src="<?= e(asset('img/isotype-white.svg')) ?>" alt="" width="56" height="56">
