@@ -38,7 +38,7 @@ $addr = org_address();   // NAP: solo se imprime si ADDRESS está definida en co
       <?php
       $links = [];
       foreach ($company as $i) { $links[$i[2]] = $i[0]; }
-      $order = [['/how-it-works/', 'How it works'], ['/our-desk/', 'Our desk']];
+      $order = [['/how-it-works/', 'How it works'], ['/our-desk/', 'Our desk'], ['/careers/', 'Careers']];
       foreach ($order as $o) { if (isset($links[$o[0]])) { echo '<a class="foot__link" href="' . e(url($o[0])) . '">' . e($o[1]) . '</a>'; } }
       foreach ($extra as $x) { echo '<a class="foot__link" href="' . e(url($x[1])) . '">' . e($x[0]) . '</a>'; }
       if (isset($links['/contact/'])) { echo '<a class="foot__link" href="' . e(url('/contact/')) . '">Contact</a>'; }

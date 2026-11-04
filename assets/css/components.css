@@ -84,6 +84,8 @@ a.btn--primary:is(:hover, :focus-visible)::after, a.btn--navy:is(:hover, :focus-
 .nav__link:focus-visible, .nav__trigger:focus-visible { outline-offset: 0; }
 .nav__link[aria-current="page"] { box-shadow: inset 0 0 0 1px var(--cyan-line); background: var(--cyan-tint); }
 .nav__links.has-pill .nav__link[aria-current="page"] { box-shadow: none; background: none; }
+.nav__link--xl { display: none; }   /* Careers: la píldora crece ~88 px y la isla de acciones (chip del desk) ya ocupa hasta 364 px: solo desde 1440 px caben las tres islas sin pisarse (medido de 1025 a 1920; en 1210 a 1264 y 1360 a 1424 se solapaban) */
+@media (min-width: 1440px) { .nav__link--xl { display: inline-flex; } }
 .nav__trigger .icon { stroke-width: 2.4; transition: transform var(--t-fast); }
 .nav__trigger[aria-expanded="true"] .icon { transform: rotate(180deg); }
 .nav__pill { position: absolute; left: 0; top: 50%; width: var(--pill-w, 0); height: 44px; margin-top: -22px; border-radius: var(--r-pill); background: var(--cyan-tint); border: 1px solid var(--cyan-line); box-sizing: border-box; transform: translateX(var(--pill-x, 0)); opacity: 0; pointer-events: none; transition: transform .22s cubic-bezier(.3, .7, .3, 1), width .22s cubic-bezier(.3, .7, .3, 1), opacity .18s; }

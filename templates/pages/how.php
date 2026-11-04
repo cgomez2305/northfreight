@@ -64,5 +64,6 @@ partial('trio', ['label' => 'Booked, tracked, documented', 'items' => [
       <li class="card <?= $i === 2 ? 'card--dark' : 'card--white' ?> sb-hw-item"><?= ns_star(18) ?><span class="head sb-hw-item__text"><?= e($t) ?></span></li>
       <?php endforeach; ?>
     </ul>
+    <?php if (route_is_live('/careers/owner-operators/')): ?><p><a class="card__link" href="<?= e(url('/careers/owner-operators/')) ?>">Ready to start? Partner with the desk <span class="arrow" aria-hidden="true">→</span></a></p><?php endif; ?>
   </div>
 </section>

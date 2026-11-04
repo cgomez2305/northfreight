@@ -4,6 +4,7 @@
  *   1. isla del logo · 2. isla de navegación (<nav>, solo ≥1025px, con la pastilla que se desliza entre ítems) · 3. isla de acciones
  *      (chip "On shift · ET hh:mm" si SHOW_ON_SHIFT, botón WhatsApp, menú móvil). ≤1024px quedan dos islas: logo y menú.
  * Params: route(array|null) para aria-current; wa(string|null) clave/mensaje de WhatsApp.
+ * El ítem Careers (.nav__link--xl) solo se muestra desde 1440px: la píldora central crece ~88px y con el chip del desk (isla de acciones de hasta 364px) por debajo se solaparían las islas (sigue en el pop-up móvil y en el footer).
  * Hooks JS: .nav__links (+ span.nav__pill) y sus button[data-mega-trigger="services|resources"][aria-controls][aria-expanded];
  *           button[data-menu-open] (aria-controls="mobile-menu"); span[data-t="et"] (reloj, lo rellena main.js).
  *           main.js pone .is-scrolled en el <header> pasados ~80px de scroll. Sin JS: cabecera completa y enlace #footer-nav (solo ≤1024px, scripting:none).
@@ -28,7 +29,8 @@ $hasResources = cfg('show_resources') && ($m['tools'] || $m['templates'] || $m['
       <button type="button" class="nav__trigger" data-mega-trigger="resources" aria-expanded="false" aria-controls="mega-resources">Resources <?= ns_icon('chevron', 12) ?></button>
       <?php endif; ?>
       <?php foreach ($m['main'] as $i): ?>
-      <a class="nav__link" href="<?= e(url($i[2])) ?>"<?= $cur === $i[2] ? ' aria-current="page"' : '' ?>><?= e($i[0]) ?></a>
+      <?php $isCur = $cur === $i[2] || ($i[2] === '/careers/' && str_starts_with($cur, '/careers/')); ?>
+      <a class="nav__link<?= $i[2] === '/careers/' ? ' nav__link--xl' : '' ?>" href="<?= e(url($i[2])) ?>"<?= $isCur ? ' aria-current="page"' : '' ?>><?= e($i[0]) ?></a>
       <?php endforeach; ?>
     </div>
   </nav>

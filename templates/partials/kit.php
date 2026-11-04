@@ -254,6 +254,7 @@ function ns_menu(): array
         'main' => [
             ['How it works', '', '/how-it-works/', null, null],
             ['Our desk', '', '/our-desk/', null, null],
+            ['Careers', '', '/careers/', null, null],
             ['Contact', '', '/contact/', null, null],
         ],
     ];

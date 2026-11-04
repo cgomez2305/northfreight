@@ -90,5 +90,6 @@ partial('trio', ['label' => 'Ways to reach the desk', 'cls' => 'sb-ct-trio', 'it
       </label>
       <button type="submit" class="btn btn--navy btn--block-m sb-ct-submit">Send message</button>
     </form>
+    <?php if (route_is_live('/careers/')): ?><p><a class="card__link" href="<?= e(url('/careers/')) ?>">Looking for driver jobs or an owner-operator partnership? See careers <span class="arrow" aria-hidden="true">→</span></a></p><?php endif; ?>
   </div>
 </section>

@@ -82,4 +82,13 @@ partial('summary', [
     ],
 ]); ?>
 
+<?php if (route_is_live('/careers/owner-operators/')): ?>
+<section class="section" aria-label="Careers">
+  <div class="container">
+    <?php partial('row-card', ['href' => url('/careers/owner-operators/'), 'title' => 'Looking for owner operator jobs?', 'text' => 'It is a dispatch partnership, not a job offer. See how partnering with the desk works and apply.', 'chips' => ['Careers', 'Apply'], 'h' => 'p',
+        'image' => ['base' => 'nf-setup-owner-operator', 'alt' => 'White semi truck parked alone in an empty lot at dusk, with bare trees behind']]); ?>
+  </div>
+</section>
+<?php endif; ?>
+
 <?php partial('faq', ['items' => route_faq_items($route), 'title' => 'Owner-operator dispatch questions', 'pre_cta' => true]); ?>
