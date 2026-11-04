@@ -22,10 +22,18 @@ No queda ninguna foto de stock (Pixabay ni del andamiaje inicial) ni ningún vid
 | `nf-lone-truck-rain-night-m-{480,658}` | 1914×822 | 4:5, 658×822, x 1202 a 1860 | CTA final en móvil |
 | `og-default.jpg` | `nf-white-truck-cyan-horizon` | 1200×630 (1,905:1) con velo, isotipo, "NORTHSTAR" y la frase de siempre | Imagen al compartir |
 
-## Slot de video
+## Videos (Night Freight)
 
-Los dos videos de stock (hero y banda del home) se borraron. El código sigue listo y no hace ninguna petición mientras no existan los archivos:
+Loops generados con IA por Carlos en HeyGen a partir de las imágenes de marca (originales 2688×1536, 15 s). Recodificados a 1920×1080, 24 fps, H.264 high, crf 26, `preset slow`, sin audio, `+faststart`, 13,6 s con fundido de costura de 1,4 s (el final enlaza con el principio). El póster de cada uno es su primer fotograma.
 
-- **Hero del home:** subir `assets/video/hero.mp4` (opcional `hero.webm`; 16:9, 1920×1080, sin audio, bucle). `ns_hero_video()` lo detecta, el HTML añade `data-hero-video` y un `<video>` vacío, y `main.js` lo monta tras `load` + idle solo en ≥1025 px, sin `prefers-reduced-motion` ni `saveData`, con fundido sobre la foto (`nf-highway-dusk-white-trucks`, que sigue siendo el LCP).
-- **Banda del home:** subir `assets/video/freight-yard.mp4` y pasar `'video' => 'freight-yard'` a `partial('video-band', …)` en `templates/pages/home.php` (la foto `image` sirve de póster).
+| Archivo | Origen en el Drive de Carlos | Peso | Uso |
+|---|---|---|---|
+| `assets/video/hero.mp4` | `IPrBXKo6_2x_upscaled.mp4` (V01, autopista al anochecer) | 2,0 MB | Hero del home (≥1025 px). La foto `nf-highway-dusk-white-trucks` es el póster y el LCP. |
+| `assets/video/freight-dock.mp4` | `irYhmStC_2x_upscaled.mp4` (V02, muelle nocturno) | 3,7 MB | Banda del home (≥1025 px). Póster: `nf-freight-dock-loop` (primer fotograma, 1920×1080). |
+| (no está en el repo) | `bTXhzswz_2x_upscaled.mp4` (V03, sala del desk) | 3,4 MB | Reserva: versión codificada lista, fuera del repo (no se publica sin uso). |
+
+El código solo pide el video en ≥1025 px, sin `prefers-reduced-motion` ni `saveData`, tras `load` + idle: en móvil, tablet y con movimiento reducido solo se descarga la foto.
+
+- **Hero del home:** `ns_hero_video('hero')` detecta `assets/video/hero.mp4` (opcional `hero.webm`); `main.js` lo monta con fundido sobre la foto.
+- **Banda del home:** `partial('video-band', [... 'video' => 'freight-dock'])` en `templates/pages/home.php`; sin el mp4 no se emite `<video>`.
 - **Video del equipo (Our desk y home):** sigue sin URL real; el play queda desactivado (`data-video-src`).

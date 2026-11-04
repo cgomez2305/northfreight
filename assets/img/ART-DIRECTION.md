@@ -315,7 +315,7 @@ Las 36 piezas están en `assets/img/nf-*` (WebP + JPG; masters fuera del repo). 
 | `nf-phone-chat-dashboard` · `nf-archive-aisle-cyan` · `nf-dispatch-room-maps` | Home: "Why a desk" (3:2 y `-tall` 4:5 en ≥1025 px) |
 | `nf-hands-map-keys` · `nf-signing-clipboard-night` · `nf-white-truck-rainy-highway` · `nf-trailer-rows-aerial` | Home: onboarding (3:2 y `-tall`) |
 | `nf-dispatch-room-wide-night` | Home: fachada del video "Meet the desk" |
-| `nf-trailer-dock-night-mist` | Home: banda de imagen (slot de video) |
+| `nf-freight-dock-loop` | Home: póster de la banda de video (primer fotograma de `assets/video/freight-dock.mp4`) |
 | `nf-dock-door-amber-night` | Home: foto del FAQ (4:5 nativo) |
 | `nf-cab-interior-cyan-night` | Hero de Owner-operators |
 | `nf-hitching-trailer-rain` · `nf-tablet-cab-night-yard` | Amazon Relay: hero y bloque "Why Relay needs a dedicated desk" |

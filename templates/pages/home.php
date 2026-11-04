@@ -24,7 +24,7 @@ $waTabs = [
 ];
 $waChips = ['Load booking', 'Load tracking', 'Back office'];
 
-// Slot de video del hero: hoy NO hay videos (assets/video/ no existe y no se pide nada). Para reactivarlo basta subir assets/video/hero.mp4 (opcional hero.webm): main.js lo monta tras load + idle solo en >=1025px sobre la foto. Ver ns_hero_video() en kit.php.
+// Video del hero: assets/video/hero.mp4 (bucle Night Freight 1080p, sin audio). main.js lo monta tras load + idle solo en >=1025px sobre la foto (que es su primer fotograma). Ver ns_hero_video() en kit.php.
 $heroVideo = ns_hero_video('hero');
 
 // Ancho útil de las fotos de las tarjetas de servicio. Carril ≥1025px: la foto manda por el ALTO de la tarjeta (≤540 px, cover) → ~540 × 1,5 = 810 px de foto, no el ancho de la tarjeta.
@@ -296,9 +296,10 @@ $figures = [
   </div>
 </section>
 
-<!-- Banda de imagen (slot de video): foto fija nf-trailer-dock-night-mist con la tarjeta de texto. Para reactivar el video: subir assets/video/freight-yard.mp4 y pasar 'video' => 'freight-yard' (solo >=1025px, tras load + idle). Sin H2 nuevo: el texto es un <p> con copy ya existente (evidencia) -->
+<!-- Banda de video: el póster es el primer fotograma de assets/video/freight-dock.mp4 (nf-freight-dock-loop), así que el paso foto a video es invisible; el video se monta solo >=1025px, tras load + idle y al acercarse. Sin H2 nuevo: el texto es un <p> con copy ya existente (evidencia) -->
 <?php partial('video-band', [
-    'image'  => ['base' => 'nf-trailer-dock-night-mist', 'alt' => 'White semi truck and dry van parked in front of a warehouse dock in the night mist'],
+    'image'  => ['base' => 'nf-freight-dock-loop', 'alt' => 'White semi truck pulling up to a lit warehouse loading dock on a wet night yard'],
+    'video'  => 'freight-dock',
     'text'   => 'Every load leaves a record: rate confirmation, check-call log, arrival timestamps, BOL and POD.',
 ]); ?>
 
