@@ -5,7 +5,8 @@
    Sistema común (se activa por clases que ya existen en los partials, nada por página):
      hero interno (.hero) · bandas y paneles (.section--surface, .section--dark, .home-relay, .cta, .footer, .co-band) · rejillas 3D por filas
      (.g2 a .g6, .blog-grid) · titulares de sección (.t-h2, .t-h2-s) · marcos de foto (.px) con parallax y escala · cifras (entradas una vez).
-   Solo home: hero fijado (también se desvanece el widget de WhatsApp y sigue el video de fondo opcional), carril horizontal fijado de servicios. Móvil (<1025 px): parallax de fotos, cifras y entrada de bandas, sin pines ni 3D.
+   Solo home: hero fijado (también se desvanece el widget de WhatsApp y sigue el video de fondo), carril horizontal fijado de servicios, sticky "Why a desk" (pin ~2,1 alturas: numeral, foto con crossfade e ítem activo),
+   líneas de progreso del onboarding (scaleX con scrub) y parallax de la banda de video. Móvil (<1025 px): parallax de fotos, líneas, cifras y entrada de bandas, sin pines ni 3D.
    Nunca se anima ningún input, select, textarea ni resultado aria-live. Estilos que necesitan: assets/css/motion.css. */
 (function () {
   'use strict';
@@ -115,6 +116,53 @@
     return function () { pin.removeEventListener('focusin', onFocus); };
   }
 
+  /* ---- Escena 2b: sticky "Why a desk" (home, >=1025px y >=700px de alto). La sección se fija ~2,1 alturas de ventana; mientras el scroll recorre la lista cambian
+     el numeral grande, la foto fija (crossfade: solo opacity y transform) y el ítem resaltado (el resto queda a opacidad .65: el texto sigue pasando AA, ver motion.css) ---- */
+  var DIM = 0.65;
+  function whyScene() {
+    var pin = one('.why__pin'), items = pin ? $('.why__item', pin) : [], nums = pin ? $('.why__nums > span', pin) : [];
+    var n = items.length;
+    if (!pin || n < 2 || nums.length !== n) return;
+    var photos = items.map(function (it) { return one('.why__photo', it); }), imgs = photos.map(function (f) { return f && one('img', f); });
+    if (photos.some(function (f) { return !f; })) return;
+    var total = n - 0.25, cur = -1;   // cada estado dura ~.5 de "tiempo" y la transición .5 centrada en cada frontera; el último estado se sostiene hasta el final
+    function setActive(i) {
+      if (i === cur) return; cur = i;
+      items.forEach(function (it, k) { it.classList.toggle('is-on', k === i); if (k === i) it.setAttribute('aria-current', 'true'); else it.removeAttribute('aria-current'); });
+    }
+    var tl = g.timeline({
+      defaults: { ease: 'none' },
+      scrollTrigger: { trigger: pin, start: 'top top', end: function () { return '+=' + Math.round(vh() * 2.1); }, pin: true, scrub: 0.5, anticipatePin: 1, invalidateOnRefresh: true,
+        onUpdate: function (self) { setActive(Math.min(n - 1, Math.floor(self.progress * total + 1e-6))); } }
+    });
+    items.forEach(function (it, i) { if (i) g.set(it, { opacity: DIM }); });
+    for (var i = 1; i < n; i++) {
+      var t = i - 0.25;
+      tl.fromTo(photos[i], { opacity: 0 }, { opacity: 1, duration: 0.5 }, t);    // la foto nueva entra por encima de la anterior
+      if (imgs[i]) tl.fromTo(imgs[i], { scale: 1.08 }, { scale: 1, duration: 0.5 }, t);
+      tl.fromTo(nums[i], { opacity: 0, yPercent: 24 }, { opacity: 1, yPercent: 0, duration: 0.5 }, t);
+      tl.to(nums[i - 1], { opacity: 0, yPercent: -24, duration: 0.5 }, t);
+      tl.to(items[i - 1], { opacity: DIM, duration: 0.5 }, t);
+      tl.fromTo(items[i], { opacity: DIM }, { opacity: 1, duration: 0.5 }, t);
+    }
+    tl.to({}, { duration: 0.001 }, total - 0.001);
+    setActive(0);
+
+    // Teclado: al enfocar el enlace de un ítem, el scroll lleva la sección al punto donde ese ítem y su foto están activos
+    function onFocus(e) {
+      var it = e.target && e.target.closest ? e.target.closest('.why__item') : null, k = items.indexOf(it);
+      if (k < 0 || k === cur) return;
+      var st = tl.scrollTrigger; if (!st) return;
+      window.scrollTo(0, Math.round(st.start + ((k === 0 ? 0.2 : k + 0.5) / total) * (st.end - st.start)));
+    }
+    pin.addEventListener('focusin', onFocus);
+    return function () {
+      pin.removeEventListener('focusin', onFocus);
+      items.forEach(function (it) { it.classList.remove('is-on'); it.removeAttribute('aria-current'); });
+      items[0].classList.add('is-on');
+    };
+  }
+
   /* ---- Escena 3: parallax de fotos. La imagen (120 % del alto del marco) se desplaza mientras el marco cruza la ventana ---- */
   function photoScene(rail) {
     $('.px').forEach(function (px) {
@@ -131,11 +179,11 @@
   // Posición vertical SIN transformaciones (suma de offsetTop): estable aunque el elemento o sus padres estén en su estado inicial de la escena
   function absTop(el) { var y = 0; while (el) { y += el.offsetTop; el = el.offsetParent; } return y; }
   // Agrupa elementos en filas visuales (misma posición vertical) para crear un trigger por fila y no uno por tarjeta
-  function rowsOf(els) {
+  function rowsOf(els, tol) {
     var out = [];
     els.forEach(function (el) {
       var t = absTop(el), r = out[out.length - 1];
-      if (r && Math.abs(r.top - t) < 24) r.els.push(el); else out.push({ top: t, els: [el] });
+      if (r && Math.abs(r.top - t) < (tol || 24)) r.els.push(el); else out.push({ top: t, els: [el] });
     });
     return out;
   }
@@ -208,7 +256,7 @@
   function headScene(rail) {
     var done = [];
     $('.t-h2, .t-h2-s').forEach(function (h) {
-      if (h.closest('.hero, .cta, .blog-feat, .home-cards') || (rail && h.closest('.home-services'))) return;
+      if (h.closest('.hero, .cta, .blog-feat, .home-cards') || (rail && h.closest('.home-services, .home-why'))) return;
       var par = h.parentElement, box = h.closest('.section-head') || (par && !par.matches('.container, .section, section, main') ? par : h);
       if (done.indexOf(box) >= 0 || box.querySelector('input, select, textarea')) return;
       done.push(box);
@@ -219,7 +267,7 @@
   /* ---- Marcos de foto grandes fuera de rejillas y héroes (video, medios de servicio, destacado del blog): entran escalando ---- */
   function mediaScene() {
     $('.px').forEach(function (px) {
-      if (px.closest('.hero, .card, .home-cards, .g2, .g3, .g4, .g5, .g6, .blog-grid, .faq__media, .cta') || !sees(px)) return;   // el CTA y la foto sticky del FAQ solo llevan el parallax interno
+      if (px.closest('.hero, .card, .home-cards, .home-steps, .g2, .g3, .g4, .g5, .g6, .blog-grid, .faq__media, .cta') || !sees(px)) return;   // el CTA, la foto sticky del FAQ y las fotos del onboarding solo llevan el parallax interno
       g.fromTo(px, { scale: 0.92 }, { scale: 1, ease: 'none', transformOrigin: '50% 50%',
         scrollTrigger: { trigger: px, start: 'top 95%', end: 'top 55%', scrub: true } });
     });
@@ -227,17 +275,43 @@
 
   /* ---- Cifras y pasos (home: onboarding y 4/1/0; How it works): entrada una vez, .7 s, escalonada por fila ---- */
   function enterScene() {
-    var list = [];
     $('.home-steps, .home-figures, .sb-hw-steps').forEach(function (ul) {
-      list.push.apply(list, A.slice.call(ul.children).filter(function (el) { return sees(el) && el.getBoundingClientRect().top > vh() * 0.9; }));
-    });
-    rowsOf(list).forEach(function (row) {
-      var par = row.els[0].parentElement;
-      var start = function () { return 'top+=' + Math.max(0, absTop(row.els[0]) - absTop(par)) + ' 88%'; };
-      g.from(row.els, {
-        y: 40, opacity: 0, duration: 0.7, ease: 'power3.out', stagger: 0.08, clearProps: 'opacity,transform',
-        scrollTrigger: { trigger: par, start: start, once: true, invalidateOnRefresh: true }
+      var list = A.slice.call(ul.children).filter(function (el) { return sees(el) && el.getBoundingClientRect().top > vh() * 0.9; });
+      rowsOf(list, ul.matches('.home-steps') ? 80 : 24).forEach(function (row) {   // las columnas del onboarding llevan desfase vertical (0/20/40/60 px) y cuentan como una fila
+        var par = row.els[0].parentElement;
+        var start = function () { return 'top+=' + Math.max(0, absTop(row.els[0]) - absTop(par)) + ' 88%'; };
+        g.from(row.els, {
+          y: 40, opacity: 0, duration: 0.7, ease: 'power3.out', stagger: 0.08, clearProps: 'opacity,transform',
+          scrollTrigger: { trigger: par, start: start, once: true, invalidateOnRefresh: true }
+        });
       });
+    });
+  }
+
+  /* ---- Onboarding (home): la línea cian de cada columna se rellena (scaleX 0 a 1, scrub) escalonada de izquierda a derecha; en móvil, una por paso ---- */
+  function lineScene() {
+    var ol = one('.home-steps');
+    if (!ol) return;
+    var cols = $('.home-step', ol).filter(sees);
+    rowsOf(cols, 80).forEach(function (row) {
+      var off = function () { return Math.max(0, absTop(row.els[0]) - absTop(ol)); };
+      var tl = g.timeline({
+        defaults: { ease: 'none' },
+        scrollTrigger: { trigger: ol, start: function () { return 'top+=' + off() + ' 88%'; }, end: function () { return 'top+=' + off() + ' 38%'; }, scrub: 0.5, invalidateOnRefresh: true }
+      });
+      row.els.forEach(function (li, i) {
+        var bar = one('.home-step__line i', li);
+        if (bar) tl.fromTo(bar, { scaleX: 0 }, { scaleX: 1, duration: 0.6 }, i * 0.2);
+      });
+    });
+  }
+
+  /* ---- Banda de video (home): la capa con póster y video se desplaza ±10 % del marco mientras la banda cruza la ventana; no toca el bucle ---- */
+  function vbandScene() {
+    $('.vband__media').forEach(function (m) {
+      var layer = one('.vband__layer', m);
+      if (!layer || !sees(m)) return;
+      g.fromTo(layer, { yPercent: -7 }, { yPercent: 7, ease: 'none', scrollTrigger: { trigger: m, start: 'top bottom', end: 'bottom top', scrub: true } });
     });
   }
 
@@ -247,8 +321,12 @@
       heroScene();
       var off = c.rail ? railScene() : null;
       if (off) undo.push(off);
+      var offWhy = c.rail ? whyScene() : null;
+      if (offWhy) undo.push(offWhy);
     }
     photoScene(!!c.rail);
+    lineScene();
+    if (c.desk) vbandScene();
     if (c.desk) {
       heroInt();
       undo.push(gridScene(!!c.rail));

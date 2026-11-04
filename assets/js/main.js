@@ -94,31 +94,40 @@
     sync();
   })();
 
-  /* ---- Video de fondo opcional del hero (assets/video/hero.mp4|webm, ver ns_hero_video()). El atributo data-hero-video solo existe si los archivos están.
-     Se monta tras `load` + idle, solo en >=1025px, sin prefers-reduced-motion ni saveData; si falla o no carga, queda la foto. ---- */
+  /* ---- Videos de fondo (hero del home y banda de video). Los <video> viajan vacíos en el HTML (preload none, sin src): aquí se les pone la fuente.
+     Solo en >=1025px, sin prefers-reduced-motion ni saveData, tras `load` + idle (así la foto del hero sigue siendo el LCP). El hero arranca ya; la banda
+     cuando se acerca a la pantalla. Ambos se pausan al salir de ella. Si falla o no carga, queda la foto / el póster. Fundido de opacidad vía .has-video. ---- */
   (function () {
-    var bg = d.querySelector('[data-hero-video]');
-    if (!bg || !window.matchMedia) return;
-    function start() {
+    var hero = d.querySelector('[data-hero-video]'), band = d.querySelector('[data-vband]');
+    if ((!hero && !band) || !window.matchMedia) return;
+    function allowed() {
       var conn = navigator.connection || {};
-      if (conn.saveData || window.matchMedia('(prefers-reduced-motion: reduce)').matches || !window.matchMedia('(min-width: 1025px)').matches) return;
-      var v = d.createElement('video'), webm = bg.getAttribute('data-webm'), mp4 = bg.getAttribute('data-mp4');
-      if (!v.canPlayType) return;
-      v.className = 'hero__video';
-      v.muted = true; v.defaultMuted = true; v.loop = true; v.playsInline = true; v.preload = 'none';
-      v.setAttribute('muted', ''); v.setAttribute('playsinline', ''); v.setAttribute('aria-hidden', 'true'); v.tabIndex = -1;
-      v.setAttribute('poster', bg.getAttribute('data-poster') || '');
+      return !(conn.saveData || window.matchMedia('(prefers-reduced-motion: reduce)').matches || !window.matchMedia('(min-width: 1025px)').matches);
+    }
+    // wrap: elemento que recibe .has-video (y lo observa IntersectionObserver); v: <video> ya en el HTML; src: mp4; webm: opcional
+    function mount(wrap, v, mp4, webm, lazy) {
+      if (!v || !v.canPlayType || v.firstChild) return;
       [[webm, 'video/webm'], [mp4, 'video/mp4']].forEach(function (s) {
         if (!s[0] || !v.canPlayType(s[1])) return;
         var el = d.createElement('source'); el.src = s[0]; el.type = s[1]; v.appendChild(el);
       });
       if (!v.firstChild) return;
-      var done = false;
-      function drop() { if (done) return; done = true; bg.classList.remove('has-video'); if (v.parentNode) v.parentNode.removeChild(v); }
+      var done = false, on = false;
+      function drop() { if (done) return; done = true; wrap.classList.remove('has-video'); while (v.firstChild) v.removeChild(v.firstChild); try { v.load(); } catch (e) { /* nada */ } }
+      function play() { try { var p = v.play(); if (p && p.catch) p.catch(drop); } catch (e) { drop(); } }
+      v.muted = true; v.defaultMuted = true; v.loop = true; v.playsInline = true;
       v.addEventListener('error', drop, true);
-      v.addEventListener('playing', function () { if (!done) bg.classList.add('has-video'); });
-      bg.appendChild(v);
-      try { var p = v.play(); if (p && p.catch) p.catch(drop); } catch (e) { drop(); }
+      v.addEventListener('playing', function () { if (!done) wrap.classList.add('has-video'); });
+      try { v.load(); } catch (e) { drop(); return; }
+      function watch(vis) { if (done || vis === on) return; on = vis; if (vis) play(); else v.pause(); }
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver(function (es) { watch(es[es.length - 1].isIntersecting); }, { rootMargin: lazy ? '300px 0px' : '0px' }).observe(wrap);
+      } else if (!lazy) { on = true; play(); }
+    }
+    function start() {
+      if (!allowed()) return;
+      if (hero) mount(hero, hero.querySelector('video'), hero.getAttribute('data-mp4'), hero.getAttribute('data-webm'), false);
+      if (band) mount(band.parentNode, band.querySelector('video'), band.getAttribute('data-mp4'), '', true);
     }
     function later() { if (window.requestIdleCallback) window.requestIdleCallback(start, { timeout: 2500 }); else setTimeout(start, 400); }
     if (d.readyState === 'complete') later(); else window.addEventListener('load', later);

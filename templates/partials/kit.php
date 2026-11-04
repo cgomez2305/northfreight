@@ -11,11 +11,21 @@ define('NS_KIT_LOADED', true);
 
 /**
  * Texto con marcas: escapa con phtext() ({{ph:X}} => ph()) y convierte
- * {hl}…{/hl} => <span class="hl">…</span> y {br} => <br>. Nada de HTML crudo.
+ * {hl}…{/hl} => <span class="hl">…</span>, {br} => <br> y {pill:base} => pastilla de foto decorativa dentro del titular
+ * (<span class="hpill" aria-hidden="true">, alt vacío: no cambia el título accesible; solo si assets/img/<base>-640.webp existe). Nada de HTML crudo.
  */
 function ns_rich(string $s): string
 {
-    return str_replace(['{hl}', '{/hl}', '{br}'], ['<span class="hl">', '</span>', '<br>'], phtext($s));
+    $out = str_replace(['{hl}', '{/hl}', '{br}'], ['<span class="hl">', '</span>', '<br>'], phtext($s));
+    if (strpos($out, '{pill:') !== false) {
+        $out = preg_replace_callback('/\{pill:([a-z0-9-]+)\}/', static function (array $m): string {
+            if (!is_file(NS_ROOT . '/assets/img/' . $m[1] . '-640.webp')) {
+                return '';
+            }
+            return '<span class="hpill" aria-hidden="true">' . ns_img(['base' => $m[1], 'alt' => '', 'widths' => [640], 'sizes' => '160px']) . '</span>';
+        }, $out);
+    }
+    return $out;
 }
 
 /** Estrella NorthStar (§5.5). Color por CSS (.star => currentColor; por defecto cian). */
@@ -67,7 +77,7 @@ function ns_img(array $o): string
         return '';
     }
     $dir = NS_ROOT . '/assets/img/';
-    $widths = $o['widths'] ?? [490, 640, 1024, 1600];
+    $widths = $o['widths'] ?? [490, 640, 1024, 1280, 1600];   // se ignoran los que no existan en disco
     $set = [];
     foreach ($widths as $w) {
         if (is_file($dir . "$base-$w.webp")) {
@@ -94,17 +104,23 @@ function ns_img(array $o): string
 }
 
 /**
- * Video de fondo OPCIONAL del hero del home: devuelve ['mp4'=>url,'webm'=>url] solo con los archivos que existan en assets/video/{nombre}.{mp4,webm}
- * (vacío si no hay ninguno: queda la foto). main.js lo monta tras `load` + idle, solo en >=1025px, sin prefers-reduced-motion ni saveData; si falla, la foto sigue.
- * Para activarlo basta subir assets/video/hero.mp4 (y opcionalmente hero.webm), muted, sin audio, ~4 a 8 s en bucle, <= 3 MB.
+ * Video de fondo del hero del home: devuelve ['mp4'=>url,'webm'=>url,'poster'=>url] solo con los archivos que existan en assets/video/{nombre}.{mp4,webm}
+ * y {nombre}-poster.webp (vacío si no hay mp4/webm: queda la foto). main.js lo monta tras `load` + idle, solo en >=1025px, sin prefers-reduced-motion ni saveData;
+ * si falla, la foto sigue. Activo con assets/video/hero.mp4 (muted, sin audio, bucle con fundido, 1,7 MB); hero.webm es opcional.
  */
 function ns_hero_video(string $name = 'hero'): array
 {
     $out = [];
+    if (preg_match('/^[a-z0-9-]+$/', $name) !== 1) {
+        return $out;
+    }
     foreach (['webm', 'mp4'] as $ext) {
-        if (preg_match('/^[a-z0-9-]+$/', $name) === 1 && is_file(NS_ROOT . "/assets/video/$name.$ext")) {
+        if (is_file(NS_ROOT . "/assets/video/$name.$ext")) {
             $out[$ext] = asset("video/$name.$ext");
         }
+    }
+    if ($out && is_file(NS_ROOT . "/assets/video/$name-poster.webp")) {
+        $out['poster'] = asset("video/$name-poster.webp");
     }
     return $out;
 }

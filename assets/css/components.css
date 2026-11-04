@@ -269,6 +269,7 @@ a.card:hover .card__icon, .card--hover:hover .card__icon { background: var(--cya
 .cta--photo .cta__text { margin-inline: auto; }
 .cta--photo .cta__actions { flex: none; width: 100%; max-width: none; flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: stretch; }
 .cta--photo .cta__actions .btn { flex: 0 1 400px; }
+.cta--photo .btn--mail { background: var(--glass-strong); }   /* sobre la foto el botón de correo lleva fondo propio: la etiqueta mono (text-3) mantiene AA también sobre los reflejos */
 @media (max-width: 640px) { .cta--photo .cta__actions .btn { flex-basis: 100%; } }
 
 /* ---- Footer: panel grande redondeado ---- */

@@ -34,7 +34,7 @@ $chips = ['all' => 'All', 'dispatch' => 'Dispatch', 'relay' => 'Amazon Relay', '
   <div class="container">
     <a class="blog-feat" href="<?= e(url($featured['path'])) ?>">
       <span class="blog-feat__media px">
-        <?= ns_img(['base' => 'white-semi-mountain-highway-crop', 'alt' => 'White semi truck with a dry van trailer on a mountain highway', 'sizes' => '(min-width:1025px) 600px, 100vw']) ?>
+        <?= ns_img(['base' => 'semi-truck-snowy-mountains', 'alt' => 'Semi truck with a dry van trailer on a highway below snow-capped mountains', 'sizes' => '(min-width:1025px) 600px, 100vw']) ?>
       </span>
       <span class="blog-feat__body">
         <span class="blog-feat__meta">

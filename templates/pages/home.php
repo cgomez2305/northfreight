@@ -1,7 +1,7 @@
 <?php
 /**
  * Home (/) — replica de la maqueta index.html. Disponibles: $route, $cfg y los helpers.
- * Orden: hero (con widget "Start in WhatsApp" y soporte opcional de video de fondo) · 01 Services · 02 Amazon Relay · 03 Onboarding · 04 Team + video · 05 Evidence · 06 FAQ (+ CTA del layout).
+ * Orden: hero (video de fondo + widget "Start in WhatsApp") · 01 Services · 02 Amazon Relay · 03 Why a desk (sticky con crossfade) · 04 Onboarding (fotos y líneas de progreso) · 05 Team + video · 06 Evidence · banda de video · 07 FAQ (+ CTA del layout).
  * El <h1> es el eyebrow pequeño (como la maqueta); el titular grande es un <p>. Estilos en assets/css/pages/home.css.
  */
 require_once NS_ROOT . '/templates/partials/kit.php';
@@ -24,7 +24,7 @@ $waTabs = [
 ];
 $waChips = ['Load booking', 'Load tracking', 'Back office'];
 
-// Video de fondo opcional del hero (assets/video/hero.mp4 y hero.webm). Hoy no existen: queda la foto. Ver ns_hero_video() en kit.php.
+// Video de fondo del hero (assets/video/hero.mp4, opcional hero.webm). main.js lo activa tras load + idle solo en >=1025px; sin él queda la foto. Ver ns_hero_video() en kit.php.
 $heroVideo = ns_hero_video('hero');
 
 // Tamaño de las fotos de las tarjetas de servicio (carril ≥1025px: ancho de tarjeta clamp(320px,40vw,600px) + 18 % de parallax)
@@ -52,11 +52,26 @@ $relay = [
     ['D · Disputes', 'Disputes with evidence', 'Every claim filed with timestamps, photos and documents attached.'],
 ];
 
+// 03 Why a desk: tres razones ya afirmadas en el sitio (How it works, Our desk, Evidence). Cada una enlaza a la página donde se explica (son los elementos enfocables del sticky).
+$why = [
+    ['01', 'One channel for every update', 'Updates you can follow, in one channel: WhatsApp, where you already work.',
+     'headset-agent-office', '/load-tracking/', 'Load tracking'],
+    ['02', 'A record of every load', 'Arrival timestamps and photos kept on file, with the BOL and POD filed per load.',
+     'archive-shelves-documents', '/trucking-back-office/', 'Trucking back office'],
+    ['03', 'A team, not a single dispatcher', 'The same desk books, tracks and documents every load, as one team.',
+     'dispatch-desk-headset-monitors', '/how-it-works/', 'How it works'],
+];
+
+// 04 Onboarding: foto decorativa por paso (alt descriptivo corto)
 $steps = [
-    ['01', 'We learn your operation', 'Trucks, equipment, lanes, drivers and the accounts you already run, including Amazon Relay.'],
-    ['02', 'We define scope & contacts', 'Who approves loads, how we report, and which tasks the desk owns from day one.'],
-    ['03', 'We run the day-to-day', 'Booking, tracking and documenting every load, with updates where you already work: WhatsApp.'],
-    ['04', 'We review & improve', 'Regular reviews of lanes, rates and incidents to keep your trucks earning.'],
+    ['01', 'We learn your operation', 'Trucks, equipment, lanes, drivers and the accounts you already run, including Amazon Relay.',
+     ['base' => 'team-reviewing-documents', 'alt' => 'Two people going over a printed document at a desk']],
+    ['02', 'We define scope & contacts', 'Who approves loads, how we report, and which tasks the desk owns from day one.',
+     ['base' => 'clipboard-signing-report', 'alt' => 'Hand filling in a report on a clipboard']],
+    ['03', 'We run the day-to-day', 'Booking, tracking and documenting every load, with updates where you already work: WhatsApp.',
+     ['base' => 'truck-night-mountain-road', 'alt' => 'Semi truck driving a mountain road at night']],
+    ['04', 'We review & improve', 'Regular reviews of lanes, rates and incidents to keep your trucks earning.',
+     ['base' => 'aerial-trucks-parking-lot', 'alt' => 'Aerial view of semi trailers lined up in a truck lot']],
 ];
 
 $chapters = [
@@ -82,9 +97,9 @@ $figures = [
     ['0', 'forms before you talk to us'],
 ];
 ?>
-<!-- HERO: foto protagonista (degradado solo desde la izquierda y abajo) + titular + widget de WhatsApp -->
+<!-- HERO: foto protagonista (degradado solo desde la izquierda y abajo) + titular + widget de WhatsApp. El <video> va vacío y sin descarga (preload none, sin src): main.js le pone la fuente tras load + idle en >=1025px y entra con un fundido sobre la foto (que sigue siendo el LCP) -->
 <section class="hero hero--home" id="top">
-  <div class="hero__bg"<?= $heroVideo ? ' data-hero-video data-mp4="' . e($heroVideo['mp4'] ?? '') . '" data-webm="' . e($heroVideo['webm'] ?? '') . '" data-poster="' . e(asset('img/truck-oncoming-dusk-mirror-1600.webp')) . '"' : '' ?>><?= ns_img(['base' => 'truck-oncoming-dusk-mirror', 'alt' => 'Semi truck approaching at dusk, seen from a car’s side mirror', 'eager' => true, 'sizes' => '100vw']) ?></div>
+  <div class="hero__bg"<?= $heroVideo ? ' data-hero-video data-mp4="' . e($heroVideo['mp4'] ?? '') . '" data-webm="' . e($heroVideo['webm'] ?? '') . '" data-poster="' . e($heroVideo['poster'] ?? '') . '"' : '' ?>><?= ns_img(['base' => 'truck-oncoming-dusk-mirror', 'alt' => 'Semi truck approaching at dusk, seen from a car’s side mirror', 'eager' => true, 'sizes' => '100vw']) ?><?php if ($heroVideo): ?><video class="hero__video" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video><?php endif; ?></div>
   <div class="container hero__in">
     <div class="hero__main">
       <h1 class="eyebrow home-kicker"><?= e($route['h1']) ?></h1>
@@ -139,7 +154,7 @@ $figures = [
 <section class="section home-services" id="services" aria-labelledby="services-title">
   <div class="home-services__pin">
     <div class="container">
-      <?php partial('section-head', ['eyebrow' => '01 · What we manage', 'title' => 'Three fronts.{br}One dispatch desk.', 'id' => 'services-title', 'split' => true,
+      <?php partial('section-head', ['eyebrow' => '01 · What we manage', 'title' => 'Three fronts.{pill:semi-truck-snowy-mountains}{br}One dispatch desk.{pill:white-semi-truck-front}', 'id' => 'services-title', 'split' => true,
           'lead' => 'Most truck dispatch companies stop at the booking. We stay on the load until the money is in. The same team that books it tracks it and closes it out.']); ?>
     </div>
     <div class="container home-rail">
@@ -171,13 +186,43 @@ $figures = [
   </div>
 </section>
 
-<!-- 03 ONBOARDING -->
+<!-- 03 WHY A DESK: con html.js-motion y >=1025px (alto >=700px) motion.js fija la sección y cambia el numeral, la foto (crossfade) y el ítem activo según el scroll.
+     Sin JS, en móvil o con movimiento reducido: tres tarjetas apiladas, foto arriba y texto debajo. Cada foto vive una sola vez en el DOM, dentro de su ítem. -->
+<section class="section home-why" aria-labelledby="why-title">
+  <div class="why__pin">
+    <div class="container">
+      <?php partial('section-head', ['eyebrow' => '03 · Why a desk', 'title' => 'A team, not a single dispatcher', 'id' => 'why-title']); ?>
+    </div>
+    <div class="container why">
+      <div class="why__nums" aria-hidden="true">
+        <?php foreach ($why as [$n]): ?><span><?= e($n) ?></span><?php endforeach; ?>
+      </div>
+      <ol class="why__list">
+        <?php foreach ($why as $i => [$n, $title, $text, $photo, $path, $linkLabel]): ?>
+        <li class="why__item<?= $i === 0 ? ' is-on' : '' ?>">
+          <figure class="why__photo"><?= ns_img(['base' => $photo, 'alt' => '', 'sizes' => '(min-width:1025px) 440px, (min-width:641px) 33vw, 100vw']) ?></figure>
+          <div class="why__body">
+            <span class="why__n t-meta" aria-hidden="true"><?= e($n) ?></span>
+            <h3 class="head t-h3"><?= e($title) ?></h3>
+            <p class="t-card"><?= e($text) ?></p>
+            <?php if (route_is_live($path)): ?><a class="why__link" href="<?= e(url($path)) ?>"><?= e($linkLabel) ?> <span class="arrow" aria-hidden="true">→</span></a><?php endif; ?>
+          </div>
+        </li>
+        <?php endforeach; ?>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- 04 ONBOARDING: columnas con foto, línea fina arriba y línea cian que se rellena con el scroll (motion.js); desfase vertical escalonado en escritorio -->
 <section class="section home-onboarding" aria-labelledby="onboarding-title">
   <div class="container stack">
-    <?php partial('section-head', ['eyebrow' => '03 · Onboarding', 'title' => 'How we plug into your operation.', 'id' => 'onboarding-title']); ?>
+    <?php partial('section-head', ['eyebrow' => '04 · Onboarding', 'title' => 'How we plug into your operation.', 'id' => 'onboarding-title']); ?>
     <ol class="home-steps">
-      <?php foreach ($steps as [$n, $title, $text]): ?>
+      <?php foreach ($steps as [$n, $title, $text, $photo]): ?>
       <li class="home-step">
+        <span class="home-step__line" aria-hidden="true"><i></i></span>
+        <figure class="home-step__photo px"><?= ns_img($photo + ['sizes' => '(min-width:1025px) 300px, (min-width:641px) 50vw, 100vw']) ?></figure>
         <span class="home-step__n" aria-hidden="true"><?= e($n) ?></span>
         <h3 class="head t-h3"><span class="sr-only">Step <?= e($n) ?>: </span><?= e($title) ?></h3>
         <p class="t-card"><?= e($text) ?></p>
@@ -196,7 +241,7 @@ $figures = [
 <section class="section section--surface home-team" aria-labelledby="team-title">
   <div class="container split">
     <div class="home-team__text">
-      <span class="t-eyebrow">04 · The desk behind the load</span>
+      <span class="t-eyebrow">05 · The desk behind the load</span>
       <h2 class="t-h2" id="team-title">Built by dispatchers.<br><span class="hl">Run as a team.</span></h2>
       <p class="t-body c-slate">Behind every trip there are people coordinating information, decisions and follow-up. Meet the team, hear how we work, and jump straight to the topic you care about.</p>
       <?php partial('video', ['part' => 'chapters', 'id' => 'desk', 'chapters' => $chapters, 'chapters_label' => 'Jump to a chapter']); ?>
@@ -213,7 +258,7 @@ $figures = [
 <section class="section" aria-labelledby="evidence-title">
   <div class="container split home-evidence">
     <div class="home-evidence__text">
-      <?php partial('section-head', ['eyebrow' => '05 · Proof, not promises', 'title' => 'Incidents are handled with evidence.', 'id' => 'evidence-title',
+      <?php partial('section-head', ['eyebrow' => '06 · Proof, not promises', 'title' => 'Incidents are handled with evidence.', 'id' => 'evidence-title',
           'lead' => 'When a broker questions detention, a lumper fee or a late arrival, the answer is already on file. Here is what our desk keeps for every load.']); ?>
       <ul class="home-docs" aria-label="Documents the desk keeps for every load">
         <?php foreach ($docs as $i => $d): ?>
@@ -244,6 +289,13 @@ $figures = [
   </div>
 </section>
 
-<!-- 06 FAQ -->
-<?php partial('faq', ['items' => route_faq_items($route), 'eyebrow' => '06 · FAQ', 'title' => 'Truck dispatch questions carriers ask us.', 'pre_cta' => true,
-    'image' => ['base' => 'white-semi-mountain-highway-sunrise', 'alt' => 'White semi truck pulling a dry van trailer on a mountain highway']]); ?>
+<!-- Banda de video: patio de carga (solo >=1025px; en móvil, movimiento reducido o saveData queda el póster). Sin H2 nuevo: el texto es un <p> con copy ya existente (evidencia) -->
+<?php partial('video-band', [
+    'video'  => 'freight-yard',
+    'text'   => 'Every load leaves a record: rate confirmation, check-call log, arrival timestamps, BOL and POD.',
+    'alt'    => 'Aerial view of a freight yard with semi trailers',
+]); ?>
+
+<!-- 07 FAQ -->
+<?php partial('faq', ['items' => route_faq_items($route), 'eyebrow' => '07 · FAQ', 'title' => 'Truck dispatch questions carriers ask us.', 'pre_cta' => true,
+    'image' => ['base' => 'warehouse-sunlight-dock', 'alt' => 'Sunlight streaming into a warehouse loading bay']]); ?>

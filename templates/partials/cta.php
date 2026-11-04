@@ -3,7 +3,7 @@
  * CTA final "Let's talk about your operation." en un panel redondeado.
  * El bloque anterior se separa con .pre-cta (el layout marca <main class="has-cta"> y lo aplica a la última .section).
  * Params: wa(string|null clave/mensaje), title(string con marcas), text(string),
- *         image(array|null, opcional: ['base'=>'dry-van-trailer-highway-dusk','alt'=>''] foto de fondo DECORATIVA, oscurecida con --cta-veil;
+ *         image(array|null, opcional: ['base'=>'truck-night-rain-headlights','alt'=>''] foto de fondo DECORATIVA, oscurecida con --cta-veil;
  *         con foto el contenido va centrado. Sin image queda el panel liso de siempre).
  */
 require_once __DIR__ . '/kit.php';

@@ -26,7 +26,7 @@ partial('hero', [
     'ctas'  => [
         ['label' => 'Ask about Relay dispatch', 'href' => wa($route['wa']), 'wa' => true, 'arrow' => true],
     ],
-    'image' => ['base' => 'white-semi-mountain-highway-crop', 'alt' => 'White semi truck with a dry van trailer on a mountain highway', 'small' => true, 'sizes' => '(min-width:1025px) 490px, 100vw'],
+    'image' => ['base' => 'white-semi-truck-front', 'alt' => 'White semi truck with a dry van trailer pulling out of a lot'],
 ]);
 
 // Resumen "In short" (SEO/GEO): editable aquí. Solo información que ya está en el copy de esta página; sin cifras, tarifas ni promesas nuevas.

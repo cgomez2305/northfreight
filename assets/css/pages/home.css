@@ -14,9 +14,10 @@
 .hero--home .hero__lead { max-width: 600px; color: var(--text); }
 .hero--home .tags { justify-content: flex-start; color: var(--text); }
 .hero--home .tag { background: var(--overlay); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
-/* Video de fondo opcional (main.js lo monta si existen assets/video/hero.mp4|webm): misma posición y escala que la foto; entra con un fundido de opacidad */
+/* Video de fondo (el <video> viaja vacío en el HTML; main.js le pone assets/video/hero.mp4 tras load + idle, solo >=1025px): misma posición y escala que la foto; entra con un fundido de opacidad */
 .hero__video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 62%; display: block; transform: scale(1.12); transform-origin: 0 62%; opacity: 0; transition: opacity .6s ease; }
 .hero__bg.has-video .hero__video { opacity: 1; }
+@media (max-width: 1024px) { .hero__video { display: none; } }
 
 /* ---- Widget "Start in WhatsApp": cristal con borde fino, abajo a la derecha del hero (en <1025px va en el flujo, debajo de los CTAs) ---- */
 .hero-wa { flex: 1 1 100%; max-width: 520px; min-width: 0; display: flex; flex-direction: column; gap: 14px; padding: 20px; background: var(--glass-strong); border: 1px solid var(--hairline-strong); border-radius: var(--r-card); }
@@ -76,24 +77,29 @@
 .home-rcard--accent .card__tag, .home-rcard--accent .card__title, .home-rcard--accent .card__text { color: var(--navy-deep); }
 @media (min-width: 641px) { .home-relay__grid > :nth-child(even) { margin-top: 36px; } }
 
-/* ---- 03 Onboarding: pasos en fila con número enorme, línea fina arriba y divisores verticales ---- */
+/* ---- 04 Onboarding: columnas con foto 4:5 (radio 24, .px), línea fina arriba con la línea cian que se rellena con el scroll (motion.js, scaleX 0 a 1 escalonado) y desfase vertical 0/20/40/60 px en escritorio ---- */
 .home-onboarding { --head-gap: 64px; }
-.home-steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--hairline-strong); }
-.home-step { display: flex; flex-direction: column; gap: 12px; padding: 28px clamp(16px, 2vw, 32px) 8px; }
-.home-step:first-child { padding-left: 0; }
-.home-step + .home-step { border-left: 1px solid var(--hairline); }
+.home-steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 40px clamp(20px, 2.2vw, 32px); align-items: start; }
+.home-step { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.home-step__line { position: relative; display: block; height: 1px; margin-bottom: 8px; background: var(--hairline-strong); }
+.home-step__line i { position: absolute; left: 0; top: -1px; width: 100%; height: 3px; border-radius: var(--r-pill); background: var(--cyan); transform-origin: 0 50%; }   /* visible por defecto (sin JS); motion.js la parte de scaleX(0) */
+.home-step__photo { margin: 0 0 8px; aspect-ratio: 4 / 5; border-radius: var(--r-card); background: var(--panel); }
+.home-step__photo picture { display: block; width: 100%; height: 100%; }
+.home-step__photo img { display: block; width: 100%; object-fit: cover; }
 .home-step__n { font-family: var(--font-head); font-weight: 900; font-size: clamp(72px, 8vw, 104px); line-height: .85; letter-spacing: -.03em; color: var(--cyan); }
-.home-step .t-h3 { margin-top: 12px; line-height: 1.02; color: var(--text); }
+.home-step .t-h3 { margin-top: 8px; line-height: 1.02; color: var(--text); }
 .home-step .t-card { color: var(--text-2); }
+@media (min-width: 1025px) {
+  .home-step:nth-child(2) { margin-top: 20px; }
+  .home-step:nth-child(3) { margin-top: 40px; }
+  .home-step:nth-child(4) { margin-top: 60px; }
+}
 @media (max-width: 1024px) {
   .home-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .home-step:nth-child(odd) { padding-left: 0; border-left: 0; }
-  .home-step:nth-child(n+3) { border-top: 1px solid var(--hairline); margin-top: 24px; }
+  .home-step__photo { aspect-ratio: 16 / 10; }
 }
 @media (max-width: 640px) {
-  .home-steps { grid-template-columns: minmax(0, 1fr); }
-  .home-step, .home-step + .home-step { padding: 28px 0 8px; border-left: 0; }
-  .home-step + .home-step { border-top: 1px solid var(--hairline); margin-top: 20px; }
+  .home-steps { grid-template-columns: minmax(0, 1fr); gap: 48px; }
 }
 /* Cifras ya afirmadas en el sitio */
 .home-figures { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: clamp(24px, 4vw, 56px); }
@@ -145,6 +151,45 @@
 .dlog__docs { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 0; padding: 18px 22px 22px; border-top: 1px solid var(--hairline); }
 .dlog__docs li { display: inline-flex; align-items: center; gap: 7px; padding: 6px 13px; border: 1px solid var(--hairline-strong); border-radius: var(--r-pill); font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--text-2); }
 .dlog__docs .icon { color: var(--cyan); stroke-width: 2.6; }
+
+/* ---- 03 Why a desk: tres tarjetas apiladas (foto arriba, texto debajo); con html.js-motion y >=1025px (alto >=700px) se convierte en el sticky de motion.css ---- */
+.home-why { --head-gap: 48px; }
+.why__pin { display: flex; flex-direction: column; gap: var(--head-gap); }
+.why { display: block; }
+.why__nums { display: none; }
+.why__list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(16px, 2vw, 24px); margin: 0; padding: 0; list-style: none; }
+.why__item { display: flex; flex-direction: column; min-width: 0; overflow: hidden; background: var(--panel); border: 1px solid var(--hairline); border-radius: var(--r-card); }
+.why__photo { margin: 0; aspect-ratio: 4 / 3; overflow: hidden; background: var(--panel-2); }
+.why__photo picture { display: block; width: 100%; height: 100%; }
+.why__photo img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.why__body { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding: 24px 24px 28px; }
+.why__n { color: var(--cyan-light); }
+.why__body .t-h3 { line-height: 1.02; color: var(--text); }
+.why__body .t-card { color: var(--text-2); }
+.why__link { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; margin-top: 4px; font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--cyan-light); text-decoration: none; transition: color var(--t-fast); }
+.why__link:hover { color: var(--text); }
+@media (max-width: 900px) { .why__list { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---- Banda de video (partial video-band): capa con póster + video, tarjeta de texto encima (>=761px) o debajo (móvil) ---- */
+.vband { margin: calc(var(--section-y) * -.25) var(--inset) var(--section-y); }
+.vband__media { position: relative; margin: 0; overflow: hidden; aspect-ratio: 21 / 9; max-height: min(80vh, 760px); width: 100%; border-radius: var(--r-panel); background: var(--panel); }
+.vband__layer { position: absolute; inset: -10% 0; }   /* 120 % del alto del marco: motion.js la desplaza (parallax) sin dejar huecos */
+.vband__poster, .vband__video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
+.vband__video { opacity: 0; transition: opacity .6s ease; }
+.vband.has-video .vband__video { opacity: 1; }
+.vband__card { position: absolute; left: clamp(20px, 3vw, 40px); bottom: clamp(20px, 3vw, 40px); width: min(460px, calc(100% - 40px)); padding: 24px 28px; background: var(--glass-strong); border: 1px solid var(--hairline-strong); border-radius: var(--r-card); }
+.vband__text { margin: 0; font-size: clamp(18px, 1.6vw, 22px); font-weight: 600; line-height: 1.35; color: var(--text); }
+@media (max-width: 760px) {
+  .vband__media { display: flex; flex-direction: column; aspect-ratio: auto; max-height: none; background: var(--panel); border: 1px solid var(--hairline); }
+  .vband__layer { position: relative; inset: auto; aspect-ratio: 4 / 3; overflow: hidden; }
+  .vband__card { position: static; width: auto; padding: 22px 22px 26px; background: transparent; border: 0; border-radius: 0; }
+}
+
+/* ---- Pastillas de foto dentro del titular (ns_rich {pill:base}): decorativas, aria-hidden y alt vacío; no cambian el texto ni el título accesible ---- */
+.hpill { display: inline-block; width: 1.7em; height: .8em; margin-left: .14em; vertical-align: -.02em; overflow: hidden; border-radius: var(--r-pill); background: var(--panel); }
+.hpill picture { display: block; width: 100%; height: 100%; }
+.hpill img { display: block; width: 100%; height: 100%; object-fit: cover; }
+@media (max-width: 640px) { .hpill { width: 1.3em; height: .62em; } }
 
 /* FAQ con foto sticky (partial faq, param image) y filas numeradas "Q/01". <1025px: sin foto, solo la numeración. Vive en el grupo home; si otra página usa `image`, cargar también este grupo o moverlo a components.css */
 .faq--photo { display: block; }
