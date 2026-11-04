@@ -156,7 +156,7 @@ function ns_img(array $o): string
 /**
  * Slot de video de fondo del hero del home: devuelve ['mp4'=>url,'webm'=>url] solo con los archivos que existan en assets/video/{nombre}.{mp4,webm}
  * (vacío si no hay ninguno: queda la foto y no se emite <video> ni se pide nada). main.js lo monta tras `load` + idle, solo en >=1025px, sin prefers-reduced-motion ni saveData;
- * si falla, la foto sigue. Hoy no hay videos (se retiraron los de stock); se reactiva subiendo hero.mp4 (muted, sin audio, bucle, 1920×1080) a assets/video/.
+ * si falla, la foto sigue. El video (hero.mp4: muted, sin audio, 1920×1080, escena de una sola pasada SIN bucle) se reproduce una vez y se queda en el último fotograma.
  */
 function ns_hero_video(string $name = 'hero'): array
 {

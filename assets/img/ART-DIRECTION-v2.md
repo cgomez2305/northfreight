@@ -107,7 +107,10 @@ Carlos entregó 39 JPG de 3840 px (masters fuera del repo). Integradas con la gr
 
 | Código | Estado |
 |---|---|
-| H01 `hero-highway-poster` | Entregada, **no se usa**: el hero del home sigue con la foto v1 `nf-highway-dusk-white-trucks`, que es el primer fotograma de `assets/video/hero.mp4` (el paso de foto a video debe seguir siendo invisible). Se usará cuando V01 se regenere con esta foto como primer fotograma. |
+| H01 `hero-highway-poster` | **Entregada y usada (fase K)**: hero del home (`nf-hero-highway-poster`), primer fotograma del video V01. |
+| V01 `hero-highway-loop` | **Entregado y usado (fase K)**: `assets/video/hero.mp4` (origen `vkSk4c32_2x_upscaled.mp4`, a partir de H01). No es un bucle (el camión se aleja en la niebla): se reproduce una vez y se queda en el último fotograma. |
+| V02 `freight-yard-loop` | **Entregado y usado (fase K)**: `assets/video/freight-dock.mp4` (origen `jzLjaq0L_2x_upscaled.mp4`, a partir de `setup-amazon-relay`). No es un bucle (llueve, se moja el suelo, cruza un vehículo): una sola pasada. |
+| V03 `desk-room-loop` | Entregado (origen `8CAdhlyz_2x_upscaled.mp4`, a partir de HR06), **no se usa** (la luz del techo se apaga). Codificado fuera del repo. |
 | WD03 `why-desk-team` | **Pendiente**: el archivo llegó vacío. El ítem 3 de "Why a desk" conserva `nf-dispatch-room-maps`. |
 | HR06 `hero-our-desk` | Entregada, **no se usa todavía**: muestra a dos personas sentadas de espaldas y puede leerse como el equipo real. Our desk mantiene `nf-dispatch-room-maps`. Carlos decide. |
 | DK01 `desk-log-backdrop` | Entregada, **no se usa** (casi negra). |
@@ -387,14 +390,14 @@ Abstract long-exposure photograph of highway light trails over dark fields, 70mm
 
 ## 8. Prompts de video (image-to-video)
 
-Usa la imagen v2 aprobada como **primer fotograma**. Duración 12 a 15 s, 24 fps, exporta lo más grande posible (2688×1536 o más). Yo hago el bucle sin salto con un fundido de costura y lo codifico a 1080p.
+Usa la imagen v2 aprobada como **primer fotograma**. Duración 12 a 15 s, 24 fps, exporta lo más grande posible (2688×1536 o más). Si el video no vuelve solo a su primer fotograma, no hay bucle posible sin salto: se reproduce una vez y se queda en el último fotograma (así se hizo en la fase K). Lo codifico a 1080p.
 
 #### V01 · `hero-highway-loop` · 16:9, 12 a 15 s
 *Uso:* Video del hero (primer fotograma = H01)
 ```
 Slow aerial dolly forward along the interstate, the camera gliding about 2 percent forward and 1 percent to the right over 12 seconds, nothing else changes. Tail-light trails flow gently, trucks drift forward at normal highway speed in the right lanes, mist moves slowly through the tree line, faint sway of treetops, the cyan horizon stays constant. No cuts, no zoom, no camera shake, no new objects entering, the last frame returns to the same composition as the first so it loops. Photographic film look, grain stays stable, no flicker. Shot on film look, subtle organic grain, muted steel-blue palette with cyan accent and sodium amber, no text, no logos, no faces.
 ```
-*Nota:* Image-to-video (HeyGen / Veo / Kling / Runway) con H01 como primer fotograma. Duración 12 a 15 s, 24 fps, 1080p o superior. Aplica el fundido de costura al final.
+*Nota:* Image-to-video (HeyGen / Veo / Kling / Runway) con H01 como primer fotograma. Duración 12 a 15 s, 24 fps, 1080p o superior. En la fase K los videos reales no cerraron el bucle y se usan en una sola pasada.
 
 #### V02 · `freight-yard-loop` · 16:9 (recorta a 21:9)
 *Uso:* Banda de video del home (primer fotograma = SV01 o una variante 16:9)

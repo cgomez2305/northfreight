@@ -24,7 +24,7 @@ $waTabs = [
 ];
 $waChips = ['Load booking', 'Load tracking', 'Back office'];
 
-// Video del hero: assets/video/hero.mp4 (bucle Night Freight 1080p, sin audio). main.js lo monta tras load + idle solo en >=1025px sobre la foto (que es su primer fotograma). Ver ns_hero_video() en kit.php.
+// Video del hero: assets/video/hero.mp4 (escena de una sola pasada, 1080p, sin audio, SIN bucle: se queda en el último fotograma). main.js lo monta tras load + idle solo en >=1025px sobre la foto (que es su primer fotograma). Ver ns_hero_video() en kit.php.
 $heroVideo = ns_hero_video('hero');
 
 // Ancho útil de las fotos de las tarjetas de servicio. Carril ≥1025px: la foto manda por el ALTO de la tarjeta (≤540 px, cover) → ~540 × 1,5 = 810 px de foto, no el ancho de la tarjeta.
@@ -98,13 +98,13 @@ $figures = [
     ['0', 'forms before you talk to us'],
 ];
 ?>
-<!-- HERO: foto protagonista (Night Freight: nf-highway-dusk-white-trucks; degradado solo desde la izquierda y abajo) + titular + widget de WhatsApp. Recortes reales: -m (4:5, ≤760 px) y -sq (cuadrado, 761 a 1024 px); en escritorio la foto 16:9 completa con srcset 1024/1280/1600/1672.
+<!-- HERO: foto protagonista (v2: nf-hero-highway-poster, master 3840×2160 con la gradación de marca; degradado solo desde la izquierda y abajo) + titular + widget de WhatsApp. Recortes reales: -m (4:5, ≤760 px) y -sq (cuadrado, 761 a 1024 px); en escritorio la foto 16:9 completa con srcset 640 a 3200.
      Slot de video: si existe assets/video/hero.mp4 (o .webm) $heroVideo lo activa: el <video> va vacío (preload none, sin src) y main.js le pone la fuente tras load + idle en >=1025px, con fundido sobre la foto (que sigue siendo el LCP). Sin archivos no se emite nada y no hay peticiones. -->
 <section class="hero hero--home" id="top">
-  <div class="hero__bg"<?= $heroVideo ? ' data-hero-video data-mp4="' . e($heroVideo['mp4'] ?? '') . '" data-webm="' . e($heroVideo['webm'] ?? '') . '"' : '' ?>><?= ns_img(['base' => 'nf-highway-dusk-white-trucks', 'widths' => [1024, 1280, 1600, 1672], 'alt' => 'White semi truck with a dry van trailer on a highway at dusk, with a second truck far ahead', 'eager' => true, 'sizes' => '100vw',
+  <div class="hero__bg"<?= $heroVideo ? ' data-hero-video data-mp4="' . e($heroVideo['mp4'] ?? '') . '" data-webm="' . e($heroVideo['webm'] ?? '') . '"' : '' ?>><?= ns_img(['base' => 'nf-hero-highway-poster', 'widths' => [640, 1024, 1280, 1600, 2048, 2560, 3200], 'alt' => 'White semi truck driving along a highway through dark hills under a heavy gray sky at dawn', 'eager' => true, 'sizes' => '100vw',
         'art' => [
-            ['media' => '(max-width:760px)', 'base' => 'nf-highway-dusk-white-trucks-m', 'sizes' => '100vw'],   // móvil: recorte 4:5 real (753×941), camión principal entero
-            ['media' => '(max-width:1024px)', 'base' => 'nf-highway-dusk-white-trucks-sq', 'sizes' => '100vw']]]) ?><?php if ($heroVideo): ?><video class="hero__video" muted loop playsinline preload="none" aria-hidden="true" tabindex="-1"></video><?php endif; ?></div>
+            ['media' => '(max-width:760px)', 'base' => 'nf-hero-highway-poster-m', 'sizes' => '100vw'],   // móvil: recorte 4:5 real desde el master (1728×2160), camión entero
+            ['media' => '(max-width:1024px)', 'base' => 'nf-hero-highway-poster-sq', 'sizes' => '100vw']]]) ?><?php if ($heroVideo): ?><video class="hero__video" muted playsinline preload="none" aria-hidden="true" tabindex="-1"></video><?php endif; ?></div>
   <div class="container hero__in">
     <div class="hero__main">
       <h1 class="eyebrow home-kicker"><?= e($route['h1']) ?></h1>
@@ -318,9 +318,9 @@ partial('photo-card', [
   </div>
 </section>
 
-<!-- Banda de video: el póster es el primer fotograma de assets/video/freight-dock.mp4 (nf-freight-dock-loop), así que el paso foto a video es invisible; el video se monta solo >=1025px, tras load + idle y al acercarse. Sin H2 nuevo: el texto es un <p> con copy ya existente (evidencia) -->
+<!-- Banda de video: el póster es el primer fotograma gradado de assets/video/freight-dock.mp4 (nf-freight-dock), así que el paso foto a video es invisible; el video (una sola pasada, sin bucle, se queda en el último fotograma) se monta solo >=1025px, tras load + idle, y empieza al verse la banda. Sin H2 nuevo: el texto es un <p> con copy ya existente (evidencia) -->
 <?php partial('video-band', [
-    'image'  => ['base' => 'nf-freight-dock-loop', 'alt' => 'White semi truck pulling up to a lit warehouse loading dock on a wet night yard'],
+    'image'  => ['base' => 'nf-freight-dock', 'alt' => 'White semi truck parked at a lit warehouse dock on a wet night yard'],
     'video'  => 'freight-dock',
     'text'   => 'Every load leaves a record: rate confirmation, check-call log, arrival timestamps, BOL and POD.',
 ]); ?>

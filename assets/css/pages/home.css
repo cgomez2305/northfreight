@@ -4,7 +4,7 @@
 .hero--home { margin-top: calc(8px - var(--hdr-mt) - var(--hdr-h)); min-height: clamp(600px, calc(100svh - 28px), 960px); display: flex; align-items: flex-end; background: var(--bg); }
 .hero__bg { position: absolute; inset: 0; z-index: 0; }
 .hero__bg picture { display: block; width: 100%; height: 100%; }
-.hero__bg img { width: 100%; height: 100%; object-fit: cover; object-position: 90% 50%; display: block; }   /* nf-highway-dusk-white-trucks 16:9 (1672×941): sin escala extra (cada punto de escala sube la ampliación); 90 % desplaza el camión un poco a la izquierda */
+.hero__bg img { width: 100%; height: 100%; object-fit: cover; object-position: 90% 50%; display: block; }   /* nf-hero-highway-poster 16:9 (v2, master 3840×2160): sin escala extra; el 90 % deja el camión (x 71 a 85 % de la foto) a la derecha, bajo el widget y fuera del titular */
 .hero__bg::after { content: ""; position: absolute; inset: 0; background: var(--hero-fade-top), var(--hero-fade-bottom), var(--hero-fade-left); }
 .hero--home .hero__in { width: 100%; padding-top: 180px; padding-bottom: clamp(32px, 4.5vw, 64px); align-items: flex-end; justify-content: space-between; gap: 32px 48px; }
 .hero--home .hero__main { flex: 1 1 560px; max-width: 980px; gap: 22px; }
@@ -14,7 +14,7 @@
 .hero--home .hero__lead { max-width: 600px; color: var(--text); }
 .hero--home .tags { justify-content: flex-start; color: var(--text); }
 .hero--home .tag { background: var(--overlay); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px); }
-/* Video de fondo (el <video> viaja vacío en el HTML; main.js le pone assets/video/hero.mp4 tras load + idle, solo >=1025px): misma posición y escala que la foto; entra con un fundido de opacidad */
+/* Video de fondo (el <video> viaja vacío en el HTML; main.js le pone assets/video/hero.mp4 tras load + idle, solo >=1025px; una sola pasada, sin bucle, se queda en el último fotograma): misma posición y escala que la foto (su primer fotograma); entra con un fundido de opacidad */
 .hero__video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 90% 50%; display: block; opacity: 0; transition: opacity .6s ease; }
 .hero__bg.has-video .hero__video { opacity: 1; }
 @media (max-width: 1024px) { .hero__video { display: none; } }

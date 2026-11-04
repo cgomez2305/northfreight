@@ -154,8 +154,10 @@
   })();
 
   /* ---- Videos de fondo (hero del home y banda de video). Los <video> viajan vacíos en el HTML (preload none, sin src): aquí se les pone la fuente.
-     Solo en >=1025px, sin prefers-reduced-motion ni saveData, tras `load` + idle (así la foto del hero sigue siendo el LCP). El hero arranca ya; la banda
-     cuando se acerca a la pantalla. Ambos se pausan al salir de ella. Si falla o no carga, queda la foto / el póster. Fundido de opacidad vía .has-video. ---- */
+     Solo en >=1025px, sin prefers-reduced-motion ni saveData, tras `load` + idle (así la foto del hero sigue siendo el LCP). Son escenas breves SIN bucle:
+     se reproducen UNA vez y se quedan en el último fotograma (no se reinician aunque la sección salga y vuelva a entrar). El hero arranca ya; la banda empieza
+     al ser visible (y empieza a bajar el archivo cuando se acerca a la pantalla). Ambos se pausan al salir de ella y se reanudan donde iban si aún no terminaron.
+     Si falla o no carga, queda la foto / el póster. Fundido de opacidad vía .has-video. ---- */
   (function () {
     var hero = d.querySelector('[data-hero-video]'), band = d.querySelector('[data-vband]');
     if ((!hero && !band) || !window.matchMedia) return;
@@ -163,7 +165,7 @@
       var conn = navigator.connection || {};
       return !(conn.saveData || window.matchMedia('(prefers-reduced-motion: reduce)').matches || !window.matchMedia('(min-width: 1025px)').matches);
     }
-    // wrap: elemento que recibe .has-video (y lo observa IntersectionObserver); v: <video> ya en el HTML; src: mp4; webm: opcional
+    // wrap: elemento que recibe .has-video (y lo observa IntersectionObserver); v: <video> ya en el HTML; src: mp4; webm: opcional; lazy: banda (precarga cerca, reproduce al verse)
     function mount(wrap, v, mp4, webm, lazy) {
       if (!v || !v.canPlayType || v.firstChild) return;
       [[webm, 'video/webm'], [mp4, 'video/mp4']].forEach(function (s) {
@@ -171,16 +173,18 @@
         var el = d.createElement('source'); el.src = s[0]; el.type = s[1]; v.appendChild(el);
       });
       if (!v.firstChild) return;
-      var done = false, on = false;
+      var done = false, on = false, ended = false;
       function drop() { if (done) return; done = true; wrap.classList.remove('has-video'); while (v.firstChild) v.removeChild(v.firstChild); try { v.load(); } catch (e) { /* nada */ } }
-      function play() { try { var p = v.play(); if (p && p.catch) p.catch(drop); } catch (e) { drop(); } }
-      v.muted = true; v.defaultMuted = true; v.loop = true; v.playsInline = true;
+      function play() { if (ended) return; try { var p = v.play(); if (p && p.catch) p.catch(drop); } catch (e) { drop(); } }
+      v.muted = true; v.defaultMuted = true; v.loop = false; v.playsInline = true;
       v.addEventListener('error', drop, true);
       v.addEventListener('playing', function () { if (!done) wrap.classList.add('has-video'); });
+      v.addEventListener('ended', function () { ended = true; });   // se queda en el último fotograma: no se vuelve a llamar a play() (reiniciaría)
       try { v.load(); } catch (e) { drop(); return; }
-      function watch(vis) { if (done || vis === on) return; on = vis; if (vis) play(); else v.pause(); }
+      function watch(vis) { if (done || ended || vis === on) return; on = vis; if (vis) play(); else v.pause(); }
       if ('IntersectionObserver' in window) {
-        new IntersectionObserver(function (es) { watch(es[es.length - 1].isIntersecting); }, { rootMargin: lazy ? '300px 0px' : '0px' }).observe(wrap);
+        if (lazy) new IntersectionObserver(function (es, o) { if (es[es.length - 1].isIntersecting) { v.preload = 'auto'; o.disconnect(); } }, { rootMargin: '300px 0px' }).observe(wrap);
+        new IntersectionObserver(function (es) { watch(es[es.length - 1].isIntersecting); }, { threshold: lazy ? 0.3 : 0 }).observe(wrap);
       } else if (!lazy) { on = true; play(); }
     }
     function start() {

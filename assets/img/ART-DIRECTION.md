@@ -304,11 +304,11 @@ Nombra los archivos exactamente como en la tabla (por ejemplo `hero-highway-post
 
 ## 8. Entregadas
 
-Estado tras la fase J (2026-11-04): la fotografía del sitio es el **set v2** (`ART-DIRECTION-v2.md`, masters de 3840 px fuera del repo, gradados a la marca; ver `CREDITS.md`). Del set v1 (36 piezas, ya sin enlace en esta tabla) solo siguen en uso las 4 que acompañan a los videos o no tienen sustituto. Ninguna foto se repite dentro de una misma página.
+Estado tras la fase J (2026-11-04): la fotografía del sitio es el **set v2** (`ART-DIRECTION-v2.md`, masters de 3840 px fuera del repo, gradados a la marca; ver `CREDITS.md`). Fase K: el hero y la banda de video del home pasaron a la v2 junto con sus videos (se reproducen una vez y se quedan en el último fotograma). Del set v1 solo siguen en uso las 2 que no tienen sustituto (`nf-dispatch-room-maps` y `nf-dispatch-room-wide-night`). Ninguna foto se repite dentro de una misma página.
 
 | Archivo | Slot |
 |---|---|
-| `nf-highway-dusk-white-trucks` (v1) | Home: hero (LCP y primer fotograma de `hero.mp4`), con recortes `-m` y `-sq` |
+| `nf-hero-highway-poster` | Home: hero (LCP y primer fotograma de `hero.mp4`, v2), con recortes `-m` (4:5) y `-sq` (1:1) desde el master |
 | `nf-cta-night-truck` | CTA final de todas las páginas (`CTA_IMAGE`), recorte `-m` en móvil |
 | `nf-service-dispatch-booking` · `nf-service-load-tracking` · `nf-service-back-office` | Home: carril de servicios (dispatch, tracking, back office). Relay: filas A (dispatch) y E (back office) |
 | `nf-hero-amazon-relay-pill-320` · `nf-hero-dry-van-pill-320` | Home: pastillas del H2 "Three fronts" |
@@ -316,7 +316,7 @@ Estado tras la fase J (2026-11-04): la fotografía del sitio es el **set v2** (`
 | `nf-onboarding-learn` · `-scope` · `-run` · `-review` | Home: onboarding (3:2 y `-tall`); How it works: filas apiladas de los 4 pasos |
 | `nf-setup-owner-operator` · `nf-setup-small-fleet` · `nf-setup-amazon-relay` | Home: pestañas "Choose your setup"; Owner: pestañas Small fleet y Amazon Relay; Relay: foto de "Why Relay needs a dedicated desk"; drafts de Hotshot, Flatbed y Power only |
 | `nf-dispatch-room-wide-night` (v1) | Home: fachada del video "Meet the desk" |
-| `nf-freight-dock-loop` (v1) | Home: póster de la banda de video (primer fotograma de `assets/video/freight-dock.mp4`) |
+| `nf-freight-dock` | Home: póster de la banda de video (primer fotograma gradado de `assets/video/freight-dock.mp4`, v2) |
 | `nf-faq-dock-light-4x5` | Home: foto del FAQ (4:5 nativo) |
 | `nf-faq-dock-light-wide` | Miniatura de `/blog/` en Resources y foto provisional de Box truck (draft) |
 | `nf-hero-owner-operators` | Hero fotográfico de Owner-operators |
