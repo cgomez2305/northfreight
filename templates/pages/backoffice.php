@@ -28,7 +28,7 @@ partial('hero', [
     'tagline' => 'The work behind the load, done right.',
     'lead'    => 'Paperwork organized, settlements prepared and disputes followed until they close.',
     'ctas'    => [['label' => 'Talk to the desk', 'href' => wa($route['wa']), 'wa' => true, 'arrow' => true]],
-    'image'   => ['base' => 'nf-desk-rain-window-night', 'alt' => 'Desk at night with a lamp, a stack of paper and a laptop beside a rain-covered window', 'pos' => '60% 50%'],
+    'image'   => ['base' => 'nf-hero-back-office', 'alt' => 'Desk with a lamp, a stamp, a stack of blank forms and a laptop beside a rain-covered window at night', 'pos' => '60% 50%'],
 ]);
 
 // Resumen "In short" (SEO/GEO): editable aquí. Solo información que ya está en el copy de esta página; sin cifras, tarifas ni promesas nuevas.
@@ -55,7 +55,7 @@ partial('summary', [
     'eyebrow' => 'One team',
     'title'   => 'Dispatch and back office, one team',
     'lead'    => 'Because the same desk books and tracks the load, the back office already has every document it needs.',
-    'image'   => ['base' => 'nf-contracts-amber-cyan', 'alt' => 'Open binder with a pen and paperwork under an amber lamp', 'pos' => '70% 60%'],
+    'image'   => ['base' => 'nf-resource-agreement', 'alt' => 'Open folder with two blank contract pages, a pen and a desk lamp, with a truck parked in the window behind', 'pos' => '70% 60%'],
     'chips'   => $flow,
     'chips_label' => 'From booking to payment',
     'chips_arrow' => true,
@@ -69,5 +69,5 @@ partial('summary', [
     'lead'    => 'Practical guides on getting paid for every hour at the dock, filling a bill of lading and what dispatch costs.',
     'btn'     => ['label' => 'All articles', 'href' => url('/blog/')],
     'paths'   => ['/blog/lumper-fees-detention-pay/', '/resources/bol-template/', '/blog/how-much-does-truck-dispatch-cost/'],
-    'exclude' => ['nf-desk-rain-window-night', 'nf-contracts-amber-cyan'],
+    'exclude' => ['nf-hero-back-office', 'nf-resource-agreement'],
 ]); ?>

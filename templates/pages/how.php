@@ -7,13 +7,13 @@ require_once NS_ROOT . '/templates/partials/kit.php';
 
 $steps = [
     ['We learn your operation', 'Trucks, equipment, lanes, drivers, home time and the accounts you already run, including Amazon Relay.', 'pin',
-     ['base' => 'nf-hands-map-keys', 'alt' => 'Hands gathered around a folded route map with a truck key and a notebook beside it', 'pos' => '55% 50%']],
+     ['base' => 'nf-onboarding-learn', 'alt' => 'Hands over a paper road map on a worn table, with a pen, truck keys and a notebook', 'pos' => '55% 50%']],
     ['We define scope & contacts', 'Who approves loads, how and when we report, and which tasks the desk owns from day one.', 'doc',
-     ['base' => 'nf-signing-clipboard-night', 'alt' => 'Hand signing a form on a clipboard at night, with a trailer out of focus behind', 'pos' => '60% 45%']],
+     ['base' => 'nf-onboarding-scope', 'alt' => 'Hand signing a form on a clipboard, with a trailer parked out of focus behind', 'pos' => '60% 45%']],
     ['We run the day-to-day', 'Booking, tracking and documenting every load. You get updates on WhatsApp, where you already work.', 'truck',
-     ['base' => 'nf-white-truck-rainy-highway', 'alt' => 'White semi truck with a dry van trailer driving a wet highway at night', 'pos' => '65% 55%']],
+     ['base' => 'nf-onboarding-run', 'alt' => 'White semi truck with a dry van trailer driving past at dusk, with the background blurred by motion', 'pos' => '65% 55%']],
     ['We review & improve', 'Regular reviews of lanes, rates and incidents to keep your trucks earning.', 'trend',
-     ['base' => 'nf-trailer-rows-aerial', 'alt' => 'Aerial view of white trailers lined up in rows in a truck lot at night', 'pos' => '55% 50%']],
+     ['base' => 'nf-onboarding-review', 'alt' => 'Rows of white trailers parked in a truck yard beside a warehouse at dusk, with a tractor pulling through', 'pos' => '55% 50%']],
 ];
 $expect = ['One channel for every update', 'A record of every load', 'A team, not a single dispatcher'];
 
@@ -23,7 +23,7 @@ partial('hero', [
     'eyebrow' => 'How we plug into your operation',
     'h1'    => 'How truck dispatching works {hl}with NorthStar{/hl}',
     'lead'  => 'Hiring a dispatch company should not mean losing control of your trucks. Here is exactly how we start and how we work with you every day.',
-    'image' => ['base' => 'nf-route-map-night-trucks', 'alt' => 'Glowing route lines over a dark map with trucks on a night highway', 'pos' => '72% 50%', 'sizes' => '(min-width:1025px) 1260px, (min-width:761px) 100vw, 540px'],
+    'image' => ['base' => 'nf-hero-how-it-works', 'alt' => 'White semi truck crossing a highway overpass at night, with light trails on the ramps below', 'pos' => '72% 50%', 'sizes' => '(min-width:1025px) 1260px, (min-width:761px) 100vw, 540px'],
 ]);
 
 // Resumen "In short" (SEO/GEO): editable aquí. Solo información que ya está en el copy de esta página; sin cifras, tarifas ni promesas nuevas.

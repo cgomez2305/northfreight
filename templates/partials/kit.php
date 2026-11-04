@@ -77,7 +77,7 @@ function ns_icon(string $name, int $size = 18, string $class = ''): string
  *     art(array de ['media'=>…, 'base'=>…, 'sizes'=>…, 'widths'=>…?]: recortes alternativos que se emiten ANTES de la fuente normal; el primero cuya media coincida gana).
  * `sizes` debe describir el ANCHO que ocupa la imagen una vez recortada con object-fit: cover (marco, margen de .px y alto incluidos), no solo el ancho del marco: con marcos
  * más altos que la foto manda el alto, y un `sizes` corto hace elegir una variante demasiado pequeña (se ve pixelada). Regla: ancho útil = max(ancho marco, alto imagen × proporción foto).
- * En móvil se declara a propósito algo por DEBAJO del ancho útil (calc(100vw - 72px)): a DPR ≤2 elige la variante de 640 (ampliación ≈ x1,26, límite x1,6) y el peso y el LCP móviles no suben; el escritorio sí pide la variante que da ≤ x1,10 en 1x.
+ * En móvil se declara a propósito algo por DEBAJO del ancho útil (calc(100vw - 72px)): a DPR ≤2 elige la variante de 640 (ampliación ≈ x1,26, límite x1,6) y el peso y el LCP móviles no suben; el escritorio sí pide la variante que da ≤ x1,10 en 1x. Desde la fase J los masters miden 3840 px (variantes 640 a 2560, y 3200 en heros y CTA): ningún marco se acerca ya al límite de ampliación.
  * Las variantes no se ampliaron nunca: solo existen anchos ≤ al de la foto de origen (el ancho nativo puede ser cualquiera; se detectan en disco).
  */
 function ns_img(array $o): string
@@ -111,7 +111,7 @@ function ns_img(array $o): string
         return $set;
     };
     $set = $srcset($base, $widths, $dir, $dirName);
-    // Variante más grande en disco: es el `src` de respaldo y da el width/height del <img> (sirve cualquier ancho nativo: 1122, 1448, 1914…). Sin variantes WebP cae al {base}.jpg.
+    // Variante más grande en disco: es el `src` de respaldo y da el width/height del <img> (sirve cualquier ancho). Sin variantes WebP cae al {base}.jpg.
     $maxW = 0;
     foreach ($widths as $cand) {
         if ((int) $cand > $maxW && is_file($dir . "$base-$cand.webp")) {
@@ -137,7 +137,15 @@ function ns_img(array $o): string
     if ($set) {
         $out .= '<source type="image/webp" srcset="' . e(implode(', ', $set)) . '" sizes="' . e($o['sizes'] ?? '100vw') . '">';
     }
-    $src = $maxW > 0 ? asset("$dirName/$base-$maxW.webp") : ($jpg !== null ? asset($jpg) : '');
+    // `src` de respaldo (solo lo usan navegadores sin <picture>): la variante más grande ≤1600 px, no la de 3200 (el width/height sí vienen de la mayor: fija la proporción)
+    $srcW = 0;
+    foreach ($widths as $cand) {
+        if ((int) $cand <= 1600 && (int) $cand > $srcW && is_file($dir . "$base-$cand.webp")) {
+            $srcW = (int) $cand;
+        }
+    }
+    $srcW = $srcW > 0 ? $srcW : $maxW;
+    $src = $srcW > 0 ? asset("$dirName/$base-$srcW.webp") : ($jpg !== null ? asset($jpg) : '');
     $out .= '<img src="' . e($src) . '" alt="' . e($o['alt'] ?? '') . '"'
         . ($w ? ' width="' . $w . '" height="' . $h . '"' : '')
         . ($eager ? ' fetchpriority="high"' : ' loading="lazy"') . ' decoding="async"'
@@ -232,15 +240,15 @@ function ns_menu(): array
 function ns_thumb(string $path, array $exclude = [], array $alt = []): ?array
 {
     static $svc = [
-        '/amazon-relay-dispatch/'            => ['nf-trailer-dock-night-mist', 'White semi truck with a dry van trailer parked at a misty warehouse dock at night'],
-        '/dispatch-for-owner-operators/'     => ['nf-cab-interior-cyan-night', 'Truck cab at night with a phone on the dashboard and a highway ahead'],
-        '/trucking-back-office/'             => ['nf-desk-rain-window-night', 'Desk at night with a lamp, a stack of paper and a laptop beside a rain-covered window'],
-        '/load-tracking/'                    => ['nf-highway-side-mirror-night', 'Night highway with trucks seen in a truck’s side mirror'],
-        '/how-it-works/'                     => ['nf-route-map-night-trucks', 'Glowing route lines over a dark map with trucks on a night highway'],
-        '/dry-van-dispatch/'                 => ['nf-white-truck-cyan-horizon', 'White semi truck pulling a dry van trailer at dusk under a cyan horizon'],
-        '/blog/'                             => ['nf-loading-dock-blue-hour', 'Open loading dock door glowing cyan under a blue-hour sky'],
-        '/resources/ifta-calculator/'        => ['nf-fuel-nozzle-truck-stop', 'Fuel nozzle at a truck stop at night with a semi truck parked behind'],
-        '/resources/dispatcher-carrier-agreement/' => ['nf-contracts-amber-cyan', 'Open binder with a pen and paperwork under an amber lamp'],
+        '/amazon-relay-dispatch/'            => ['nf-hero-amazon-relay', 'White semi truck with a dry van trailer parked beside a warehouse dock on a wet night yard'],
+        '/dispatch-for-owner-operators/'     => ['nf-hero-owner-operators', 'Truck cab at dusk with a phone mounted on the dashboard, a clipboard and a rest area beyond the windshield'],
+        '/trucking-back-office/'             => ['nf-hero-back-office', 'Desk with a lamp, a stamp, a stack of blank forms and a laptop beside a rain-covered window at night'],
+        '/load-tracking/'                    => ['nf-check-tracking-mirror', 'Truck side mirror at dusk showing the trailer and the highway behind it'],
+        '/how-it-works/'                     => ['nf-hero-how-it-works', 'White semi truck crossing a highway overpass at night, with light trails on the ramps below'],
+        '/dry-van-dispatch/'                 => ['nf-hero-dry-van', 'White semi truck pulling a dry van trailer along a highway under an overcast dusk sky'],
+        '/blog/'                             => ['nf-faq-dock-light-wide', 'Open loading dock door under a warm wall light at dusk, with yellow bollards'],
+        '/resources/ifta-calculator/'        => ['nf-resource-ifta', 'Diesel fuel nozzle in the pump holster at a truck stop at night, with a white semi truck parked in the distance'],
+        '/resources/dispatcher-carrier-agreement/' => ['nf-resource-agreement', 'Open folder with two blank contract pages, a pen and a desk lamp, with a truck parked in the window behind'],
     ];
     $found = null;
     foreach (data('posts') as $p) {

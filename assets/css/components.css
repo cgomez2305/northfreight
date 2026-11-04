@@ -196,7 +196,7 @@ a.btn--primary:hover::after, a.btn--navy:hover::after, a.btn--primary:focus-visi
 .hero--int { width: min(calc(100% - 2 * var(--inset)), var(--max)); margin-inline: auto; }
 
 /* ---- PATRÓN A · hero fotográfico (layout photo del partial hero): la foto es el marco. Va anclada a la derecha del panel (90 % del ancho, con máscara en su borde izquierdo) y el texto abajo a la izquierda sobre degradado;
-   así la foto nunca se amplía por encima de x1,6 en retina aunque el master mida 1448 px. ≥1025px: texto sobre foto con degradado medido (AA). <1025px: la foto arriba, el texto debajo sobre --bg, sin superponer. ---- */
+   (con los masters de 3840 px de la fase J ya no hace falta por resolución: queda por composición, el texto ocupa la zona izquierda). ≥1025px: texto sobre foto con degradado medido (AA). <1025px: la foto arriba, el texto debajo sobre --bg, sin superponer. ---- */
 .hero--photo { background: var(--bg); border: 1px solid var(--hairline); }
 .hero__pic { position: relative; margin: 0; overflow: hidden; background: var(--bg); aspect-ratio: 4 / 3; }
 .hero__pic picture { display: block; width: 100%; height: 100%; }
@@ -211,7 +211,7 @@ a.btn--primary:hover::after, a.btn--navy:hover::after, a.btn--primary:focus-visi
 .hero--photo .sa-sheet { background: var(--glass-strong); }
 @media (min-width: 761px) and (max-width: 1024px) { .hero__pic { aspect-ratio: 16 / 9; } }
 @media (min-width: 1025px) {
-  .hero--photo { min-height: clamp(520px, 74vh, 640px); display: flex; }   /* ≤640: la foto (110 % del alto por el parallax) no pasa de ~704 px de alto y los masters 16:9 no superan x1,6 en retina */
+  .hero--photo { min-height: clamp(520px, 74vh, 640px); display: flex; }   /* ≤640: la foto (110 % del alto por el parallax) no pasa de ~704 px de alto y los masters de 3840 px dan margen de sobra en retina */
   .hero__pic { position: absolute; top: 0; right: 0; bottom: 0; width: 90%; aspect-ratio: auto; }
   .hero__pic picture { -webkit-mask-image: var(--photo-mask); mask-image: var(--photo-mask); }   /* la máscara va en el <picture> (no en .hero__pic) para no crear un contexto de apilamiento que dejaría el botón de play del video bajo el degradado */
   .hero__pic::after { content: none; }
@@ -324,8 +324,8 @@ a.card:hover .card__icon, .card--hover:hover .card__icon { background: var(--cya
 .cta__mark { width: 48px; height: 48px; display: block; }
 .cta__text { max-width: 520px; font-size: 19px; line-height: 1.55; color: var(--text-2); }
 .cta__actions { position: relative; flex: 1 1 340px; max-width: 440px; display: flex; flex-direction: column; gap: 12px; }
-/* Con foto (param image): la foto (nf-lone-truck-rain-night, 21:9; recorte -m 4:5 en móvil) llena el panel; el texto va a la izquierda sobre --cta-veil (contraste medido >= 4,5:1) y el camión queda a la vista a la derecha.
-   Padding vertical reducido: la altura del panel fija la ampliación de la foto (cover por alto); ≤ ~650 px mantiene x1,6 en retina con la foto de 822 px de alto. */
+/* Con foto (param image): la foto (nf-cta-night-truck, 21:9, master 3864 px; recorte -m 4:5 en móvil) llena el panel; el texto va a la izquierda sobre --cta-veil (contraste medido >= 4,5:1) y el camión queda a la vista a la derecha.
+   Padding vertical reducido: la altura del panel fija la ampliación de la foto (cover por alto); con el master de 1656 px de alto queda holgado. */
 .cta--photo { background: var(--panel-2); }
 .cta__bg { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
 .cta__bg picture { display: block; width: 100%; height: 100%; }

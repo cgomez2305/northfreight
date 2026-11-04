@@ -5,7 +5,7 @@
  * Params: items(array de ['q','a','link'=>['label','path']?] como devuelve route_faq_items()/faq_items(); el enlace también
  *         se acepta como [label, path]),
  *         title(string, defecto "Questions carriers ask us."), eyebrow(string, defecto "FAQ"),
- *         image(array|null, opcional: ['base'=>'nf-dock-door-amber-night','alt'=>'…','sizes'?]): en ≥1025px columna izquierda con la foto fija (sticky, radio 24, parallax .px)
+ *         image(array|null, opcional: ['base'=>'nf-faq-dock-light-4x5','alt'=>'…','sizes'?]): en ≥1025px columna izquierda con la foto fija (sticky, radio 24, parallax .px)
  *           y a la derecha título + filas numeradas "Q/01…" en mono; <1025px la foto no se muestra. Sin image se mantiene el diseño de siempre. El JSON-LD FAQPage no cambia.
  *         surface('white' defecto: sección blanca, tarjetas gris | 'light': sección gris, tarjetas blancas),
  *         open_first(bool, true), section(bool, true: envuelve en <section class="section"> con .pre-cta si pre_cta), pre_cta(bool), id.

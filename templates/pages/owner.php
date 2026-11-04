@@ -35,7 +35,7 @@ partial('hero', [
         ['label' => 'Talk to a dispatcher', 'href' => wa($route['wa']), 'wa' => true, 'arrow' => true],
         ['label' => 'How we onboard', 'href' => url('/how-it-works/'), 'variant' => 'ghost'],
     ],
-    'image'   => ['base' => 'nf-cab-interior-cyan-night', 'alt' => 'Truck cab at night with a phone on the dashboard and a highway ahead', 'pos' => '62% 50%'],
+    'image'   => ['base' => 'nf-hero-owner-operators', 'alt' => 'Truck cab at dusk with a phone mounted on the dashboard, a clipboard and a rest area beyond the windshield', 'pos' => '62% 50%'],
 ]);
 
 // Resumen "In short" (SEO/GEO): editable aquí. Solo información que ya está en el copy de esta página; sin cifras, tarifas ni promesas nuevas.
@@ -61,7 +61,7 @@ partial('summary', [
     'eyebrow' => 'Why owner-operators work with us',
     'title'   => 'You stay in control.',
     'lead'    => 'You approve every load. We tell you what we booked and why, and you can reach the desk on WhatsApp at any time.',
-    'image'   => ['base' => 'nf-lone-truck-blue-twilight', 'alt' => 'Lone white semi truck parked on a wet lot under a blue twilight sky', 'pos' => '60% 100%'],
+    'image'   => ['base' => 'nf-check-owner-approve', 'alt' => 'A hand holding a phone with a check mark on the screen inside a truck cab at dusk', 'pos' => '60% 100%'],
     'extra'   => ns_checks($control, 'What staying in control means'),
 ]); ?>
 
@@ -73,11 +73,11 @@ partial('summary', [
     'items'   => [
         ['label' => 'Small fleet', 'title' => 'Small fleet', 'wa' => "Hi, I run a small fleet and I'd like to talk about dispatch with NorthStar.",
          'points' => ['A team, not a single dispatcher', 'New drivers set up and ready to roll on day one', 'Who approves loads, how we report and which tasks the desk owns'],
-         'image' => ['base' => 'nf-white-fleet-blue-hour', 'alt' => 'Five white semi trucks lined up in a lot at blue hour beside a street lamp', 'pos' => '50% 70%'],
+         'image' => ['base' => 'nf-setup-small-fleet', 'alt' => 'Several white semi trucks parked in a row in a depot lot at dusk', 'pos' => '50% 70%'],
          'link' => ['label' => 'See how we onboard', 'href' => url('/how-it-works/')]],
         ['label' => 'Amazon Relay carrier', 'title' => 'Amazon Relay carrier', 'wa' => 'relay',
          'points' => ['Block and load booking', 'Trip and arrival records', 'Scorecard follow-up and disputes filed with evidence'],
-         'image' => ['base' => 'nf-loading-dock-blue-hour', 'alt' => 'Open loading dock door glowing cyan under a blue-hour sky', 'pos' => '50% 55%'],
+         'image' => ['base' => 'nf-setup-amazon-relay', 'alt' => 'White semi truck at a warehouse dock wall at night under tall floodlights', 'pos' => '50% 55%'],
          'link' => ['label' => 'Amazon Relay dispatch', 'href' => url('/amazon-relay-dispatch/')]],
     ],
 ]); ?>

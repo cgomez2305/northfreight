@@ -101,6 +101,18 @@ Ruedas y ejes creíbles (ficha de anatomía) · sin letras en ninguna parte · l
 
 La columna "Sustituye a" indica qué archivo `nf-*` reemplaza cada imagen; si una imagen v2 no es mejor que la actual, se queda la actual.
 
+### Estado de entrega (fase J, 2026-11-04)
+
+Carlos entregó 39 JPG de 3840 px (masters fuera del repo). Integradas con la gradación de marca descrita en `CREDITS.md`: CTA01, SV01 a SV03, WD01, WD02, ON01 a ON04, FAQ01 (4:5 y horizontal), TB01 a TB03, CK01 a CK03, HR01 a HR05, BL01 a BL04, RW01 a RW05, MM01 y OG01.
+
+| Código | Estado |
+|---|---|
+| H01 `hero-highway-poster` | Entregada, **no se usa**: el hero del home sigue con la foto v1 `nf-highway-dusk-white-trucks`, que es el primer fotograma de `assets/video/hero.mp4` (el paso de foto a video debe seguir siendo invisible). Se usará cuando V01 se regenere con esta foto como primer fotograma. |
+| WD03 `why-desk-team` | **Pendiente**: el archivo llegó vacío. El ítem 3 de "Why a desk" conserva `nf-dispatch-room-maps`. |
+| HR06 `hero-our-desk` | Entregada, **no se usa todavía**: muestra a dos personas sentadas de espaldas y puede leerse como el equipo real. Our desk mantiene `nf-dispatch-room-maps`. Carlos decide. |
+| DK01 `desk-log-backdrop` | Entregada, **no se usa** (casi negra). |
+| Apoyo | `cta-night-truck-16x9`, `og-default-1200x630` (recortes alternos, sin uso); `faq-dock-light` horizontal se usa como `nf-faq-dock-light-wide`. |
+
 ---
 
 ## 7. Prompts de imagen

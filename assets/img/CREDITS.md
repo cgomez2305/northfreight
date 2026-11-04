@@ -1,30 +1,44 @@
 # Créditos de imágenes
 
-Toda la fotografía del sitio es el set **Night Freight**: 36 imágenes generadas con IA por Carlos siguiendo `ART-DIRECTION.md` (hora azul y noche, navy y cian con un acento ámbar, sin rostros, sin logotipos ni texto legible). Los **masters originales (PNG de 1122 a 1914 px de ancho) están fuera del repositorio**. Este archivo no se sirve por web (`index.php` bloquea `.md`).
+Toda la fotografía del sitio es de Carlos (generada con IA). Hay dos generaciones:
 
-No queda ninguna foto de stock (Pixabay ni del andamiaje inicial) ni ningún video: `assets/video/` ya no existe. Los videos de stock se retiraron porque no combinan con la línea gráfica; el slot de video sigue en el código (ver "Slot de video" abajo).
+- **Set v2 "fotografía documental" (fase J, 2026-11-04):** 33 masters JPG de 3840 px de ancho (el CTA, de 3864 px; el OG, de 2400 px; FAQ 4:5 de 3072×3840) generados con los prompts de `ART-DIRECTION-v2.md`. **Los masters están fuera del repositorio.** Nombre de archivo: `nf-<nombre-v2>` (p. ej. `nf-service-dispatch-booking`).
+- **Set v1 "Night Freight" (fases E a G):** solo quedan 4 piezas en uso: `nf-highway-dusk-white-trucks` (+ `-m`, `-sq`; es el primer fotograma de `assets/video/hero.mp4`), `nf-freight-dock-loop` (primer fotograma de `assets/video/freight-dock.mp4`), `nf-dispatch-room-maps` (+ `-tall`) y `nf-dispatch-room-wide-night`. Se conservan hasta que Carlos regenere los videos o decida sustituirlas (ver "Lo discutible" en el reporte de la fase J).
+
+No hay ninguna foto de stock. Este archivo no se sirve por web (`index.php` bloquea `.md`).
+
+## Gradación de marca (fase J, script fuera del repo)
+
+Las v2 salen más grises y claras que el sitio (navy `#04101F` y cian). Antes de exportar, TODAS reciben la misma gradación por lote (PIL + numpy, en float):
+
+1. **Anti-banding:** en las zonas planas (diferencia de luminancia con una versión desenfocada σ 7 menor de 0,02) se mezcla con esa versión desenfocada; los bordes reales no se tocan. Rompe los plateaus de posterizado de cielos, papeles y zonas oscuras.
+2. **Sombras hacia navy:** mezcla con `#04101F` del 30 % en luminancia 0, decreciendo lineal hasta 0 % en luminancia 0,35.
+3. **Medios tonos más fríos:** rojo −3 % y azul +2 %, ponderados por 4·Y·(1−Y).
+4. **Saturación** ×0,97 (no sube); el cian no se refuerza.
+5. **Curva** con contraste suave: 22 % de mezcla con `smoothstep`.
+6. **Grano luminoso** gaussiano σ 1,2 % (mismo valor en R, G y B) aplicado a 3840 px antes de reducir.
+
+Hoja antes y después de las 4 pruebas (exterior nocturno, cielo nublado claro, interior con lámpara, detalle de papeles) en el reporte de la fase J.
 
 ## Archivos
 
-- `nf-<nombre>.jpg` (respaldo, ancho nativo) y `nf-<nombre>-{640,1024,1280,…,ancho nativo}.webp` (calidad 84, `method=6`, `unsharp` suave de radio 0,6 y 40 % solo en las variantes reducidas; la variante nativa no se retoca). Ninguna variante se amplía por encima del master.
+- `nf-<nombre>.jpg`: respaldo a 1600 px de ancho (calidad 85, progresivo).
+- `nf-<nombre>-{640,1024,1280,1600,2048,2560}.webp` y `-3200.webp` solo en los heros fotográficos (patrón A) y el CTA: calidad 83, `method=6`, `unsharp` suave (radio 0,6, 40 %) en todas las variantes (todas son reducciones; no se exporta el ancho nativo). El mega menú solo lleva 640 y 1024. `ns_img()` los detecta por nombre.
 - Fuera del set: `favicon.png|svg`, `isotype*.svg`, `star-outline.svg` y `og-default.jpg`.
 
-## Recortes reales (hechos desde el master a resolución nativa, no con `cover`)
+## Recortes reales (desde el master gradado a resolución nativa, no con `cover`)
 
-| Archivo | Master | Recorte | Uso |
+| Archivo | Master | Recorte (x0, y0, x1, y1) | Uso |
 |---|---|---|---|
-| `nf-highway-dusk-white-trucks-m-{480,640,753}` | 1672×941 | 4:5, 753×941, x 811 a 1564 | Hero del home ≤760 px |
-| `nf-highway-dusk-white-trucks-sq-{640,941}` | 1672×941 | 1:1, 941×941, x 666 a 1607 | Hero del home 761 a 1024 px |
-| `nf-{phone-chat-dashboard,archive-aisle-cyan,dispatch-room-maps,hands-map-keys,signing-clipboard-night,white-truck-rainy-highway,trailer-rows-aerial}-tall-{480,640,819}` | 1536×1024 | 4:5, 819×1024, a alto completo | Sticky "Why a desk" (3) y onboarding (4) en ≥1025 px |
-| `nf-truck-lights-rain-front-pill-320`, `nf-white-truck-cyan-horizon-pill-320` | 1672×941 y 1734×907 | 2,125:1 (640×301 y 760×358) reducido a 320 px | Pastillas del H2 "Three fronts" |
-| `nf-lone-truck-rain-night-m-{480,658}` | 1914×822 | 4:5, 658×822, x 1202 a 1860 | CTA final en móvil |
-| `og-default.jpg` | `nf-white-truck-cyan-horizon` | 1200×630 (1,905:1) con velo, isotipo, "NORTHSTAR" y la frase de siempre | Imagen al compartir |
+| `nf-cta-night-truck-m-{480,640,1024,1325}` | 3864×1656 | 4:5, 2390,0 a 3715,1656 | CTA final en móvil (≤760 px) |
+| `nf-{why-one-channel,why-record-every-load}-tall-{480,640,1024,1280}` | 3840×2560 | 4:5, 2048×2560: 973,0 a 3021,2560 y 1088,0 a 3136,2560 | Sticky "Why a desk" (≥1025 px) |
+| `nf-onboarding-{learn,scope,run,review}-tall-{480,640,1024,1280}` | 3840×2560 | 4:5, 2048×2560: x0 896, 1088, 1664 y 1357 | Onboarding del home (≥1025 px) |
+| `nf-hero-amazon-relay-pill-320`, `nf-hero-dry-van-pill-320` | 3840×2880 | 2,125:1 a todo el ancho: 0,681 a 3840,2488 y 0,536 a 3840,2343, reducido a 320 px | Pastillas del H2 "Three fronts" |
+| `nf-highway-dusk-white-trucks-{m,sq}-*` | v1 (1672×941) | sin cambios | Hero del home en ≤760 px y 761 a 1024 px |
+| `og-default.jpg` | `og-default` v2 (2400×1256) | 2392×1256 (x 8 a 2400) reducido a 1200×630, con velo, isotipo, "NORTHSTAR" y la frase de siempre | Imagen al compartir |
 
-## Fase H (heroes y marcos fotográficos)
-
-- Se retiran los recortes 4:3 `-r43` de Dry van y How it works: los heros fotográficos usan ahora el master completo (`nf-white-truck-cyan-horizon`, `nf-route-map-night-trucks`, srcset hasta el ancho nativo).
-- Se recupera `nf-trailer-dock-night-mist` (1536×1024, sin recorte; WebP 640/1024/1280/1536 + JPG) como foto del hero de Amazon Relay: el sujeto queda a la derecha y la zona izquierda oscura sirve al texto. `nf-hitching-trailer-rain` pasa a la foto ancha de "Why Relay needs a dedicated desk".
-- Marcos grandes (hero fotográfico, filas apiladas, banda): la foto va anclada a la derecha del marco con el 90 % del ancho (máscara en su borde izquierdo, bajo el degradado del texto), de modo que un master de 1448 px de ancho nunca se amplía por encima de x1,6 en retina dentro del marco de 1280 px.
+No se usan: `hero-highway-poster` (el hero del home sigue con la foto v1 porque es el primer fotograma del video), `hero-our-desk` (muestra a dos personas sentadas de espaldas: Carlos decide), `desk-log-backdrop` (casi negra), `cta-night-truck-16x9` y `og-default-1200x630` (apoyo).
+`nf-faq-dock-light-wide` es la versión horizontal de la foto del FAQ (apoyo): miniatura de `/blog/` y foto provisional de Box truck (draft).
 
 ## Videos (Night Freight)
 

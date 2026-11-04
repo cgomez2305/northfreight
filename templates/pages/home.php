@@ -35,15 +35,15 @@ $services = [
     ['num' => '01', 'title' => 'Dispatch & load booking',
      'text' => 'We search, negotiate and book freight on Amazon Relay and dry van lanes, plan routes around hours of service and coordinate every pickup with your drivers.',
      'href' => url('/dispatch-for-owner-operators/'), 'cta' => 'Dispatch for owner-operators',
-     'image' => ['base' => 'nf-trailer-dock-dusk', 'alt' => 'White dry van trailer backed into a warehouse loading dock at dusk', 'sizes' => $railSizes]],
+     'image' => ['base' => 'nf-service-dispatch-booking', 'alt' => 'White dry van trailer backed into a warehouse loading dock at dusk', 'sizes' => $railSizes]],
     ['num' => '02', 'title' => 'Load tracking & check calls',
      'text' => 'Every trip followed from pickup to POD: ETAs, arrivals and departures logged, incidents documented and brokers kept informed, so you are not on the phone.',
      'href' => url('/load-tracking/'), 'cta' => 'Load tracking',
-     'image' => ['base' => 'nf-phone-route-rain-highway', 'alt' => 'Hand holding a phone with a route line while a semi truck drives past on a rainy highway', 'sizes' => $railSizes]],
+     'image' => ['base' => 'nf-service-load-tracking', 'alt' => 'A hand holding a phone inside a truck cab at dusk, with a trailer parked beyond the windshield', 'sizes' => $railSizes]],
     ['num' => '03', 'title' => 'Trucking back office',
      'text' => 'Paperwork organized, settlements prepared and disputes followed with evidence. We also help onboard new drivers so they are ready to roll on day one.',
      'href' => url('/trucking-back-office/'), 'cta' => 'Back office services',
-     'image' => ['base' => 'nf-logistics-desk-cyan', 'alt' => 'Desk at night with a laptop, a tablet showing a table, a stack of paperwork and a pen under a lamp', 'sizes' => $railSizes]],
+     'image' => ['base' => 'nf-service-back-office', 'alt' => 'Desk with a stack of paper forms, a pen, a binder clip, a closed laptop and a tablet', 'sizes' => $railSizes]],
 ];
 
 $relay = [
@@ -56,9 +56,9 @@ $relay = [
 // 03 Why a desk: tres razones ya afirmadas en el sitio (How it works, Our desk, Evidence). Cada una enlaza a la página donde se explica (son los elementos enfocables del sticky).
 $why = [
     ['01', 'One channel for every update', 'Updates you can follow, in one channel: WhatsApp, where you already work.',
-     'nf-phone-chat-dashboard', '/load-tracking/', 'Load tracking'],
+     'nf-why-one-channel', '/load-tracking/', 'Load tracking'],
     ['02', 'A record of every load', 'Arrival timestamps and photos kept on file, with the BOL and POD filed per load.',
-     'nf-archive-aisle-cyan', '/trucking-back-office/', 'Trucking back office'],
+     'nf-why-record-every-load', '/trucking-back-office/', 'Trucking back office'],
     ['03', 'A team behind every load', 'The same desk books, tracks and documents every load, as one team.',
      'nf-dispatch-room-maps', '/how-it-works/', 'How it works'],
 ];
@@ -66,13 +66,13 @@ $why = [
 // 04 Onboarding: foto decorativa por paso (alt descriptivo corto)
 $steps = [
     ['01', 'We learn your operation', 'Trucks, equipment, lanes, drivers and the accounts you already run, including Amazon Relay.',
-     ['base' => 'nf-hands-map-keys', 'alt' => 'Hands gathered around a folded route map with a truck key and a notebook beside it']],
+     ['base' => 'nf-onboarding-learn', 'alt' => 'Hands over a paper road map on a worn table, with a pen, truck keys and a notebook']],
     ['02', 'We define scope & contacts', 'Who approves loads, how we report, and which tasks the desk owns from day one.',
-     ['base' => 'nf-signing-clipboard-night', 'alt' => 'Hand signing a form on a clipboard at night, with a trailer out of focus behind']],
+     ['base' => 'nf-onboarding-scope', 'alt' => 'Hand signing a form on a clipboard, with a trailer parked out of focus behind']],
     ['03', 'We run the day-to-day', 'Booking, tracking and documenting every load, with updates where you already work: WhatsApp.',
-     ['base' => 'nf-white-truck-rainy-highway', 'alt' => 'White semi truck with a dry van trailer driving a wet highway at night']],
+     ['base' => 'nf-onboarding-run', 'alt' => 'White semi truck with a dry van trailer driving past at dusk, with the background blurred by motion']],
     ['04', 'We review & improve', 'Regular reviews of lanes, rates and incidents to keep your trucks earning.',
-     ['base' => 'nf-trailer-rows-aerial', 'alt' => 'Aerial view of white trailers lined up in rows in a truck lot at night']],
+     ['base' => 'nf-onboarding-review', 'alt' => 'Rows of white trailers parked in a truck yard beside a warehouse at dusk, with a tractor pulling through']],
 ];
 
 $chapters = [
@@ -159,7 +159,7 @@ $figures = [
 <section class="section home-services" id="services" aria-labelledby="services-title">
   <div class="home-services__pin">
     <div class="container">
-      <?php partial('section-head', ['eyebrow' => '01 · What we manage', 'title' => 'Three fronts.{pill:nf-truck-lights-rain-front}{br}One dispatch desk.{pill:nf-white-truck-cyan-horizon}', 'id' => 'services-title', 'split' => true,
+      <?php partial('section-head', ['eyebrow' => '01 · What we manage', 'title' => 'Three fronts.{pill:nf-hero-amazon-relay}{br}One dispatch desk.{pill:nf-hero-dry-van}', 'id' => 'services-title', 'split' => true,
           'lead' => 'Most truck dispatch companies stop at the booking. We stay on the load until the money is in. The same team that books it tracks it and closes it out.']); ?>
     </div>
     <div class="container home-rail">
@@ -186,15 +186,15 @@ $figures = [
     'items'   => [
         ['label' => 'Owner-operator', 'title' => 'Owner-operator', 'wa' => 'owner',
          'points' => ['You approve every load', 'Updates on WhatsApp, where you already work', 'Arrival timestamps and photos kept on file'],
-         'image' => ['base' => 'nf-lone-truck-blue-twilight', 'alt' => 'Lone white semi truck parked on a wet lot under a blue twilight sky', 'pos' => '60% 100%'],
+         'image' => ['base' => 'nf-setup-owner-operator', 'alt' => 'White semi truck parked alone in an empty lot at dusk, with bare trees behind', 'pos' => '60% 100%'],
          'link' => ['label' => 'Dispatch for owner-operators', 'href' => url('/dispatch-for-owner-operators/')]],
         ['label' => 'Small fleet', 'title' => 'Small fleet', 'wa' => "Hi, I run a small fleet and I'd like to talk about dispatch with NorthStar.",
          'points' => ['A team, not a single dispatcher', 'New drivers set up and ready to roll on day one', 'Who approves loads, how we report and which tasks the desk owns'],
-         'image' => ['base' => 'nf-white-fleet-blue-hour', 'alt' => 'Five white semi trucks lined up in a lot at blue hour beside a street lamp', 'pos' => '50% 70%'],
+         'image' => ['base' => 'nf-setup-small-fleet', 'alt' => 'Several white semi trucks parked in a row in a depot lot at dusk', 'pos' => '50% 70%'],
          'link' => ['label' => 'See how we onboard', 'href' => url('/how-it-works/')]],
         ['label' => 'Amazon Relay carrier', 'title' => 'Amazon Relay carrier', 'wa' => 'relay',
          'points' => ['Block and load booking', 'Trip and arrival records', 'Scorecard follow-up and disputes filed with evidence'],
-         'image' => ['base' => 'nf-loading-dock-blue-hour', 'alt' => 'Open loading dock door glowing cyan under a blue-hour sky', 'pos' => '50% 55%'],
+         'image' => ['base' => 'nf-setup-amazon-relay', 'alt' => 'White semi truck at a warehouse dock wall at night under tall floodlights', 'pos' => '50% 55%'],
          'link' => ['label' => 'Amazon Relay dispatch', 'href' => url('/amazon-relay-dispatch/')]],
     ],
 ]); ?>
@@ -337,4 +337,4 @@ partial('photo-card', [
 
 <!-- 09 FAQ -->
 <?php partial('faq', ['items' => route_faq_items($route), 'eyebrow' => '09 · FAQ', 'title' => 'Truck dispatch questions carriers ask us.', 'pre_cta' => true,
-    'image' => ['base' => 'nf-dock-door-amber-night', 'alt' => 'Open loading dock door glowing under an amber lamp at night', 'sizes' => '(min-width:1025px) 660px, 0px']]); ?>
+    'image' => ['base' => 'nf-faq-dock-light-4x5', 'alt' => 'Open loading dock door under a warm wall light at dusk, with yellow bollards', 'sizes' => '(min-width:1025px) 660px, 0px']]); ?>

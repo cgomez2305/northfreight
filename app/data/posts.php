@@ -17,7 +17,7 @@
 return [
     [
         'slug'     => 'how-much-does-truck-dispatch-cost',
-        'image'    => ['base' => 'nf-vintage-calculator-night-road', 'alt' => 'Vintage desk calculator beside a notepad and a clock, with a truck on a night road behind'],
+        'image'    => ['base' => 'nf-blog-cost', 'alt' => 'Desk calculator beside coins and a folded paper receipt next to a rain-streaked window'],
         'path'     => '/blog/how-much-does-truck-dispatch-cost/',
         'title'    => 'How much does truck dispatch service cost?',
         'category' => 'Dispatch',
@@ -39,7 +39,7 @@ return [
     ],
     [
         'slug'     => 'amazon-relay-requirements',
-        'image'    => ['base' => 'nf-clipboard-on-truck-hood', 'alt' => 'Checklist on a clipboard resting on a truck hood at a night dock'],
+        'image'    => ['base' => 'nf-blog-relay-requirements', 'alt' => 'Clipboard with a blank checklist resting on a truck hood, with a trailer at a dock behind'],
         'path'     => '/blog/amazon-relay-requirements/',
         'title'    => 'Amazon Relay requirements for carriers',
         'category' => 'Amazon Relay',
@@ -61,7 +61,7 @@ return [
     ],
     [
         'slug'     => 'amazon-relay-load-board',
-        'image'    => ['base' => 'nf-tablet-cab-night-yard', 'alt' => 'Tablet mounted in a truck cab at night looking over a yard of trailers'],
+        'image'    => ['base' => 'nf-blog-relay-load-board', 'alt' => 'Rugged tablet mounted on a truck dashboard with a clipboard below and a trailer yard beyond the windshield'],
         'path'     => '/blog/amazon-relay-load-board/',
         'title'    => 'How the Amazon Relay load board works',
         'category' => 'Amazon Relay',
@@ -83,7 +83,7 @@ return [
     ],
     [
         'slug'     => 'lumper-fees-detention-pay',
-        'image'    => ['base' => 'nf-dock-waiting-clock', 'alt' => 'Wall clock beside a loading dock door at night as a trailer waits'],
+        'image'    => ['base' => 'nf-blog-lumper-detention', 'alt' => 'Loaded trailer at a loading dock at night, with a wall clock above the dock door and a clipboard on a ledge'],
         'path'     => '/blog/lumper-fees-detention-pay/',
         'title'    => 'Lumper fees and detention pay: how to get paid for both',
         'category' => 'Paperwork & pay',
@@ -105,7 +105,7 @@ return [
     ],
     [
         'slug'     => 'rate-per-mile',
-        'image'    => ['base' => 'nf-calculator-map-dashboard', 'alt' => 'Calculator and route map on a truck dashboard at dusk'],
+        'image'    => ['base' => 'nf-resource-rate-per-mile', 'alt' => 'Calculator and a folded paper road map on a truck dashboard, with the highway ahead'],
         'path'     => '/resources/rate-per-mile-calculator/',
         'title'    => 'Rate per mile: know if a load pays',
         'category' => 'Dispatch',
@@ -118,7 +118,7 @@ return [
     ],
     [
         'slug'     => 'glossary',
-        'image'    => ['base' => 'nf-cards-fan-key-fob', 'alt' => 'Fan of blank cards beside a notebook and a truck key fob'],
+        'image'    => ['base' => 'nf-resource-glossary', 'alt' => 'Blank index cards, a worn notebook and a truck key fob on a desk beside a window'],
         'path'     => '/resources/glossary/',
         'title'    => 'The trucking glossary for new owner-operators',
         'category' => 'Dispatch',
@@ -131,7 +131,7 @@ return [
     ],
     [
         'slug'     => 'fill-a-bol',
-        'image'    => ['base' => 'nf-shipping-form-clipboard', 'alt' => 'Clipboard with a blank shipping form under a cool light'],
+        'image'    => ['base' => 'nf-resource-bol-template', 'alt' => 'Clipboard with a blank multi-part shipping form and a pen'],
         'path'     => '/resources/bol-template/',
         'title'    => 'How to fill a bill of lading',
         'category' => 'Paperwork & pay',

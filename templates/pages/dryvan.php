@@ -22,7 +22,7 @@ partial('hero', [
     'ctas'  => [
         ['label' => 'Talk to a dispatcher', 'href' => wa($route['wa']), 'wa' => true, 'arrow' => true],
     ],
-    'image' => ['base' => 'nf-white-truck-cyan-horizon', 'alt' => 'White semi truck pulling a dry van trailer at dusk under a cyan horizon', 'pos' => '70% 50%', 'sizes' => '(min-width:1025px) 1350px, (min-width:761px) 100vw, 580px'],
+    'image' => ['base' => 'nf-hero-dry-van', 'alt' => 'White semi truck pulling a dry van trailer along a highway under an overcast dusk sky', 'pos' => '70% 50%', 'sizes' => '(min-width:1025px) 1350px, (min-width:761px) 100vw, 580px'],
 ]);
 
 // Resumen "In short" (SEO/GEO): editable aquí. Solo información que ya está en el copy de esta página; sin cifras, tarifas ni promesas nuevas.
@@ -52,7 +52,7 @@ partial('summary', [
     'eyebrow' => 'How we work',
     'title'   => 'One desk behind every dry van load',
     'lead'    => 'The same desk books, tracks and documents every load, as one team.',
-    'image'   => ['base' => 'nf-loading-dock-blue-hour', 'alt' => 'Open loading dock door glowing cyan under a blue-hour sky', 'pos' => '50% 55%'],
+    'image'   => ['base' => 'nf-check-dry-van-interior', 'alt' => 'Inside an empty dry van trailer, with cargo rails along the walls and a worn wooden floor', 'pos' => '50% 55%'],
     'extra'   => ns_checks(['You approve every load', 'Updates on WhatsApp, where you already work', 'A record of every load', 'A team, not a single dispatcher'], 'What working with the desk means'),
 ]); ?>
 

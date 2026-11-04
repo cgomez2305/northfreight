@@ -13,7 +13,7 @@
  *  tagline string  frase corta bajo el titular
  *  lead    string  entrada
  *  ctas    array   [['label','href','variant'=>'primary|ghost','icon'=>'arrow|whatsapp|null','arrow'=>bool (→ de texto, solo en ghost: los primarios ya llevan la celda de flecha ↗ por CSS)],…]
- *  image   array   ['base'=>'nf-cab-interior-cyan-night','alt'=>'…','pos'=>'70% 50%' (object-position), 'sizes'=>'…' (ancho útil del cover: max(ancho del marco, alto de la foto ≈ 704 px × proporción); las fotos 16:9 o más anchas necesitan sizes mayor y, en móvil, el marco 4:3 manda por el alto)] PATRÓN A (hero fotográfico): la foto es el marco del hero (ancho del contenedor, radio 32), anclada a la derecha
+ *  image   array   ['base'=>'nf-hero-owner-operators','alt'=>'…','pos'=>'70% 50%' (object-position), 'sizes'=>'…' (ancho útil del cover: max(ancho del marco, alto de la foto ≈ 704 px × proporción); las fotos 16:9 o más anchas necesitan sizes mayor y, en móvil, el marco 4:3 manda por el alto)] PATRÓN A (hero fotográfico): la foto es el marco del hero (ancho del contenedor, radio 32), anclada a la derecha
  *                  del panel con `.px`; el texto va abajo a la izquierda sobre degradado (--photo-fade-*) y las migas arriba como chip. En <1025px la foto va arriba y el texto debajo, sin superponer.
  *  aside   string  HTML ya renderizado. Con `image` es una tarjeta de vidrio abajo a la derecha (solo copy ya afirmado: ficha de equipo, puntos del resumen); sin `image`, columna derecha como siempre (Desk log, vista previa de documento)
  *  bg      string  HTML ya renderizado que sustituye a la foto (la fachada del video en Our desk: el marco ya lleva su <picture> y el botón de play)
