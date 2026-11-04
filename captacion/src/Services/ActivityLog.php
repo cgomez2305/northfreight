@@ -27,6 +27,44 @@ final class ActivityLog
         }
     }
 
+    /** Aplana un arreglo a ruta.con.puntos => valor (para comparar ajustes anidados). */
+    private static function flat(mixed $v, string $prefix = ''): array
+    {
+        if (!is_array($v)) {
+            return [$prefix => $v];
+        }
+        if (!$v) {
+            return [$prefix => []];
+        }
+        $out = [];
+        foreach ($v as $k => $x) {
+            $out += self::flat($x, $prefix === '' ? (string) $k : $prefix . '.' . $k);
+        }
+        return $out;
+    }
+
+    /**
+     * Registra un cambio de configuracion con los valores anterior y nuevo SOLO de lo que cambio (rutas con puntos). Nunca recibe secretos: quien llama pasa
+     * ajustes del panel, no variables del .env. Devuelve true si habia algo que registrar.
+     */
+    public static function settingsChange(int $userId, string $group, array $before, array $after): bool
+    {
+        $a = self::flat($before);
+        $b = self::flat($after);
+        $diff = [];
+        foreach (array_unique(array_merge(array_keys($a), array_keys($b))) as $path) {
+            if (($a[$path] ?? null) !== ($b[$path] ?? null)) {
+                $diff[$path] = [$a[$path] ?? null, $b[$path] ?? null];
+            }
+        }
+        if (!$diff) {
+            return false;
+        }
+        $extra = count($diff) > 40 ? ['truncated' => count($diff)] : [];
+        self::record('settings_change', $userId, 'settings', $group, ['diff' => array_slice($diff, 0, 40, true)] + $extra);
+        return true;
+    }
+
     public static function ip(): ?string
     {
         $ip = $_SERVER['REMOTE_ADDR'] ?? null;

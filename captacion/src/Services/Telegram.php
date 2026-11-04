@@ -18,8 +18,21 @@ final class Telegram
         return (Env::get('TELEGRAM_BOT_TOKEN') ?? '') !== '' && (Env::get('TELEGRAM_CHAT_ID') ?? '') !== '';
     }
 
-    /** @throws \RuntimeException sin configurar o si Telegram rechaza/no responde (el job se reintenta) */
+    /** @throws \RuntimeException sin configurar o si Telegram rechaza/no responde (el job se reintenta). Deja el resultado en Integrations (estado de la pantalla de Configuracion). */
     public static function send(string $htmlText): void
+    {
+        try {
+            self::doSend($htmlText);
+            Integrations::record('telegram', true);
+        } catch (\RuntimeException $e) {
+            if (self::configured()) {
+                Integrations::record('telegram', false, $e->getMessage());
+            }
+            throw $e;
+        }
+    }
+
+    private static function doSend(string $htmlText): void
     {
         if (!self::configured()) {
             throw new \RuntimeException('Telegram sin configurar: faltan TELEGRAM_BOT_TOKEN o TELEGRAM_CHAT_ID en config/.env');
@@ -49,17 +62,18 @@ final class Telegram
     }
 
     /**
-     * Texto de la alerta de un lead (HTML de Telegram). $kind: 'hot' | 'followup' | 'signed_reentry'.
+     * Texto de la alerta de un lead (HTML de Telegram). $kind: 'hot' | 'warm' | 'followup' | 'signed_reentry'; $minutes = espera de la segunda alerta.
      * Lleva: nombre, perfil, estado, equipo, puntuacion, fuente, pagina de llegada, enlace tel: y enlace al lead en el panel.
      */
-    public static function leadText(array $lead, string $kind): string
+    public static function leadText(array $lead, string $kind, ?int $minutes = null): string
     {
         $profiles = ['owner_operator' => 'Owner-operator', 'small_carrier' => 'Carrier pequeno', 'company_driver' => 'Company driver'];
         $name = trim(($lead['first_name'] ?? '') . ' ' . ($lead['last_name'] ?? ''));
         $phone = (string) ($lead['phone_e164'] ?? '');
         $equipment = self::equipment($lead);
         $head = match ($kind) {
-            'followup'       => 'SIN CONTACTO tras 15 min: lead caliente',
+            'followup'       => 'SIN CONTACTO tras ' . ($minutes ?? 15) . ' min: lead caliente',
+            'warm'           => 'Lead TIBIO',
             'signed_reentry' => 'Un lead ya FIRMADO volvio a escribir',
             default          => 'Lead CALIENTE',
         };

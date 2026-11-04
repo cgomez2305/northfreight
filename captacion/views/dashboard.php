@@ -103,7 +103,7 @@ $days = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domin
       <dl class="strip">
         <div><dt>Calificados (caliente + tibio)</dt><dd><?= $strip['qualified_pct'] !== null ? $e(Fmt::pct($strip['qualified_pct'], 1)) : '—' ?></dd></div>
         <div><dt>Tasa de descarte</dt><dd><?= $strip['discard_pct'] !== null ? $e(Fmt::pct($strip['discard_pct'], 1)) : '—' ?></dd></div>
-        <div><dt>Costo por lead</dt><dd><?php if ($strip['cpl'] !== null): ?>$<?= $e(Fmt::num($strip['cpl'], 2)) ?><?php else: ?><span class="dd-na"><?= $strip['has_costs'] ? 'Sin leads con costo este mes' : 'Sin costos cargados' ?></span><?php endif; ?></dd></div>
+        <div><dt>Costo por lead</dt><dd><?php if ($strip['cpl'] !== null): ?>$<?= $e(Fmt::num($strip['cpl'], 2)) ?><?php if ($strip['cps'] !== null): ?> <span class="dd-na">· $<?= $e(Fmt::num($strip['cps'], 0)) ?> por firmado</span><?php endif; ?><?php else: ?><span class="dd-na"><?= $strip['has_costs'] ? 'Sin leads con costo este mes' : 'Sin costos cargados' ?></span><?php endif; ?></dd></div>
       </dl>
       <p class="foot-note">Franja: últimas 12 semanas<?= $strip['n'] > 0 ? ' · ' . $e(Fmt::num($strip['n'])) . ' leads' : '' ?>.</p>
     </div>

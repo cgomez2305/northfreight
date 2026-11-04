@@ -20,8 +20,7 @@ final class Mailer
 
     public static function to(): string
     {
-        $to = trim((string) Env::get('MAIL_TO', ''));
-        return filter_var($to, FILTER_VALIDATE_EMAIL) ? $to : '';
+        return Alerts::mailTo();   // el de Configuracion > Alertas o, si esta vacio, MAIL_TO del .env
     }
 
     /** @return string 'sent' | 'logged' */
@@ -50,7 +49,13 @@ final class Mailer
                 $m->isHTML(false);
                 $m->Subject = $subject;
                 $m->Body = $body;
-                $m->send();   // si falla lanza: el job se reintenta
+                try {
+                    $m->send();   // si falla lanza: el job se reintenta
+                } catch (\Throwable $t) {
+                    Integrations::record('smtp', false, $t->getMessage());
+                    throw $t;
+                }
+                Integrations::record('smtp', true);
                 Storage::log('mail', '[sent] to=' . $to . ' subject=' . $subject);
                 return 'sent';
             }

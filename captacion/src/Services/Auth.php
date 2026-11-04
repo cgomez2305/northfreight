@@ -124,6 +124,21 @@ final class Auth
         return ['status' => 'ok', 'via' => $via, 'recovery_left' => $left];
     }
 
+    /** Comprueba un codigo TOTP de 6 digitos y lo consume (un paso usado no se reutiliza). No toca la sesion ni last_login_at. */
+    public static function consumeTotp(array $user, string $code): bool
+    {
+        $secret = Crypto::decrypt((string) $user['totp_secret']);
+        $code = trim($code);
+        if ($secret === null || preg_match('/^\d{3}\s?\d{3}$/', $code) !== 1) {
+            return false;
+        }
+        $step = Totp::verify($secret, $code, Clock::time(), 1, $user['totp_last_step'] !== null ? (int) $user['totp_last_step'] : null);
+        if ($step === null) {
+            return false;
+        }
+        return Db::run('UPDATE users SET totp_last_step = ? WHERE id = ? AND (totp_last_step IS NULL OR totp_last_step < ?)', [$step, (int) $user['id'], $step])->rowCount() === 1;
+    }
+
     // --- Codigos de recuperacion ---------------------------------------------------------------------------------
 
     public static function normalizeRecovery(string $code): string

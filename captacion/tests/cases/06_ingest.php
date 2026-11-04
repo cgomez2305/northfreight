@@ -45,7 +45,9 @@ return static function (array $ctx): void {
     T::eq(array_column($cs, 'channel'), ['call', 'email', 'sms'], 'consentimiento: una fila por canal cubierto (call, email, sms)');
     T::ok($cs[0]['consent_text'] === 'TEXTO EXACTO DEL CONSENTIMIENTO v1' && $cs[0]['ip'] === '203.0.113.9' && $cs[0]['user_agent'] === 'UA-Test/1.0' && $cs[0]['revoked_at'] === null && $cs[0]['consent_version'] === 'v1', 'consentimiento: texto exacto, IP, user agent, version y fecha');
     $j = $jobs();
-    T::ok(count($j) === 1 && $j[0]['type'] === 'email_notify' && $j[0]['status'] === 'pending', 'lead tibio: solo email_notify');
+    $types = array_column($j, 'type');
+    sort($types);
+    T::ok($types === ['email_notify', 'telegram_alert'] && $j[0]['status'] === 'pending' && str_contains((string) Db::value("SELECT payload FROM jobs WHERE type = 'telegram_alert'"), '"warm"'), 'lead tibio: correo + Telegram de tibios (sin llave de FMCSA el modo automatico avisa de los tibios)');
 
     // sin consentimiento: no se crean filas
     T::reset();
@@ -121,7 +123,7 @@ return static function (array $ctx): void {
     JobHandlers::$fmcsa = null;
     $lead = Lead::find($leadId);
     T::ok(!in_array('fmcsa_pending', $lead['flags'], true) && $lead['temperature'] === 'hot' && $lead['score'] === 100, 'job fmcsa_enrich: quita fmcsa_pending y reevalua (100, caliente)');
-    T::ok($count('jobs', "type = 'telegram_alert'") === 1 && $count('jobs', "type = 'telegram_alert_followup'") === 1, 'al pasar a caliente tras FMCSA se encolan A2 y A3');
+    T::ok($count('jobs', "type = 'telegram_alert' AND payload LIKE '%\"hot\"%'") === 1 && $count('jobs', "type = 'telegram_alert_followup'") === 1, 'al pasar a caliente tras FMCSA se encolan A2 y A3');
     T::ok(in_array('fmcsa', $events($leadId), true) && $count('lead_events', "lead_id = $leadId AND type = 'scored'") === 2, 'eventos fmcsa y un segundo scored');
 
     // ---------------------------------------------------------------- deduplicacion
@@ -147,9 +149,9 @@ return static function (array $ctx): void {
     T::reset();
     $a = LeadIngest::handle(['email' => null, 'trucks' => null, 'equipment' => []] + $base, 'web_careers');
     $aid = (int) $a['lead_id'];
-    $jobsBefore = $count('jobs', "type = 'telegram_alert'");
+    $jobsBefore = $count('jobs', "type = 'telegram_alert' AND payload LIKE '%\"hot\"%'");
     $r = LeadIngest::handle(['trucks' => '10', 'equipment' => ['reefer'], 'referral_code' => 'AMIGO'] + $base, 'web_careers');
-    T::ok($r['status'] === 'reentry' && Lead::find($aid)['temperature'] === 'hot' && $jobsBefore === 0 && $count('jobs', "type = 'telegram_alert'") === 1, 'reingreso que sube a caliente: se encola la alerta A2');
+    T::ok($r['status'] === 'reentry' && Lead::find($aid)['temperature'] === 'hot' && $jobsBefore === 0 && $count('jobs', "type = 'telegram_alert' AND payload LIKE '%\"hot\"%'") === 1, 'reingreso que sube a caliente: se encola la alerta A2');
     // Reingreso de un descartado sigue siendo descartado (no se pisan CDL/ingles)
     // Regla 2: perdido hace mas de 90 dias -> reabrir
     T::reset();

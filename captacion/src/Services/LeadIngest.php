@@ -25,7 +25,8 @@ use Captacion\Models\Lead;
 
 final class LeadIngest
 {
-    public const FOLLOWUP_MINUTES = 15;
+    /** Minutos por defecto de la segunda alerta A3 (el valor vigente sale de Alerts::followupMinutes(), editable en Configuracion). */
+    public const FOLLOWUP_MINUTES = Alerts::DEFAULTS['followup_minutes'];
 
     public static function handle(array $data, string $source, array $ctx = []): array
     {
@@ -171,7 +172,7 @@ final class LeadIngest
                 if ($scored['temperature'] === 'hot' && $existing['temperature'] !== 'hot') {
                     self::enqueueFor($leadId, 'hot', $attempt);
                 }
-                Queue::push('email_notify', ['lead_id' => $leadId, 'kind' => 'reentry'], $now);
+                self::pushEmail($leadId, 'reentry', null);
             }
         }
         if ($fmPending && ($merged['usdot'] ?? null) !== null) {
@@ -223,15 +224,33 @@ final class LeadIngest
         return self::result('created', $leadId, $row);
     }
 
-    /** Paso 6: acciones segun la temperatura. Caliente: A2 inmediato + A3 a 15 min. Tibio y frio: aviso por correo. Descartado: nada (solo el evento). */
+    /** Paso 6: acciones segun la temperatura y los ajustes de Alertas. Caliente: A2 inmediato + A3 a los N min. Tibio: correo + (si esta activado) Telegram. Frio: correo. Descartado: nada. */
     public static function enqueueFor(int $leadId, string $temperature, int $attempt = 1): void
     {
         $now = Clock::now();
+        $cfg = Alerts::get();
         if ($temperature === 'hot') {
-            Queue::push('telegram_alert', ['lead_id' => $leadId, 'kind' => 'hot'], $now, 'telegram_alert:' . $leadId . ':' . $attempt);
-            Queue::push('telegram_alert_followup', ['lead_id' => $leadId], Clock::shift(self::FOLLOWUP_MINUTES * 60), 'telegram_followup:' . $leadId . ':' . $attempt);
+            if ($cfg['hot_telegram']) {
+                Queue::push('telegram_alert', ['lead_id' => $leadId, 'kind' => 'hot'], $now, 'telegram_alert:' . $leadId . ':' . $attempt);
+                if ($cfg['followup_telegram']) {
+                    Queue::push('telegram_alert_followup', ['lead_id' => $leadId], Clock::shift($cfg['followup_minutes'] * 60), 'telegram_followup:' . $leadId . ':' . $attempt);
+                }
+            } else {
+                self::pushEmail($leadId, 'new_lead', 'email_notify:' . $leadId . ':' . $attempt);   // sin Telegram para los calientes, que al menos lleguen por correo
+            }
         } elseif ($temperature === 'warm' || $temperature === 'cold') {
-            Queue::push('email_notify', ['lead_id' => $leadId, 'kind' => 'new_lead'], $now, 'email_notify:' . $leadId . ':' . $attempt);
+            self::pushEmail($leadId, 'new_lead', 'email_notify:' . $leadId . ':' . $attempt);
+            if ($temperature === 'warm' && Alerts::warmTelegram($cfg)) {
+                Queue::push('telegram_alert', ['lead_id' => $leadId, 'kind' => 'warm'], Alerts::nonUrgentRunAt(), 'telegram_warm:' . $leadId . ':' . $attempt);
+            }
+        }
+    }
+
+    /** Aviso por correo (no urgente: respeta el horario de silencio). No hace nada si el correo esta apagado en Alertas. */
+    private static function pushEmail(int $leadId, string $kind, ?string $dedupe): void
+    {
+        if (Alerts::get()['email']) {
+            Queue::push('email_notify', ['lead_id' => $leadId, 'kind' => $kind], Alerts::nonUrgentRunAt(), $dedupe);
         }
     }
 
@@ -256,8 +275,9 @@ final class LeadIngest
                 if ($scored['temperature'] === 'disqualified') {
                     self::event($leadId, 'disqualified', ['reasons' => $scored['breakdown']['disqualified']]);
                 }
-                if ($enqueue && $scored['temperature'] === 'hot' && $lead['temperature'] !== 'hot' && $lead['first_contact_at'] === null) {
-                    self::enqueueFor($leadId, 'hot', (int) $lead['attempt']);
+                if ($enqueue && $lead['first_contact_at'] === null && (($scored['temperature'] === 'hot' && $lead['temperature'] !== 'hot')
+                    || ($scored['temperature'] === 'warm' && !in_array($lead['temperature'], ['hot', 'warm'], true)))) {
+                    self::enqueueFor($leadId, $scored['temperature'], (int) $lead['attempt']);
                 }
             }
             return ['score' => $scored['score'], 'temperature' => $scored['temperature'], 'previous_score' => (int) $lead['score'], 'previous_temperature' => (string) $lead['temperature']];

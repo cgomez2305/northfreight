@@ -83,8 +83,8 @@ return static function (array $ctx): void {
     T::eq(array_column($cs, 'channel'), ['call', 'email', 'sms'], 'consents: una fila por canal');
     T::ok($cs[0]['consent_text'] === $siteText && $siteText !== '' && $cs[0]['ip'] === '127.0.0.1' && $cs[0]['user_agent'] === $ua && $cs[0]['consent_version'] === 'v1', 'consents: CONSENT_TEXT_V1 EXACTO del sitio, IP, user agent y version');
     T::eq(Db::all('SELECT type FROM lead_events WHERE lead_id = ? ORDER BY id', [$lead['id']]) === [['type' => 'created'], ['type' => 'scored']], true, 'lead_events: created, scored');
-    $jobs = Db::all('SELECT type, status FROM jobs');
-    T::eq($jobs, [['type' => 'email_notify', 'status' => 'pending']], 'jobs: email_notify encolado (lead tibio)');
+    $jobs = Db::all('SELECT type, status FROM jobs ORDER BY id');
+    T::eq($jobs, [['type' => 'email_notify', 'status' => 'pending'], ['type' => 'telegram_alert', 'status' => 'pending']], 'jobs: correo + Telegram de tibios encolados (lead tibio, sin llave de FMCSA)');
     $thanksOn = $thanksOf('on', $r);
     T::ok(str_contains($thanksOn, 'Application received') && str_contains($thanksOn, 'data-lead-type="owner-operator"'), 'pagina de gracias normal');
 

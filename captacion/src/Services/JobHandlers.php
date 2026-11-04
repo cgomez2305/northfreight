@@ -26,6 +26,7 @@ final class JobHandlers
             'telegram_alert_followup' => [self::class, 'telegramFollowup'],
             'fmcsa_enrich'            => [self::class, 'fmcsaEnrich'],
             'email_notify'            => [self::class, 'emailNotify'],
+            'rescore_batch'           => [ScoringConfig::class, 'runBatch'],
         ];
     }
 
@@ -42,7 +43,14 @@ final class JobHandlers
     public static function telegramAlert(array $payload): void
     {
         $lead = self::lead($payload);
-        $kind = in_array($payload['kind'] ?? '', ['hot', 'signed_reentry'], true) ? (string) $payload['kind'] : 'hot';
+        $kind = in_array($payload['kind'] ?? '', ['hot', 'warm', 'signed_reentry'], true) ? (string) $payload['kind'] : 'hot';
+        $cfg = Alerts::get();
+        if ($kind === 'hot' && !$cfg['hot_telegram']) {
+            return;   // apagado en Configuracion despues de encolarse
+        }
+        if ($kind === 'warm' && (!Alerts::warmTelegram($cfg) || $lead['temperature'] !== 'warm' || $lead['first_contact_at'] !== null || $lead['stage'] !== 'new')) {
+            return;   // ya no aplica: se apago, subio a caliente o ya lo atendieron
+        }
         Telegram::send(Telegram::leadText($lead, $kind));
         LeadIngest::event((int) $lead['id'], 'alert_sent', ['channel' => 'telegram', 'kind' => $kind]);
     }
@@ -54,7 +62,10 @@ final class JobHandlers
         if ($lead['first_contact_at'] !== null || $lead['temperature'] !== 'hot' || $lead['stage'] !== 'new') {
             return;   // ya lo atendieron (o dejo de ser caliente): nada que avisar
         }
-        Telegram::send(Telegram::leadText($lead, 'followup'));
+        if (!Alerts::get()['followup_telegram']) {
+            return;
+        }
+        Telegram::send(Telegram::leadText($lead, 'followup', Alerts::followupMinutes()));
         LeadIngest::event((int) $lead['id'], 'alert_sent', ['channel' => 'telegram', 'kind' => 'followup']);
         // TODO Q4: sms_backup_alert (SMS de respaldo a Carlos con Twilio, requiere A2P 10DLC). Hoy solo queda registrado como 'parked'.
         Queue::push('sms_backup_alert', ['lead_id' => (int) $lead['id']], Clock::now(), 'sms_backup:' . $lead['id'] . ':' . $lead['attempt'], 'parked', 'TODO Q4: SMS de respaldo a Carlos (no ejecutado en Q1)');
@@ -73,6 +84,9 @@ final class JobHandlers
     public static function emailNotify(array $payload): void
     {
         $lead = self::lead($payload);
+        if (!Alerts::get()['email']) {
+            return;   // correo apagado en Configuracion
+        }
         $kind = (string) ($payload['kind'] ?? 'new_lead');
         $temps = ['hot' => 'CALIENTE', 'warm' => 'tibio', 'cold' => 'frio', 'disqualified' => 'descartado'];
         $profiles = ['owner_operator' => 'Owner-operator', 'small_carrier' => 'Carrier pequeno', 'company_driver' => 'Company driver'];

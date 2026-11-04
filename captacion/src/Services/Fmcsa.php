@@ -63,6 +63,20 @@ final class Fmcsa
      */
     public function lookup(string $usdot): array
     {
+        try {
+            $r = $this->doLookup($usdot);
+        } catch (FmcsaUnavailable $e) {
+            if ($this->configured()) {
+                Integrations::record('fmcsa', false, $e->getMessage());
+            }
+            throw $e;
+        }
+        Integrations::record('fmcsa', true);
+        return $r;
+    }
+
+    private function doLookup(string $usdot): array
+    {
         if (!$this->configured()) {
             throw new FmcsaUnavailable('FMCSA_WEBKEY sin configurar');
         }

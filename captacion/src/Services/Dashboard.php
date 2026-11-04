@@ -335,21 +335,8 @@ final class Dashboard
         $n = count($set);
         $q = count(array_filter($set, static fn($r) => in_array($r['temperature'], ['hot', 'warm'], true)));
         $dq = count(array_filter($set, static fn($r) => $r['temperature'] === 'disqualified'));
-        $costRows = (int) Db::value('SELECT COUNT(*) FROM channel_costs');
-        $cpl = null;
-        if ($costRows > 0) {
-            $et = Fmt::et($now)->format('Y-m');
-            $amount = (float) Db::value('SELECT COALESCE(SUM(amount), 0) FROM channel_costs WHERE period = ?', [$et]);
-            $sources = array_column(Db::all('SELECT DISTINCT source FROM channel_costs WHERE period = ? AND amount > 0', [$et]), 'source');
-            $leads = 0;
-            if ($sources) {
-                $mStart = Fmt::monthStart($now);
-                $in = implode(',', array_fill(0, count($sources), '?'));
-                $leads = (int) Db::value("SELECT COUNT(*) FROM leads WHERE deleted_at IS NULL AND created_at >= ? AND source IN ($in)", [Fmt::utc($mStart), ...$sources]);
-            }
-            $cpl = $amount > 0 && $leads > 0 ? $amount / $leads : null;
-        }
-        return ['n' => $n, 'qualified_pct' => $n > 0 ? $q / $n * 100 : null, 'discard_pct' => $n > 0 ? $dq / $n * 100 : null, 'cpl' => $cpl, 'has_costs' => $costRows > 0];
+        $cost = Costs::currentMonth($now);
+        return ['n' => $n, 'qualified_pct' => $n > 0 ? $q / $n * 100 : null, 'discard_pct' => $n > 0 ? $dq / $n * 100 : null, 'cpl' => $cost['cpl'], 'cps' => $cost['cps'], 'has_costs' => $cost['has_costs']];
     }
 
     private static function heat(array $rows, int $now): array

@@ -10,6 +10,7 @@ require dirname(__DIR__) . '/src/bootstrap.php';
 
 use Captacion\Controllers\AjaxController;
 use Captacion\Controllers\AuthController;
+use Captacion\Controllers\ConfigController;
 use Captacion\Controllers\DashboardController;
 use Captacion\Controllers\LeadActionsController;
 use Captacion\Controllers\LeadsController;
@@ -74,6 +75,8 @@ switch (true) {
         TareasController::create();
     case preg_match('#^/tareas/(\d{1,12})/([a-z]{4,8})$#', $path, $m) === 1:
         TareasController::handle((int) $m[1], $m[2]);
+    case preg_match('#^/config(?:/([a-z]{3,12})(?:/([a-z]{3,12}))?)?$#', $path, $m) === 1:
+        ConfigController::route($m[1] ?? null, $m[2] ?? null);
     case $path === '/login':
         AuthController::login();
     case $path === '/login/2fa':
