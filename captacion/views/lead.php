@@ -164,6 +164,7 @@ $loc = trim(($lead['city'] ? $lead['city'] . ', ' : '') . ($lead['state'] ?? '')
   </div>
 
   <div class="lead__side">
+    <?php require __DIR__ . '/_lead_q3.php'; ?>
     <section class="card" aria-labelledby="h-score">
       <header class="card__h"><h2 class="label" id="h-score">PUNTUACIÓN DESGLOSADA</h2><b class="mono"><?= $e($lead['score']) ?>/100</b></header>
       <div class="card__b">

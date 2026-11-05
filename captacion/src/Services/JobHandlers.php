@@ -1,6 +1,6 @@
 <?php
 /**
- * Handlers de la cola (fase Q1): telegram_alert (A2), telegram_alert_followup (A3), fmcsa_enrich, email_notify.
+ * Handlers de la cola (fase Q1): telegram_alert (A2), telegram_alert_followup (A3), fmcsa_enrich, email_notify; Q3: handoff_deliver, handoff_notify, sequence_step.
  * Cada handler recibe (array $payload, array $job) y lanza una excepcion para fallar (la cola reintenta a 1, 5 y 15 min).
  * sms_backup_alert NO tiene handler: se registra 'parked' (TODO Q4: SMS de respaldo a Carlos por Twilio, tras el registro A2P 10DLC).
  */
@@ -28,6 +28,9 @@ final class JobHandlers
             'email_notify'            => [self::class, 'emailNotify'],
             'rescore_batch'           => [ScoringConfig::class, 'runBatch'],
             'backup_db'               => [Backup::class, 'handler'],
+            'handoff_deliver'         => [Handoff::class, 'deliver'],
+            'handoff_notify'          => [Handoff::class, 'notify'],
+            'sequence_step'           => [Sequences::class, 'runStep'],
         ];
     }
 

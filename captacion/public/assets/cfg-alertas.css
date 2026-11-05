@@ -1,23 +1,7 @@
 /* NorthStar Captación · configuración, pestaña «alertas». Se carga solo en esa pantalla, encima de panel.css. Sin estilos en línea (CSP): clases y variables. */
 .al-list{display:flex;flex-direction:column;gap:6px}
-.tgl{display:flex;gap:14px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line);cursor:pointer}
-.tgl:last-child{border:0}
-.tgl input{appearance:none;-webkit-appearance:none;flex:none;width:46px;height:28px;margin:2px 0 0;border-radius:var(--r-pill);background:var(--field);position:relative;cursor:pointer;transition:background .15s}
-.tgl input::after{content:"";position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:50%;background:var(--surface);transition:transform .15s}
-.tgl input:checked{background:var(--navy-2)}
-.tgl input:checked::after{transform:translateX(18px)}
-.tgl input:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
-.tgl__t{display:flex;flex-direction:column;gap:2px;min-width:0}
-.tgl__t b{font-weight:600}
-.tgl__t small{color:var(--ink-3);font-size:13px;line-height:1.4}
 .al-min{max-width:260px;padding:10px 0}
 .al-q{max-width:440px}
-.warm__o{margin:0}
-.warm__i{display:block;cursor:pointer}
-.warm__i input{position:absolute;opacity:0}
-.warm__i span{display:inline-flex;align-items:center;min-height:36px;padding:0 14px;border-radius:var(--r-pill);font-size:14px;font-weight:500;color:var(--ink-2)}
-.warm__i input:checked+span{background:var(--navy-2);color:var(--on-navy)}
-.warm__i input:focus-visible+span{outline:2px solid var(--focus);outline-offset:2px}
 .warm__why{display:flex;gap:9px;align-items:flex-start;margin-top:12px;padding:11px 13px;border-radius:var(--r-in);background:var(--sunk);border:1px solid var(--line);font-size:13.5px;color:var(--ink-2);line-height:1.45}
 .warm__why .ic{margin-top:2px;flex:none;width:16px;height:16px}
 .warm__why.is-on{background:var(--cyan-tint);border-color:var(--cyan-line)}

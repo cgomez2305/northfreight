@@ -422,3 +422,124 @@ CREATE TABLE backups (
   KEY idx_backups_started (started_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- ===== 006_handoff.sql =====
+-- 006_handoff: fase Q3-A. Entrega de leads a NorthStar (doc §11, A9): una fila por entrega (`handoffs`, version 1, 2… si se reenvia) y una por destino (`handoff_deliveries`).
+-- confirm_status: NULL = esperando a NorthStar | signed | rejected | superseded (una entrega mas nueva la reemplazo; sus enlaces dejan de valer).
+-- nonce + expires_at firman el enlace de confirmacion sin login (/c/{token}); el enlace se usa una sola vez (confirm_status deja de ser NULL).
+CREATE TABLE handoffs (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  lead_id BIGINT UNSIGNED NOT NULL,
+  attempt SMALLINT UNSIGNED NOT NULL DEFAULT 1,
+  version SMALLINT UNSIGNED NOT NULL DEFAULT 1,
+  reason VARCHAR(12) NOT NULL DEFAULT 'stage',
+  created_by BIGINT UNSIGNED NULL,
+  status VARCHAR(12) NOT NULL DEFAULT 'pending',
+  nonce CHAR(32) NOT NULL,
+  expires_at DATETIME NOT NULL,
+  confirm_status VARCHAR(12) NULL,
+  confirmed_at DATETIME NULL,
+  confirmed_via VARCHAR(10) NULL,
+  reject_reason VARCHAR(60) NULL,
+  reject_note VARCHAR(500) NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_handoff_version (lead_id, attempt, version),
+  KEY idx_handoff_open (confirm_status, created_at),
+  CONSTRAINT fk_handoff_lead FOREIGN KEY (lead_id) REFERENCES leads (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- status: pending | retrying | sent | failed | skipped
+CREATE TABLE handoff_deliveries (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  handoff_id BIGINT UNSIGNED NOT NULL,
+  target VARCHAR(20) NOT NULL,
+  status VARCHAR(10) NOT NULL DEFAULT 'pending',
+  attempts TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  http_code SMALLINT UNSIGNED NULL,
+  error VARCHAR(300) NULL,
+  sent_at DATETIME NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_delivery_target (handoff_id, target),
+  CONSTRAINT fk_delivery_handoff FOREIGN KEY (handoff_id) REFERENCES handoffs (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ===== 007_viewer_reports.sql =====
+-- 007_viewer_reports: fase Q3-B/C/D. Invitaciones de un solo uso (rol viewer de NorthStar) e informes (instantanea de metricas semanal y mensual).
+ALTER TABLE users ADD COLUMN invited_by BIGINT UNSIGNED NULL AFTER role;
+ALTER TABLE users ADD COLUMN deactivated_at DATETIME NULL AFTER last_login_at;
+
+-- Solo se guarda el hash del token (el enlace en claro se muestra una vez). Caduca a las 48 h y se usa una sola vez.
+CREATE TABLE user_invites (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  user_id BIGINT UNSIGNED NOT NULL,
+  token_hash CHAR(64) NOT NULL,
+  expires_at DATETIME NOT NULL,
+  used_at DATETIME NULL,
+  created_by BIGINT UNSIGNED NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_invite_hash (token_hash),
+  KEY idx_invite_user (user_id, used_at),
+  CONSTRAINT fk_invite_user FOREIGN KEY (user_id) REFERENCES users (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- kind: weekly | monthly. period: 'AAAA-Www' (semana ISO) o 'AAAA-MM'. ident: identificador legible (INF-2026-10). metrics: instantanea JSON (nunca se recalcula al abrirla).
+-- actions: las tres acciones del mes siguiente (editables mientras status = draft). notified_at: aviso a Carlos; sent_at: correo con enlace a los destinatarios al publicar.
+CREATE TABLE reports (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  kind VARCHAR(10) NOT NULL,
+  period VARCHAR(10) NOT NULL,
+  ident VARCHAR(24) NOT NULL,
+  metrics JSON NOT NULL,
+  actions JSON NULL,
+  status VARCHAR(10) NOT NULL DEFAULT 'draft',
+  generated_by BIGINT UNSIGNED NULL,
+  published_at DATETIME NULL,
+  published_by BIGINT UNSIGNED NULL,
+  notified_at DATETIME NULL,
+  sent_at DATETIME NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_report_period (kind, period),
+  UNIQUE KEY uq_report_ident (ident),
+  KEY idx_report_pub (kind, status, period)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ===== 008_comms.sql =====
+-- 008_comms: fase Q3-E. Plantillas de correo (EN/ES), inscripciones a secuencias (A6 tibios, A12 referidos) y registro de correos enviados.
+-- tkey identifica la plantilla (a6_d1, a12_referral…); (tkey, lang) es unico. kind: system (viene de fabrica, se puede restaurar) | custom.
+CREATE TABLE email_templates (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  tkey VARCHAR(60) NOT NULL,
+  lang CHAR(2) NOT NULL DEFAULT 'en',
+  name VARCHAR(120) NOT NULL,
+  subject VARCHAR(190) NOT NULL,
+  body MEDIUMTEXT NOT NULL,
+  kind VARCHAR(10) NOT NULL DEFAULT 'custom',
+  active TINYINT(1) NOT NULL DEFAULT 1,
+  updated_by BIGINT UNSIGNED NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_template (tkey, lang)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- sequence_enrollments (001): step = indice del PROXIMO paso; status: active | paused | completed | stopped. blocks cuenta los intentos bloqueados (marcador sin resolver, tope de envios)
+-- y entra en la clave del job para poder reintentar. Una inscripcion por lead y secuencia.
+ALTER TABLE sequence_enrollments ADD COLUMN paused_reason VARCHAR(30) NULL AFTER status;
+ALTER TABLE sequence_enrollments ADD COLUMN blocked_reason VARCHAR(120) NULL AFTER paused_reason;
+ALTER TABLE sequence_enrollments ADD COLUMN blocks SMALLINT UNSIGNED NOT NULL DEFAULT 0 AFTER blocked_reason;
+ALTER TABLE sequence_enrollments ADD COLUMN started_by BIGINT UNSIGNED NULL AFTER blocks;
+ALTER TABLE sequence_enrollments ADD COLUMN last_sent_at DATETIME NULL AFTER next_run_at;
+ALTER TABLE sequence_enrollments ADD COLUMN completed_at DATETIME NULL AFTER last_sent_at;
+ALTER TABLE sequence_enrollments ADD UNIQUE KEY uq_seq_lead (lead_id, sequence_key);
+
+-- messages (001): los correos salientes de secuencias y de plantillas llevan asunto y la secuencia; status: sent | logged (sin SMTP) | failed.
+ALTER TABLE messages ADD COLUMN subject VARCHAR(190) NULL AFTER template_key;
+ALTER TABLE messages ADD COLUMN sequence_key VARCHAR(60) NULL AFTER subject;
+ALTER TABLE messages ADD KEY idx_messages_out (channel, direction, created_at);
+

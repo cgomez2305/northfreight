@@ -16,20 +16,25 @@ use Captacion\Services\Alerts;
 use Captacion\Services\Backup;
 use Captacion\Services\Costs;
 use Captacion\Services\Display;
+use Captacion\Services\Handoff;
 use Captacion\Services\Integrations;
+use Captacion\Services\Invites;
+use Captacion\Services\Mailer;
 use Captacion\Services\RateLimiter;
 use Captacion\Services\Reauth;
 use Captacion\Services\Scoring;
 use Captacion\Services\ScoringConfig;
+use Captacion\Services\Sequences;
 use Captacion\Services\Settings;
 
 final class ConfigController extends Responder
 {
     public const TABS = [
         'puntuacion' => 'Puntuación', 'alertas' => 'Alertas', 'costos' => 'Costos por canal', 'integraciones' => 'Integraciones', 'horario' => 'Horario y zona', 'copias' => 'Copias de seguridad',
+        'entrega' => 'Entrega a NorthStar', 'correo' => 'Correo y secuencias', 'usuarios' => 'Usuarios',
     ];
     /** Pestañas cuyos formularios exigen confirmacion reciente. */
-    public const LOCKED_TABS = ['puntuacion', 'alertas', 'costos', 'horario', 'copias'];
+    public const LOCKED_TABS = ['puntuacion', 'alertas', 'costos', 'horario', 'copias', 'entrega', 'correo', 'usuarios'];
     public const TEST_LIMIT = 6;   // pruebas de integracion por minuto y usuario
 
     public static function route(?string $a, ?string $b): never
@@ -55,6 +60,15 @@ final class ConfigController extends Responder
             'integrations/test'   => self::integrationTest($user),
             'backups/run'         => self::backupRun($user),
             'backups/download'    => self::backupDownload($user),
+            'handoff/save'        => self::handoffSave($user),
+            'handoff/test'        => self::handoffTest($user),
+            'handoff/retry'       => self::handoffRetry($user),
+            'mail/save'           => self::mailSave($user),
+            'users/invite'        => self::usersInvite($user),
+            'users/relink'        => self::usersAction($user, 'relink'),
+            'users/reset'         => self::usersAction($user, 'reset'),
+            'users/deactivate'    => self::usersAction($user, 'deactivate'),
+            'users/activate'      => self::usersAction($user, 'activate'),
             default               => self::notFound(),
         };
         self::notFound();
@@ -104,6 +118,9 @@ final class ConfigController extends Responder
             'integraciones' => ['cards' => Integrations::status(), 'testResult' => self::takeTestResult(), 'testUsdot' => Integrations::TEST_USDOT],
             'horario'       => ['zones' => Display::ZONES, 'tz' => Display::timezone(), 'hours' => Display::hours()],
             'copias'        => Backup::pageVars(),
+            'entrega'       => ['hand' => Handoff::config(), 'handView' => Handoff::overview(), 'handTargets' => Handoff::targets(), 'once' => self::takeOnce()],
+            'correo'        => ['mail' => Sequences::mailSettings(), 'mailWarn' => Sequences::warnings(), 'canDeliver' => Mailer::canDeliver(), 'smtpSet' => Mailer::smtpConfigured(), 'mailFrom' => Mailer::fromAddress()],
+            'usuarios'      => ['viewers' => Invites::viewers(), 'once' => self::takeOnce(), 'inviteForm' => ['name' => '', 'email' => '']],
         };
         self::page('config', $user, 'config', [['Configuración', '/config'], [self::TABS[$tab], null]], $over + $vars, $status);
     }
@@ -117,6 +134,14 @@ final class ConfigController extends Responder
         $nowEt = \Captacion\Services\Fmt::et(Clock::time());
         return ['costTable' => Costs::table(), 'sources' => Costs::sources(), 'costForm' => $edit !== null ? ['source' => $edit['source'], 'period' => $edit['period'], 'amount' => number_format((float) $edit['amount'], 2, '.', ''), 'id' => (int) $edit['id']] : ['source' => '', 'period' => $nowEt->format('Y-m'), 'amount' => '', 'id' => 0],
             'maxPeriod' => $nowEt->modify('+1 month')->format('Y-m'), 'month' => Costs::currentMonth(Clock::time())];
+    }
+
+    /** Secreto o enlace que se muestra UNA vez (queda en la sesion hasta la siguiente pantalla de configuracion). */
+    private static function takeOnce(): ?array
+    {
+        $r = $_SESSION['cfg_once'] ?? null;
+        unset($_SESSION['cfg_once']);
+        return is_array($r) ? $r : null;
     }
 
     private static function takeTestResult(): ?array
@@ -302,5 +327,170 @@ final class ConfigController extends Responder
     {
         $back = self::guardPost('copias', true);
         Backup::download((int) ($_POST['id'] ?? 0), (int) $user['id'], $back);
+    }
+
+    // --- Entrega a NorthStar (Q3-A) ----------------------------------------------------------------------------------------
+
+    private static function handoffSave(array $user): never
+    {
+        $back = self::guardPost('entrega');
+        $v = Handoff::validate($_POST);
+        $mode = is_string($_POST['secret_mode'] ?? null) ? $_POST['secret_mode'] : 'keep';
+        $secret = null;
+        $once = null;
+        if ($mode === 'generate') {
+            $secret = Handoff::generateSecret();
+            $once = ['kind' => 'secret', 'value' => $secret];
+        } elseif ($mode === 'set') {
+            $secret = is_string($_POST['webhook_secret'] ?? null) ? trim($_POST['webhook_secret']) : '';
+            if ($secret === '') {
+                $v['errors']['webhook_secret'] = 'Escribe el secreto o elige «Generar uno nuevo».';
+                $v['ok'] = false;
+            }
+        } elseif ($mode === 'clear') {
+            $secret = '';
+        }
+        if (!$v['ok']) {
+            self::flash(false, 'Revisa los campos marcados. No se guardó nada.');
+            self::index($user, ['hand' => ['email' => $v['values']['email'], 'webhook_url' => $v['values']['webhook_url'], 'webhook_on' => $v['values']['webhook_on'], 'webhook_secret' => '', 'secret_set' => Handoff::config()['secret_set']], 'errors' => $v['errors']], 422, 'entrega');
+        }
+        $r = Handoff::saveConfig($v['values'], $secret, (int) $user['id']);
+        if (!$r['ok']) {
+            self::flash(false, $r['msg']);
+            self::redirect($back);
+        }
+        if ($once !== null) {
+            $_SESSION['cfg_once'] = $once;
+        }
+        // lo que estaba esperando un destino se pone en cola ahora que lo hay
+        $extra = Handoff::configured() ? Handoff::retryPending((int) $user['id']) : null;
+        self::flash(true, $r['msg'] . ($extra !== null && $extra['ok'] && !str_starts_with($extra['msg'], 'No había') ? ' ' . $extra['msg'] : ''));
+        self::redirect($back);
+    }
+
+    private static function handoffTest(array $user): never
+    {
+        $back = self::guardPost('entrega', true, '#prueba');
+        if (!Handoff::configured()) {
+            self::flash(false, 'No hay ningún destino activo: guarda un correo o un webhook primero.');
+            self::redirect($back);
+        }
+        $key = 'u' . (int) $user['id'];
+        if (RateLimiter::tooMany('handoff_test', $key, 4, 60)) {
+            self::flash(false, 'Demasiadas pruebas seguidas. Espera un minuto.');
+            self::redirect($back);
+        }
+        RateLimiter::hit('handoff_test', $key, 60);
+        $res = Handoff::sendTest((int) $user['id']);
+        $ok = count(array_filter($res['results'], static fn($r) => $r['ok']));
+        self::flash($ok === count($res['results']), 'Prueba de entrega: ' . $ok . ' de ' . count($res['results']) . ' destino' . (count($res['results']) === 1 ? '' : 's') . ' respondió bien.');
+        self::redirect($back);
+    }
+
+    private static function handoffRetry(array $user): never
+    {
+        $back = self::guardPost('entrega');
+        $r = Handoff::retryPending((int) $user['id']);
+        self::flash($r['ok'], $r['msg']);
+        self::redirect($back);
+    }
+
+    // --- Correo y secuencias (Q3-E/D) ----------------------------------------------------------------------------------------
+
+    private static function mailSave(array $user): never
+    {
+        $back = self::guardPost('correo');
+        $err = [];
+        $line = static fn($k, $max) => mb_substr(trim((string) preg_replace('/[^\P{C}\n]/u', '', is_string($_POST[$k] ?? null) ? $_POST[$k] : '')), 0, $max);
+        $address = trim((string) preg_replace('/\n{2,}/', "\n", str_replace("\r", '', $line('address', 300))));
+        $enabled = ($_POST['enabled'] ?? '') === '1';
+        if ($address !== '' && mb_strlen($address) < 12) {
+            $err['address'] = 'Escribe la dirección completa (calle, ciudad, estado y código postal).';
+        }
+        if (preg_match('/<|>/', $address) === 1) {
+            $err['address'] = 'Solo texto, sin etiquetas.';
+        }
+        if ($enabled && $address === '') {
+            $err['address'] = 'Para encender las secuencias hace falta la dirección física del remitente (CAN-SPAM).';
+        }
+        $fromName = $line('from_name', 80) ?: 'NorthStar Freight Solutions';
+        $replyTo = $line('reply_to', 190);
+        if ($replyTo !== '' && !filter_var($replyTo, FILTER_VALIDATE_EMAIL)) {
+            $err['reply_to'] = 'Ese correo no es válido.';
+        }
+        $weekly = $line('weekly_to', 190);
+        if ($weekly !== '' && !filter_var($weekly, FILTER_VALIDATE_EMAIL)) {
+            $err['weekly_to'] = 'Ese correo no es válido.';
+        }
+        $monthly = [];
+        foreach (preg_split('/[\s,;]+/', is_string($_POST['monthly_to'] ?? null) ? $_POST['monthly_to'] : '') ?: [] as $m) {
+            $m = strtolower(trim($m));
+            if ($m === '') {
+                continue;
+            }
+            if (!filter_var($m, FILTER_VALIDATE_EMAIL) || strlen($m) > 190) {
+                $err['monthly_to'] = 'Hay un correo que no es válido: ' . mb_substr($m, 0, 60);
+                break;
+            }
+            $monthly[] = $m;
+        }
+        if (count($monthly) > 10) {
+            $err['monthly_to'] = 'Máximo 10 destinatarios.';
+        }
+        $capHour = is_string($_POST['cap_hour'] ?? null) && ctype_digit($_POST['cap_hour']) ? (int) $_POST['cap_hour'] : 0;
+        $capLead = is_string($_POST['cap_lead'] ?? null) && ctype_digit($_POST['cap_lead']) ? (int) $_POST['cap_lead'] : 0;
+        if ($capHour < 1 || $capHour > 500) {
+            $err['cap_hour'] = 'Entre 1 y 500 correos por hora.';
+        }
+        if ($capLead < 1 || $capLead > 5) {
+            $err['cap_lead'] = 'Entre 1 y 5 correos por lead cada 24 horas.';
+        }
+        $rates = $line('rates_source', 200);
+        $values = ['enabled' => $enabled, 'address' => $address, 'from_name' => $fromName, 'reply_to' => $replyTo, 'weekly_to' => $weekly, 'monthly_to' => array_values(array_unique($monthly)), 'cap_hour' => $capHour ?: 20, 'cap_lead' => $capLead ?: 1, 'rates_source' => $rates];
+        if ($err) {
+            self::flash(false, 'Revisa los campos marcados. No se guardó nada.');
+            self::index($user, ['mail' => $values, 'errors' => $err], 422, 'correo');
+        }
+        $before = Sequences::mailSettings();
+        Settings::set('mail', $values);
+        $changed = ActivityLog::settingsChange((int) $user['id'], 'mail', $before, Sequences::mailSettings());
+        self::flash(true, $changed ? 'Correo y secuencias guardados.' : 'No había cambios que guardar.');
+        self::redirect($back);
+    }
+
+    // --- Usuarios lectores (Q3-B) --------------------------------------------------------------------------------------------
+
+    private static function usersInvite(array $user): never
+    {
+        $back = self::guardPost('usuarios');
+        $name = is_string($_POST['name'] ?? null) ? $_POST['name'] : '';
+        $email = is_string($_POST['email'] ?? null) ? $_POST['email'] : '';
+        $r = Invites::invite($name, $email, (int) $user['id']);
+        if (!$r['ok']) {
+            self::flash(false, 'Revisa los campos marcados. No se creó ninguna cuenta.');
+            self::index($user, ['inviteForm' => ['name' => mb_substr($name, 0, 120), 'email' => mb_substr($email, 0, 190)], 'errors' => $r['errors']], 422, 'usuarios');
+        }
+        $_SESSION['cfg_once'] = ['kind' => 'link', 'value' => $r['link'], 'name' => mb_substr(trim($name), 0, 120), 'ttl' => '48 horas'];
+        self::flash(true, 'Cuenta de lector creada. Copia el enlace de invitación ahora: no se vuelve a mostrar.');
+        self::redirect($back);
+    }
+
+    private static function usersAction(array $user, string $action): never
+    {
+        $back = self::guardPost('usuarios');
+        $id = is_string($_POST['id'] ?? null) && ctype_digit($_POST['id']) ? (int) $_POST['id'] : 0;
+        $uid = (int) $user['id'];
+        $r = match ($action) {
+            'relink'     => Invites::relink($id, $uid),
+            'reset'      => Invites::reset2fa($id, $uid),
+            'deactivate' => Invites::setActive($id, false, $uid) + ['link' => null],
+            default      => Invites::setActive($id, true, $uid) + ['link' => null],
+        };
+        if (!empty($r['link'])) {
+            $who = \Captacion\Models\User::find($id);
+            $_SESSION['cfg_once'] = ['kind' => 'link', 'value' => $r['link'], 'name' => (string) ($who['name'] ?? ''), 'ttl' => '48 horas'];
+        }
+        self::flash($r['ok'], $r['msg']);
+        self::redirect($back);
     }
 }

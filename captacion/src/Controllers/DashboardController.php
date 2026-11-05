@@ -18,7 +18,10 @@ final class DashboardController extends Responder
 {
     public static function index(): never
     {
-        $user = self::user();
+        $user = self::user(true);
+        if (($user['role'] ?? '') === 'viewer') {
+            self::redirect('/resultados');   // el lector de NorthStar solo ve resultados e informes
+        }
         $period = is_string($_GET['p'] ?? null) && isset(Dashboard::PERIODS[$_GET['p']]) ? $_GET['p'] : 'today';
         $rq = is_string($_GET['rq'] ?? null) ? mb_substr(trim($_GET['rq']), 0, 100) : '';
         $rp = max(1, min(100000, (int) ($_GET['rp'] ?? 1)));

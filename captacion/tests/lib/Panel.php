@@ -81,8 +81,20 @@ final class Panel
         if ($r['status'] !== 303) {
             return false;
         }
-        $this->csrf = $this->csrfOf($this->get('/')['body']);
+        $r = $this->get('/');
+        $this->csrf = $this->csrfOf($r['body']);
+        if ($this->csrf === '' && $r['status'] === 303) {   // el lector aterriza en /resultados
+            $this->csrf = $this->csrfOf($this->get('/resultados')['body']);
+        }
         return $this->csrf !== '';
+    }
+
+    /** Confirma identidad (contrasena + TOTP nuevo) para editar Configuracion. */
+    public function unlock(int $userId, string $tab = 'alertas'): bool
+    {
+        Db::run('UPDATE users SET totp_last_step = NULL WHERE id = ?', [$userId]);
+        $r = $this->post('/config/unlock', ['_csrf' => $this->csrf, 'tab' => $tab, 'password' => self::PASSWORD, 'code' => Totp::code(self::SECRET)]);
+        return $r['status'] === 303;
     }
 
     public function json(array $r): array

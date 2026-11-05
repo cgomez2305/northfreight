@@ -31,29 +31,39 @@ abstract class Responder
         exit;
     }
 
-    /** Usuario autenticado (2FA completo) o redireccion a /login. */
-    protected static function user(): array
+    /**
+     * Usuario autenticado (2FA completo) o redireccion a /login.
+     * AUTORIZACION POR ROL, DENEGADA POR DEFECTO: una cuenta `viewer` (el lector de NorthStar) solo entra donde el controlador lo declara con $viewerOk = true
+     * (/resultados e /informes). En cualquier otra ruta recibe 403 sin ningun dato. Un controlador nuevo que llame a user() sin mas queda cerrado para el lector.
+     */
+    protected static function user(bool $viewerOk = false): array
     {
         Session::start();
         $uid = Session::userId();
         $user = $uid !== null ? User::find($uid) : null;
-        if ($user === null || (int) $user['is_active'] !== 1) {
+        if ($user === null || (int) $user['is_active'] !== 1 || $user['totp_confirmed_at'] === null) {
             if ($uid !== null) {
-                Session::destroy();   // la cuenta ya no existe o se desactivo: fuera
+                Session::destroy();   // la cuenta ya no existe, se desactivo o se reinicio su 2FA: fuera
             }
             self::redirect('/login');
+        }
+        if (($user['role'] ?? '') === 'viewer' && !$viewerOk) {
+            self::html('message', ['title' => 'Sin permiso', 'heading' => 'Sin permiso', 'text' => 'Tu cuenta solo puede ver los resultados y los informes.', 'linkHref' => '/resultados', 'linkText' => 'Ir a resultados'], 403);
         }
         return $user;
     }
 
-    /** Igual que user() pero para endpoints JSON: 401 en vez de redirigir. */
-    protected static function userJson(): array
+    /** Igual que user() pero para endpoints JSON: 401 en vez de redirigir y 403 para el lector. */
+    protected static function userJson(bool $viewerOk = false): array
     {
         Session::start();
         $uid = Session::userId();
         $user = $uid !== null ? User::find($uid) : null;
-        if ($user === null || (int) $user['is_active'] !== 1) {
+        if ($user === null || (int) $user['is_active'] !== 1 || $user['totp_confirmed_at'] === null) {
             self::json(['ok' => false, 'error' => 'unauthenticated'], 401);
+        }
+        if (($user['role'] ?? '') === 'viewer' && !$viewerOk) {
+            self::json(['ok' => false, 'error' => 'forbidden'], 403);
         }
         return $user;
     }
@@ -92,11 +102,13 @@ abstract class Responder
      */
     protected static function page(string $view, array $user, string $active, array $crumbs, array $vars = [], int $status = 200): never
     {
-        $notes = Notifications::all((int) $user['id']);
-        $hot = (int) Db::value("SELECT COUNT(*) FROM leads WHERE deleted_at IS NULL AND temperature = 'hot' AND first_contact_at IS NULL AND stage = 'new'");
+        $viewer = ($user['role'] ?? '') === 'viewer';
+        // El lector de NorthStar no ve campana, atajos de leads, buscador ni contadores: nada que se parezca a un lead.
+        $notes = $viewer ? [] : Notifications::all((int) $user['id']);
+        $hot = $viewer ? 0 : (int) Db::value("SELECT COUNT(*) FROM leads WHERE deleted_at IS NULL AND temperature = 'hot' AND first_contact_at IS NULL AND stage = 'new'");
         self::html($view, $vars + [
             'shell' => true, 'user' => $user, 'csrf' => Session::csrf(), 'active' => $active, 'crumbs' => $crumbs, 'bell' => $notes,
-            'unread' => Notifications::unread($notes), 'hotBadge' => $hot, 'overdueBadge' => Tasks::overdueCount(), 'isAdmin' => ($user['role'] ?? '') === 'admin', 'flash' => self::takeFlash(),
+            'unread' => Notifications::unread($notes), 'hotBadge' => $hot, 'overdueBadge' => $viewer ? 0 : Tasks::overdueCount(), 'isAdmin' => ($user['role'] ?? '') === 'admin', 'isViewer' => $viewer, 'flash' => self::takeFlash(),
             'sysOk' => !array_filter($notes, static fn($n) => in_array($n['kind'], ['bad', 'warn'], true)),
         ], $status);
     }

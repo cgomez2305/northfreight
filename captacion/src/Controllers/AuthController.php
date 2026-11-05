@@ -16,7 +16,8 @@ final class AuthController extends Responder
     {
         Session::start();
         if (Session::userId() !== null) {
-            self::redirect('/');
+            $u = User::find((int) Session::userId());
+            self::redirect(($u['role'] ?? '') === 'viewer' ? '/resultados' : '/');
         }
         $vars = ['title' => 'Entrar', 'csrf' => Session::csrf(), 'notice' => Session::wasExpired() ? 'La sesión caducó por inactividad. Entra de nuevo.' : null];
         if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
@@ -70,7 +71,7 @@ final class AuthController extends Responder
         if ($r['via'] === 'recovery') {
             $_SESSION['notice'] = 'Entraste con un código de recuperación. Te quedan ' . (int) $r['recovery_left'] . ' sin usar.';
         }
-        self::redirect('/');
+        self::redirect(($user['role'] ?? '') === 'viewer' ? '/resultados' : '/');
     }
 
     public static function logout(): never

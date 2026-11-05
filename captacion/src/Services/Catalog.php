@@ -65,6 +65,10 @@ final class Catalog
         'stage_changed' => 'Cambio de etapa', 'note_added' => 'Nota añadida', 'note_edited' => 'Nota editada', 'note_deleted' => 'Nota eliminada', 'task_created' => 'Tarea creada',
         'task_done' => 'Tarea completada', 'call_logged' => 'Llamada registrada', 'reopened_manual' => 'Lead reabierto', 'a3_cancelled' => 'Segunda alerta cancelada',
         'task_reopened' => 'Tarea reabierta', 'task_snoozed' => 'Tarea pospuesta', 'task_edited' => 'Tarea editada', 'task_deleted' => 'Tarea eliminada',
+        'handoff_created' => 'Entrega a NorthStar creada', 'handoff_resent' => 'Entrega a NorthStar reenviada', 'handoff_no_target' => 'Entrega sin destino configurado', 'handoff_sent' => 'Entrega enviada',
+        'handoff_failed' => 'La entrega falló', 'handoff_confirmed' => 'NorthStar confirmó la firma', 'handoff_rejected' => 'NorthStar rechazó el lead', 'conversion' => 'Conversión registrada',
+        'sequence_enrolled' => 'Inscrito en una secuencia', 'sequence_paused' => 'Secuencia en pausa', 'sequence_resumed' => 'Secuencia reanudada', 'sequence_stopped' => 'Secuencia detenida',
+        'sequence_step_skipped' => 'Paso de secuencia omitido', 'sequence_email' => 'Correo de secuencia', 'lead_responded' => 'Marcado como respondido',
     ];
 
     /** Grupo de filtro de la linea de tiempo de cada tipo de evento. */

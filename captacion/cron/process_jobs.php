@@ -29,6 +29,14 @@ if ($lock === false || !flock($lock, LOCK_EX | LOCK_NB)) {
 }
 
 try {
+    try {
+        $due = \Captacion\Services\Sequences::enqueueDue();   // pasos de secuencias vencidos -> jobs sequence_step (solo con secuencias encendidas y direccion fisica configurada)
+        if ($due > 0) {
+            fwrite(STDOUT, "sequences: $due pasos en cola\n");
+        }
+    } catch (Throwable $t) {
+        Storage::error('sequences enqueue failed', get_class($t) . ': ' . $t->getMessage());
+    }
     $stats = Queue::runBatch(JobHandlers::all(), Env::int('JOBS_MAX_SECONDS', 50), 20);
     fwrite(STDOUT, 'jobs: ' . json_encode($stats) . "\n");
 } catch (Throwable $t) {

@@ -13,9 +13,11 @@ use Captacion\Controllers\AjaxController;
 use Captacion\Controllers\AuthController;
 use Captacion\Controllers\ConfigController;
 use Captacion\Controllers\DashboardController;
+use Captacion\Controllers\InviteController;
 use Captacion\Controllers\LeadActionsController;
 use Captacion\Controllers\LeadsController;
 use Captacion\Controllers\PipelineController;
+use Captacion\Controllers\PublicController;
 use Captacion\Controllers\TareasController;
 use Captacion\Services\Storage;
 
@@ -80,6 +82,12 @@ switch (true) {
         ConfigController::route($m[1] ?? null, $m[2] ?? null);
     case preg_match('#^/actividad(?:/([a-z]{3,12}))?$#', $path, $m) === 1:
         ActividadController::route($m[1] ?? null);
+    case preg_match('#^/c/([A-Za-z0-9_-]{40,300})$#', $path, $m) === 1:
+        PublicController::confirm($m[1]);
+    case preg_match('#^/invite/([a-f0-9]{64})$#', $path, $m) === 1:
+        InviteController::handle($m[1]);
+    case preg_match('#^/u/([A-Za-z0-9_-]{20,100})$#', $path, $m) === 1:
+        PublicController::unsubscribe($m[1]);
     case $path === '/login':
         AuthController::login();
     case $path === '/login/2fa':

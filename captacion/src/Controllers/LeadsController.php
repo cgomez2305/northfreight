@@ -13,8 +13,10 @@ use Captacion\Services\Catalog;
 use Captacion\Services\Csv;
 use Captacion\Services\Dashboard;
 use Captacion\Services\Fmt;
+use Captacion\Services\Handoff;
 use Captacion\Services\LeadActions;
 use Captacion\Services\LeadQuery;
+use Captacion\Services\Sequences;
 use Captacion\Services\Timeline;
 
 final class LeadsController extends Responder
@@ -68,7 +70,7 @@ final class LeadsController extends Responder
         self::page('lead', $user, 'leads', [['Leads', '/leads'], [$name, null]], [
             'title' => $name, 'css' => ['charts', 'lead'], 'hideTabbar' => true, 'lead' => $lead, 'timeline' => Timeline::build($lead, $events, $messages, $noteText, $users), 'notes' => $notes, 'tasks' => $tasks, 'calls' => $calls,
             'consents' => $consents, 'appts' => $appts, 'users' => $users, 'dupes' => $dupes, 'stageOptions' => $stageOptions,
-            'needsOverride' => $needsOverride,
+            'needsOverride' => $needsOverride, 'handoff' => Handoff::forLead($id), 'seqs' => Sequences::forLead($id),
         ]);
     }
 

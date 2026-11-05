@@ -1,0 +1,4 @@
+/* NorthStar Captación · configuración, pestaña «correo». Encima de config.css + panel.css. Sin estilos en línea (CSP). */
+.co-list{display:flex;flex-direction:column;gap:14px}
+.co-two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+@media (max-width:760px){.co-two{grid-template-columns:1fr}}

@@ -82,7 +82,7 @@ final class LeadActions
     }
 
     /** @param array{reason?:string,note?:string,override?:bool,auto?:bool} $o */
-    public static function setStage(int $leadId, string $to, array $o, int $userId): array
+    public static function setStage(int $leadId, string $to, array $o, ?int $userId): array
     {
         return Db::transaction(static function () use ($leadId, $to, $o, $userId): array {
             $lead = Lead::find($leadId, true);
@@ -149,6 +149,15 @@ final class LeadActions
                 self::cancelA3($leadId, (int) $lead['attempt'], $userId, 'el lead pasó a «' . $stages[$to] . '»');
             }
             ActivityLog::record('lead_stage', $userId, 'lead', $leadId, ['from' => $from, 'to' => $to, 'reason' => $reason, 'override' => $override ?: null]);
+            // Q3: A7 (el avance del lead pausa sus secuencias), A9 (entrega a NorthStar al presentar) y conversion al firmar
+            if ($to !== 'new') {
+                Sequences::pauseForLead($leadId, 'stage', $userId);
+            }
+            if ($to === 'presented') {
+                Handoff::onPresented($leadId, $userId);
+            } elseif (in_array($to, self::CLOSED, true)) {
+                Handoff::afterSigned(array_merge($lead, ['stage' => $to]), $userId);
+            }
             return self::ok('Etapa cambiada a «' . $stages[$to] . '».');
         });
     }

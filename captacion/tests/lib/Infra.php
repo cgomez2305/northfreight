@@ -91,6 +91,32 @@ final class Infra
         throw new \RuntimeException("php -S $name no arranco");
     }
 
+    /** Arranca el SMTP falso (lib/smtp_mock.php). Devuelve el puerto. */
+    public static function smtpMock(string $name, string $log, string $modeFile = ''): int
+    {
+        $port = self::freePort(25800);
+        self::spawn($name, [PHP_BINARY, __DIR__ . '/smtp_mock.php', (string) $port, $log, $modeFile], [], self::$work . "/$name.log");
+        $deadline = microtime(true) + 10;
+        while (microtime(true) < $deadline) {
+            $s = @fsockopen('127.0.0.1', $port, $e, $es, 0.2);
+            if ($s) {
+                fclose($s);
+                return $port;
+            }
+            usleep(100000);
+        }
+        throw new \RuntimeException("smtp mock $name no arranco");
+    }
+
+    /** Lineas JSON de un log de mock. @return list<array> */
+    public static function readLog(string $file): array
+    {
+        if (!is_file($file)) {
+            return [];
+        }
+        return array_values(array_filter(array_map(static fn($l) => json_decode($l, true), file($file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: []), 'is_array'));
+    }
+
     public static function stop(string $name): void
     {
         if (!isset(self::$procs[$name])) {

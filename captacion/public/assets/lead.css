@@ -116,3 +116,4 @@
   .leadbar__b--main{background:var(--navy-2);color:var(--on-navy);border-color:var(--navy-2)}
   .leadbar__b--main .ic{color:var(--cyan)}
 }
+.q3a{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.q3l{display:grid;gap:14px}.q3l li{display:grid;gap:3px}

@@ -1,0 +1,10 @@
+/* NorthStar Captación · configuración, pestaña «entrega». Encima de config.css + panel.css. Sin estilos en línea (CSP). */
+.en-grid{display:flex;flex-direction:column;gap:14px}
+.en-secret .field{margin-top:10px;max-width:420px}
+.en-res{display:flex;flex-direction:column;gap:8px;margin:0 0 10px}
+.en-res li{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-size:14px}
+.en-once{border-color:var(--warn-dot);background:var(--warn-bg)}
+.en-doc{display:flex;flex-direction:column;gap:10px;font-size:14px;line-height:1.5;color:var(--ink-2)}
+.en-doc ol{list-style:decimal;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+.secret{overflow-wrap:anywhere}
+@media (max-width:760px){.en-secret .field{max-width:none}}

@@ -134,13 +134,67 @@ final class Timeline
                 $icon = 'clock';
                 $detail = (string) ($p['title'] ?? '') . (!empty($p['to']) ? ' · nueva fecha ' . Fmt::dateTime((string) $p['to']) : '');
                 break;
+            case 'handoff_created':
+            case 'handoff_resent':
+            case 'handoff_no_target':
+                $icon = 'send';
+                $detail = 'Versión ' . (int) ($p['version'] ?? 1) . ($type === 'handoff_no_target' ? ' · configura el destino en Configuración > Entrega' : '');
+                break;
+            case 'handoff_sent':
+                $icon = 'send';
+                $tone = 'good';
+                $detail = ['email' => 'Correo', 'webhook' => 'Webhook'][$p['target'] ?? ''] ?? (string) ($p['target'] ?? '');
+                break;
+            case 'handoff_failed':
+                $icon = 'send';
+                $tone = 'bad';
+                $detail = (['email' => 'Correo', 'webhook' => 'Webhook'][$p['target'] ?? ''] ?? (string) ($p['target'] ?? '')) . ' · ' . mb_substr((string) ($p['error'] ?? ''), 0, 160);
+                break;
+            case 'handoff_confirmed':
+            case 'conversion':
+                $icon = 'check-circle';
+                $tone = 'good';
+                $detail = $type === 'conversion' ? 'Fuente: ' . Catalog::source($p['source'] ?? null) : ((string) ($p['via'] ?? '') === 'link' ? 'Por enlace, sin iniciar sesión' : 'Marcado en el panel');
+                break;
+            case 'handoff_rejected':
+                $icon = 'flag';
+                $tone = 'bad';
+                $detail = Catalog::label(Catalog::LOSS_REASONS, $p['reason'] ?? null) . (!empty($p['note']) ? ' · ' . $p['note'] : '') . ' · ' . ((string) ($p['via'] ?? '') === 'link' ? 'por enlace' : 'marcado en el panel');
+                break;
+            case 'sequence_enrolled':
+            case 'sequence_paused':
+            case 'sequence_resumed':
+            case 'sequence_stopped':
+            case 'sequence_step_skipped':
+            case 'sequence_email':
+            case 'lead_responded':
+                $icon = 'mail';
+                $tone = $type === 'sequence_stopped' ? 'bad' : 'slate';
+                $bits = [];
+                if (!empty($p['sequence'])) {
+                    $bits[] = Sequences::DEFS[$p['sequence']]['name'] ?? (string) $p['sequence'];
+                }
+                if (!empty($p['step'])) {
+                    $bits[] = (string) $p['step'];
+                }
+                if (!empty($p['reason'])) {
+                    $bits[] = Sequences::REASONS[$p['reason']] ?? (string) $p['reason'];
+                }
+                if (!empty($p['why'])) {
+                    $bits[] = (string) $p['why'];
+                }
+                if (!empty($p['status'])) {
+                    $bits[] = $p['status'] === 'sent' ? 'enviado' : 'solo registrado (sin SMTP)';
+                }
+                $detail = implode(' · ', $bits);
+                break;
             case 'consent_revoked':
                 $icon = 'shield';
                 $tone = 'bad';
                 $detail = 'Canal: ' . ($p['channel'] ?? 'all') . ' · vía ' . ($p['via'] ?? '—');
                 break;
         }
-        $group = Catalog::EVENT_GROUPS[$type] ?? (in_array($type, ['created', 'scored', 'fmcsa', 'disqualified', 'alert_sent', 'a3_cancelled', 'reentry', 'reentry_signed', 'consent_revoked'], true) ? 'system' : 'system');
+        $group = Catalog::EVENT_GROUPS[$type] ?? ('system');
         return ['at' => $at, 'icon' => $icon, 'tone' => $tone, 'group' => $group, 'title' => $title, 'detail' => $detail, 'by' => $by];
     }
 }

@@ -243,6 +243,13 @@ final class LeadIngest
             if ($temperature === 'warm' && Alerts::warmTelegram($cfg)) {
                 Queue::push('telegram_alert', ['lead_id' => $leadId, 'kind' => 'warm'], Alerts::nonUrgentRunAt(), 'telegram_warm:' . $leadId . ':' . $attempt);
             }
+            if ($temperature === 'warm') {
+                try {
+                    Sequences::enrollWarm($leadId);   // A6: seguimiento por correo de los tibios (solo si las secuencias estan encendidas)
+                } catch (\Throwable $t) {
+                    Storage::error('enrollWarm failed', get_class($t) . ': ' . $t->getMessage());
+                }
+            }
         }
     }
 

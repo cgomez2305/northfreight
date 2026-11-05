@@ -5,7 +5,7 @@ use Captacion\Middleware\SecurityHeaders;
 $nonce = SecurityHeaders::nonce();
 $assetV = static fn(string $f): string => (string) (@filemtime(CAPTACION_ROOT . '/public/assets/' . $f) ?: 1);
 $shell = !empty($shell);
-$brand = '<a class="brand" href="/" aria-label="NorthStar Captación, ir al dashboard"><img class="brand__mark" src="/assets/isotype.svg" width="30" height="30" alt=""><span class="brand__txt"><b>NORTH<i>STAR</i></b><small>CAPTACIÓN</small></span></a>';
+$brand = '<a class="brand" href="' . (!empty($isViewer) ? '/resultados' : '/') . '" aria-label="NorthStar Captación, ir al inicio"><img class="brand__mark" src="/assets/isotype.svg" width="30" height="30" alt=""><span class="brand__txt"><b>NORTH<i>STAR</i></b><small>CAPTACIÓN</small></span></a>';
 ?>
 <!doctype html>
 <html lang="es">
@@ -41,6 +41,11 @@ $brand = '<a class="brand" href="/" aria-label="NorthStar Captación, ir al dash
       <button class="icon-btn side__close" type="button" data-nav-close aria-label="Cerrar menú"><?= Ui::icon('x') ?></button>
     </div>
     <nav class="side__nav">
+<?php if (!empty($isViewer)): ?>
+      <p class="side__group">NorthStar</p>
+      <a class="nav-i<?= $active === 'resultados' ? ' is-on' : '' ?>" href="/resultados"<?= $active === 'resultados' ? ' aria-current="page"' : '' ?>><?= Ui::icon('bar-chart') ?>Resultados</a>
+      <a class="nav-i<?= $active === 'informes' ? ' is-on' : '' ?>" href="/informes"<?= $active === 'informes' ? ' aria-current="page"' : '' ?>><?= Ui::icon('file') ?>Informes</a>
+<?php else: ?>
       <p class="side__group">Principal</p>
       <a class="nav-i<?= $active === 'dashboard' ? ' is-on' : '' ?>" href="/"<?= $active === 'dashboard' ? ' aria-current="page"' : '' ?>><?= Ui::icon('dashboard') ?>Dashboard</a>
       <a class="nav-i<?= $active === 'leads' ? ' is-on' : '' ?>" href="/leads"<?= $active === 'leads' ? ' aria-current="page"' : '' ?>><?= Ui::icon('users') ?>Leads</a>
@@ -51,20 +56,25 @@ $brand = '<a class="brand" href="/" aria-label="NorthStar Captación, ir al dash
       <a class="nav-i" href="/leads?from=<?= $e(\Captacion\Services\Fmt::et(\Captacion\Clock::time())->format('Y-m-d')) ?>"><?= Ui::icon('inbox') ?>Llegaron hoy</a>
       <a class="nav-i" href="/leads?t=disqualified"><?= Ui::icon('flag') ?>Descartados</a>
       <?php if ($isAdmin): ?>
+      <p class="side__group">Reportes y correo</p>
+      <a class="nav-i<?= $active === 'reportes' ? ' is-on' : '' ?>" href="/reportes"<?= $active === 'reportes' ? ' aria-current="page"' : '' ?>><?= Ui::icon('bar-chart') ?>Reportes</a>
+      <a class="nav-i<?= $active === 'informes' ? ' is-on' : '' ?>" href="/informes"<?= $active === 'informes' ? ' aria-current="page"' : '' ?>><?= Ui::icon('file') ?>Informes</a>
+      <a class="nav-i<?= $active === 'comunicaciones' ? ' is-on' : '' ?>" href="/comunicaciones"<?= $active === 'comunicaciones' ? ' aria-current="page"' : '' ?>><?= Ui::icon('mail') ?>Comunicaciones</a>
       <p class="side__group">Administración</p>
       <a class="nav-i<?= $active === 'config' ? ' is-on' : '' ?>" href="/config"<?= $active === 'config' ? ' aria-current="page"' : '' ?>><?= Ui::icon('gear') ?>Configuración</a>
       <a class="nav-i<?= $active === 'actividad' ? ' is-on' : '' ?>" href="/actividad"<?= $active === 'actividad' ? ' aria-current="page"' : '' ?>><?= Ui::icon('activity') ?>Actividad</a>
       <?php endif; ?>
+<?php endif; ?>
     </nav>
     <div class="side__foot">
-      <a class="sys" href="/#cola">
+      <?php if (empty($isViewer)): ?><a class="sys" href="/#cola">
         <span class="sys__row"><i class="dot<?= !empty($sysOk) ? ' is-ok' : '' ?>"></i>Estado del sistema</span>
         <small>Cola, cron e integraciones</small>
-      </a>
+      </a><?php endif; ?>
       <div class="dd" data-dd>
         <button class="user" type="button" aria-expanded="false" aria-haspopup="menu" aria-controls="dd-user">
           <?= Ui::avatar((string) $user['name'], 'md', 0) ?>
-          <span class="user__txt"><b><?= $e($user['name']) ?></b><small><?= $e($user['role'] === 'admin' ? 'Administrador' : 'Lector') ?></small></span>
+          <span class="user__txt"><b><?= $e($user['name']) ?></b><small><?= $e($user['role'] === 'admin' ? 'Administrador' : 'Lector · NorthStar') ?></small></span>
           <?= Ui::icon('chevrons') ?>
         </button>
         <div class="dd__panel dd__panel--up" id="dd-user" role="menu" hidden>
@@ -79,7 +89,7 @@ $brand = '<a class="brand" href="/" aria-label="NorthStar Captación, ir al dash
   <div class="col">
     <header class="top">
       <button class="icon-btn top__burger" type="button" data-nav-open aria-controls="side" aria-expanded="false" aria-label="Abrir menú"><?= Ui::icon('menu') ?></button>
-      <a class="top__logo" href="/" aria-label="Dashboard"><img src="/assets/isotype.svg" width="26" height="26" alt=""></a>
+      <a class="top__logo" href="<?= !empty($isViewer) ? '/resultados' : '/' ?>" aria-label="Inicio"><img src="/assets/isotype.svg" width="26" height="26" alt=""></a>
       <nav class="crumbs" aria-label="Migas de pan">
         <ol>
           <?php foreach ($crumbs as $i => [$text, $href]): $last = $i === count($crumbs) - 1; ?>
@@ -88,11 +98,11 @@ $brand = '<a class="brand" href="/" aria-label="NorthStar Captación, ir al dash
         </ol>
       </nav>
       <div class="top__tools">
-        <button class="search-btn" type="button" data-search aria-haspopup="dialog" aria-keyshortcuts="Control+K Meta+K /">
+        <?php if (empty($isViewer)): ?><button class="search-btn" type="button" data-search aria-haspopup="dialog" aria-keyshortcuts="Control+K Meta+K /">
           <?= Ui::icon('search') ?><span class="search-btn__t">Buscar leads, teléfono, USDOT…</span><span class="kbds" aria-hidden="true"><kbd data-mod>Ctrl</kbd><kbd>K</kbd></span>
-        </button>
+        </button><?php endif; ?>
         <span class="clock" title="Hora en <?= $e(\Captacion\Services\Display::timezone()) ?>"><?= $e(\Captacion\Services\Fmt::zone()) ?> <time data-clock data-tz="<?= $e(\Captacion\Services\Display::timezone()) ?>"><?= $e(\Captacion\Services\Fmt::et(\Captacion\Clock::time())->format('H:i')) ?></time></span>
-        <div class="dd" data-dd data-notes>
+        <?php if (empty($isViewer)): ?><div class="dd" data-dd data-notes>
           <button class="icon-btn" type="button" aria-expanded="false" aria-controls="dd-notes" aria-haspopup="dialog" aria-label="Avisos<?= $unread > 0 ? ', ' . $unread . ' sin leer' : '' ?>">
             <?= Ui::icon('bell') ?><span class="icon-btn__n" data-unread<?= $unread > 0 ? '' : ' hidden' ?>><?= $e($unread) ?></span>
           </button>
@@ -108,7 +118,7 @@ $brand = '<a class="brand" href="/" aria-label="NorthStar Captación, ir al dash
               </ul>
             <?php endif; ?>
           </div>
-        </div>
+        </div><?php endif; ?>
         <div class="dd" data-dd>
           <button class="icon-btn icon-btn--av" type="button" aria-expanded="false" aria-haspopup="menu" aria-controls="dd-av" aria-label="Cuenta de <?= $e($user['name']) ?>"><?= Ui::avatar((string) $user['name'], 'sm', 0) ?></button>
           <div class="dd__panel" id="dd-av" role="menu" hidden>
@@ -127,15 +137,20 @@ $brand = '<a class="brand" href="/" aria-label="NorthStar Captación, ir al dash
 
 <?php if (empty($hideTabbar)): ?>
 <nav class="tabbar" aria-label="Acceso rápido">
+<?php if (!empty($isViewer)): ?>
+  <a class="tab<?= $active === 'resultados' ? ' is-on' : '' ?>" href="/resultados"><?= Ui::icon('bar-chart') ?><span>Resultados</span></a>
+  <a class="tab<?= $active === 'informes' ? ' is-on' : '' ?>" href="/informes"><?= Ui::icon('file') ?><span>Informes</span></a>
+<?php else: ?>
   <a class="tab<?= $active === 'dashboard' ? ' is-on' : '' ?>" href="/"><?= Ui::icon('dashboard') ?><span>Inicio</span></a>
   <a class="tab<?= $active === 'leads' ? ' is-on' : '' ?>" href="/leads"><?= Ui::icon('users') ?><span>Leads</span></a>
   <a class="tab<?= $active === 'pipeline' ? ' is-on' : '' ?>" href="/pipeline"><?= Ui::icon('columns') ?><span>Pipeline</span></a>
   <a class="tab<?= $active === 'tareas' ? ' is-on' : '' ?>" href="/tareas"><?= Ui::icon('list-check') ?><span>Tareas</span><?php if ($overdueBadge > 0): ?><i class="tab__n"><?= $e($overdueBadge) ?></i><?php endif; ?></a>
+<?php endif; ?>
   <button class="tab" type="button" data-nav-open aria-controls="side"><?= Ui::icon('menu') ?><span>Menú</span></button>
 </nav>
 <?php endif; ?>
 
-<dialog class="dlg dlg--search" id="search" aria-label="Buscar leads">
+<?php if (empty($isViewer)): ?><dialog class="dlg dlg--search" id="search" aria-label="Buscar leads">
   <div class="srch" role="search">
     <div class="srch__bar"><?= Ui::icon('search') ?>
       <input id="search-q" type="text" enterkeyhint="search" role="combobox" aria-expanded="false" aria-controls="search-list" aria-autocomplete="list" placeholder="Nombre, teléfono, correo o USDOT" autocomplete="off" spellcheck="false" maxlength="100" aria-label="Buscar leads">
@@ -145,7 +160,7 @@ $brand = '<a class="brand" href="/" aria-label="NorthStar Captación, ir al dash
     <p class="srch__msg" id="search-msg" role="status">Escribe al menos 2 caracteres.</p>
     <p class="srch__foot"><span><kbd>↑</kbd><kbd>↓</kbd> moverse</span><span><kbd>Enter</kbd> abrir</span><span><kbd>/</kbd> buscar desde cualquier página</span></p>
   </div>
-</dialog>
+</dialog><?php endif; ?>
 <dialog class="dlg dlg--confirm" id="confirm" aria-labelledby="confirm-t">
   <form method="dialog">
     <h2 id="confirm-t" class="dlg__t">¿Seguro?</h2>
