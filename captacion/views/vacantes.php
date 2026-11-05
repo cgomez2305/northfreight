@@ -20,8 +20,8 @@ $nActive = count(array_filter($jobs, static fn($j) => $j['status'] === 'active' 
 
 <p class="pstat vstat" role="status">
   <span class="dot<?= $nActive > 0 ? ' is-ok' : ' dot--warn' ?>"></span>
-  <?= $nActive > 0 ? $e($nActive) . ($nActive === 1 ? ' vacante publicada' : ' vacantes publicadas') . ' en el sitio' : 'No hay vacantes publicadas: <code>/careers/cdl-a-drivers/</code> responde 404 y el formulario no ofrece «company driver»' ?>.
-  <?php if ($pub): ?>Último envío al sitio <?= $e(Fmt::ago((string) $pub['at'])) ?> (<?= $e((int) $pub['count']) ?> en <code><?= $e($siteFile) ?></code>).<?php endif; ?>
+  <span><?= $nActive > 0 ? $e($nActive) . ($nActive === 1 ? ' vacante publicada' : ' vacantes publicadas') . ' en el sitio' : 'No hay vacantes publicadas: <code>/careers/cdl-a-drivers/</code> responde 404 y el formulario no ofrece «company driver»' ?>.
+  <?php if ($pub): ?>Último envío al sitio <?= $e(Fmt::ago((string) $pub['at'])) ?> (<?= $e((int) $pub['count']) ?> en <code><?= $e($siteFile) ?></code>).<?php endif; ?></span>
 </p>
 <p class="vnote muted">El sitio guarda el HTML en caché hasta 5 minutos: un cambio puede tardar ese tiempo en verse. Al vencer su fecha, una vacante deja de existir sola (404) y sale del sitemap.</p>
 
