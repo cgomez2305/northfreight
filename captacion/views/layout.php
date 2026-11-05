@@ -19,7 +19,7 @@ $brand = '<a class="brand" href="/" aria-label="NorthStar Captación, ir al dash
 <link rel="preload" href="/assets/fonts/barlow-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/fonts.css?v=<?= $e($assetV('fonts.css')) ?>">
 <link rel="stylesheet" href="/assets/panel.css?v=<?= $e($assetV('panel.css')) ?>">
-<?php foreach (($css ?? []) as $sheet): if (preg_match('/^[a-z0-9-]{2,24}$/', (string) $sheet) !== 1) { continue; } ?>
+<?php foreach (($css ?? ($shell ? [] : ['auth'])) as $sheet): if (preg_match('/^[a-z0-9-]{2,24}$/', (string) $sheet) !== 1) { continue; } ?>
 <link rel="stylesheet" href="/assets/<?= $e($sheet) ?>.css?v=<?= $e($assetV($sheet . '.css')) ?>">
 <?php endforeach; ?>
 <script nonce="<?= $e($nonce) ?>">document.documentElement.classList.add('js')</script>

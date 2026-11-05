@@ -28,7 +28,7 @@ final class LeadsController extends Responder
         $counts = LeadQuery::tempCounts($f);
         $total = (int) Db::value('SELECT COUNT(*) FROM leads WHERE deleted_at IS NULL');
         self::page('leads', $user, 'leads', [['Leads', null], ['Bandeja', null]], [
-            'title' => 'Leads', 'f' => $f, 'paging' => $paging, 'list' => $list, 'counts' => $counts, 'facets' => LeadQuery::facets(), 'grandTotal' => $total,
+            'title' => 'Leads', 'css' => ['leads'], 'f' => $f, 'paging' => $paging, 'list' => $list, 'counts' => $counts, 'facets' => LeadQuery::facets(), 'grandTotal' => $total,
         ]);
     }
 
@@ -66,7 +66,7 @@ final class LeadsController extends Responder
             $needsOverride[$s] = LeadActions::needsOverride($lead, (string) $s);
         }
         self::page('lead', $user, 'leads', [['Leads', '/leads'], [$name, null]], [
-            'title' => $name, 'hideTabbar' => true, 'lead' => $lead, 'timeline' => Timeline::build($lead, $events, $messages, $noteText, $users), 'notes' => $notes, 'tasks' => $tasks, 'calls' => $calls,
+            'title' => $name, 'css' => ['charts', 'lead'], 'hideTabbar' => true, 'lead' => $lead, 'timeline' => Timeline::build($lead, $events, $messages, $noteText, $users), 'notes' => $notes, 'tasks' => $tasks, 'calls' => $calls,
             'consents' => $consents, 'appts' => $appts, 'users' => $users, 'dupes' => $dupes, 'stageOptions' => $stageOptions,
             'needsOverride' => $needsOverride,
         ]);

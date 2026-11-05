@@ -1,0 +1,21 @@
+/* NorthStar Captación · configuración, pestaña «integraciones». Se carga solo en esa pantalla, encima de panel.css. Sin estilos en línea (CSP): clases y variables. */
+.intg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.intg__c{padding:18px 20px;display:flex;flex-direction:column;gap:12px}
+.intg__h{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.intg__t{font:700 26px/1 var(--f-cond)}
+.intg__d{display:grid;gap:8px}
+.intg__d div{display:flex;justify-content:space-between;gap:12px;padding-bottom:8px;border-bottom:1px solid var(--line);font-size:14px}
+.intg__d dt{color:var(--ink-3)}
+.intg__d dd{font:500 13px var(--f-mono);overflow-wrap:anywhere;text-align:right}
+.intg__l,.intg__x{display:flex;gap:7px;align-items:flex-start;font-size:13.5px;color:var(--ink-2)}
+.intg__l .ic,.intg__x .ic{width:15px;height:15px;margin-top:2px;flex:none}
+.intg__x{color:var(--bad)}
+.intg__r{margin:0}
+.intg__f{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-top:auto}
+.intg__u{width:150px}
+@media (max-width:1023px){
+  .intg{grid-template-columns:1fr}
+}
+@media (max-width:760px){
+  .intg__f .btn,.intg__u{width:100%}
+}

@@ -1,0 +1,62 @@
+/* NorthStar Captación · bandeja de leads (/leads). Se carga solo en esa pantalla, encima de panel.css. Sin estilos en línea (CSP): clases y variables. */
+.steps{display:flex;flex-direction:column;gap:12px;margin-top:10px;text-align:left;width:min(560px,100%)}
+.steps li{display:flex;gap:14px;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--sunk)}
+.steps b{display:block;color:var(--ink)}
+.steps p{font-size:13.5px;max-width:none}
+.steps__n{width:28px;height:28px;border-radius:50%;background:var(--navy-2);color:var(--on-navy);display:grid;place-items:center;font:600 13px var(--f-mono);flex:none}
+.tbl .c-chk{width:44px;padding-right:0}
+.tbl .c-chk input{width:18px;height:18px;display:block}
+.is-urgent>*{background:var(--hot-bg)}
+.is-urgent .c-name{box-shadow:inset 3px 0 0 var(--hot-dot)}
+.sort__a{width:8px}
+.perpage{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-3)}
+.perpage select{min-height:34px;padding:0 8px;border:1px solid var(--line-2);border-radius:10px;background:var(--surface)}
+@container (max-width:1240px){
+  .tbl--leads .c-src{display:none}
+}
+@container (max-width:1100px){
+  .tbl--leads .c-eq{display:none}
+}
+@container (max-width:900px){
+  .tbl--leads .c-prof{display:none}
+}
+@container (max-width:860px){
+  .tbl--leads .c-st{display:none}
+}
+@container (max-width:700px){
+  .tbl--leads tbody tr{padding-left:52px}
+  .tbl--leads .c-chk{position:absolute;left:16px;top:18px;width:auto}
+  .tbl--leads .c-act{position:absolute;right:12px;bottom:8px}
+  .tbl--leads .c-when{margin-right:44px}
+  .is-urgent{box-shadow:inset 3px 0 0 var(--hot-dot)}
+  .is-urgent .c-name{box-shadow:none}
+}
+.ptab--hot .dot{background:var(--hot-dot)}
+.ptab--warm .dot{background:var(--warm-dot)}
+.ptab--cold .dot{background:var(--cold-dot)}
+.ptab--dq .dot{background:var(--dq-dot)}
+.field--q{grid-column:span 2}
+.filters .check--f{grid-column:span 1}
+.filters__a{grid-column:span 1}
+.filters__a{display:flex;gap:8px;align-items:center}
+.check--f{align-self:center;min-height:44px;align-items:center}
+.filters-toggle{display:none}
+.bulk{position:sticky;bottom:16px;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 14px 14px;padding:10px 12px 10px 18px;background:var(--navy-2);color:var(--on-navy);border-radius:16px;box-shadow:var(--shadow-pop)}
+.bulk[hidden]{display:none}
+.bulk__a{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.bulk select{min-height:36px;padding:0 10px;border-radius:10px;border:1px solid var(--navy-3);background:var(--navy-3);color:var(--on-navy)}
+.bulk .btn--primary{background:var(--cyan);color:var(--navy)}
+.bulk .btn--secondary{background:none;color:var(--on-navy);border-color:var(--on-navy-2)}
+.bulk .btn--ghost{color:var(--on-navy-2)}
+.bulk :focus-visible{outline-color:var(--focus-on-navy)}
+@media (max-width:1180px){
+  .filters .check--f,.filters__a{grid-column:span 1}
+}
+@media (max-width:760px){
+  .field--q{grid-column:1/-1}
+  .filters-toggle{display:inline-flex}
+  .filters__a{grid-column:1/-1}
+  .filters__a .btn{flex:1}
+  .bulk{position:fixed;left:8px;right:8px;bottom:calc(66px + env(safe-area-inset-bottom));margin:0}
+  .perpage{display:none}
+}

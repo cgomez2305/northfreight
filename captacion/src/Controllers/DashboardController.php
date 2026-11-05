@@ -34,7 +34,7 @@ final class DashboardController extends Responder
         $hour = (int) Fmt::et(Clock::time())->format('G');
         $first = trim(explode(' ', (string) $user['name'])[0]);
         self::page('dashboard', $user, 'dashboard', [['Dashboard', null], ['Resumen', null]], [
-            'title' => 'Dashboard', 'd' => $data, 'period' => $period, 'recent' => Dashboard::recent($rq, $rp), 'rq' => $rq,
+            'title' => 'Dashboard', 'css' => ['charts', 'dashboard'], 'd' => $data, 'period' => $period, 'recent' => Dashboard::recent($rq, $rp), 'rq' => $rq,
             'greeting' => ($hour < 12 ? 'Buenos días' : ($hour < 19 ? 'Buenas tardes' : 'Buenas noches')) . ', ' . $first,
             'nowEt' => Fmt::et(Clock::time()),
             'queue' => $queue, 'cronAgo' => $cronAgo, 'cronLate' => $cronLate,

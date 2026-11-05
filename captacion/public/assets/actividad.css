@@ -1,4 +1,4 @@
-/* NorthStar Captación · registro de actividad (/actividad). Se carga solo en esa pantalla, junto a config.css para la retención. */
+/* NorthStar Captación · registro de actividad (/actividad). Se carga solo en esa pantalla, encima de panel.css. Sin estilos en línea (CSP): clases y variables. */
 .act-f{display:grid;grid-template-columns:repeat(4,minmax(0,1fr)) minmax(0,1.4fr) auto;gap:12px;padding:16px;align-items:end}
 .act-f__a{display:flex;gap:8px}.act-f__q .inp{min-height:44px}
 .tbl--act .c-when{white-space:nowrap;font-weight:500}.tbl--act .c-when small,.tbl--act .c-ip small{display:block;color:var(--ink-3);font-size:12px;font-weight:400}

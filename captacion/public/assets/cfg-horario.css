@@ -1,0 +1,5 @@
+/* NorthStar Captación · configuración, pestaña «horario». Se carga solo en esa pantalla, encima de panel.css. Sin estilos en línea (CSP): clases y variables. */
+.hz-tz select{max-width:520px}
+.hz-h{max-width:380px}
+.hz-days{border:0;padding:0;margin:14px 0 0;min-width:0}
+.hz-days legend{font-size:13px;font-weight:600;color:var(--ink-2);margin-bottom:8px;padding:0}

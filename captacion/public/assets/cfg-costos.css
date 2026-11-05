@@ -1,0 +1,28 @@
+/* NorthStar Captación · configuración, pestaña «costos». Se carga solo en esa pantalla, encima de panel.css. Sin estilos en línea (CSP): clases y variables. */
+.co-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr) minmax(0,1fr) auto;gap:12px;align-items:end}
+.strip--3{grid-template-columns:repeat(3,1fr);margin-top:0}
+.tbl--costs .num-c,.tbl--costs th.num-c{text-align:right}
+.tbl--costs tr.is-first th{border-top:1px solid var(--line-2)}
+.tbl--costs tbody tr:first-child th{border-top:0}
+.tbl--costs .rep{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.tbl--costs .c-act{white-space:nowrap;text-align:right}
+.inl{display:inline-block;margin-left:4px}
+@media (max-width:1180px){
+  .co-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .co-go{grid-column:1/-1}
+}
+@media (max-width:760px){
+  .co-grid{grid-template-columns:1fr}
+  .strip--3{grid-template-columns:1fr}
+}
+@container (max-width:700px){
+  .tbl--costs tbody tr{display:grid;grid-template-columns:1fr 1fr;gap:6px 18px;padding:14px 16px}
+  .tbl--costs tbody tr.is-first{border-top:0}
+  .tbl--costs tbody th{grid-column:1/-1;order:-1;flex:none;font:600 12px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3)}
+  .tbl--costs .rep{position:static;width:auto;height:auto;clip:auto;overflow:visible}
+  .tbl--costs td{display:flex;justify-content:space-between;gap:8px;text-align:right;font-size:14px}
+  .tbl--costs td[data-l]::before{content:attr(data-l);color:var(--ink-3);font-size:12.5px;text-align:left}
+  .tbl--costs td[data-l="Fuente"]{grid-column:1/-1;font-weight:600}
+  .tbl--costs td[data-l="Fuente"]::before{content:none}
+  .tbl--costs .c-act{grid-column:1/-1;justify-content:flex-end;padding-top:4px!important}
+}

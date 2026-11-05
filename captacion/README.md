@@ -1,10 +1,11 @@
-# NorthStar Captación (mini-CRM) — fases Q1 y Q2a
+# NorthStar Captación (mini-CRM) — fases Q1, Q2a y Q2b
 
 Aplicación PHP **aparte del sitio** (el sitio sigue sin base de datos) que capta, califica y da seguimiento a owner-operators, carriers pequeños y company drivers. La opera una sola persona (Carlos, ClikRank). Documento maestro: `sistema-captacion-choferes-northstar.md` v2.0.
 
 **Qué incluye esta entrega (Q1):** base (estructura, migraciones, usuarios, login con 2FA, sesiones, CSRF, límites, registro de actividad, cola `jobs` + cron), motor de captación (validar, antispam, deduplicar, FMCSA, puntuar, encolar), alertas de Telegram (A2/A3), revocación STOP (A15), integración en proceso con el formulario del sitio y un panel mínimo.
 **Q2a (panel con identidad NorthStar):** sistema de diseño, shell, login/2FA restyled, dashboard con datos reales, bandeja de leads con filtros y acciones masivas, ficha del lead completa (etapas, notas, tareas, llamadas, consentimientos) y datos de demostración locales (ver §15).
-**Qué NO incluye todavía:** kanban, prospectos FMCSA, tareas/agenda como módulo, reportes y configuración (Q2b/Q3), WhatsApp/SMS/Cal.com/n8n (Q4), Meta y job boards (Q6), entrega a NorthStar y reportes (Q5).
+**Q2b (panel de trabajo, §17 y §16):** kanban del pipeline con arrastre, tareas y agenda, configuración (puntuación, alertas, costos por canal, integraciones, horario), registro de actividad y copias de seguridad.
+**Qué NO incluye todavía:** prospectos FMCSA, reportes (Q3), WhatsApp/SMS/Cal.com/n8n (Q4), Meta y job boards (Q6), entrega a NorthStar y reportes (Q5).
 
 Sin dependencias nuevas: PHP 8.2+ (el servidor tiene 8.3), PDO MySQL, curl, sodium, openssl, mbstring. PHPMailer (el del sitio, `../vendor/`) solo si hay SMTP; el CRM funciona sin él.
 
@@ -323,9 +324,8 @@ Necesita `mariadbd`/`mariadb-install-db` en el PATH. No toca ningún servidor re
 - Equipos que NorthStar despacha, estados de contratación y mínimo de experiencia de company drivers (§4).
 - Texto de consentimiento: revisión legal. **`CONSENT_TEXT_V1` cubre llamada, SMS y correo, no WhatsApp**; antes de que Q4 mande el WhatsApp A1 automático hay que ampliar el texto (nueva versión `v2`) o apoyarse en que el lead escribió primero.
 - Correo duplicado: el sitio avisa por correo y el CRM también (`email_notify`).
-- Fase Q2b/Q3: kanban, prospectos FMCSA, tareas y agenda como módulo, reportes, configuración (pesos, costos por canal, plantillas). Hoy los costos por canal no tienen pantalla: `channel_costs` se carga por SQL y el dashboard muestra «Sin costos cargados» mientras esté vacía.
-- CSS del panel: 50,9 KB sin comprimir (≈ 11 KB gzip) + 3,5 KB de `fonts.css`; el objetivo del brief era < 40 KB. JS: 14,6 KB.
-
+- Fase Q3: prospectos FMCSA y reportes. Pendiente de Q2b: la sincronización de citas con Cal.com (la tabla `appointments` y la vista ya están listas; Q4) y una copia automática fuera de Hostinger (hoy es una descarga manual, §16).
+- CSS del panel (Q2b-F): partido en `panel.css` (base, 30,9 KB) + una hoja por pantalla (§17). Total por pantalla con `fonts.css` entre 36,6 y 44,9 KB sin comprimir (la ficha del lead es la más pesada); JS: `panel.js` 14,7 KB + el de la pantalla (kanban 18,4 KB). Sigue pendiente de Q2a: probar en Firefox y Safari.
 ---
 
 ## 15. Panel (Q2a): identidad, pantallas y operación
@@ -422,3 +422,25 @@ Probado en la suite (`16_backup`: restaura en una base vacía y compara `CHECKSU
 **Ensayo recomendado** (cada trimestre): descarga una copia, restáurala en una base `cap_restore` local y compara `CHECKSUM TABLE`. Un volcado que nunca se ha restaurado no es una copia.
 
 **Limitaciones conocidas.** Sin cifrado propio del archivo (los permisos 0600 y `storage/` fuera del docroot son la protección en el servidor); sin copia incremental (la base del CRM es pequeña: ~40 KB con 120 leads de demostración); el volcado usa transacción de instantánea, no bloquea el panel, pero en una base de cientos de miles de filas el tope de 240 s podría quedarse corto (subir `BACKUP_MAX_SECONDS`).
+
+---
+
+## 17. Panel de trabajo (Q2b): pipeline, tareas, configuración y actividad
+
+Migración nueva: **`005_pipeline_config.sql`** (`leads.stage_changed_at` + índice del kanban, índices de tareas y citas, `appointments.title`, `activity_log.agent`, tabla `backups`); idempotente, probada desde cero y sobre la base de Q2a. Cron nuevo: solo el de copias (§11 punto 11). Todas las acciones: sesión + 2FA + rol en el servidor (`viewer` solo lee) + CSRF + validación + `activity_log`; los POST de configuración y la descarga de copias exigen además contraseña + 2FA recientes (`Reauth`, `REAUTH_SECONDS`).
+
+| Ruta | Qué es |
+|---|---|
+| `GET /pipeline?pl=A\|B&t=&src=&q=` | Kanban: pestañas por pipeline, una columna por etapa del doc §7 con su conteo real, 25 tarjetas por columna y «Ver más» (`POST /ajax/pipeline/cards`), «Perdido/Descartado» colapsada. |
+| `POST /ajax/pipeline/move` | Mover una tarjeta. Llama a `LeadActions::setStage`, **la misma función que la ficha** (motivo obligatorio para Perdido/Descartado, orden de Presentado/Firmado, «Contactado» fija `first_contact_at` y cancela A3, transacción + evento + `activity_log`); si falta un dato responde qué pedir y el panel abre un diálogo. Actualización optimista con reversión y mensaje si el servidor rechaza. Alternativa por teclado y táctil: menú «Mover a…» en cada tarjeta; en móvil las columnas son un carrusel con snap y chips de etapa. |
+| `GET /tareas?tab=today\|overdue\|upcoming\|done\|week` · `POST /tareas/new` · `POST /tareas/{id}/{done\|reopen\|snooze\|edit\|delete}` | Tareas y agenda (las mismas `tasks` de la ficha; borrado lógico). Posponer: +1 h, mañana o fecha. Las citas (`appointments`) salen junto a las tareas con enlace al lead (la sincronización con Cal.com es de la fase Q4). Contador de vencidas en la barra lateral y en la campana. |
+| `GET /config?tab=puntuacion\|alertas\|costos\|integraciones\|horario\|copias` + `POST /config/...` | Solo administradores. **Puntuación**: pesos del doc §6 y umbrales (validación de rangos, caliente > tibio), vista previa del efecto, recálculo por la cola en lotes (`rescore_batch`, evento `scored`), restablecer, y los ajustes provisionales con su historial. **Alertas**: Telegram caliente (A2), segunda alerta A3 (minutos configurables, 15 por defecto), **alerta de Telegram también para tibios** (`auto` = solo mientras no haya llave de FMCSA, porque sin ella un lead perfecto no pasa de ~65 puntos; `on`/`off`), correo de aviso y horario de silencio (ET) para las no urgentes. **Costos por canal** (`channel_costs`, por mes y fuente; el dashboard calcula CPL y costo por firmado). **Integraciones**: Telegram, FMCSA, SMTP, cron y copia diaria con estado en vivo y botón «Probar» (nunca se muestran secretos). **Horario y zona**. **Copias**: §16. |
+| `GET /actividad` · `POST /actividad/{export\|retention}` | Solo administradores: inicios de sesión (éxitos y fallos con IP y agente resumidos), exportaciones, cambios de configuración, cambios masivos y borrados, con filtros, paginación, CSV (protección contra fórmulas) y retención configurable (la purga corre en el cron de copias). |
+
+### CSS y JS por pantalla
+
+`panel.css` es la base (variables de color, shell, botones, campos, tarjetas, tablas, diálogos). Cada pantalla añade solo su hoja: `charts.css`+`dashboard.css` (/), `leads.css`, `charts.css`+`lead.css` (ficha), `kanban.css`, `tareas.css`, `config.css`+`cfg-<pestaña>.css` (configuración), `config.css`+`actividad.css`, `auth.css` (login, 2FA, alta y mensajes). Lo indica cada controlador con `'css' => [...]` y `layout.php` las enlaza (nombre `[a-z0-9-]{2,24}`); sin `css` las pantallas sin barra lateral cargan `auth`. La prueba `17_pulido` comprueba que cada ruta carga exactamente sus hojas y que la suma con `fonts.css` no pasa de 45.000 bytes. Al tocar CSS: el color nuevo va en `:root` de `panel.css`; una regla va a la hoja de la única pantalla que la usa y a `panel.css` si la usan varias. JS sin librerías, con nonce: `panel.js` (todas) + `kanban.js`, `tareas.js` o `config.js`.
+
+### Pruebas
+
+`php captacion/tests/run.php`: nuevos `12_kanban`, `13_tareas`, `14_config`, `15_actividad`, `16_backup` y `17_pulido` (kanban: transiciones válidas e inválidas y paginación; tareas: filtros, posponer y vencidas; configuración: validación de pesos, recálculo en lotes, alertas tibias en la cola, costos y CPL, integraciones contra servidores simulados; actividad: filtros y CSV; copias: §16; autorización por rol en cada endpoint).

@@ -1,0 +1,51 @@
+/* NorthStar Captación · configuración, pestaña «puntuacion». Se carga solo en esa pantalla, encima de panel.css. Sin estilos en línea (CSP): clases y variables. */
+.cfg-fs[disabled] .num__in{background:var(--sunk)}
+.cfg-fs[disabled] .num__in input{background:none}
+.num{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:600;color:var(--ink-2);min-width:0}
+.num__in{display:flex;align-items:center;border:1px solid var(--field);border-radius:var(--r-in);background:var(--surface);padding-right:10px}
+.num__in input{width:100%;min-height:42px;border:0;background:none;padding:0 10px;outline:0;font:500 15px var(--f-mono);color:var(--ink);min-width:0}
+.num__in:focus-within{border-color:var(--focus);box-shadow:0 0 0 3px var(--cyan-tint)}
+.num__in i{font:500 11px var(--f-mono);color:var(--ink-3);font-style:normal}
+.numgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px 14px}
+.numgrid--2{grid-template-columns:repeat(2,minmax(0,260px))}
+.tiergrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:16px}
+.tiers{border:1px solid var(--line);border-radius:14px;padding:12px 14px 8px;min-width:0;margin:0}
+.tiers legend{padding:0 6px;font-weight:600;font-size:13.5px}
+.tiers legend small{color:var(--ink-3);font-weight:400}
+.tier{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr) minmax(0,1fr);gap:10px;align-items:center;padding:5px 0}
+.tier__l{font-size:13px;color:var(--ink-3)}
+.tier--h{padding:0 0 2px;font:500 10.5px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.prov-note{display:flex;gap:8px;align-items:flex-start;margin-bottom:12px;padding:9px 12px;border-radius:var(--r-in);background:var(--warn-bg);color:var(--warn);font-size:13.5px}
+.prov-note .ic{margin-top:2px;width:16px;height:16px}
+.pv{margin-top:2px}
+.pv__t{font-weight:600;margin-bottom:8px}
+.pv__t2{width:100%;max-width:520px;border-collapse:collapse;font-size:14px}
+.pv__t2 th,.pv__t2 td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--line)}
+.pv__t2 thead th{font:500 10.5px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.pv__t2 tbody th{font-weight:500}
+.pv__t2 td{font-family:var(--f-mono)}
+.pv__n{margin-top:10px;color:var(--ink-2);font-size:13.5px;max-width:70ch}
+.rc-state{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.rc-bar{width:100%;max-width:520px;height:10px;border-radius:5px;overflow:hidden;appearance:none;-webkit-appearance:none;border:0;background:var(--line)}
+.rc-bar::-webkit-progress-bar{background:var(--line)}
+.rc-bar::-webkit-progress-value{background:var(--cyan)}
+.rc-bar::-moz-progress-bar{background:var(--cyan)}
+.rc-form .cfg-fs{gap:12px;align-items:flex-start}
+.pr-item{padding:12px 0;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px;min-width:0}
+.pr-item__t{font-weight:600;font-size:13px;color:var(--ink-2)}
+.opts-eq{border:0;padding:0;margin:0;min-width:0}
+.opts-eq legend{font-size:13px;font-weight:600;color:var(--ink-2);margin-bottom:8px;padding:0}
+.check--conf{font-size:13px;color:var(--ink-3)}
+.hist{display:flex;flex-direction:column}
+.hist li{display:grid;grid-template-columns:130px minmax(0,1fr);gap:12px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+.hist time{font:500 12px var(--f-mono);color:var(--ink-3)}
+.hist span{overflow-wrap:anywhere}
+@media (max-width:1180px){
+  .numgrid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .tiergrid{grid-template-columns:1fr}
+}
+@media (max-width:760px){
+  .numgrid,.numgrid--2{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tier{grid-template-columns:minmax(0,.8fr) minmax(0,1fr) minmax(0,1fr)}
+  .hist li{grid-template-columns:1fr;gap:2px}
+}

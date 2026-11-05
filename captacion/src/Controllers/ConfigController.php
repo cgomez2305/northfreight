@@ -90,7 +90,7 @@ final class ConfigController extends Responder
         $tab = $forceTab ?? self::tabOf($_GET['tab'] ?? null);
         $now = Clock::time();
         $vars = [
-            'title' => 'Configuración', 'css' => ['config'], 'js' => ['config'], 'tab' => $tab, 'tabs' => self::TABS, 'locked' => in_array($tab, self::LOCKED_TABS, true) && !Reauth::fresh(),
+            'title' => 'Configuración', 'css' => ['config', 'cfg-' . $tab], 'js' => ['config'], 'tab' => $tab, 'tabs' => self::TABS, 'locked' => in_array($tab, self::LOCKED_TABS, true) && !Reauth::fresh(),
             'needsUnlock' => in_array($tab, self::LOCKED_TABS, true), 'reauthLeft' => Reauth::remaining(), 'reauthTtl' => Reauth::ttl(), 'errors' => [], 'now' => $now,
         ];
         $vars += match ($tab) {

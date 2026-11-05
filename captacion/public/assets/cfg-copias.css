@@ -1,0 +1,18 @@
+/* NorthStar Captación · configuración, pestaña «copias». Se carga solo en esa pantalla, encima de panel.css. Sin estilos en línea (CSP): clases y variables. */
+.bk-s{display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+.bk-run .btn[disabled],.tbl--bk .btn[disabled]{opacity:.5;cursor:not-allowed}
+.tbl--bk .num-c,.tbl--bk th.num-c{text-align:right}
+.tbl--bk .c-n small{display:block;color:var(--ink-3);font-size:12px;font-weight:400}
+.tbl--bk .bk-f{font-size:12px}
+.tbl--bk .c-act{text-align:right;white-space:nowrap}
+.bk-err{display:block;margin-top:4px;color:var(--bad);font-size:12px;white-space:normal;max-width:260px}
+.tbl--bk td form{margin:0}
+@container (max-width:700px){
+  .tbl--bk tbody tr{display:grid;grid-template-columns:1fr 1fr;gap:6px 18px;padding:14px 16px}
+  .tbl--bk tbody th.c-n{grid-column:1/-1;order:-1;flex:none}
+  .tbl--bk td{display:flex;justify-content:space-between;gap:8px;text-align:right;font-size:14px}
+  .tbl--bk td[data-l]::before{content:attr(data-l);color:var(--ink-3);font-size:12.5px;text-align:left}
+  .tbl--bk td.bk-f{grid-column:1/-1;display:block;text-align:left;overflow-wrap:anywhere;font-size:12px}.tbl--bk td.bk-f::before{content:none}
+  .tbl--bk td[data-l="Estado"]{flex-wrap:wrap;align-items:center}.tbl--bk td[data-l="Estado"] .bk-err{flex:1 1 100%;max-width:none;text-align:right}
+  .tbl--bk .c-act{grid-column:1/-1;justify-content:flex-end}
+}
