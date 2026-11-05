@@ -71,7 +71,7 @@ final class ComunicacionesController extends Responder
     {
         $rows = Templates::all();
         foreach ($rows as &$r) {
-            $r['pending'] = Templates::unresolved((string) $r['subject'] . "\n" . (string) $r['body']);
+            $r['pending'] = Templates::render($r, Templates::sampleLead((string) $r['lang']), (string) $r['lang'], Url::base() . '/u/EJEMPLO')['unresolved'];
         }
         unset($r);
         self::shell($user, 'plantillas', ['view' => 'list', 'templates' => $rows]);
