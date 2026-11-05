@@ -18,6 +18,8 @@ return static function (array $ctx): void {
         '/config?tab=integraciones' => ['config', 'cfg-integraciones'], '/config?tab=horario' => ['config', 'cfg-horario'], '/config?tab=copias' => ['config', 'cfg-copias'],
         // Q3
         '/config?tab=entrega' => ['config', 'cfg-entrega'], '/config?tab=correo' => ['config', 'cfg-correo'], '/config?tab=usuarios' => ['config', 'cfg-usuarios'],
+        // Q4a
+        '/prospectos' => ['prospectos'], '/referidos' => ['referidos'], '/vacantes' => ['vacantes'], '/vacantes/new' => ['vacantes'], '/config?tab=prospectos' => ['config', 'cfg-prospectos'],
         '/reportes' => ['charts', 'reportes'], '/resultados' => ['charts', 'reportes'], '/informes' => ['reportes'], '/comunicaciones' => ['comms'], '/comunicaciones/inscripciones' => ['comms'], '/comunicaciones/envios' => ['comms'],
     ];
     $s = Panel::start($ctx, 'panel-pol');
@@ -52,7 +54,7 @@ return static function (array $ctx): void {
     T::eq([$r['status'], Infra::header($r, 'location')], [303, '/resultados'], 'lector: / lo lleva a /resultados');
     $r = $v->get('/resultados');
     T::ok($r['status'] === 200 && str_contains($r['body'], 'href="/resultados"') && str_contains($r['body'], 'href="/informes"') && !str_contains($r['body'], 'href="/pipeline"') && !str_contains($r['body'], 'href="/tareas"') && !str_contains($r['body'], 'href="/leads') && !str_contains($r['body'], 'href="/config"') && !str_contains($r['body'], 'href="/actividad"') && !str_contains($r['body'], 'data-search') && !str_contains($r['body'], 'data-notes'), 'lector: la barra lateral trae solo Resultados e Informes (sin Pipeline, Tareas, Leads, buscador ni campana)');
-    $crumbs = ['/pipeline' => 'Pipeline', '/tareas' => 'Tareas', '/actividad' => 'Actividad', '/config?tab=copias' => 'Copias de seguridad', '/config?tab=alertas' => 'Alertas', '/reportes' => 'Últimos 30 días', '/informes' => 'Informes', '/comunicaciones' => 'Plantillas', '/config?tab=entrega' => 'Entrega a NorthStar', '/config?tab=usuarios' => 'Usuarios'];
+    $crumbs = ['/pipeline' => 'Pipeline', '/tareas' => 'Tareas', '/actividad' => 'Actividad', '/config?tab=copias' => 'Copias de seguridad', '/config?tab=alertas' => 'Alertas', '/reportes' => 'Últimos 30 días', '/informes' => 'Informes', '/comunicaciones' => 'Plantillas', '/config?tab=entrega' => 'Entrega a NorthStar', '/config?tab=usuarios' => 'Usuarios', '/prospectos' => 'Prospectos', '/referidos' => 'Referidos', '/vacantes' => 'Vacantes', '/config?tab=prospectos' => 'Prospectos'];
     foreach ($crumbs as $route => $last) {
         $r = $s->get($route);
         T::ok(preg_match('#<li aria-current="page">' . preg_quote($last, '#') . '</li>#', $r['body']) === 1 && str_contains($r['body'], '<title>'), "migas de {$route}: termina en «{$last}»");
@@ -62,7 +64,7 @@ return static function (array $ctx): void {
     Db::pdo()->exec('DELETE FROM lead_events');
     Db::pdo()->exec('DELETE FROM tasks');
     Db::pdo()->exec('DELETE FROM leads');
-    foreach (['/informes' => 'Todavía no hay informes', '/comunicaciones/inscripciones' => 'Nadie está inscrito', '/comunicaciones/envios' => 'Aún no se ha enviado ningún correo', '/config?tab=entrega' => 'Aún no se ha presentado ningún lead', '/resultados' => 'Sin leads recibidos', '/' => 'Aún no hay', '/leads' => 'empty', '/pipeline' => 'empty', '/tareas' => 'empty', '/actividad?q=zzzz-nada' => 'Nada coincide', '/config?tab=copias' => 'Aún no hay copias'] as $route => $needle) {
+    foreach (['/informes' => 'Todavía no hay informes', '/comunicaciones/inscripciones' => 'Nadie está inscrito', '/comunicaciones/envios' => 'Aún no se ha enviado ningún correo', '/config?tab=entrega' => 'Aún no se ha presentado ningún lead', '/resultados' => 'Sin leads recibidos', '/' => 'Aún no hay', '/leads' => 'empty', '/pipeline' => 'empty', '/tareas' => 'empty', '/actividad?q=zzzz-nada' => 'Nada coincide', '/config?tab=copias' => 'Aún no hay copias', '/prospectos' => 'Todavía no hay prospectos', '/referidos' => 'Todavía no hay códigos de referido', '/vacantes' => 'Todavía no hay vacantes'] as $route => $needle) {
         $r = $s->get($route);
         T::ok($r['status'] === 200 && str_contains($r['body'], $needle) && !str_contains($r['body'], 'Warning') && !str_contains($r['body'], 'Fatal error'), "estado vacio de {$route}: 200 con su aviso y sin errores de PHP");
     }
