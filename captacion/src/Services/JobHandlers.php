@@ -27,6 +27,7 @@ final class JobHandlers
             'fmcsa_enrich'            => [self::class, 'fmcsaEnrich'],
             'email_notify'            => [self::class, 'emailNotify'],
             'rescore_batch'           => [ScoringConfig::class, 'runBatch'],
+            'backup_db'               => [Backup::class, 'handler'],
         ];
     }
 

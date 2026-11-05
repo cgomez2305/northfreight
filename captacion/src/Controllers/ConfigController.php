@@ -1,6 +1,6 @@
 <?php
 /**
- * /config (solo administradores): Puntuacion, Alertas, Costos por canal, Integraciones, Horario y zona (las Copias de seguridad se añaden en la entrega E).
+ * /config (solo administradores): Puntuacion, Alertas, Costos por canal, Integraciones, Horario y zona y Copias de seguridad.
  * Cada accion: sesion + rol admin + CSRF + validacion + activity_log. Los cambios que modifican el comportamiento (pesos, alertas, costos, horario, copias) exigen
  * una confirmacion reciente de contraseña + 2FA (Services\Reauth); sin ella los formularios se ven bloqueados y el servidor rechaza el POST.
  */
@@ -13,6 +13,7 @@ use Captacion\Clock;
 use Captacion\Db;
 use Captacion\Services\ActivityLog;
 use Captacion\Services\Alerts;
+use Captacion\Services\Backup;
 use Captacion\Services\Costs;
 use Captacion\Services\Display;
 use Captacion\Services\Integrations;
@@ -25,10 +26,10 @@ use Captacion\Services\Settings;
 final class ConfigController extends Responder
 {
     public const TABS = [
-        'puntuacion' => 'Puntuación', 'alertas' => 'Alertas', 'costos' => 'Costos por canal', 'integraciones' => 'Integraciones', 'horario' => 'Horario y zona',
+        'puntuacion' => 'Puntuación', 'alertas' => 'Alertas', 'costos' => 'Costos por canal', 'integraciones' => 'Integraciones', 'horario' => 'Horario y zona', 'copias' => 'Copias de seguridad',
     ];
     /** Pestañas cuyos formularios exigen confirmacion reciente. */
-    public const LOCKED_TABS = ['puntuacion', 'alertas', 'costos', 'horario'];
+    public const LOCKED_TABS = ['puntuacion', 'alertas', 'costos', 'horario', 'copias'];
     public const TEST_LIMIT = 6;   // pruebas de integracion por minuto y usuario
 
     public static function route(?string $a, ?string $b): never
@@ -52,6 +53,8 @@ final class ConfigController extends Responder
             'costs/delete'        => self::costDelete($user),
             'display'             => self::displaySave($user),
             'integrations/test'   => self::integrationTest($user),
+            'backups/run'         => self::backupRun($user),
+            'backups/download'    => self::backupDownload($user),
             default               => self::notFound(),
         };
         self::notFound();
@@ -100,6 +103,7 @@ final class ConfigController extends Responder
             'costos'        => self::costsVars(),
             'integraciones' => ['cards' => Integrations::status(), 'testResult' => self::takeTestResult(), 'testUsdot' => Integrations::TEST_USDOT],
             'horario'       => ['zones' => Display::ZONES, 'tz' => Display::timezone(), 'hours' => Display::hours()],
+            'copias'        => Backup::pageVars(),
         };
         self::page('config', $user, 'config', [['Configuración', '/config'], [self::TABS[$tab], null]], $over + $vars, $status);
     }
@@ -280,5 +284,23 @@ final class ConfigController extends Responder
         ActivityLog::record('integration_test', (int) $user['id'], 'integration', $name, ['ok' => $res['ok'], 'level' => $res['level']]);
         $_SESSION['test_result'] = ['name' => $name] + $res + ['at' => Clock::now()];
         self::redirect($back);
+    }
+
+    // --- Copias de seguridad ----------------------------------------------------------------------------------------------
+
+    /** «Hacer copia ahora»: la hace el cron de la cola (no exige confirmacion: no entrega datos). */
+    private static function backupRun(array $user): never
+    {
+        $back = self::guardPost('copias', false);
+        $r = Backup::request((int) $user['id']);
+        self::flash($r['ok'], $r['msg']);
+        self::redirect($back);
+    }
+
+    /** Descarga: solo admin y con confirmacion reciente (contiene todos los datos personales de los leads). */
+    private static function backupDownload(array $user): never
+    {
+        $back = self::guardPost('copias', true);
+        Backup::download((int) ($_POST['id'] ?? 0), (int) $user['id'], $back);
     }
 }

@@ -124,6 +124,16 @@ final class Integrations
             'error' => '',
             'help' => $at === null || $late ? 'Revisa la tarea de cron de cron/process_jobs.php (cada minuto) y storage/error.log.' : '',
         ];
+        // Copia diaria de la base
+        $bk = Backup::health($now);
+        $bs = Settings::get('cron.backup');
+        $cards[] = [
+            'key' => 'backup', 'title' => 'Copia diaria', 'testable' => false,
+            'level' => $bk['level'], 'headline' => $bk['level'] === 'ok' ? 'Al día' : ($bk['failed'] ? 'La última falló' : 'Requiere atención'),
+            'details' => [['Última copia buena', $bk['last_ok'] !== null ? Fmt::dateTime((string) $bk['last_ok']) . ' · ' . Fmt::ago((string) $bk['last_ok']) : '—'], ['Programada', 'cada día 3:30 a. m. (Nueva York)']],
+            'last' => '', 'error' => $bk['failed'] ? (string) (is_array($bs) ? ($bs['error'] ?? '') : '') : '',
+            'help' => $bk['level'] === 'ok' ? '' : 'Revisa la pestaña «Copias de seguridad» y la tarea de cron de cron/backup_db.php (cada hora a los :30).',
+        ];
         return $cards;
     }
 

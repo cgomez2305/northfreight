@@ -53,6 +53,15 @@ final class Notifications
                 'href' => '/tareas?tab=overdue',
             ];
         }
+        $bk = Backup::health();
+        if ($bk['level'] !== 'ok') {
+            $bst = Settings::get('cron.backup');
+            $items[] = [
+                'key' => 'backup:' . ($bk['failed'] ? 'failed' : ($bk['last_ok'] === null ? 'none' : 'stale')) . ':' . (is_array($bst) ? (string) ($bst['at'] ?? '') : ''), 'kind' => $bk['level'] === 'bad' ? 'bad' : 'warn',
+                'title' => $bk['failed'] ? 'La última copia de seguridad falló' : ($bk['last_ok'] === null ? 'Aún no hay copias de seguridad' : 'La última copia de seguridad es antigua'),
+                'meta' => $bk['msg'], 'href' => '/config?tab=copias',
+            ];
+        }
         if (!Telegram::configured()) {
             $items[] = ['key' => 'telegram_unconfigured', 'kind' => 'warn', 'title' => 'Telegram sin configurar', 'meta' => 'Las alertas de leads calientes no llegarán a tu teléfono', 'href' => '/#cola'];
         }
