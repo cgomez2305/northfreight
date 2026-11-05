@@ -23,8 +23,40 @@ return static function (array $ctx): void {
     T::eq((int) $pdo->query('SELECT COUNT(*) FROM schema_migrations')->fetchColumn(), count($files), 'schema_migrations tiene una fila por migracion');
     T::eq($ctx['migrationsApplied'], $files, 'la base de trabajo tambien se migro desde cero');
 
+    // Q3: la migracion se aplica SOBRE la base de Q2b (001 a 005) con datos reales, sin perderlos
+    $rootPdo->exec('DROP DATABASE IF EXISTS cap_mig_q2b');
+    $rootPdo->exec('CREATE DATABASE cap_mig_q2b CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+    $q2b = new PDO('mysql:host=127.0.0.1;port=' . $ctx['dbPort'] . ';dbname=cap_mig_q2b;charset=utf8mb4', 'root', '', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
+    $tmp = $ctx['work'] . '/mig-q2b';
+    @mkdir($tmp, 0777, true);
+    foreach (glob($tmp . '/*.sql') ?: [] as $f) {
+        unlink($f);
+    }
+    foreach (array_filter($files, static fn($f) => (int) substr($f, 0, 3) <= 5) as $f) {
+        copy("$dir/$f.sql", "$tmp/$f.sql");
+    }
+    $first = Migrator::run($q2b, $tmp);
+    T::eq($first, ['001_core', '002_auth', '003_settings_seed', '004_panel', '005_pipeline_config'], 'base de Q2b: se aplican 001 a 005');
+    $q2b->exec("INSERT INTO users (name, email, password_hash, role) VALUES ('Carlos', 'c@example.com', 'x', 'admin')");
+    $q2b->exec("INSERT INTO leads (profile, first_name, last_name, source, stage, temperature) VALUES ('owner_operator', 'Real', 'Lead', 'web_careers', 'presented', 'hot')");
+    $q2b->exec("INSERT INTO sequence_enrollments (lead_id, sequence_key, step, status) VALUES (1, 'a6_warm', 0, 'active')");
+    $q2b->exec("INSERT INTO messages (lead_id, channel, direction, body) VALUES (1, 'email', 'out', 'hola')");
+    $q2b->exec("INSERT INTO settings (`key`, value) VALUES ('alerts', '{\"email\":true}')");
+    $newOnes = Migrator::run($q2b, $dir);
+    T::eq($newOnes, ['006_handoff', '007_viewer_reports', '008_comms'], 'sobre la base de Q2b se aplican solo 006, 007 y 008');
+    T::eq([(int) $q2b->query('SELECT COUNT(*) FROM leads')->fetchColumn(), (int) $q2b->query('SELECT COUNT(*) FROM sequence_enrollments')->fetchColumn(), (int) $q2b->query('SELECT COUNT(*) FROM messages')->fetchColumn(), (int) $q2b->query('SELECT COUNT(*) FROM users')->fetchColumn()], [1, 1, 1, 1], '  y los datos existentes siguen ahi');
+    T::eq(Migrator::run($q2b, $dir), [], '  repetirlas no hace nada');
+    $qc = static fn(string $t) => $q2b->query("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = 'cap_mig_q2b' AND TABLE_NAME = '$t'")->fetchAll(PDO::FETCH_COLUMN);
+    T::ok(in_array('invited_by', $qc('users'), true) && in_array('deactivated_at', $qc('users'), true) && in_array('subject', $qc('messages'), true) && in_array('sequence_key', $qc('messages'), true) && in_array('blocks', $qc('sequence_enrollments'), true) && in_array('blocked_reason', $qc('sequence_enrollments'), true), '  columnas nuevas en users, messages y sequence_enrollments');
+    $q2bTables = $q2b->query('SHOW TABLES')->fetchAll(PDO::FETCH_COLUMN);
+    T::ok(!array_diff(['handoffs', 'handoff_deliveries', 'user_invites', 'reports', 'email_templates'], $q2bTables), '  tablas nuevas: handoffs, handoff_deliveries, user_invites, reports, email_templates');
+    T::eq($q2b->query("SELECT status FROM sequence_enrollments WHERE id = 1")->fetchColumn(), 'active', '  la inscripcion previa conserva su estado');
+    $q2b->exec("INSERT INTO sequence_enrollments (lead_id, sequence_key, step, status) VALUES (1, 'a12_referral', 0, 'active')");
+    T::throws(static fn() => $q2b->exec("INSERT INTO sequence_enrollments (lead_id, sequence_key, step, status) VALUES (1, 'a6_warm', 0, 'active')"), 'una inscripcion por lead y secuencia (clave unica)', 'Duplicate');
+    $rootPdo->exec('DROP DATABASE cap_mig_q2b');
+
     $tables = $pdo->query('SHOW TABLES')->fetchAll(PDO::FETCH_COLUMN);
-    foreach (['users', 'leads', 'lead_events', 'consents', 'prospects_fmcsa', 'tasks', 'appointments', 'messages', 'sequence_enrollments', 'referral_codes', 'referrals', 'job_postings', 'channel_costs', 'settings', 'jobs', 'activity_log', 'recovery_codes', 'login_attempts', 'schema_migrations'] as $t) {
+    foreach (['users', 'leads', 'lead_events', 'consents', 'prospects_fmcsa', 'tasks', 'appointments', 'messages', 'sequence_enrollments', 'referral_codes', 'referrals', 'job_postings', 'channel_costs', 'settings', 'jobs', 'activity_log', 'recovery_codes', 'login_attempts', 'schema_migrations', 'handoffs', 'handoff_deliveries', 'user_invites', 'reports', 'email_templates', 'backups', 'lead_notes'] as $t) {
         T::ok(in_array($t, $tables, true), "tabla $t existe");
     }
     $cols = static fn(string $t) => $pdo->query("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = 'cap_mig' AND TABLE_NAME = '$t'")->fetchAll(PDO::FETCH_COLUMN);

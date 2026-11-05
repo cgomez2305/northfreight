@@ -124,6 +124,18 @@ final class Integrations
             'error' => '',
             'help' => $at === null || $late ? 'Revisa la tarea de cron de cron/process_jobs.php (cada minuto) y storage/error.log.' : '',
         ];
+        // Informes automaticos (A13/A14)
+        $rc = Settings::get('cron.reports');
+        $rat = is_array($rc) && isset($rc['at']) ? Clock::parse((string) $rc['at']) : null;
+        $rlate = $rat !== null && $now - $rat > 7200;
+        $cards[] = [
+            'key' => 'reports', 'title' => 'Informes automáticos', 'testable' => false,
+            'level' => $rat === null ? 'warn' : ($rlate ? 'bad' : 'ok'),
+            'headline' => $rat === null ? 'Nunca se ha ejecutado' : ($rlate ? 'Lleva más de 2 horas sin correr' : 'Corriendo'),
+            'details' => [['Última pasada', $rat === null ? '—' : Fmt::dateTime((string) $rc['at']) . ' · ' . Fmt::ago((string) $rc['at'])], ['Programado', 'cada hora; resumen los lunes 8:00 a. m. e informe el día 1 (hora de Nueva York)']],
+            'last' => '', 'error' => '',
+            'help' => $rat === null || $rlate ? 'Agrega la tarea de cron de cron/reports_cron.php (cada hora) en hPanel. Pasos en el README §18.' : '',
+        ];
         // Copia diaria de la base
         $bk = Backup::health($now);
         $bs = Settings::get('cron.backup');

@@ -53,6 +53,17 @@ final class Notifications
                 'href' => '/tareas?tab=overdue',
             ];
         }
+        // Q3: entregas a NorthStar sin destino o fallidas
+        $waiting = (int) Db::value("SELECT COUNT(*) FROM handoffs WHERE confirm_status IS NULL AND status = 'no_target'");
+        if ($waiting > 0) {
+            $items[] = ['key' => 'handoff_waiting:' . $waiting . ':' . (int) Db::value("SELECT MAX(id) FROM handoffs WHERE confirm_status IS NULL AND status = 'no_target'"), 'kind' => 'warn',
+                'title' => $waiting === 1 ? '1 lead presentado sin destino de entrega' : $waiting . ' leads presentados sin destino de entrega', 'meta' => 'Destino de entrega sin configurar', 'href' => '/config?tab=entrega'];
+        }
+        $hf = (int) Db::value("SELECT COUNT(*) FROM handoffs WHERE confirm_status IS NULL AND status IN ('failed','partial') AND EXISTS (SELECT 1 FROM handoff_deliveries d WHERE d.handoff_id = handoffs.id AND d.status = 'failed')");
+        if ($hf > 0) {
+            $items[] = ['key' => 'handoff_failed:' . $hf . ':' . (int) Db::value("SELECT MAX(id) FROM handoffs WHERE status IN ('failed','partial')"), 'kind' => 'bad',
+                'title' => $hf === 1 ? '1 entrega a NorthStar falló' : $hf . ' entregas a NorthStar fallaron', 'meta' => 'Revisa el destino y usa «Reenviar entrega» en la ficha', 'href' => '/config?tab=entrega'];
+        }
         $bk = Backup::health();
         if ($bk['level'] !== 'ok') {
             $bst = Settings::get('cron.backup');
