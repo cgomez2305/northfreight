@@ -1,6 +1,7 @@
 <?php
 /**
- * Front controller del panel (subdominio captacion.). Rutas: / (dashboard), /pipeline, /tareas, /config, /actividad, /leads, /leads/{id}, /leads/{id}/{accion}, /leads/bulk, /leads/export, /ajax/search, /ajax/notifications/read, /login, /login/2fa, /logout.
+ * Front controller del panel (subdominio captacion.). Rutas: / (dashboard), /pipeline, /tareas, /config, /actividad, /leads, /leads/{id}, /leads/{id}/{accion}, /leads/bulk, /leads/export, /ajax/search, /ajax/notifications/read, /login, /login/2fa, /logout,
+ * Q3: /reportes, /resultados, /informes, /comunicaciones; publicas con token: /c/{token}, /u/{token}, /invite/{token}. Autorizacion por rol DENEGADA POR DEFECTO en Responder::user().
  * setup.php y api/lead.php son puntos de entrada propios. Cualquier otra ruta: 404.
  */
 
@@ -11,6 +12,7 @@ require dirname(__DIR__) . '/src/bootstrap.php';
 use Captacion\Controllers\ActividadController;
 use Captacion\Controllers\AjaxController;
 use Captacion\Controllers\AuthController;
+use Captacion\Controllers\ComunicacionesController;
 use Captacion\Controllers\ConfigController;
 use Captacion\Controllers\DashboardController;
 use Captacion\Controllers\InviteController;
@@ -18,6 +20,9 @@ use Captacion\Controllers\LeadActionsController;
 use Captacion\Controllers\LeadsController;
 use Captacion\Controllers\PipelineController;
 use Captacion\Controllers\PublicController;
+use Captacion\Controllers\ReportesController;
+use Captacion\Controllers\ResultadosController;
+use Captacion\Controllers\InformesController;
 use Captacion\Controllers\TareasController;
 use Captacion\Services\Storage;
 
@@ -82,6 +87,14 @@ switch (true) {
         ConfigController::route($m[1] ?? null, $m[2] ?? null);
     case preg_match('#^/actividad(?:/([a-z]{3,12}))?$#', $path, $m) === 1:
         ActividadController::route($m[1] ?? null);
+    case $path === '/resultados':
+        ResultadosController::index();
+    case preg_match('#^/reportes(?:/([a-z]{4,10}))?$#', $path, $m) === 1:
+        ReportesController::route($m[1] ?? null);
+    case preg_match('#^/informes(?:/(?:(\d{1,10})(?:/([a-z]{4,10}))?|(generate)))?$#', $path, $m) === 1:
+        InformesController::route(isset($m[1]) && $m[1] !== '' ? (int) $m[1] : null, ($m[2] ?? '') !== '' ? $m[2] : (($m[3] ?? '') !== '' ? $m[3] : null));
+    case preg_match('#^/comunicaciones(?:/([a-z]{4,14})(?:/(\d{1,10}|new))?(?:/([a-z]{3,10}))?)?$#', $path, $m) === 1:
+        ComunicacionesController::route($m[1] ?? null, ($m[2] ?? '') !== '' ? $m[2] : null, ($m[3] ?? '') !== '' ? $m[3] : null);
     case preg_match('#^/c/([A-Za-z0-9_-]{40,300})$#', $path, $m) === 1:
         PublicController::confirm($m[1]);
     case preg_match('#^/invite/([a-f0-9]{64})$#', $path, $m) === 1:

@@ -158,12 +158,12 @@ return static function (array $ctx): void {
     T::eq($s->get("/tareas/$webId/done")['status'], 303, 'GET a una accion: no ejecuta (redirige)');
     // lector: ve pero no escribe
     $vp = $v->get('/tareas');
-    T::ok($vp['status'] === 200 && !str_contains($vp['body'], 'Nueva tarea') && !str_contains($vp['body'], 'data-edit'), 'lector: ve la lista sin botones de escritura');
+    T::ok($vp['status'] === 403 && !str_contains($vp['body'], 'Nueva tarea') && !str_contains($vp['body'], 'data-edit'), 'lector: /tareas responde 403 (Q3: solo ve resultados e informes)');
     $r = $v->post("/tareas/$webId/delete", ['_csrf' => $v->csrf]);
-    T::ok($r['status'] === 303 && Db::value('SELECT deleted_at FROM tasks WHERE id = ?', [$webId]) === null, 'lector: borrar por HTTP no hace nada');
+    T::ok($r['status'] === 403 && Db::value('SELECT deleted_at FROM tasks WHERE id = ?', [$webId]) === null, 'lector: borrar por HTTP responde 403 y no hace nada');
     $r = $v->post('/tareas/new', ['_csrf' => $v->csrf, 'title' => 'Del lector']);
     T::ok((int) Db::value("SELECT COUNT(*) FROM tasks WHERE title = 'Del lector'") === 0, 'lector: crear por HTTP no hace nada');
-    T::ok(str_contains($v->get('/tareas')['body'], 'solo lectura'), '  y le avisa que su cuenta es de solo lectura');
+    T::ok(str_contains($v->get('/tareas')['body'], 'solo puede ver los resultados'), '  y le explica qué sí puede ver');
     $s->post("/tareas/$webId/delete", ['_csrf' => $s->csrf]);
     T::ok(Db::value('SELECT deleted_at FROM tasks WHERE id = ?', [$webId]) !== null, 'borrar por HTTP (administrador)');
     $sidebar = $s->get('/leads')['body'];

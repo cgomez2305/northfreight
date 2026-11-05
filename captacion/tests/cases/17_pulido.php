@@ -45,7 +45,9 @@ return static function (array $ctx): void {
     $v = $s->another();
     T::ok($v->login($viewer['email']), 'login del lector');
     $r = $v->get('/');
-    T::ok(str_contains($r['body'], 'href="/pipeline"') && str_contains($r['body'], 'href="/tareas"') && !str_contains($r['body'], 'href="/config"') && !str_contains($r['body'], 'href="/actividad"') && !str_contains($r['body'], 'Administración'), 'lector: ve Pipeline y Tareas pero no Configuración ni Actividad');
+    T::eq([$r['status'], Infra::header($r, 'location')], [303, '/resultados'], 'lector: / lo lleva a /resultados');
+    $r = $v->get('/resultados');
+    T::ok($r['status'] === 200 && str_contains($r['body'], 'href="/resultados"') && str_contains($r['body'], 'href="/informes"') && !str_contains($r['body'], 'href="/pipeline"') && !str_contains($r['body'], 'href="/tareas"') && !str_contains($r['body'], 'href="/leads') && !str_contains($r['body'], 'href="/config"') && !str_contains($r['body'], 'href="/actividad"') && !str_contains($r['body'], 'data-search') && !str_contains($r['body'], 'data-notes'), 'lector: la barra lateral trae solo Resultados e Informes (sin Pipeline, Tareas, Leads, buscador ni campana)');
     $crumbs = ['/pipeline' => 'Pipeline', '/tareas' => 'Tareas', '/actividad' => 'Actividad', '/config?tab=copias' => 'Copias de seguridad', '/config?tab=alertas' => 'Alertas'];
     foreach ($crumbs as $route => $last) {
         $r = $s->get($route);

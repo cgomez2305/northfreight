@@ -1,0 +1,62 @@
+/* NorthStar Captación · reportes, resultados e informes (/reportes, /resultados, /informes). Encima de panel.css + charts.css. Sin estilos en línea (CSP): clases y variables. Incluye la hoja de impresión. */
+.rk{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:14px}
+.rk__c{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);padding:14px 18px 16px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.rk__v{font:700 44px/1 var(--f-cond);letter-spacing:-.01em;overflow-wrap:anywhere}
+.rk__v--na{font-size:24px;line-height:1.15;color:var(--ink-2)}
+.rk__d{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-3)}
+.rk__s{font-size:12.5px;color:var(--ink-3);line-height:1.4}
+.rep-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
+.rep-grid--3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.rep-range{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}
+.rep-range .field{width:min(210px,100%)}
+.rep-note{margin-top:12px;line-height:1.45}
+.rep-pad{padding:12px 20px 0}
+.fn{display:flex;flex-direction:column;gap:13px}
+.fn__r{display:grid;grid-template-columns:minmax(110px,36%) minmax(0,1fr) 76px;gap:12px;align-items:center}
+.fn__l{display:flex;flex-direction:column;min-width:0}
+.fn__l b{font-weight:600}
+.fn__l small{color:var(--ink-3);font-size:12px;line-height:1.3}
+.fn__n{display:flex;flex-direction:column;text-align:right}
+.fn__n b{font:600 15px var(--f-mono)}
+.fn__n small{color:var(--ink-3);font-size:12px}
+.fn--loss .fn__r{grid-template-columns:minmax(110px,44%) minmax(0,1fr) 64px}
+.hb{width:100%;height:10px;display:block}
+.hb__bg{fill:var(--seg-e)}
+.hb__fg{fill:var(--cyan)}
+.hb--end .hb__fg{fill:var(--navy-2)}
+.tbl--rep th.num-c,.tbl--rep td.num-c{text-align:right}
+.tbl--rep tfoot th,.tbl--rep tfoot td{font-weight:600;border-top:1px solid var(--line-2);background:var(--sunk)}
+.tbl--rep .c-act{text-align:right;white-space:nowrap}
+.rep-acts{list-style:decimal;padding-left:22px;display:grid;gap:10px;font-size:16px;line-height:1.45}
+.rep-print-h{display:none}
+.inl{display:inline-block}
+.q3a{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+@media (max-width:1100px){.rep-grid--3{grid-template-columns:1fr}}
+@media (max-width:1024px){.rep-grid{grid-template-columns:1fr}}
+@media (max-width:760px){
+  .rk__v{font-size:38px}
+  .fn__r{grid-template-columns:minmax(0,1fr) 64px;gap:4px 10px}
+  .fn__r .hb{grid-column:1/-1;grid-row:2}
+  .tbl--rep thead{display:none}
+  .tbl--rep tbody tr,.tbl--rep tfoot tr{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;padding:12px 16px;border-bottom:1px solid var(--line)}
+  .tbl--rep tbody th,.tbl--rep tfoot th{grid-column:1/-1;border:0;padding:0;font:600 14px var(--f-sans)}
+  .tbl--rep td{display:flex;justify-content:space-between;gap:8px;border:0;padding:0;white-space:normal;font-size:13.5px}
+  .tbl--rep td[data-l]::before{content:attr(data-l);color:var(--ink-3);font-size:12px}
+  .tbl--rep td[colspan]{grid-column:1/-1}
+  .tbl--rep .c-act{grid-column:1/-1;justify-content:flex-end}
+  .rep-range .field{width:100%}
+}
+@media print{
+  @page{size:A4;margin:14mm}
+  html,body{background:#fff!important;font-size:12px}
+  .side,.top,.tabbar,.scrim,.skip,.rep-nop,.page-head__a,.flash,dialog,.dd,.icon-btn{display:none!important}
+  .shell{display:block}
+  .col,.main{display:block;padding:0;margin:0;max-width:none}
+  .rep-print-h{display:block;font:600 11px var(--f-mono);letter-spacing:.06em;color:var(--ink-2);border-bottom:2px solid var(--navy);padding-bottom:8px;margin-bottom:12px}
+  .card,.rk__c{box-shadow:none;break-inside:avoid;border-color:#bbb}
+  .rk{grid-template-columns:repeat(3,1fr);gap:8px}
+  .rep-grid,.rep-grid--3{grid-template-columns:1fr 1fr;gap:10px}
+  .h1{font-size:28px}
+  a{color:inherit;text-decoration:none}
+  .tbl td,.tbl th{padding:6px 8px;font-size:11.5px}
+}

@@ -45,6 +45,7 @@
  $$('[data-confirm]').forEach(function (b) { b.addEventListener('click', function (e) { if (!cd || !cd.showModal) return; e.preventDefault(); pending = b; $('#confirm-m').textContent = b.getAttribute('data-confirm'); cd.showModal(); $('#confirm-y').focus(); }); });
  if (cd) cd.addEventListener('close', function () { if (cd.returnValue === 'yes' && pending) { var f = pending.form; pending.removeAttribute('data-confirm'); if (f.requestSubmit) f.requestSubmit(pending); else f.submit(); } cd.returnValue = ''; pending = null; });
  $$('[data-toggle]').forEach(function (b) { b.addEventListener('click', function () { var t = $(b.getAttribute('data-toggle')); if (!t) return; var show = t.hidden || (t.classList.contains('filters') && !t.classList.contains('is-open')); if (t.classList.contains('filters')) t.classList.toggle('is-open', show); else t.hidden = !show; b.setAttribute('aria-expanded', show ? 'true' : 'false'); if (show) { var f = $('textarea,input:not([type=hidden])', t); if (f) f.focus(); } }); });
+ $$('[data-print]').forEach(function (b) { b.addEventListener('click', function () { window.print(); }); });
  var sd = $('#search'), sq = $('#search-q'), sl = $('#search-list'), sm = $('#search-msg'), sIdx = -1, sTimer, sCtl;
  function sOpen() { if (!sd || !sd.showModal || sd.open) return; closeDd(); navClose(); sd.showModal(); sq.focus(); sq.select(); }
  $$('[data-search]').forEach(function (b) { b.addEventListener('click', function () { navClose(); sOpen(); }); });

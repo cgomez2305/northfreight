@@ -1,6 +1,8 @@
 -- 007_viewer_reports: fase Q3-B/C/D. Invitaciones de un solo uso (rol viewer de NorthStar) e informes (instantanea de metricas semanal y mensual).
 ALTER TABLE users ADD COLUMN invited_by BIGINT UNSIGNED NULL AFTER role;
 ALTER TABLE users ADD COLUMN deactivated_at DATETIME NULL AFTER last_login_at;
+-- Reportes (/reportes, informes): firmados por fecha de firma.
+ALTER TABLE leads ADD KEY idx_leads_signed (deleted_at, signed_at);
 
 -- Solo se guarda el hash del token (el enlace en claro se muestra una vez). Caduca a las 48 h y se usa una sola vez.
 CREATE TABLE user_invites (

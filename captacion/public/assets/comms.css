@@ -1,0 +1,31 @@
+/* NorthStar Captación · comunicaciones (plantillas, inscripciones, correos enviados). Encima de panel.css + config.css-like helpers. Sin estilos en línea (CSP). */
+.cfg-intro{max-width:78ch}
+.cfg-tabs{margin-bottom:2px}
+.cm-note{padding:12px 20px 16px;line-height:1.45}
+.cm-edit{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:14px;align-items:start}
+.cm-fields{display:flex;flex-direction:column;gap:14px}
+.cm-side{display:flex;flex-direction:column;gap:14px;min-width:0}
+.cm-prev{display:flex;flex-direction:column;gap:12px}
+.cm-subj{font-size:14px;overflow-wrap:anywhere}
+.cm-body{border:1px solid var(--line);border-radius:var(--r-in);background:var(--sunk);padding:14px 16px;font-size:14px;line-height:1.55;overflow-wrap:anywhere}
+.mk{background:var(--warn-bg);color:var(--warn);border-radius:4px;padding:0 3px;font-weight:600}
+.cm-seqs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.cm-steps{display:grid;gap:8px;margin-bottom:10px;list-style:decimal;padding-left:20px}
+.cm-steps small{display:block}
+.cm-filter{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.cm-filter select{min-height:36px;padding:0 10px;border:1px solid var(--field);border-radius:var(--r-in);background:var(--surface)}
+.tbl--cm .c-act{text-align:right;white-space:nowrap}
+.tbl--cm td small,.tbl--cm th small{display:block}
+.inl{display:inline-block;margin-left:6px}
+.q3a{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.num__e{color:var(--bad);font-size:12.5px;font-weight:500}
+.field.has-err input,.field.has-err select,.field.has-err textarea{border-color:var(--bad-dot)}
+@media (max-width:1100px){.cm-edit{grid-template-columns:1fr}.cm-seqs{grid-template-columns:1fr}}
+@media (max-width:760px){
+  .tbl--cm thead{display:none}
+  .tbl--cm tbody tr{display:grid;gap:5px;padding:12px 16px;border-bottom:1px solid var(--line)}
+  .tbl--cm td,.tbl--cm tbody th{white-space:normal;border:0;padding:0}
+  .tbl--cm td[data-l]::before{content:attr(data-l) ": ";color:var(--ink-3);font-size:12px}
+  .tbl--cm .c-act{text-align:left;padding-top:6px}
+  .cm-filter{width:100%}
+}

@@ -95,6 +95,14 @@ final class Charts
             . '<circle class="donut__fg" cx="22" cy="22" r="16" fill="none" stroke-width="5" stroke-linecap="round" transform="rotate(-90 22 22)" stroke-dasharray="' . self::n($circ * $pct / 100) . ' ' . self::n($circ) . '"/></svg>';
     }
 
+    /** Barra horizontal de proporcion (0 a 100) para embudos y rankings. */
+    public static function hbar(float $pct, string $cls = ''): string
+    {
+        $pct = max(0.0, min(100.0, $pct));
+        return '<svg class="hb' . ($cls !== '' ? ' ' . htmlspecialchars($cls, ENT_QUOTES) : '') . '" viewBox="0 0 100 8" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect class="hb__bg" width="100" height="8" rx="4"/>'
+            . ($pct > 0 ? '<rect class="hb__fg" width="' . self::n(max(2.0, $pct)) . '" height="8" rx="4"/>' : '') . '</svg>';
+    }
+
     /**
      * Barra segmentada. @param list<array{value:float|int,label:string}> $segments; las clases seg-0..seg-4 ponen el color.
      */

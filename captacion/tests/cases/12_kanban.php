@@ -105,7 +105,7 @@ return static function (array $ctx): void {
     T::ok(!preg_match('/\sstyle="/i', $pg['body']) && !preg_match('/\son\w+="/i', $pg['body']) && preg_match('/<script(?![^>]*\bnonce=")/i', $pg['body']) === 0 && str_contains($pg['body'], '/assets/kanban.js') && str_contains($pg['body'], '/assets/kanban.css'), '/pipeline: sin estilos ni handlers en linea, scripts con nonce, hojas propias');
     T::ok(str_contains($pg['body'], 'data-move') && str_contains($pg['body'], 'data-write="1"'), 'administrador: tarjetas con «Mover a…»');
     $pv = $v->get('/pipeline');
-    T::ok($pv['status'] === 200 && !str_contains($pv['body'], 'data-move') && str_contains($pv['body'], 'data-write="0"'), 'lector: ve el tablero pero sin «Mover a…»');
+    T::ok($pv['status'] === 403 && !str_contains($pv['body'], 'data-board') && !str_contains($pv['body'], 'kcard'), 'lector: el tablero responde 403 y no trae ninguna tarjeta (Q3: el lector solo ve resultados e informes)');
     T::eq($c->get('/pipeline?pl=B&t=%27%3Bdrop&src=%3Cscript%3E&q=%00x')['status'], 200, 'parametros hostiles: 200 (se normalizan)');
     T::ok(str_contains($c->get('/pipeline?pl=B')['body'], 'Precalificado') && str_contains($c->get('/pipeline?pl=B')['body'], 'Descartado'), 'pipeline B: columnas de company drivers');
 

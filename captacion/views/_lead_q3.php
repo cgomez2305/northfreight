@@ -10,12 +10,10 @@ $tn = ['email' => 'Correo', 'webhook' => 'Webhook'];
 $ds = ['pending' => 'en cola', 'retrying' => 'reintentando', 'sent' => 'enviada', 'failed' => 'falló', 'skipped' => 'omitida'];
 $confTxt = $hl === null ? '' : ['signed' => 'Firmó', 'rejected' => 'Rechazado', 'superseded' => 'Reemplazada por una versión nueva'][$hl['confirm_status'] ?? ''] ?? 'Esperando respuesta';
 $presented = $lead['stage'] === 'presented';
-$post = static fn(string $action, string $label, string $icon, string $cls = 'btn--secondary', string $confirm = '', array $extra = []) => '<form method="post" action="/leads/' . (int) $GLOBALS['__leadId'] . '/' . $action . '" class="q3f">'
-    . '<input type="hidden" name="_csrf" value="' . htmlspecialchars((string) $GLOBALS['__csrf'], ENT_QUOTES) . '">'
+$post = static fn(string $action, string $label, string $icon, string $cls = 'btn--secondary', string $confirm = '', array $extra = []) => '<form method="post" action="/leads/' . (int) $id . '/' . $action . '" class="q3f">'
+    . '<input type="hidden" name="_csrf" value="' . htmlspecialchars((string) $csrf, ENT_QUOTES) . '">'
     . implode('', array_map(static fn($k, $v) => '<input type="hidden" name="' . htmlspecialchars($k, ENT_QUOTES) . '" value="' . htmlspecialchars((string) $v, ENT_QUOTES) . '">', array_keys($extra), $extra))
     . '<button class="btn btn--sm ' . $cls . '" type="submit"' . ($confirm !== '' ? ' data-confirm="' . htmlspecialchars($confirm, ENT_QUOTES) . '"' : '') . '>' . Ui::icon($icon) . htmlspecialchars($label, ENT_QUOTES) . '</button></form>';
-$GLOBALS['__leadId'] = $id;
-$GLOBALS['__csrf'] = $csrf;
 $activeSeq = array_filter($seqs, static fn($s) => $s['status'] === 'active');
 ?>
 <?php if ($hl !== null || $presented): ?>
