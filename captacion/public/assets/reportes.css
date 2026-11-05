@@ -60,5 +60,7 @@
   .rep-grid,.rep-grid--3{grid-template-columns:1fr 1fr;gap:10px}
   .h1{font-size:28px}
   a{color:inherit;text-decoration:none}
-  .tbl td,.tbl th{padding:6px 8px;font-size:11.5px}
+  .tw{overflow:visible}
+  .tbl td,.tbl th{padding:5px 6px;font-size:10.5px;white-space:normal}
+  .tbl thead th{font-size:9px;letter-spacing:.03em}
 }
