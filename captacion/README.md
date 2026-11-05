@@ -1,4 +1,4 @@
-# NorthStar Captación (mini-CRM) — fases Q1, Q2a, Q2b y Q3
+# NorthStar Captación (mini-CRM) — fases Q1, Q2a, Q2b, Q3 y Q4a
 
 Aplicación PHP **aparte del sitio** (el sitio sigue sin base de datos) que capta, califica y da seguimiento a owner-operators, carriers pequeños y company drivers. La opera una sola persona (Carlos, ClikRank). Documento maestro: `sistema-captacion-choferes-northstar.md` v2.0.
 
@@ -6,7 +6,8 @@ Aplicación PHP **aparte del sitio** (el sitio sigue sin base de datos) que capt
 **Q2a (panel con identidad NorthStar):** sistema de diseño, shell, login/2FA restyled, dashboard con datos reales, bandeja de leads con filtros y acciones masivas, ficha del lead completa (etapas, notas, tareas, llamadas, consentimientos) y datos de demostración locales (ver §15).
 **Q2b (panel de trabajo, §17 y §16):** kanban del pipeline con arrastre, tareas y agenda, configuración (puntuación, alertas, costos por canal, integraciones, horario), registro de actividad y copias de seguridad.
 **Q3 (entrega, reportes y correo, §18):** entrega de leads a NorthStar (correo y webhook firmado, confirmación sin login), rol de solo lectura para NorthStar, reportes, informes automáticos y plantillas y secuencias de correo.
-**Qué NO incluye todavía:** prospectos FMCSA, WhatsApp/SMS/Cal.com/n8n (Q4), Meta y job boards (Q6).
+**Q4a (captación saliente, §19):** prospectos FMCSA (llamadas en frío manuales), referidos y vacantes publicadas en el sitio.
+**Qué NO incluye todavía:** WhatsApp/SMS/Cal.com/n8n (Q4b), Meta y job boards (Q6).
 
 Sin dependencias nuevas: PHP 8.2+ (el servidor tiene 8.3), PDO MySQL, curl, sodium, openssl, mbstring. PHPMailer (el del sitio, `../vendor/`) solo si hay SMTP; el CRM funciona sin él.
 
@@ -40,7 +41,7 @@ captacion/
   views/             layout (shell), _icons (sprite SVG), _auth_open/_auth_close, login, twofa, setup, message, dashboard, leads, lead
   db/                schema.sql (generado) · migrations/NNN_nombre.sql
   bin/               migrate.php · import-jsonl.php · seed-demo.php (SOLO local)        (solo CLI)
-  cron/              process_jobs.php (cada minuto) · fmcsa_daily.php (stub documentado)
+  cron/              process_jobs.php (cada minuto) · fmcsa_daily.php (cada hora; Q4a) · reports_cron.php · backup_db.php
   config/            .env (NO versionado) · .env.example · disposable-domains.txt · .htaccess (Require all denied)
   storage/           logs, sesiones, locks, ratelimit (NO versionado, con .gitignore y .htaccess deny)
   tests/             run.php (runner propio) · cases/ · lib/ · fixtures/
@@ -269,7 +270,7 @@ Hostinger despliega `main` a `public_html` (Git deploy), así que `captacion/` l
    ```
    * * * * * /opt/alt/php83/usr/bin/php /home/u480515229/domains/northstarfreightsolutions.us/public_html/captacion/cron/process_jobs.php >/dev/null 2>&1
    ```
-   (A futuro, fase 6: `cron/fmcsa_daily.php`, hoy un stub documentado. No lo agregues todavía.)
+   (Prospectos FMCSA: `cron/fmcsa_daily.php`, ver §19.)
 7. **Telegram:** crea un bot con @BotFather → `TELEGRAM_BOT_TOKEN`; escríbele cualquier mensaje y abre `https://api.telegram.org/bot<TOKEN>/getUpdates` para leer `chat.id` → `TELEGRAM_CHAT_ID`. El panel deja de avisar «Telegram sin configurar».
 8. **FMCSA:** registra una webKey en https://mobile.fmcsa.dot.gov/QCDevsite/HomePage → `FMCSA_WEBKEY`. **Probar con un USDOT real** y comparar con §5.
 9. **Encender el sitio:** en `public_html/app/config.local.php` añade `define('CAPTACION_ENABLED', 1);`. Reimporta lo acumulado: `/opt/alt/php83/usr/bin/php captacion/bin/import-jsonl.php --dry-run` y luego sin `--dry-run`.
@@ -486,3 +487,51 @@ Definiciones (también en pantalla, código en `Services\Reports`): cohorte = le
 ### 18.6 Pruebas
 
 `php captacion/tests/run.php`: nuevos `18_handoff` (destinos, reintentos, idempotencia, tokens válido/caducado/reutilizado/manipulado, rechazo, botones de la ficha), `19_viewer` (invitaciones y prueba negativa de fugas), `20_reports` (embudo, tiempos, costos y pérdidas contra datos conocidos, consistencia con la base, EXPLAIN, exportación, informe mensual, crons semanal y mensual con zona horaria) y `21_comms` (plantillas, marcadores, secuencias, topes, A7, baja, A12), con un **SMTP simulado** (`tests/lib/smtp_mock.php`) y un webhook simulado; `01_migrations` prueba además la migración sobre una base de Q2b con datos. No cubierto: SMTP, Telegram y n8n reales, MySQL 8, `.htaccess`.
+
+---
+
+## 19. Prospectos FMCSA, referidos y vacantes (Q4a)
+
+Migración nueva: **`009_prospects_referrals_jobs.sql`** (idempotente; probada desde cero y sobre la base de Q2b con filas previas): completa `prospects_fmcsa`, crea `prospect_calls` (historial de intentos) y `dnc_numbers` (lista interna de no llamar), amplía `referral_codes`, `referrals` (único por lead) y `job_postings`, y actualiza la plantilla A12 de fábrica si nadie la editó. Rutas nuevas, **solo administradores** (el lector recibe 403 sin datos; sin sesión, `/login`): `/prospectos`, `/referidos`, `/vacantes`, y la pestaña `Configuración > Prospectos`. Sidebar «Captación saliente».
+
+### 19.1 Fuente de datos de FMCSA (probada contra la API real el 2026-11-05)
+
+Las APIs de `data.transportation.gov` (Socrata/SODA) son públicas y de solo lectura, sin llave. Qué existe HOY (los datasets viejos ya no se actualizan: «Carrier - All With History» `6eyk-hxee` y «AuthHist» `9mw4-x3tu` dicen *last refreshed 05/14/2026*; FMCSA migró a **Motus**):
+
+| Uso | Dataset | Campos que usamos |
+|---|---|---|
+| Autoridades concedidas | `yu5v-wbh6` «Motus AuthHist - All With History» | `docket_number` (MC), `usdot_number`, `op_auth_type` = *Motor Carrier of Property (Except Household Goods)*, `op_auth_status` = *Active*, `reason` = *Granted* (en mayúsculas, `GRANTED`, las anteriores al 2026-05-28), `status_change_date` (AAAAMMDD = **fecha de concesión**) |
+| Datos del carrier | `az4n-8mr2` «Company Census File» | `dot_number`, `legal_name`, `dba_name`, `phone`, `email_address`, `phy_city`, `phy_state`, `phy_country`, `add_date`, `status_code`, `carrier_operation`, `power_units`, `truck_units`, `total_drivers`, `classdef`, `hm_ind` y las banderas de carga `crgo_*` |
+
+Medido: ~29.000 concesiones en 12 meses (hoy ~200 por día hábil); en una muestra de 200, el 100 % trae teléfono y correo, 96 % es de EE. UU., 64 % tiene 1 unidad. **Limitaciones reales:** no hay tipo de equipo (dry van, reefer…; solo la carga que el carrier *declara*), no hay nombre de contacto (la razón social es lo único), el correo del censo es el del registro (aquí **no se usa para escribir**: solo se muestra), algunos datos son erróneos (p. ej. 1002 conductores con 1 unidad) y una concesión puede ser de un USDOT viejo reactivado. No se verifica que la autoridad siga activa hoy (una suspensión posterior no se ve hasta la próxima consulta a QCMobile al convertir). Territorios, Canadá y México se descartan.
+**Cambiar de dataset:** constantes `GRANTS_DATASET` y `CENSUS_DATASET` y los campos de `grantsParams()`, `censusParams()` y `buildRow()` en `Services/ProspectImport.php`; `SOCRATA_API_BASE` cambia de portal. `SOCRATA_APP_TOKEN` (opcional, gratis en data.transportation.gov) va en la cabecera `X-App-Token` y sube el límite compartido; sin él una corrida diaria (2 a 6 consultas) sobra. Los reintentos (429 y 5xx) esperan 2 y 4 s; un 4xx (columna o dataset inexistente) es un error permanente con el mensaje de Socrata.
+
+### 19.2 Corrida diaria (`cron/fmcsa_daily.php`)
+
+```
+20 * * * * /opt/alt/php83/usr/bin/php /home/u480515229/domains/northstarfreightsolutions.us/public_html/captacion/cron/fmcsa_daily.php >/dev/null 2>&1
+```
+**Cada hora**; decide por la hora de Nueva York (con cambio de hora): una corrida al día desde las 6:00 a. m. ET; si ese día no corrió (cron caído, servidor apagado), la siguiente hora la recupera. Idempotente (USDOT único), `flock` (`storage/locks/fmcsa_daily.lock`), páginas de 200 con cursor `(fecha, docket)` y presupuesto de **40 s** (`FMCSA_MAX_SECONDS`) y 60 % de `memory_limit`: si no termina, la siguiente hora continúa desde el cursor (la tarjeta dice «a medias»). Una corrida completa sin tope ni errores deja `prospects.complete_until`; la siguiente solo mira desde 3 días antes. Una corrida con **tope diario** no avanza esa marca (entran primero los más recientes; lo demás se ve otro día). Cambiar un filtro reinicia la marca. Prueba por SSH: `php cron/fmcsa_daily.php --force` (ignora la hora y «ya corrió hoy»; no salta filtros ni tope) y `--now=AAAA-MM-DDTHH:MM` (hora ET simulada). Exit 1 si Socrata falla (se reintenta a la hora siguiente).
+**Filtros** (`Configuración > Prospectos`, `ProspectConfig`): antigüedad máxima (1 a 24 meses, 12), estados, flota máxima (10; sin dato no descarta), solo con teléfono (sí), categorías de carga (ninguna), tope diario (40) y encendido. **Deduplicación y descartes contados** (tarjeta «Última corrida» y `activity_log` `prospects_run`): ya en la lista, ya es lead (USDOT o teléfono), teléfono en no llamar, sin ficha en el censo, USDOT inactivo, fuera de EE. UU., estado, flota, sin teléfono, teléfono repetido, carga, tope. La tarjeta de estado de **Integraciones** muestra el cron (rojo/ámbar si lleva más de 3 h sin correr) y Socrata (con botón «Probar»); la campana avisa del cron sin correr o con error.
+
+### 19.3 `/prospectos` (llamadas en frío, a mano)
+
+«Lista de hoy» = por llamar + reintentos que ya tocan, ordenada por autoridad más reciente y dato más completo (los reintentos vencidos primero); pestañas con contadores (Por llamar, Sin respuesta, Conversó, Interesado, No interesado, No llamar más), búsqueda (razón social, USDOT, MC, teléfono, ciudad), filtros (estado, flota, antigüedad), CSV (`prospects_export`, UTF-8 con BOM y protección contra fórmulas). Cada tarjeta: botón **Llamar** (`tel:`), hora local del prospecto, datos de FMCSA, **resultado con un clic** (sin respuesta, conversó, interesado, no interesado, no llamar más; nota y siguiente intento opcionales) e historial. **Máximo 3 intentos sin respuesta seguidos**: el 3.º cierra («Sin respuesta (cerrada)», reabrible a mano; cada reintento se reprograma al siguiente día hábil, 9:00 a. m. ET). **Convertir en lead**: fuente `fmcsa_outbound`, perfil owner-operator (1 unidad o sin dato) o carrier pequeño (2 o más), datos de FMCSA ya cargados (sin `fmcsa_pending`), etapa «Contactado» con `first_contact_at` ahora, **sin consentimiento de mensajería y sin alertas, correos ni secuencias**; si ya hay un lead con ese teléfono o correo se enlaza a él sin tocarlo. **«No llamar más»** es permanente: guarda el teléfono en `dnc_numbers`, no se reabre ni convierte, y ni FMCSA (mismo USDOT) ni otro USDOT con el mismo teléfono lo vuelven a listar. Se puede quitar solo a mano en la base (`DELETE FROM dnc_numbers`).
+**Horario (doc §16):** el botón Llamar solo está activo de **8 a. m. a 9 p. m. hora local** (`Services/UsTimeZones`). Solo se conoce el estado, así que en los estados con dos zonas (AK, AZ, FL, ID, IN, KS, KY, MI, NE, NV, ND, OR, SD, TN, TX) se exige que sea hora válida en **todas** sus zonas (p. ej. Florida: 9 a. m. a 9 p. m. ET). Fuera de horario la tarjeta dice la hora de allá y cuándo abre, y deja «Ver teléfono». El servidor no marca nada: las llamadas son siempre manuales.
+> **Carlos: valida con tu abogado el cumplimiento de las llamadas en frío (TCPA, reglas de horario y listas de no llamar estatales, incluida la nacional DNC) antes de operarlas.** Esta pantalla ayuda (horario, lista interna, nada automático) pero no sustituye esa revisión.
+
+### 19.4 Referidos (`/referidos`)
+
+Alta de códigos (nombre, lead asociado opcional, código elegido o generado `NOMBRE-XXXX`, bono, nota), enlace compartible `SITE_URL/careers/?ref=CODIGO` con botón Copiar, activar/desactivar, lista de leads referidos con estado (referido → calificado → firmado) y bono (sin bono → **pendiente de aprobar** → aprobado → pagado, o cancelado) con aprobar (exige monto > 0), pagar, cancelar y reabrir; todo en `activity_log`. El monto es **provisional, pendiente de confirmar con NorthStar**, hasta pulsar «NorthStar ya confirmó» (`referrals.bonus_confirmed`). **Captura en el sitio** (sin cambios visuales ni de textos): `assets/js/main.js` guarda `?ref=` validado (`[A-Za-z0-9_-]{3,40}`) en `localStorage` **60 días** (clave `ns_ref`, sin cookie) y lo manda dentro del campo oculto de atribución; `app/forms/lead.php` lo vuelve a validar y lo guarda en el JSONL (`attribution.ref`); `LeadIngest` lo normaliza a mayúsculas, **ignora sin error** un código inexistente o desactivado, suma los puntos de referido (+5 owner, +10 driver), crea la fila de `referrals` y el evento «Llegó por un código de referido». Un lead que ya existía y vuelve con código lo recibe si no tenía. Un lead no se refiere a sí mismo. Al **firmar** (por la vía que sea, `Handoff::afterSigned`) el referido pasa a «Firmado» y el bono a «pendiente de aprobar», con aviso por Telegram (job `referral_notify`, solo si Telegram está configurado), insignia en la barra lateral y aviso en la campana. **A12:** la plantilla de fábrica usa `{link_referido}` (crea el código del lead firmado al enviarse; sin cifras de bono).
+
+### 19.5 Vacantes (`/vacantes`) y el sitio
+
+Alta, edición, publicar, pausar, cerrar, reabrir y borrar borradores, con validación estricta (`Services/JobPostings`): sin HTML (`<`, `>`, `&lt;`), fechas reales, `valid_through` **futura** para publicar y ≤ 1 año, slug único, texto sin cifras inventadas y **pago solo si se marca «Publicar el pago»** con cifras y unidad. Publicar exige resumen, ciudad y estado y al menos un requisito o responsabilidad. Cada cambio reescribe de forma atómica (`.tmp` + `rename`, 0640) **`storage/jobs.json` del sitio** (`SITE_STORAGE_DIR` o, por defecto, `<repo>/storage`: en Hostinger `public_html/storage`, fuera de la web) dentro de la misma transacción: si no se puede escribir, el cambio se revierte y el panel lo explica. Esquema `{"schema":1,"generated_at":…,"jobs":{slug:{status,title,posted,valid_through,employment_type,location,summary,equipment,responsibilities,requirements,benefits,pay}}}`; solo publicadas y en pausa, sin vencer. `app/data/jobs.php` del sitio lo lee, **valida y sanea cada campo** (sin `<` ni `>`, largos máximos, tipos, fechas, máximo 50 y 256 KB) e **ignora lo inválido**; con JSON ausente, vacío, corrupto o malicioso devuelve el arreglo vacío y nunca falla (probado). Comprobado de punta a punta con el sitio real: publicar crea `/careers/cdl-a-drivers/{slug}/` con `JobPosting`, el hub, la opción «company driver» del formulario, el sitemap y `llms`; pausar, cerrar o vencer dan 404 y salen del sitemap. **Retraso por caché:** LiteSpeed cachea el HTML 5 minutos en producción: un cambio puede tardar hasta 5 min en verse (la pantalla lo avisa). Con 0 vacantes el sitio queda idéntico a antes.
+
+### 19.6 Variables nuevas del `.env`
+
+`SOCRATA_APP_TOKEN` (opcional) · `SITE_URL` (por defecto `https://northstarfreightsolutions.us`, para los enlaces de referido) · `SITE_STORAGE_DIR` (por defecto `<repo>/storage`) · `FMCSA_MAX_SECONDS` (40) · `FMCSA_PAGE_SIZE` (200) · `SOCRATA_API_BASE` (solo pruebas o cambio de portal).
+
+### 19.7 Pruebas
+
+`php captacion/tests/run.php`: nuevos `22_prospects` (horario por zona con cambio de hora y estados de dos zonas, filtros, cliente Socrata con token/reintentos/errores, corrida con **fixtures reales** `tests/fixtures/socrata/`, dedupe contra leads y no llamar, tope diario, cursor y reanudación, compuerta por hora ET, resultados, intentos, no llamar más, conversión), `23_prospects_ui` (pantalla, HTTP con CSRF, CSV, campana, configuración, autorización por rol en cada ruta nueva y el cron por CLI contra un Socrata simulado, con `flock`) y `24_referrals_jobs` (referidos con el sitio real y vacantes de punta a punta, y `jobs.php` con JSON vacío, corrupto y malicioso). `01_migrations` prueba la 009 sobre una base con filas previas. No cubierto: Socrata fuera de la prueba manual del 2026-11-05, el `tel:` en un celular real, LiteSpeed y su caché.

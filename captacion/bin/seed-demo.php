@@ -25,6 +25,8 @@ use Captacion\Db;
 use Captacion\Env;
 use Captacion\Services\Catalog;
 use Captacion\Services\Scoring;
+use Captacion\Services\JobsPublisher;
+use Captacion\Services\ProspectImport;
 use Captacion\Services\Settings;
 
 $opts = getopt('', ['reset', 'count::', 'seed::']);
@@ -52,6 +54,14 @@ if ($real > 0) {
     $refuse('la tabla leads tiene ' . $real . ' lead(s) que no son de demostracion.');
 }
 if (isset($opts['reset'])) {
+    // Q4a: prospectos, referidos y vacantes de demostracion (marcados con source='demo', nota 'demo' y created_by = 0)
+    Db::pdo()->exec('SET FOREIGN_KEY_CHECKS = 0');
+    Db::pdo()->exec("DELETE FROM prospect_calls WHERE prospect_id IN (SELECT id FROM prospects_fmcsa WHERE source = 'demo')");
+    Db::pdo()->exec("DELETE FROM prospects_fmcsa WHERE source = 'demo'");
+    Db::pdo()->exec("DELETE FROM referrals WHERE referral_code_id IN (SELECT id FROM referral_codes WHERE note = 'demo')");
+    Db::pdo()->exec("DELETE FROM referral_codes WHERE note = 'demo'");
+    Db::pdo()->exec('DELETE FROM job_postings WHERE created_by = 0');
+    Db::pdo()->exec('SET FOREIGN_KEY_CHECKS = 1');
     $ids = array_column(Db::all("SELECT id FROM leads WHERE site_lead_id LIKE 'demo\\_%'"), 'id');
     if ($ids) {
         $in = implode(',', array_map('intval', $ids));
@@ -401,5 +411,93 @@ foreach ($arrivals as $ts) {
         $jobsFailed++;
     }
 }
+
+// --- Q4a: prospectos FMCSA, referidos y vacantes de demostracion -------------------------------------------------
+$nowEt = (new DateTimeImmutable('@' . $now))->setTimezone(new DateTimeZone('America/New_York'));
+$today = $nowEt->format('Y-m-d');
+$companies = ['Delta Haul', 'Brightline Freight', 'Rio Verde Transport', 'Cardinal Road', 'Sunrise Carriers', 'Lone Star Logistics', 'Peach State Trucking', 'Blue Ridge Hauling', 'Gulf Coast Express', 'Silver Pine Transport', 'Prairie Wind Freight',
+    'Keystone Cargo', 'Magnolia Haulers', 'Copper Mesa Trucking', 'North Fork Carriers', 'Iron Valley Transport', 'Bayou Line', 'Summit Road Freight', 'Mission Trail Trucking', 'Redwood Haul', 'Harbor Point Cargo', 'Juniper Freight', 'Coastal Run LLC', 'Granite State Haul'];
+$cities = ['FL' => ['Orlando', 'Tampa', 'Miami', 'Lakeland'], 'TX' => ['Houston', 'Dallas', 'Laredo', 'San Antonio'], 'GA' => ['Atlanta', 'Savannah'], 'CA' => ['Fresno', 'Bakersfield'], 'IL' => ['Joliet'], 'NC' => ['Charlotte'], 'TN' => ['Memphis'], 'OH' => ['Columbus'], 'AZ' => ['Phoenix'], 'NJ' => ['Newark']];
+$pStates = array_keys($cities);
+$cargoSets = [['genfreight'], ['genfreight', 'bldgmat'], ['genfreight', 'produce', 'coldfood'], ['genfreight', 'machlrg', 'construct'], []];
+$statusPlan = array_merge(array_fill(0, 13, 'to_call'), ['no_answer', 'no_answer', 'no_answer_closed', 'talked', 'talked', 'interested', 'interested', 'not_interested', 'dnc', 'to_call', 'to_call']);
+$prospIds = [];
+foreach ($companies as $i => $co) {
+    $st = $pStates[$i % count($pStates)];
+    $units = $weighted(['1' => 60, '2' => 22, '3' => 10, '5' => 6, '8' => 2]);
+    $granted = $nowEt->modify('-' . mt_rand(0, 85) . ' days')->format('Y-m-d');
+    $cargo = $cargoSets[$i % count($cargoSets)];
+    $area = $pick($areas[$st] ?? [305]);
+    $phone = '+1' . $area . '555' . str_pad((string) (100 + $i), 4, '0', STR_PAD_LEFT);
+    $status = $statusPlan[$i % count($statusPlan)];
+    $attempts = $status === 'no_answer' ? mt_rand(1, 2) : ($status === 'no_answer_closed' ? 3 : 0);
+    $email = $rnd() < .8 ? strtolower(preg_replace('/[^a-z]/i', '', $co)) . '@example.com' : null;
+    $row = ['usdot' => (string) (4400000 + mt_rand(1000, 99999)), 'mc_number' => 'MC' . (880000 + $i * 7), 'legal_name' => strtoupper($co) . ' LLC', 'dba' => null, 'phone' => $phone, 'email' => $email, 'state' => $st, 'city' => strtoupper($pick($cities[$st])),
+        'authority_granted_at' => $granted, 'fleet_size' => (int) $units, 'drivers' => max(1, (int) $units), 'cargo' => $cargo ?: null, 'completeness' => 4 + ($email !== null ? 1 : 0) + ($cargo ? 1 : 0) + 1, 'fmcsa_data' => ['census_status' => 'A', 'grants_dataset' => 'yu5v-wbh6', 'census_dataset' => 'az4n-8mr2'],
+        'source' => 'demo', 'status' => $status, 'attempts' => $attempts, 'listed_on' => $today, 'created_at' => Clock::at($now - mt_rand(0, 3) * 86400), 'updated_at' => Clock::now()];
+    if ($status === 'no_answer') {
+        $row['next_call_at'] = Clock::at($now + ($i % 2 === 0 ? -3600 : 86400));
+    }
+    if (in_array($status, ['talked', 'interested'], true)) {
+        $row['next_call_at'] = Clock::at($now - 1800);
+    }
+    if ($status !== 'to_call') {
+        $row['last_call_at'] = Clock::at($now - mt_rand(3600, 3 * 86400));
+        $row['last_result'] = $status === 'no_answer_closed' ? 'no_answer' : $status;
+    }
+    if ($status === 'dnc') {
+        $row += ['do_not_call' => 1, 'dnc_at' => Clock::at($now - 86400), 'closed_at' => Clock::at($now - 86400)];
+    }
+    $pid = Db::insert('prospects_fmcsa', $row);
+    $prospIds[$status][] = $pid;
+    $calls = $status === 'no_answer_closed' ? 3 : (in_array($status, ['no_answer'], true) ? $attempts : ($status === 'to_call' ? 0 : 1));
+    for ($c = 1; $c <= $calls; $c++) {
+        $isNa = in_array($status, ['no_answer', 'no_answer_closed'], true);
+        Db::insert('prospect_calls', ['prospect_id' => $pid, 'user_id' => $userId, 'result' => $isNa ? 'no_answer' : $status, 'note' => $isNa ? ($c === 1 ? 'Buzón de voz lleno' : null) : ($status === 'talked' ? 'Tiene 2 camiones, pidió que lo llamemos el jueves.' : null),
+            'attempt_no' => $isNa ? $c : 0, 'created_at' => Clock::at($now - (($calls - $c + 1) * 86400))]);
+    }
+}
+Settings::set('prospects.run', ['day' => $today, 'since' => $nowEt->modify('-12 months')->format('Ymd'), 'cursor' => null, 'finished' => true, 'capped' => false, 'started_at' => Clock::at($now - 7200), 'updated_at' => Clock::now(), 'finished_at' => Clock::at($now - 7100),
+    'pages' => 3, 'requests' => 6, 'resumed' => 0, 'counters' => ['read' => 380, 'new' => count($companies), 'known' => 210, 'already_lead' => 4, 'dnc' => 1, 'no_census' => 2, 'census_inactive' => 9, 'not_us' => 14, 'state' => 0, 'fleet' => 31, 'no_phone' => 18, 'dup_phone' => 2, 'cargo' => 0, 'cap' => 0], 'error' => null]);
+Settings::set('cron.prospects', ['at' => Clock::at($now - 600), 'status' => 'done', 'day' => $today, 'finished' => true]);
+Settings::set(ProspectImport::COMPLETE_KEY, $today);
+
+$signedDemo = Db::all("SELECT id FROM leads WHERE site_lead_id LIKE 'demo\\_%' AND stage IN ('signed', 'hired') ORDER BY id LIMIT 3");
+$openDemo = Db::all("SELECT id FROM leads WHERE site_lead_id LIKE 'demo\\_%' AND stage NOT IN ('signed', 'hired', 'lost') ORDER BY id DESC LIMIT 8");
+$codeOwners = [['Luis Ortega', $signedDemo[0]['id'] ?? null, 'LUIS-7K2M', 250.0], ['Marcos Reyes', $signedDemo[1]['id'] ?? null, 'MARCOS-4PQ9', 250.0], ['Rosa Gómez (grupo de Facebook)', null, 'ROSA-GRUPO', null]];
+$codeIds = [];
+foreach ($codeOwners as [$on, $ol, $cd, $amt]) {
+    $codeIds[] = Db::insert('referral_codes', ['owner_name' => $on, 'owner_lead_id' => $ol, 'code' => $cd, 'bonus_amount' => $amt, 'active' => 1, 'note' => 'demo', 'created_by' => $userId, 'created_at' => Clock::at($now - 20 * 86400)]);
+}
+$refPlan = [[0, 'referred', 'none'], [0, 'qualified', 'none'], [1, 'signed', 'pending'], [0, 'signed', 'approved'], [1, 'signed', 'paid'], [2, 'referred', 'none']];
+foreach ($refPlan as $i => [$ci, $rs, $bs]) {
+    $lid = $openDemo[$i]['id'] ?? ($signedDemo[$i]['id'] ?? null);
+    if ($lid === null) {
+        continue;
+    }
+    Db::run("UPDATE leads SET referral_code = ? WHERE id = ?", [$codeOwners[$ci][2], (int) $lid]);
+    Db::insert('referrals', ['referral_code_id' => $codeIds[$ci], 'lead_id' => (int) $lid, 'status' => $rs, 'bonus_status' => $bs, 'qualified_at' => $rs !== 'referred' ? Clock::at($now - 6 * 86400) : null, 'signed_at' => $rs === 'signed' ? Clock::at($now - 3 * 86400) : null,
+        'bonus_amount' => $rs === 'signed' ? 250.0 : null, 'bonus_approved_at' => in_array($bs, ['approved', 'paid'], true) ? Clock::at($now - 2 * 86400) : null, 'bonus_paid_at' => $bs === 'paid' ? Clock::at($now - 86400) : null, 'created_at' => Clock::at($now - (10 - $i) * 86400)]);
+}
+
+$jobsDemo = [
+    ['Regional CDL-A Company Driver', 'regional-cdl-a-company-driver', 'active', 'Lakeland', 'FL', '33801', 'Regional dry van routes out of Lakeland with home time most weekends.', 'Dry van', ["Run regional dry van loads", "Keep logs and trip paperwork current", "Report delays to the dispatch desk"], ["Standard CDL-A", "1 year of tractor-trailer experience", "Clean MVR"], ["Home most weekends"], ['min' => 1100, 'max' => 1400, 'unit' => 'WEEK']],
+    ['OTR CDL-A Company Driver', 'otr-cdl-a-company-driver', 'paused', 'Atlanta', 'GA', null, 'Over-the-road dry van lanes across the Southeast.', 'Dry van', ["Run OTR dry van loads"], ["Standard CDL-A", "2 years of OTR experience"], [], null],
+    ['Local CDL-A Driver Tampa', 'local-cdl-a-driver-tampa', 'draft', 'Tampa', 'FL', null, '', null, [], [], [], null],
+];
+foreach ($jobsDemo as $i => [$t, $slug, $stt, $city, $reg, $zip, $sum, $eq, $resp, $req, $ben, $pay]) {
+    Db::insert('job_postings', ['title' => $t, 'slug' => $slug, 'status' => $stt, 'is_active' => $stt === 'active' ? 1 : 0, 'posted_on' => $nowEt->modify('-5 days')->format('Y-m-d'), 'valid_through' => $nowEt->modify('+40 days')->format('Y-m-d'),
+        'employment_type' => 'FULL_TIME', 'location' => $city . ', ' . $reg, 'city' => $city, 'region' => $reg, 'postal' => $zip, 'summary' => $sum ?: null, 'equipment' => $eq, 'responsibilities' => $resp ?: null, 'requirements' => $req ?: null, 'benefits' => $ben ?: null,
+        'pay_min' => $pay['min'] ?? null, 'pay_max' => $pay['max'] ?? null, 'pay_unit' => $pay['unit'] ?? null, 'pay_currency' => $pay ? 'USD' : null, 'published_at' => $stt === 'draft' ? null : Clock::at($now - 5 * 86400), 'created_by' => 0]);
+}
+try {
+    JobsPublisher::publish();
+} catch (Throwable $t) {
+    fwrite(STDERR, 'aviso: no se pudo escribir jobs.json (' . $t->getMessage() . ")\n");
+}
+$out['prospects'] = count($companies);
+$out['referral_codes'] = count($codeIds);
+$out['job_postings'] = count($jobsDemo);
+
 Settings::set('cron.process_jobs', ['at' => Clock::now(), 'processed' => 3, 'done' => 3, 'retried' => 0, 'failed' => 0, 'seconds' => 0.4]);
 fwrite(STDOUT, 'Sembrados: ' . json_encode($out) . "\n");
