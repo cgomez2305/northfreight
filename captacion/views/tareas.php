@@ -16,7 +16,7 @@ $emptyCopy = [
 ];
 $taskRow = static function (array $it) use ($e, $csrf, $canWrite, $back, $now): string {
     ob_start();
-    $done = $it['done_at'] !== null;
+    $done = ($it['done_at'] ?? null) !== null;
     $isTask = $it['kind'] === 'task';
     $late = $isTask && !$done && $it['due_at'] !== null && (int) Clock::parse((string) $it['due_at']) < $now;
     $lead = $it['lead_id'] !== null && $it['first_name'] !== null ? Fmt::name($it) : null;

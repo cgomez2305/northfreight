@@ -170,7 +170,7 @@ Tabla `jobs`: `pending → running → done`. Si el handler lanza una excepción
 
 `cron/process_jobs.php`: `flock` en `storage/locks/process_jobs.lock` (si la pasada anterior sigue, sale con «locked»), máximo ~50 s por pasada (`JOBS_MAX_SECONDS`), lotes de 20, y deja la marca `settings['cron.process_jobs']` que el panel muestra como «última ejecución del cron».
 
-Tipos de job de esta fase: `telegram_alert` (A2; `kind`: `hot`, `signed_reentry`), `telegram_alert_followup` (A3: a los 15 min, solo si no hay `first_contact_at`, el lead sigue caliente y en etapa `new`), `fmcsa_enrich`, `email_notify`.
+Tipos de job de esta fase: `telegram_alert` (A2; `kind`: `hot`, `signed_reentry`), `telegram_alert_followup` (A3: a los 15 min, solo si no hay `first_contact_at`, el lead sigue caliente y en etapa `new`), `fmcsa_enrich`, `email_notify`, `rescore_batch` (recálculo de puntuación en lotes, Q2b-C) y `backup_db` (copia manual desde Configuración, Q2b-E).
 
 Telegram: `TELEGRAM_BOT_TOKEN` + `TELEGRAM_CHAT_ID`. Sin ellas el job falla con «Telegram sin configurar…» (reintentos) y el panel avisa. El token nunca se registra. `TELEGRAM_API_BASE` existe solo para las pruebas.
 
@@ -237,7 +237,7 @@ Ver `config/.env.example` (comentado). Resumen:
 | `FMCSA_WEBKEY` | Llave QCMobile (gratuita). Sin ella: `fmcsa_pending`. |
 | `TELEGRAM_BOT_TOKEN` `TELEGRAM_CHAT_ID` | Alertas A2/A3. |
 | `MAIL_TO` `SMTP_HOST` `SMTP_PORT` `SMTP_USER` `SMTP_PASS` `SMTP_SECURE` | Avisos por correo (mismos nombres que `app/config.local.php` del sitio). Sin SMTP: `storage/mail.log`. |
-| Opcionales | `SESSION_IDLE_SECONDS` (28800) · `API_RATE_LIMIT` (120/h) · `INGEST_RATE_LIMIT` (5/h) · `JOBS_MAX_SECONDS` (50) · `TOTP_ISSUER` · `STORAGE_DIR` (solo pruebas) · `CAPTACION_ENV_FILE` (otra ruta del .env). |
+| Opcionales | `SESSION_IDLE_SECONDS` (28800) · `API_RATE_LIMIT` (120/h) · `INGEST_RATE_LIMIT` (5/h) · `JOBS_MAX_SECONDS` (50) · `BACKUP_MAX_SECONDS` (240, tope de tiempo del volcado) · `REAUTH_SECONDS` (600, vigencia de la confirmación contraseña + 2FA en Configuración y descargas) · `TOTP_ISSUER` · `STORAGE_DIR` (solo pruebas) · `CAPTACION_ENV_FILE` (otra ruta del .env). |
 
 El sitio solo necesita `define('CAPTACION_ENABLED', 1);` en `app/config.local.php` (ver `app/config.local.example.php`). Si se sube `RATE_LIMIT` del sitio por encima de 5, subir también `INGEST_RATE_LIMIT`.
 
@@ -279,7 +279,12 @@ Hostinger despliega `main` a `public_html` (Git deploy), así que `captacion/` l
     curl -sI https://captacion.northstarfreightsolutions.us/setup.php        # 404 una vez creado el admin
     curl -sI https://captacion.northstarfreightsolutions.us/login            # 200, X-Robots-Tag noindex, CSP, Set-Cookie ... Secure; HttpOnly; SameSite=Lax
     ```
-11. **Backups:** el doc exige copia diaria de la base con retención de 30 días y otra fuera de Hostinger (hPanel → Copias de seguridad / `mysqldump` por cron). No está automatizado.
+11. **Copias de seguridad (Q2b-E).** Segundo cron en hPanel → Cron Jobs, **cada hora a los :30** (el propio script decide si toca: hace la copia solo a las 3:30 a. m. de Nueva York, con cambio de hora incluido, y recupera un día perdido):
+    ```
+    30 * * * * /opt/alt/php83/usr/bin/php /home/u480515229/domains/northstarfreightsolutions.us/public_html/captacion/cron/backup_db.php >/dev/null 2>&1
+    ```
+    Prueba manual por SSH: `/opt/alt/php83/usr/bin/php cron/backup_db.php --force` (hace una copia ahora; sale 0 si fue bien). Ver §16 (qué guarda, retención, verificación y **cómo restaurar**) y haz además una descarga periódica a un disco tuyo.
+12. **Migraciones de Q2b:** tras el deploy, `/opt/alt/php83/usr/bin/php bin/migrate.php` aplica `005_pipeline_config.sql` (índices del kanban y de tareas, `leads.stage_changed_at`, `appointments.title`, `activity_log.agent` y la tabla `backups`). Es idempotente (`--status` la muestra como aplicada).
 
 ### `.htaccess`
 
@@ -381,3 +386,39 @@ Se niega a correr si `APP_ENV` no es `local`, si `DB_HOST` no es 127.0.0.1/local
 ### Pruebas
 
 `php captacion/tests/run.php` (ahora con `11_panel_q2a`): dashboard contra datos conocidos y consistencia con la base, filtros/orden/paginación de la bandeja, transiciones de etapa y validaciones (ambos pipelines, masivo, A3 cancelada, llamadas, notas, tareas, reabrir, revocar), buscador, avisos y «leído», exportación CSV con protección contra fórmulas, y por HTTP: sin sesión, sin/ con CSRF, límite de uso y escapado en cada endpoint nuevo.
+
+---
+
+## 16. Copias de seguridad y restauración (Q2b-E, doc §17)
+
+**Qué hace.** `cron/backup_db.php` (cada hora a los :30; actúa a las 3:30 a. m. ET) genera `storage/backups/captacion-AAAAMMDD-HHMMSS[-manual].sql.gz` con **todas** las tablas del CRM (estructura + datos, incluidas `settings`, `users` con sus secretos TOTP **cifrados**, `activity_log` y `consents`). Es PHP puro: no usa `mysqldump` (se prueba con el PATH vacío), lee con una conexión propia en una **instantánea consistente** (`REPEATABLE READ` + `CONSISTENT SNAPSHOT`: todas las tablas al mismo instante aunque el panel siga escribiendo), por lotes de 200 filas, en streaming (memoria constante), con `flock` (una copia a la vez, `storage/locks/backup.lock`) y un tope de tiempo (`BACKUP_MAX_SECONDS`, 240 s). El archivo queda en `storage/backups/` (carpeta 0700, archivo 0600, `.htaccess` «deny»; `storage/` ya está fuera del docroot del subdominio). Dos copias en el mismo segundo no se pisan (`-b`, `-c`…).
+
+**Verificación (antes de darla por buena).** Se descomprime TODO el `.gz`; las tablas del archivo son exactamente las de la base; las filas escritas de cada tabla coinciden con su marcador `-- TABLE … ROWS n` y con `COUNT(*)` leído en la misma instantánea; el archivo termina en `-- END OK tables=N rows=M`. Si algo falla se borra el parcial, la copia queda `failed` con el motivo y `settings['cron.backup']` pasa a `failed`. Se guarda también el `sha256`.
+
+**Retención.** 30 días (siempre se conserva la última copia buena); lo purgado deja `backup_purge` en `activity_log`. El mismo cron purga el registro de actividad según su retención.
+
+**Dónde se ve.** Configuración → *Copias de seguridad* (lista con fecha, tamaño, tablas, filas y estado; **Hacer copia ahora** la encola y la hace el cron de la cola; **Descargar** exige contraseña + 2FA recientes, responde con `Cache-Control: no-store` y queda en `activity_log` como `backup_download`), la tarjeta *Copia diaria* de Integraciones y la **campana** (aviso rojo si la última copia falló, ámbar si la última buena tiene más de 26 h o no hay ninguna). Solo administradores.
+
+**Fuera de Hostinger (recomendado, no automático).** Las copias del servidor se pierden si el servidor se pierde. Descarga una cada semana o mes desde la pantalla y guárdala **cifrada** en un disco tuyo (p. ej. `gpg -c captacion-….sql.gz`). Contiene datos personales de leads: no la subas sin cifrar a ningún servicio de terceros ni la mandes por correo. El CRM no envía copias a ningún tercero.
+
+### Restaurar (paso a paso)
+
+Probado en la suite (`16_backup`: restaura en una base vacía y compara `CHECKSUM TABLE` y número de filas de las 20 tablas de datos; `backups` y `settings` se excluyen porque la propia copia las modifica después de la instantánea) y a mano con el cron real.
+
+1. **Elige la copia.** En el servidor: `ls -lh captacion/storage/backups/`; o descarga una desde la pantalla. Comprueba que está sana (no necesita la base): `php captacion/bin/backup-verify.php RUTA.sql.gz` → `OK` (exit 0).
+2. **Pon el sitio en pausa** si restauras sobre la base en uso: quita la línea del cron de la cola y `define('CAPTACION_ENABLED', 0);` en `app/config.local.php` (el sitio sigue guardando los leads en JSONL; se reimportan con `bin/import-jsonl.php`).
+3. **Crea una base vacía** (hPanel → MySQL; o, para ensayar, `CREATE DATABASE cap_restore CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;`). Para restaurar sobre la misma base basta con que exista: el archivo hace `DROP TABLE IF EXISTS` de cada tabla y desactiva las llaves foráneas mientras carga.
+4. **Carga el volcado:**
+   ```bash
+   gunzip -c captacion/storage/backups/captacion-AAAAMMDD-HHMMSS.sql.gz | mysql -h127.0.0.1 -P3306 -uUSUARIO -p NOMBRE_BASE
+   ```
+   (`mariadb` en lugar de `mysql` si es el cliente instalado.) Sin SSH: phpMyAdmin → Importar acepta `.sql.gz`, pero hosting compartido limita el tamaño (si no entra, usa SSH). Debe terminar sin errores.
+5. **Comprueba:** `SELECT COUNT(*) FROM leads;` y compara con el recuento de la pantalla de copias (columna Filas) o ejecuta `CHECKSUM TABLE leads, lead_events, lead_notes, tasks, consents;` en la base original (si aún existe) y en la restaurada: deben coincidir.
+6. **Apunta el CRM a esa base** si es otra (`DB_NAME` en `config/.env`) y corre `php captacion/bin/migrate.php --status` (la tabla `schema_migrations` viaja en la copia: debe decir que no falta nada; si la copia es de antes de una migración, aplícala).
+7. **`APP_KEY` tiene que ser la misma** que cuando se hizo la copia: cifra los secretos TOTP guardados. Con otra clave nadie puede iniciar sesión (haz el alta de nuevo, §12 «Perdí también los códigos»). Por eso se guarda una copia de `APP_KEY` fuera del servidor (§11 punto 3).
+8. **Reactiva** el cron de la cola y `CAPTACION_ENABLED`; entra al panel, mira *Estado del sistema* y reimporta los leads que llegaron durante la pausa: `php captacion/bin/import-jsonl.php --dry-run` y luego sin `--dry-run` (deduplica).
+9. Anota la restauración: el panel deja `login_ok` en el registro de actividad, pero la restauración en sí no (la base restaurada trae el registro hasta el momento de la copia).
+
+**Ensayo recomendado** (cada trimestre): descarga una copia, restáurala en una base `cap_restore` local y compara `CHECKSUM TABLE`. Un volcado que nunca se ha restaurado no es una copia.
+
+**Limitaciones conocidas.** Sin cifrado propio del archivo (los permisos 0600 y `storage/` fuera del docroot son la protección en el servidor); sin copia incremental (la base del CRM es pequeña: ~40 KB con 120 leads de demostración); el volcado usa transacción de instantánea, no bloquea el panel, pero en una base de cientos de miles de filas el tope de 240 s podría quedarse corto (subir `BACKUP_MAX_SECONDS`).
