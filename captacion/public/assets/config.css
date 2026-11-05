@@ -68,3 +68,4 @@
 .warm__i span{display:inline-flex;align-items:center;min-height:36px;padding:0 14px;border-radius:var(--r-pill);font-size:14px;font-weight:500;color:var(--ink-2)}
 .warm__i input:checked+span{background:var(--navy-2);color:var(--on-navy)}
 .warm__i input:focus-visible+span{outline:2px solid var(--focus);outline-offset:2px}
+.cfg-tabs{flex-wrap:wrap;overflow:visible}

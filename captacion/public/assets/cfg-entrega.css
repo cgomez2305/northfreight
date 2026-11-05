@@ -8,3 +8,4 @@
 .en-doc ol{list-style:decimal;padding-left:20px;display:flex;flex-direction:column;gap:6px}
 .secret{overflow-wrap:anywhere}
 @media (max-width:760px){.en-secret .field{max-width:none}}
+.en-act{display:flex}

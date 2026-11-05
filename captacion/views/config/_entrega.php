@@ -60,7 +60,7 @@ $active = ($hand['email'] !== '' ? 1 : 0) + (($hand['webhook_on'] && $hand['webh
     <p class="muted">Envía una ficha de un lead <b>ficticio</b> a cada destino activo, marcada como «PRUEBA» y sin enlaces de confirmación. Si el correo de NorthStar está activo y hay SMTP, ellos recibirán ese correo.</p>
     <?php if ($lt): ?><ul class="en-res"><?php foreach ($lt['results'] as $k => $r): ?><li><span class="chip chip--<?= $r['ok'] ? 'warm' : 'hot' ?>"><i class="dot"></i><?= $e($tn[$k] ?? $k) ?></span> <?= $e($r['msg']) ?></li><?php endforeach; ?></ul><p class="muted">Última prueba: <?= $e(Fmt::dateTime($lt['at'])) ?> · <?= $e(Fmt::ago($lt['at'])) ?></p><?php endif; ?>
     <form method="post" action="/config/handoff/test"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>">
-      <fieldset class="cfg-fs"<?= $locked ? ' disabled' : '' ?>><button class="btn btn--secondary" type="submit"<?= $active === 0 ? ' disabled' : '' ?>><span class="btn__t">Enviar prueba</span><span class="btn__cell"><?= Ui::icon('send') ?></span></button></fieldset></form>
+      <fieldset class="cfg-fs"<?= $locked ? ' disabled' : '' ?>><div class="en-act"><button class="btn btn--secondary" type="submit"<?= $active === 0 ? ' disabled' : '' ?>><span class="btn__t">Enviar prueba</span><span class="btn__cell"><?= Ui::icon('send') ?></span></button></div></fieldset></form>
   </div>
 </section>
 
