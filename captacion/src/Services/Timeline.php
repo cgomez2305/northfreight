@@ -188,6 +188,21 @@ final class Timeline
                 }
                 $detail = implode(' · ', $bits);
                 break;
+            case 'prospect_converted':
+                $icon = 'users';
+                $tone = 'good';
+                $detail = 'USDOT ' . (string) ($p['usdot'] ?? '') . (!empty($p['existing_lead']) ? ' · ya existía este lead' : ' · llamada manual, sin mensajes ni alertas');
+                break;
+            case 'referral_linked':
+                $icon = 'users';
+                $tone = 'good';
+                $detail = 'Código ' . (string) ($p['code'] ?? '') . (!empty($p['by']) ? ' · de ' . (string) $p['by'] : '');
+                break;
+            case 'referral_signed':
+                $icon = 'check-circle';
+                $tone = 'good';
+                $detail = 'Bono pendiente de aprobar en Referidos';
+                break;
             case 'consent_revoked':
                 $icon = 'shield';
                 $tone = 'bad';

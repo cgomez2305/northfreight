@@ -69,6 +69,7 @@ final class Catalog
         'handoff_failed' => 'La entrega falló', 'handoff_confirmed' => 'NorthStar confirmó la firma', 'handoff_rejected' => 'NorthStar rechazó el lead', 'conversion' => 'Conversión registrada',
         'sequence_enrolled' => 'Inscrito en una secuencia', 'sequence_paused' => 'Secuencia en pausa', 'sequence_resumed' => 'Secuencia reanudada', 'sequence_stopped' => 'Secuencia detenida',
         'sequence_step_skipped' => 'Paso de secuencia omitido', 'sequence_email' => 'Correo de secuencia', 'lead_responded' => 'Marcado como respondido',
+        'prospect_converted' => 'Convertido desde un prospecto FMCSA', 'referral_linked' => 'Llegó por un código de referido', 'referral_signed' => 'Su referido firmó',
     ];
 
     /** Grupo de filtro de la linea de tiempo de cada tipo de evento. */

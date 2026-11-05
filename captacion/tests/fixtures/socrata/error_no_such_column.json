@@ -1,0 +1,8 @@
+{
+ "message": "Query coordinator error: query.soql.no-such-column; No such column: crgo_dryvan",
+ "errorCode": "query.soql.no-such-column",
+ "data": {
+  "column": "crgo_dryvan",
+  "dataset": "india.33553"
+ }
+}

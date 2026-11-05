@@ -24,6 +24,7 @@ require __DIR__ . '/lib/T.php';
 require __DIR__ . '/lib/Infra.php';
 require __DIR__ . '/lib/Panel.php';
 require __DIR__ . '/lib/Fx.php';
+require __DIR__ . '/lib/SocrataFixture.php';
 
 use Captacion\Db;
 use Captacion\Env;

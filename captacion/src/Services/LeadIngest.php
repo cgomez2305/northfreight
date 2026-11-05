@@ -8,7 +8,7 @@
  *        -> 5 puntuar (Scoring) -> 6 encolar acciones segun la temperatura. Lead + eventos + consentimiento + jobs se guardan en UNA transaccion.
  *
  * $ctx: ip, public (bool: aplica el limite de 5 envios/hora por IP), skip_antispam (importaciones), quiet (no encola alertas ni avisos; importaciones),
- *       fmcsa (instancia de Fmcsa, para pruebas), fmcsa_sync (false = no consultar FMCSA en linea; solo encolar).
+ *       fmcsa (instancia de Fmcsa, para pruebas), fmcsa_sync (false = no consultar FMCSA en linea; solo encolar), fmcsa_data (resultado normalizado ya conocido: se usa tal cual).
  *
  * Resultado: ['ok'=>bool, 'status'=>created|reentry|reopened|signed_reentry|duplicate_id|rejected, 'lead_id'=>?int, 'reason'=>?string, 'errors'=>[campo=>codigo],
  *             'score'=>?int, 'temperature'=>?string, 'flags'=>[...]]. Lanza solo ante errores de infraestructura (base caida...): quien llama decide.
@@ -69,7 +69,9 @@ final class LeadIngest
         // 4) FMCSA en linea (fuera de la transaccion: no se retiene ningun bloqueo mientras se espera a la API)
         $fm = null;
         $fmPending = false;
-        if ($lead['usdot'] !== null) {
+        if (is_array($ctx['fmcsa_data'] ?? null)) {
+            $fm = $ctx['fmcsa_data'];   // datos de FMCSA ya conocidos (conversion de un prospecto del censo publico): no se consulta ni se encola nada
+        } elseif ($lead['usdot'] !== null) {
             if (($ctx['fmcsa_sync'] ?? true) === false) {
                 $fmPending = true;
             } else {
