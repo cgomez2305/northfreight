@@ -96,7 +96,7 @@ return static function (array $ctx): void {
     $r = Tasks::snooze($t1, '1h', '', $uid);
     T::eq(Db::value('SELECT due_at FROM tasks WHERE id = ?', [$t1]), Clock::at((int) Clock::parse((string) $before) + 3600), 'posponer +1 h: suma una hora a su fecha (si aun no vencio)');
     Tasks::snooze($over2, '1h', '', $uid);
-    T::eq(Db::value('SELECT due_at FROM tasks WHERE id = ?', [$over2]), Clock::at($now + 3600), 'posponer +1 h una vencida: una hora desde ahora');
+    T::ok(abs((int) Clock::parse((string) Db::value('SELECT due_at FROM tasks WHERE id = ?', [$over2])) - ($now + 3600)) <= 5, 'posponer +1 h una vencida: una hora desde ahora (±5 s: el reloj sigue corriendo durante la prueba)');
     Tasks::snooze($over1, 'tomorrow', '', $uid);
     $tmr = Fmt::fromEtInput(Fmt::et($now)->modify('+1 day')->format('Y-m-d') . 'T09:00');
     T::eq(Db::value('SELECT due_at FROM tasks WHERE id = ?', [$over1]), $tmr, 'posponer a mañana: manana a la hora de inicio del horario comercial');
