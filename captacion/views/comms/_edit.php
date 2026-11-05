@@ -30,7 +30,7 @@ $mark = static fn(string $s): string => (string) preg_replace('/(\[\[[^\]]{1,200
     <section class="card" aria-labelledby="pv-t">
       <header class="card__h"><h2 class="label" id="pv-t">VISTA PREVIA</h2><span class="muted">Con un lead de ejemplo</span></header>
       <div class="card__b cm-prev">
-        <?php if ($preview['unresolved']): ?><p class="flash flash--bad" role="status"><?= Ui::icon('alert') ?><span><b>No se enviará.</b> Hay <?= $e(count($preview['unresolved'])) ?> texto<?= count($preview['unresolved']) === 1 ? '' : 's' ?> sin resolver: <?= $e(implode(' ', array_map(static fn($x) => mb_substr($x, 0, 50), array_slice($preview['unresolved'], 0, 3)))) ?></span></p><?php else: ?><p class="flash flash--ok" role="status"><?= Ui::icon('check-circle') ?>Sin marcadores pendientes: lista para enviar.</p><?php endif; ?>
+        <?php if ($preview['unresolved']): ?><p class="flash flash--bad" role="status"><?= Ui::icon('alert') ?><span><b>No se enviará.</b> Hay <?= $e(count($preview['unresolved'])) ?> texto<?= count($preview['unresolved']) === 1 ? '' : 's' ?> sin resolver: <?= $e(implode(' ', array_map(static fn($x) => mb_substr($x, 0, 120), array_slice($preview['unresolved'], 0, 3)))) ?></span></p><?php else: ?><p class="flash flash--ok" role="status"><?= Ui::icon('check-circle') ?>Sin marcadores pendientes: lista para enviar.</p><?php endif; ?>
         <p class="cm-subj"><b>Asunto:</b> <?= $mark($preview['subject']) ?></p>
         <div class="cm-body"><?= nl2br($mark($preview['text'])) ?></div>
       </div>
