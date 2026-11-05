@@ -74,7 +74,7 @@ final class JobsPublisher
         $json = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR);
         $dir = self::dir();
         if (!is_dir($dir) && !@mkdir($dir, 0750, true) && !is_dir($dir)) {
-            throw new \RuntimeException('No se pudo crear la carpeta storage/ del sitio. Revisa los permisos.');
+            throw new \RuntimeException('No se pudo crear la carpeta del sitio para storage/jobs.json. Revisa los permisos. No se aplicó el cambio.');
         }
         $tmp = $dir . '/.jobs.json.' . bin2hex(random_bytes(6)) . '.tmp';
         $n = @file_put_contents($tmp, $json . "\n", LOCK_EX);

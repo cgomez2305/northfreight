@@ -36,6 +36,7 @@ if (!function_exists('ns_jobs_from_file')) {
         if (!is_string($v)) {
             return '';
         }
+        $v = strip_tags($v);
         $v = (string) preg_replace('/[\x00-\x1F\x7F]+/u', ' ', $v);
         $v = str_replace(['<', '>'], '', $v);
         return trim((string) mb_substr(trim((string) preg_replace('/\s{2,}/u', ' ', $v)), 0, $max, 'UTF-8'));
@@ -79,7 +80,7 @@ if (!function_exists('ns_jobs_from_file')) {
         $type = $j['employment_type'] ?? 'FULL_TIME';
         $out = ['status' => $status, 'title' => $title, 'posted' => $posted, 'valid_through' => $until, 'employment_type' => in_array($type, ['FULL_TIME', 'PART_TIME', 'CONTRACTOR', 'TEMPORARY'], true) ? $type : 'FULL_TIME'];
         $loc = is_array($j['location'] ?? null) ? $j['location'] : [];
-        $region = strtoupper(ns_jobs_text($loc['region'] ?? '', 2));
+        $region = strtoupper(ns_jobs_text($loc['region'] ?? '', 3));
         $postal = ns_jobs_text($loc['postal'] ?? '', 10);
         $location = array_filter([
             'city' => ns_jobs_text($loc['city'] ?? '', 80), 'region' => preg_match('/^[A-Z]{2}$/', $region) === 1 ? $region : '', 'postal' => preg_match('/^\d{5}(-\d{4})?$/', $postal) === 1 ? $postal : '', 'country' => 'US',
@@ -112,6 +113,7 @@ if (!function_exists('ns_jobs_from_file')) {
     function ns_jobs_from_file(string $file): array
     {
         try {
+            clearstatcache(true, $file);
             if (!is_file($file) || !is_readable($file)) {
                 return [];
             }

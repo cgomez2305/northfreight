@@ -99,8 +99,9 @@ final class LeadIngest
     {
         $quiet = !empty($ctx['quiet']);
         $now = Clock::now();
-        if ($lead['referral_code'] !== null && Referrals::find($lead['referral_code']) === null) {
-            $lead['referral_code'] = null;   // codigo inexistente o desactivado: se ignora sin error y sin puntos de referido
+        if ($lead['referral_code'] !== null) {
+            $refRow = Referrals::find($lead['referral_code']);
+            $lead['referral_code'] = $refRow !== null ? (string) $refRow['code'] : null;   // codigo inexistente o desactivado: se ignora sin error y sin puntos de referido; si existe, se guarda en su forma canonica
         }
         if ($fm !== null) {
             $lead['fmcsa_data'] = $fm;
