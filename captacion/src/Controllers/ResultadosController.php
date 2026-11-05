@@ -15,7 +15,7 @@ final class ResultadosController extends Responder
     public static function index(): never
     {
         $user = self::user(true);
-        $r = Reports::resolve(['r' => $_GET['r'] ?? null], Reports::VIEWER_PRESETS);
+        $r = Reports::resolve(['r' => $_GET['r'] ?? 'lastmonth'], Reports::VIEWER_PRESETS);
         $cur = Reports::forViewer(Reports::compute($r['from'], $r['to']));
         $prev = Reports::forViewer(Reports::compute($r['prev_from'], $r['prev_to']));
         self::page('resultados', $user, 'resultados', [['Resultados', null], [$r['label'], null]], [
