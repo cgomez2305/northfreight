@@ -56,6 +56,8 @@ if (isset($opts['reset'])) {
     if ($ids) {
         $in = implode(',', array_map('intval', $ids));
         Db::pdo()->exec('SET FOREIGN_KEY_CHECKS = 0');
+        Db::pdo()->exec("DELETE FROM handoff_deliveries WHERE handoff_id IN (SELECT id FROM handoffs WHERE lead_id IN ($in))");
+        Db::pdo()->exec("DELETE FROM handoffs WHERE lead_id IN ($in)");
         foreach (['lead_events', 'lead_notes', 'tasks', 'appointments', 'messages', 'consents', 'sequence_enrollments'] as $t) {
             Db::pdo()->exec("DELETE FROM $t WHERE lead_id IN ($in)");
         }
