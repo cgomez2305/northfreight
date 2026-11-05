@@ -89,7 +89,16 @@ final class PublicController
         if ($id === null) {
             self::page('unsub', ['state' => 'invalid', 'lang' => 'en'], 404);
         }
-        // GET (el enlace del correo) y POST (List-Unsubscribe=One-Click de los clientes de correo) dan de baja al instante: un clic, nada mas que pedir.
+        $lead = \Captacion\Models\Lead::find($id);
+        if ($lead === null) {
+            self::page('unsub', ['state' => 'invalid', 'lang' => 'en'], 404);
+        }
+        $lang = in_array($lead['language'], ['en', 'es'], true) ? (string) $lead['language'] : 'en';
+        // GET (el enlace del correo): SOLO muestra la confirmacion. Los escaneres de seguridad de correo precargan los enlaces y darian bajas falsas.
+        if (strtoupper((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET')) !== 'POST') {
+            self::page('unsub', ['state' => 'confirm', 'lang' => $lang, 'token' => $token]);
+        }
+        // POST (el boton de la pagina o el List-Unsubscribe=One-Click del cliente de correo): el token firmado es la credencial, sin CSRF.
         $r = Unsub::apply($id, 'unsubscribe_link');
         if (!$r['ok']) {
             self::page('unsub', ['state' => 'invalid', 'lang' => 'en'], 404);

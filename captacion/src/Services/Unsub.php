@@ -2,7 +2,7 @@
 /**
  * Baja de correo de un clic (CAN-SPAM, A15 para el canal email). El enlace /u/{token} va en el pie de cada correo y en la cabecera List-Unsubscribe.
  * Token: base64url("u.<leadId>") + HMAC-SHA256 (43 caracteres, sin separador) con APP_KEY. Sin caducidad (la baja debe funcionar mientras exista el correo) y sin datos personales en la URL.
- * Efecto (idempotente): revoca el consentimiento de correo (consents.revoked_at, bandera stop_email), detiene TODAS las secuencias del lead y lo registra
+ * Solo el POST aplica la baja (el GET muestra la confirmacion). Efecto (idempotente): revoca el consentimiento de correo (consents.revoked_at, bandera stop_email), detiene TODAS las secuencias del lead y lo registra
  * en lead_events y activity_log.
  */
 
