@@ -95,8 +95,8 @@ $empty = !$ov['codes'] && !$ov['referrals'];
     <?php foreach ($ov['codes'] as $c): $link = Referrals::link((string) $c['code']); ?>
     <li class="rrow rrow--code<?= (int) $c['active'] === 1 ? '' : ' is-off' ?>">
       <div class="rrow__w"><b class="rrow__code mono"><?= $e($c['code']) ?></b><small><?= $e($c['owner_name']) ?><?php if ($c['owner_lead_id']): ?> · <a href="/leads/<?= $e($c['owner_lead_id']) ?>">lead #<?= $e($c['owner_lead_id']) ?></a><?php endif; ?><?= $c['note'] ? ' · ' . $e($c['note']) : '' ?></small>
-        <span class="rlink"><input class="mono" type="text" readonly value="<?= $e($link) ?>" aria-label="Enlace del código <?= $e($c['code']) ?>" size="44"><button class="btn btn--secondary btn--sm" type="button" data-copy="<?= $e($link) ?>"><?= Ui::icon('link') ?>Copiar</button></span></div>
-      <div class="rrow__s"><span class="chip chip--plain"><?= $e($c['n_ref']) ?> referidos</span><span class="chip chip--plain"><?= $e($c['n_signed']) ?> firmados</span>
+        <span class="rlink"><input class="mono" type="text" readonly value="<?= $e($link) ?>" aria-label="Enlace del código <?= $e($c['code']) ?>"><button class="btn btn--secondary btn--sm" type="button" data-copy="<?= $e($link) ?>"><?= Ui::icon('link') ?>Copiar</button></span></div>
+      <div class="rrow__s"><span class="chip chip--plain"><?= $e($c['n_ref']) ?> <?= (int) $c['n_ref'] === 1 ? 'referido' : 'referidos' ?></span><span class="chip chip--plain"><?= $e($c['n_signed']) ?> <?= (int) $c['n_signed'] === 1 ? 'firmado' : 'firmados' ?></span>
         <span class="chip chip--<?= (int) $c['active'] === 1 ? 'ok' : 'dq' ?>"><?= (int) $c['active'] === 1 ? 'Activo' : 'Desactivado' ?></span></div>
       <div class="rrow__a">
         <form class="rrow__f" method="post" action="/referidos/<?= $e($c['id']) ?>/code"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="op" value="amount">
