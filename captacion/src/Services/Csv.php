@@ -43,4 +43,22 @@ final class Csv
         }
         return $out;
     }
+
+    /** CSV de la lista de prospectos FMCSA. @param list<array> $rows filas de Prospects::exportRows */
+    public static function prospects(array $rows, int $now): string
+    {
+        $out = "\xEF\xBB\xBF" . self::line([
+            'USDOT', 'MC', 'Razón social', 'DBA', 'Teléfono', 'Correo en FMCSA', 'Estado', 'Ciudad', 'Autoridad concedida', 'Unidades', 'Conductores', 'Carga declarada', 'Estado en la lista',
+            'Intentos sin respuesta', 'Último resultado', 'Último intento (' . Fmt::zone() . ')', 'Siguiente intento (' . Fmt::zone() . ')', 'Lead',
+        ]);
+        foreach ($rows as $r) {
+            $out .= self::line([
+                $r['usdot'], $r['mc_number'], $r['legal_name'], $r['dba'], $r['phone'], $r['email'], $r['state'], $r['city'], $r['authority_granted_at'], $r['fleet_size'], $r['drivers'],
+                \Captacion\Db::decode($r['cargo']), Prospects::STATUSES[$r['status']] ?? $r['status'], $r['attempts'], $r['last_result'] !== null ? (Prospects::RESULTS[$r['last_result']] ?? $r['last_result']) : '',
+                $r['last_call_at'] !== null ? (Fmt::et((string) $r['last_call_at'])?->format('Y-m-d H:i') ?? '') : '', $r['next_call_at'] !== null ? (Fmt::et((string) $r['next_call_at'])?->format('Y-m-d H:i') ?? '') : '',
+                $r['converted_lead_id'],
+            ]);
+        }
+        return $out;
+    }
 }

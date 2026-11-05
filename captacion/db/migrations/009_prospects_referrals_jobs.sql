@@ -85,3 +85,7 @@ ALTER TABLE job_postings ADD COLUMN published_at DATETIME NULL AFTER valid_throu
 ALTER TABLE job_postings ADD COLUMN created_by BIGINT UNSIGNED NULL AFTER published_at;
 ALTER TABLE job_postings ADD KEY idx_jobs_status (deleted_at, status);
 UPDATE job_postings SET status = IF(is_active = 1, 'active', 'draft') WHERE status = 'draft';
+
+-- A12 (pedido de referidos): la plantilla de fabrica incluye ahora el enlace personal {link_referido} (sin cifras de bono). Solo se actualizan las que nadie ha editado.
+UPDATE email_templates SET body = 'Hi {nombre},\n\nIt has been a month since you started with NorthStar. Thanks for trusting us with your loads.\n\nIf you know another owner-operator or small fleet that could use a dispatch desk, you can share your personal link: {link_referido}\n\nOr just reply to this email with their name and phone number and we will reach out. No pressure, and only if you think it would help them.\n\nNorthStar Freight Solutions' WHERE tkey = 'a12_referral' AND lang = 'en' AND kind = 'system' AND updated_by IS NULL;
+UPDATE email_templates SET body = 'Hola {nombre},\n\nHa pasado un mes desde que empezaste con NorthStar. Gracias por confiarnos tus cargas.\n\nSi conoces a otro owner-operator o flota pequeña que pueda usar una mesa de dispatch, puedes compartir tu enlace personal: {link_referido}\n\nO responde a este correo con su nombre y teléfono y los contactamos. Sin presión, y solo si crees que le ayudaría.\n\nNorthStar Freight Solutions' WHERE tkey = 'a12_referral' AND lang = 'es' AND kind = 'system' AND updated_by IS NULL;

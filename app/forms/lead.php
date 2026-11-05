@@ -11,7 +11,7 @@
  * Reglas de producto:
  *  - Elegibilidad (CDL estandar, ingles FMCSA 391.11, anos de experiencia) NUNCA rechaza en pantalla: solo marca `qualified` true/false en el lead. No se pregunta nacionalidad ni estatus migratorio.
  *  - Consentimiento (TCPA) OPCIONAL: se guarda consent {given, version, text exacto, fecha UTC, IP (solo si lo dio), user agent}. No condiciona el envio.
- *  - Atribucion (utm_*, referrer, landing, first_seen) llega en un campo oculto `attr` (JSON) que rellena main.js; sin JS el lead entra sin atribucion (valido).
+ *  - Atribucion (utm_*, referrer, landing, first_seen y ref = codigo de referido) llega en un campo oculto `attr` (JSON) que rellena main.js; sin JS el lead entra sin atribucion (valido).
  *  - Correo (PHPMailer, mismo camino que contact.php; sin SMTP se registra en storage/mail.log) y webhook opcional (LEAD_WEBHOOK_URL, POST JSON con cURL, timeout 4 s) se ejecutan tras guardar y
  *    NUNCA rompen la respuesta: si fallan se registra en storage/error.log y el lead sigue guardado.
  *  - Mini-CRM de captacion (captacion/, fase Q1): con CAPTACION_ENABLED = 1 el lead tambien se entrega EN PROCESO al motor (Captacion\Services\LeadIngest::handle) antes de escribir el JSONL.
@@ -235,12 +235,14 @@ function ns_lead_mail_body(array $l, array $opt): string
     }
 
     // --- Atribucion (campo oculto `attr`, JSON de main.js): solo claves conocidas y con largo limitado ---
-    $attr = ['utm_source' => '', 'utm_medium' => '', 'utm_campaign' => '', 'utm_term' => '', 'utm_content' => '', 'referrer' => '', 'landing' => '', 'first_seen' => ''];
+    $attr = ['utm_source' => '', 'utm_medium' => '', 'utm_campaign' => '', 'utm_term' => '', 'utm_content' => '', 'referrer' => '', 'landing' => '', 'first_seen' => '', 'ref' => ''];
     $decoded = is_string($in['attr'] ?? null) && strlen($in['attr']) <= 2000 ? json_decode($in['attr'], true) : null;
     if (is_array($decoded)) {
         foreach ($attr as $k => $_) {
             $attr[$k] = ns_clean($decoded[$k] ?? '', $k === 'referrer' || $k === 'landing' ? 300 : 100);
         }
+        // Codigo de referido (?ref=): solo letras, numeros, guion y guion bajo (3 a 40); cualquier otra cosa se ignora sin error. El CRM comprueba que el codigo exista.
+        $attr['ref'] = preg_match('/^[A-Za-z0-9_-]{3,40}$/', $attr['ref']) === 1 ? $attr['ref'] : '';
     }
 
     // --- Elegibilidad interna: nunca se muestra ni rechaza en pantalla ---

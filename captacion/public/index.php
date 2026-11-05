@@ -1,7 +1,7 @@
 <?php
 /**
  * Front controller del panel (subdominio captacion.). Rutas: / (dashboard), /pipeline, /tareas, /config, /actividad, /leads, /leads/{id}, /leads/{id}/{accion}, /leads/bulk, /leads/export, /ajax/search, /ajax/notifications/read, /login, /login/2fa, /logout,
- * Q3: /reportes, /resultados, /informes, /comunicaciones; publicas con token: /c/{token}, /u/{token}, /invite/{token}. Autorizacion por rol DENEGADA POR DEFECTO en Responder::user().
+ * Q4a: /prospectos, /referidos, /vacantes (solo administradores). Q3: /reportes, /resultados, /informes, /comunicaciones; publicas con token: /c/{token}, /u/{token}, /invite/{token}. Autorizacion por rol DENEGADA POR DEFECTO en Responder::user().
  * setup.php y api/lead.php son puntos de entrada propios. Cualquier otra ruta: 404.
  */
 
@@ -19,6 +19,9 @@ use Captacion\Controllers\InviteController;
 use Captacion\Controllers\LeadActionsController;
 use Captacion\Controllers\LeadsController;
 use Captacion\Controllers\PipelineController;
+use Captacion\Controllers\ProspectosController;
+use Captacion\Controllers\ReferidosController;
+use Captacion\Controllers\VacantesController;
 use Captacion\Controllers\PublicController;
 use Captacion\Controllers\ReportesController;
 use Captacion\Controllers\ResultadosController;
@@ -87,6 +90,12 @@ switch (true) {
         ConfigController::route($m[1] ?? null, $m[2] ?? null);
     case preg_match('#^/actividad(?:/([a-z]{3,12}))?$#', $path, $m) === 1:
         ActividadController::route($m[1] ?? null);
+    case preg_match('#^/prospectos(?:/(export|\d{1,12})(?:/(result|convert|reopen))?)?$#', $path, $m) === 1:
+        ProspectosController::route(($m[1] ?? '') !== '' ? $m[1] : null, ($m[2] ?? '') !== '' ? $m[2] : null);
+    case preg_match('#^/referidos(?:/(new|confirm|\d{1,12})(?:/([a-z]{3,10}))?)?$#', $path, $m) === 1:
+        ReferidosController::route(($m[1] ?? '') !== '' ? $m[1] : null, ($m[2] ?? '') !== '' ? $m[2] : null);
+    case preg_match('#^/vacantes(?:/(new|\d{1,12})(?:/([a-z]{3,10}))?)?$#', $path, $m) === 1:
+        VacantesController::route(($m[1] ?? '') !== '' ? $m[1] : null, ($m[2] ?? '') !== '' ? $m[2] : null);
     case $path === '/resultados':
         ResultadosController::index();
     case preg_match('#^/reportes(?:/([a-z]{4,10}))?$#', $path, $m) === 1:

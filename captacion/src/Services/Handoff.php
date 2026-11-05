@@ -467,6 +467,11 @@ final class Handoff
         }
         LeadActions::event($leadId, 'conversion', ['pipeline' => $lead['pipeline'], 'source' => $lead['source']], $userId);
         Sequences::enrollReferral($leadId, Clock::time());
+        try {
+            Referrals::onSigned($lead, $userId);   // si el lead llego con un codigo de referido: bono «pendiente de aprobar» y aviso
+        } catch (\Throwable $t) {
+            Storage::error('referral onSigned failed', get_class($t) . ': ' . $t->getMessage());
+        }
         Queue::push('handoff_notify', ['lead_id' => $leadId, 'kind' => 'signed'], $now, 'handoff_notify:signed:' . $leadId . ':' . (int) $lead['attempt']);
     }
 

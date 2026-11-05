@@ -389,7 +389,7 @@
   })();
 
   /* ---- Captación de leads: atribución de primera parte y evento de analítica ----
-     (1) Al aterrizar guarda utm_*, referrer (sin query) y landing en localStorage (30 días; sin cookies) y los vuelca al campo oculto [data-attr-field] de los formularios de solicitud ([data-attr-form]).
+     (1) Al aterrizar guarda utm_*, referrer (sin query) y landing en localStorage (30 días; sin cookies) y los vuelca al campo oculto [data-attr-field] de los formularios de solicitud ([data-attr-form]). El código ?ref= se guarda aparte (60 días) y viaja en ese mismo campo.
          Sin JS o sin localStorage el lead entra sin atribución (válido). La política de privacidad debe mencionarlo.
      (2) En la página de gracias ([data-lead-event]) emite generate_lead (gtag o dataLayer) y Lead (Meta) SOLO si esas herramientas ya existen en la página: no se carga ningún script de terceros. */
   (function () {
@@ -409,9 +409,23 @@
       keys.forEach(function (k) { rec[k] = q[k] || ''; });
       try { store.setItem(KEY, JSON.stringify(rec)); } catch (e) { /* sin almacenamiento: vale para esta página */ }
     }
+    /* Código de referido (?ref=CODIGO): se valida (letras, números, guion y guion bajo, 3 a 40), se guarda 60 días en localStorage (sin cookies) y viaja dentro del mismo campo oculto. */
+    var REF_KEY = 'ns_ref', ref = '';
+    try {
+      var rr = JSON.parse(store.getItem(REF_KEY) || 'null');
+      if (rr && rr.t && now - rr.t <= 60 * DAY && /^[A-Za-z0-9_-]{3,40}$/.test(rr.c || '')) ref = rr.c;
+    } catch (e) { ref = ''; }
+    try {
+      var qr = new URLSearchParams(location.search).get('ref');
+      if (qr && /^[A-Za-z0-9_-]{3,40}$/.test(qr.trim())) {
+        ref = qr.trim();
+        try { store.setItem(REF_KEY, JSON.stringify({ c: ref, t: now })); } catch (e) { /* sin almacenamiento: vale para esta página */ }
+      }
+    } catch (e) { /* sin URLSearchParams */ }
     $$('[data-attr-field]').forEach(function (f) {
       var out = {};
       ['first_seen', 'landing', 'referrer'].concat(keys).forEach(function (k) { out[k] = rec[k] || ''; });
+      if (ref) out.ref = ref;
       f.value = JSON.stringify(out);
     });
     var ev = d.querySelector('[data-lead-event]');

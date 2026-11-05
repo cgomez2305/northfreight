@@ -99,6 +99,9 @@ final class LeadIngest
     {
         $quiet = !empty($ctx['quiet']);
         $now = Clock::now();
+        if ($lead['referral_code'] !== null && Referrals::find($lead['referral_code']) === null) {
+            $lead['referral_code'] = null;   // codigo inexistente o desactivado: se ignora sin error y sin puntos de referido
+        }
         if ($fm !== null) {
             $lead['fmcsa_data'] = $fm;
             if (($fm['found'] ?? false) && ($fm['authority_age_months'] ?? null) !== null) {
@@ -149,6 +152,9 @@ final class LeadIngest
         $mflags = Flags::derive($mflags, $merged);
         $updates += ['score' => $scored['score'], 'temperature' => $scored['temperature'], 'score_breakdown' => $scored['breakdown'], 'disqualified_reason' => $scored['disqualified_reason'], 'flags' => $mflags];
         Db::update('leads', $leadId, $updates);
+        if (isset($updates['referral_code'])) {
+            Referrals::attach($leadId, $updates['referral_code']);
+        }
 
         if ($lead['consent']['given']) {
             Consent::record($leadId, $lead['consent']);
@@ -202,6 +208,9 @@ final class LeadIngest
             'updated_at' => $now,
         ];
         $leadId = Db::insert('leads', $row);
+        if ($lead['referral_code'] !== null) {
+            Referrals::attach($leadId, $lead['referral_code']);
+        }
 
         self::event($leadId, 'created', [
             'source' => $source, 'site_lead_id' => $lead['site_lead_id'], 'landing_page' => $lead['landing_page'], 'utm' => $lead['utm'],
@@ -390,6 +399,7 @@ final class LeadIngest
             'best_time'    => $s['best_time'] ?? '',
             'job'          => $s['job'] ?? '',
             'attribution'  => $att,
+            'referral_code' => (string) ($att['ref'] ?? ($s['referral_code'] ?? '')),
             'consent'      => [
                 'given'      => !empty($consent['given']),
                 'text'       => (string) ($consent['text'] ?? ''),

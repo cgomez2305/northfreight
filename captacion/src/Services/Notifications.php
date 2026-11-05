@@ -73,6 +73,33 @@ final class Notifications
                 'meta' => $bk['msg'], 'href' => '/config?tab=copias',
             ];
         }
+        // Q4a: prospectos con seguimiento de hoy, cron de FMCSA, bonos por aprobar y vacantes por vencer
+        $due = Prospects::followupsDue(Clock::time());
+        if ($due['n'] > 0) {
+            $items[] = ['key' => 'prospects_due:' . $due['n'] . ':' . $due['max_id'], 'kind' => 'warn', 'title' => $due['n'] === 1 ? '1 prospecto con seguimiento para hoy' : $due['n'] . ' prospectos con seguimiento para hoy',
+                'meta' => 'Reintentos y llamadas que prometiste volver a hacer', 'href' => '/prospectos'];
+        }
+        $pcfg = ProspectConfig::get();
+        if ($pcfg['enabled']) {
+            $pcron = Settings::get('cron.prospects');
+            $pat = is_array($pcron) && isset($pcron['at']) ? Clock::parse((string) $pcron['at']) : null;
+            $prun = ProspectImport::state();
+            if ($pat === null || Clock::time() - $pat > 10800) {
+                $items[] = ['key' => 'fmcsa_cron:' . ($pat === null ? 'never' : 'late'), 'kind' => 'warn', 'title' => $pat === null ? 'El cron de prospectos FMCSA nunca se ha ejecutado' : 'El cron de prospectos FMCSA no corre',
+                    'meta' => $pat === null ? 'Crea la tarea de cron de fmcsa_daily.php (cada hora)' : 'Última pasada ' . Fmt::ago((string) $pcron['at']), 'href' => '/config?tab=integraciones'];
+            } elseif (is_array($prun) && !empty($prun['error'])) {
+                $items[] = ['key' => 'fmcsa_error:' . substr(md5((string) $prun['error']), 0, 8), 'kind' => 'bad', 'title' => 'La búsqueda de prospectos FMCSA falló', 'meta' => mb_substr((string) $prun['error'], 0, 90), 'href' => '/config?tab=integraciones'];
+            }
+        }
+        $bonus = Referrals::pendingApproval();
+        if ($bonus > 0) {
+            $items[] = ['key' => 'bonus_pending:' . $bonus . ':' . (int) Db::value("SELECT MAX(id) FROM referrals WHERE bonus_status = 'pending'"), 'kind' => 'hot', 'title' => $bonus === 1 ? '1 bono de referido por aprobar' : $bonus . ' bonos de referido por aprobar',
+                'meta' => 'Un referido firmó', 'href' => '/referidos?f=pending'];
+        }
+        $soon = (int) Db::value("SELECT COUNT(*) FROM job_postings WHERE deleted_at IS NULL AND status = 'active' AND valid_through >= ? AND valid_through <= ?", [JobPostings::today(), (new \DateTimeImmutable(JobPostings::today()))->modify('+7 days')->format('Y-m-d')]);
+        if ($soon > 0) {
+            $items[] = ['key' => 'jobs_expiring:' . $soon . ':' . JobPostings::today(), 'kind' => 'warn', 'title' => $soon === 1 ? '1 vacante vence esta semana' : $soon . ' vacantes vencen esta semana', 'meta' => 'Renueva la fecha o déjala vencer', 'href' => '/vacantes'];
+        }
         if (!Telegram::configured()) {
             $items[] = ['key' => 'telegram_unconfigured', 'kind' => 'warn', 'title' => 'Telegram sin configurar', 'meta' => 'Las alertas de leads calientes no llegarán a tu teléfono', 'href' => '/#cola'];
         }

@@ -1,0 +1,29 @@
+/* NorthStar Captación · vacantes (/vacantes y su formulario). Se carga solo en esas pantallas, encima de panel.css. Sin estilos en línea (CSP). */
+.steps{display:flex;flex-direction:column;gap:12px;margin-top:10px;text-align:left;width:min(560px,100%)}
+.steps li{display:flex;gap:14px;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--sunk)}
+.steps b{display:block;color:var(--ink)}
+.steps p{font-size:13.5px;max-width:none}
+.steps__n{width:28px;height:28px;border-radius:50%;background:var(--navy-2);color:var(--on-navy);display:grid;place-items:center;font:600 13px var(--f-mono);flex:none}
+.chip--ok{background:var(--ok-bg);color:var(--ok)}
+.pstat{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13.5px;color:var(--ink-2)}
+.vnote{margin-top:-8px}
+.vrows{display:flex;flex-direction:column}
+.vrow{display:grid;grid-template-columns:minmax(0,1.8fr) auto auto;gap:10px 18px;align-items:center;padding:16px 20px;border-top:1px solid var(--line)}
+.vrow:first-child{border-top:0}
+.vrow__w{display:flex;flex-direction:column;gap:3px;min-width:0}
+.vrow__w small{color:var(--ink-3);overflow-wrap:anywhere}
+.vrow__t{font:700 21px/1.1 var(--f-cond);color:var(--ink)}
+.vrow__a{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;align-items:center}
+.vform{padding:22px;display:flex;flex-direction:column;gap:22px}
+.vform__g{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;border:0;padding:0;margin:0;min-width:0}
+.vform__g--1{grid-template-columns:minmax(0,1fr)}
+.vform__g legend{grid-column:1/-1;padding:0 0 4px;margin-bottom:2px}
+.vf-2{grid-column:span 2}
+.vf-all{grid-column:1/-1}
+.vform textarea{width:100%;padding:10px 12px;border:1px solid var(--field);border-radius:var(--r-in);background:var(--surface);outline:0;resize:vertical;line-height:1.45}
+.vform textarea:focus{border-color:var(--focus);box-shadow:0 0 0 3px var(--cyan-tint)}
+.ferr{color:var(--bad);font-weight:600}
+.vform__a{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.vstate{gap:12px}
+@media (max-width:1100px){.vform__g{grid-template-columns:repeat(2,minmax(0,1fr))}.vrow{grid-template-columns:minmax(0,1fr) auto}.vrow__a{grid-column:1/-1;justify-content:flex-start}}
+@media (max-width:760px){.vform{padding:16px}.vform__g{grid-template-columns:minmax(0,1fr)}.vf-2{grid-column:auto}.vrow{padding:14px 16px;grid-template-columns:minmax(0,1fr)}}

@@ -30,6 +30,7 @@ final class JobHandlers
             'backup_db'               => [Backup::class, 'handler'],
             'handoff_deliver'         => [Handoff::class, 'deliver'],
             'handoff_notify'          => [Handoff::class, 'notify'],
+            'referral_notify'         => [Referrals::class, 'notify'],
             'sequence_step'           => [Sequences::class, 'runStep'],
         ];
     }

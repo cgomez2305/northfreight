@@ -42,8 +42,15 @@ return static function (array $ctx): void {
     $q2b->exec("INSERT INTO sequence_enrollments (lead_id, sequence_key, step, status) VALUES (1, 'a6_warm', 0, 'active')");
     $q2b->exec("INSERT INTO messages (lead_id, channel, direction, body) VALUES (1, 'email', 'out', 'hola')");
     $q2b->exec("INSERT INTO settings (`key`, value) VALUES ('alerts', '{\"email\":true}')");
+    // Q4a: filas previas de prospectos, referidos y vacantes (existian vacias en el esquema original) sobreviven a la 009
+    $q2b->exec("INSERT INTO prospects_fmcsa (usdot, legal_name, state, status, attempts) VALUES ('1234567', 'Viejo Prospecto', 'TX', 'to_call', 1)");
+    $q2b->exec("INSERT INTO referral_codes (owner_name, code) VALUES ('Ana', 'ANA-1')");
+    $q2b->exec("INSERT INTO referrals (referral_code_id, lead_id) VALUES (1, 1)");
+    $q2b->exec("INSERT INTO job_postings (title, slug, valid_through, is_active) VALUES ('Driver viejo', 'driver-viejo', '2027-01-01', 1)");
     $newOnes = Migrator::run($q2b, $dir);
-    T::eq($newOnes, ['006_handoff', '007_viewer_reports', '008_comms'], 'sobre la base de Q2b se aplican solo 006, 007 y 008');
+    T::eq($newOnes, ['006_handoff', '007_viewer_reports', '008_comms', '009_prospects_referrals_jobs'], 'sobre la base de Q2b se aplican solo 006, 007, 008 y 009');
+    T::eq([$q2b->query('SELECT status FROM referrals WHERE id = 1')->fetchColumn(), $q2b->query("SELECT status FROM job_postings WHERE slug = 'driver-viejo'")->fetchColumn(), (int) $q2b->query('SELECT attempts FROM prospects_fmcsa')->fetchColumn(), $q2b->query('SELECT source FROM prospects_fmcsa')->fetchColumn()],
+        ['referred', 'active', 1, 'socrata'], '  009 conserva las filas previas (el referido pasa de «new» a «referred», la vacante activa queda «active»)');
     T::eq([(int) $q2b->query('SELECT COUNT(*) FROM leads')->fetchColumn(), (int) $q2b->query('SELECT COUNT(*) FROM sequence_enrollments')->fetchColumn(), (int) $q2b->query('SELECT COUNT(*) FROM messages')->fetchColumn(), (int) $q2b->query('SELECT COUNT(*) FROM users')->fetchColumn()], [1, 1, 1, 1], '  y los datos existentes siguen ahi');
     T::eq(Migrator::run($q2b, $dir), [], '  repetirlas no hace nada');
     $qc = static fn(string $t) => $q2b->query("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = 'cap_mig_q2b' AND TABLE_NAME = '$t'")->fetchAll(PDO::FETCH_COLUMN);
@@ -56,7 +63,7 @@ return static function (array $ctx): void {
     $rootPdo->exec('DROP DATABASE cap_mig_q2b');
 
     $tables = $pdo->query('SHOW TABLES')->fetchAll(PDO::FETCH_COLUMN);
-    foreach (['users', 'leads', 'lead_events', 'consents', 'prospects_fmcsa', 'tasks', 'appointments', 'messages', 'sequence_enrollments', 'referral_codes', 'referrals', 'job_postings', 'channel_costs', 'settings', 'jobs', 'activity_log', 'recovery_codes', 'login_attempts', 'schema_migrations', 'handoffs', 'handoff_deliveries', 'user_invites', 'reports', 'email_templates', 'backups', 'lead_notes'] as $t) {
+    foreach (['prospect_calls', 'dnc_numbers', 'users', 'leads', 'lead_events', 'consents', 'prospects_fmcsa', 'tasks', 'appointments', 'messages', 'sequence_enrollments', 'referral_codes', 'referrals', 'job_postings', 'channel_costs', 'settings', 'jobs', 'activity_log', 'recovery_codes', 'login_attempts', 'schema_migrations', 'handoffs', 'handoff_deliveries', 'user_invites', 'reports', 'email_templates', 'backups', 'lead_notes'] as $t) {
         T::ok(in_array($t, $tables, true), "tabla $t existe");
     }
     $cols = static fn(string $t) => $pdo->query("SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = 'cap_mig' AND TABLE_NAME = '$t'")->fetchAll(PDO::FETCH_COLUMN);

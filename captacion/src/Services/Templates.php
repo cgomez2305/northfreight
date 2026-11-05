@@ -2,7 +2,7 @@
 /**
  * Plantillas de correo (Comunicaciones): CRUD, variables, marcadores y pie obligatorio (CAN-SPAM).
  *
- *  - Variables: {nombre} {equipo} {estado} {link_baja} {link_calculadora} {whatsapp}. Una variable desconocida que quede sin reemplazar cuenta como «sin resolver».
+ *  - Variables: {nombre} {equipo} {estado} {link_baja} {link_calculadora} {whatsapp} {link_referido} (el enlace con el codigo de referido del lead; lo crea si no existe). Una variable desconocida que quede sin reemplazar cuenta como «sin resolver».
  *  - Marcadores [[CONFIRMAR: …]]: texto pendiente de confirmar. Una plantilla con un marcador (o variable) sin resolver NO se envia.
  *  - Pie (siempre, no editable): quien escribe, direccion fisica (Configuracion > Correo; sin ella no se envia ninguna secuencia) y enlace de baja de un clic.
  *  - Solo texto plano: se escapa todo; el HTML del correo lo arma render().
@@ -70,6 +70,7 @@ final class Templates
             '{link_baja}' => $unsubUrl,
             '{link_calculadora}' => self::SITE . '/resources/rate-per-mile-calculator/',
             '{whatsapp}' => self::WHATSAPP,
+            '{link_referido}' => Referrals::link('EJEMPLO'),   // render() lo cambia por el codigo real del lead solo si la plantilla lo usa
         ];
     }
 
@@ -121,6 +122,9 @@ final class Templates
     public static function render(array $tpl, array $lead, string $lang, string $unsubUrl): array
     {
         $vars = self::vars($lead, $lang, $unsubUrl);
+        if (str_contains((string) $tpl['subject'] . "\n" . (string) $tpl['body'], '{link_referido}')) {
+            $vars['{link_referido}'] = Referrals::linkForLead($lead);   // crea el codigo del lead si no tiene (A12)
+        }
         $subject = (string) preg_replace('/\s+/', ' ', self::interpolate((string) $tpl['subject'], $vars));
         $body = self::interpolate((string) $tpl['body'], $vars);
         $unres = self::unresolved($subject . "\n" . $body);

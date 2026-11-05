@@ -136,6 +136,30 @@ final class Integrations
             'last' => '', 'error' => '',
             'help' => $rat === null || $rlate ? 'Agrega la tarea de cron de cron/reports_cron.php (cada hora) en hPanel. Pasos en el README §18.' : '',
         ];
+        // Prospectos FMCSA (cron diario) y datos publicos de Socrata
+        $pc = Settings::get('cron.prospects');
+        $pat = is_array($pc) && isset($pc['at']) ? Clock::parse((string) $pc['at']) : null;
+        $pcfg = ProspectConfig::get();
+        $plate = $pcfg['enabled'] && ($pat === null || $now - $pat > 10800);
+        $run = ProspectImport::state();
+        $cards[] = [
+            'key' => 'prospects', 'title' => 'Prospectos FMCSA (cron)', 'testable' => false,
+            'level' => !$pcfg['enabled'] ? 'off' : ($plate ? 'warn' : (is_array($run) && !empty($run['error']) ? 'bad' : 'ok')),
+            'headline' => !$pcfg['enabled'] ? 'Búsqueda apagada' : ($pat === null ? 'Nunca se ha ejecutado' : ($plate ? 'Lleva más de 3 horas sin correr' : 'Corriendo')),
+            'details' => [['Última pasada', $pat === null ? '—' : Fmt::dateTime((string) $pc['at']) . ' · ' . Fmt::ago((string) $pc['at'])], ['Última corrida', is_array($run) ? ($run['day'] ?? '—') . ' · ' . (!empty($run['finished']) ? 'terminada' : 'a medias') . ' · ' . (int) ($run['counters']['new'] ?? 0) . ' nuevos' : '—'], ['Programado', 'cada hora; corre una vez al día desde las 6:00 a. m. (Nueva York)']],
+            'last' => '', 'error' => is_array($run) && !empty($run['error']) ? (string) $run['error'] : '',
+            'help' => $pcfg['enabled'] && ($pat === null || $plate) ? 'Agrega la tarea de cron de cron/fmcsa_daily.php (cada hora, minuto 20) en hPanel. Pasos en el README §19.' : '',
+        ];
+        $so = self::last('socrata');
+        $sbad = ($so['last'] ?? '') === 'err';
+        [$sok] = self::lastLine($so);
+        $cards[] = [
+            'key' => 'socrata', 'title' => 'Datos públicos de FMCSA (Socrata)', 'testable' => true,
+            'level' => $sbad ? 'bad' : ($sok > 0 ? 'ok' : 'off'), 'headline' => $sbad ? 'La última consulta falló' : ($sok > 0 ? 'Responde' : 'Sin consultas todavía'),
+            'details' => [['Token (opcional)', self::mask(Env::get('SOCRATA_APP_TOKEN')) ?? 'sin token: límite compartido'], ['Servicio', Env::get('SOCRATA_API_BASE') !== null ? 'personalizado (SOCRATA_API_BASE)' : 'data.transportation.gov'], ['Datasets', ProspectImport::GRANTS_DATASET . ' y ' . ProspectImport::CENSUS_DATASET]],
+            'last' => $sok > 0 ? 'Última consulta correcta ' . Fmt::ago((string) $so['ok_at']) : 'Sin consultas todavía', 'error' => $sbad ? (string) ($so['err'] ?? '') : '',
+            'help' => 'Es de solo lectura y no necesita llave. Con SOCRATA_APP_TOKEN (gratis en data.transportation.gov) sube el límite de consultas.',
+        ];
         // Copia diaria de la base
         $bk = Backup::health($now);
         $bs = Settings::get('cron.backup');
@@ -159,6 +183,7 @@ final class Integrations
                 'telegram' => self::testTelegram(),
                 'fmcsa'    => self::testFmcsa($usdot),
                 'smtp'     => self::testSmtp(),
+                'socrata'  => self::testSocrata(),
                 default    => ['ok' => false, 'level' => 'bad', 'msg' => 'Integración desconocida.'],
             };
         } catch (\Throwable $t) {
@@ -193,6 +218,20 @@ final class Integrations
         $age = $r['authority_age_months'] ?? null;
         return ['ok' => true, 'level' => 'ok', 'msg' => 'USDOT ' . $usdot . ': ' . ($r['legal_name'] ?? 'sin nombre') . ' · autoridad ' . ($r['authority_status'] ?? '?') . ' · seguro ' . (($r['insured'] ?? null) === true ? 'registrado' : (($r['insured'] ?? null) === false ? 'sin registrar' : '?'))
             . ($age !== null ? ' · ' . $age . ' meses de antigüedad' : '') . '.'];
+    }
+
+    private static function testSocrata(): array
+    {
+        $c = new SocrataClient();
+        try {
+            $rows = $c->query(ProspectImport::GRANTS_DATASET, ProspectImport::grantsParams(gmdate('Ymd', Clock::time() - 30 * 86400), null, 1));
+        } catch (SocrataUnavailable $e) {
+            self::record('socrata', false, $e->getMessage());
+            return ['ok' => false, 'level' => 'bad', 'msg' => 'Socrata no respondió bien: ' . mb_substr(Storage::redact($e->getMessage()), 0, 200)];
+        }
+        self::record('socrata', true);
+        $d = (string) ($rows[0]['status_change_date'] ?? '');
+        return ['ok' => true, 'level' => 'ok', 'msg' => 'Socrata respondió' . ($d !== '' ? '. Última concesión vista: ' . substr($d, 0, 4) . '-' . substr($d, 4, 2) . '-' . substr($d, 6, 2) : ' sin filas en los últimos 30 días') . ($c->hasToken() ? ' (con token)' : ' (sin token: límite compartido)') . '.'];
     }
 
     private static function testSmtp(): array

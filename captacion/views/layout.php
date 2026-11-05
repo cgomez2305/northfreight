@@ -56,6 +56,10 @@ $brand = '<a class="brand" href="' . (!empty($isViewer) ? '/resultados' : '/') .
       <a class="nav-i" href="/leads?from=<?= $e(\Captacion\Services\Fmt::et(\Captacion\Clock::time())->format('Y-m-d')) ?>"><?= Ui::icon('inbox') ?>Llegaron hoy</a>
       <a class="nav-i" href="/leads?t=disqualified"><?= Ui::icon('flag') ?>Descartados</a>
       <?php if ($isAdmin): ?>
+      <p class="side__group">Captación saliente</p>
+      <a class="nav-i<?= $active === 'prospectos' ? ' is-on' : '' ?>" href="/prospectos"<?= $active === 'prospectos' ? ' aria-current="page"' : '' ?>><?= Ui::icon('phone') ?>Prospectos<?php if (($followBadge ?? 0) > 0): ?><span class="badge badge--late" title="Seguimientos de hoy"><?= $e($followBadge) ?><span class="sr"> seguimientos de hoy</span></span><?php endif; ?></a>
+      <a class="nav-i<?= $active === 'referidos' ? ' is-on' : '' ?>" href="/referidos"<?= $active === 'referidos' ? ' aria-current="page"' : '' ?>><?= Ui::icon('user-plus') ?>Referidos<?php if (($bonusBadge ?? 0) > 0): ?><span class="badge badge--hot" title="Bonos por aprobar"><?= $e($bonusBadge) ?><span class="sr"> bonos por aprobar</span></span><?php endif; ?></a>
+      <a class="nav-i<?= $active === 'vacantes' ? ' is-on' : '' ?>" href="/vacantes"<?= $active === 'vacantes' ? ' aria-current="page"' : '' ?>><?= Ui::icon('file') ?>Vacantes</a>
       <p class="side__group">Reportes y correo</p>
       <a class="nav-i<?= $active === 'reportes' ? ' is-on' : '' ?>" href="/reportes"<?= $active === 'reportes' ? ' aria-current="page"' : '' ?>><?= Ui::icon('bar-chart') ?>Reportes</a>
       <a class="nav-i<?= $active === 'informes' ? ' is-on' : '' ?>" href="/informes"<?= $active === 'informes' ? ' aria-current="page"' : '' ?>><?= Ui::icon('file') ?>Informes</a>

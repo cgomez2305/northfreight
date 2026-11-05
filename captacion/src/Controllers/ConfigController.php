@@ -20,6 +20,8 @@ use Captacion\Services\Handoff;
 use Captacion\Services\Integrations;
 use Captacion\Services\Invites;
 use Captacion\Services\Mailer;
+use Captacion\Services\ProspectConfig;
+use Captacion\Services\ProspectImport;
 use Captacion\Services\RateLimiter;
 use Captacion\Services\Reauth;
 use Captacion\Services\Scoring;
@@ -31,10 +33,10 @@ final class ConfigController extends Responder
 {
     public const TABS = [
         'puntuacion' => 'Puntuación', 'alertas' => 'Alertas', 'costos' => 'Costos por canal', 'integraciones' => 'Integraciones', 'horario' => 'Horario y zona', 'copias' => 'Copias de seguridad',
-        'entrega' => 'Entrega a NorthStar', 'correo' => 'Correo y secuencias', 'usuarios' => 'Usuarios',
+        'entrega' => 'Entrega a NorthStar', 'correo' => 'Correo y secuencias', 'usuarios' => 'Usuarios', 'prospectos' => 'Prospectos',
     ];
     /** Pestañas cuyos formularios exigen confirmacion reciente. */
-    public const LOCKED_TABS = ['puntuacion', 'alertas', 'costos', 'horario', 'copias', 'entrega', 'correo', 'usuarios'];
+    public const LOCKED_TABS = ['puntuacion', 'alertas', 'costos', 'horario', 'copias', 'entrega', 'correo', 'usuarios', 'prospectos'];
     public const TEST_LIMIT = 6;   // pruebas de integracion por minuto y usuario
 
     public static function route(?string $a, ?string $b): never
@@ -69,6 +71,8 @@ final class ConfigController extends Responder
             'users/reset'         => self::usersAction($user, 'reset'),
             'users/deactivate'    => self::usersAction($user, 'deactivate'),
             'users/activate'      => self::usersAction($user, 'activate'),
+            'prospects/save'      => self::prospectsSave($user),
+            'prospects/window'    => self::prospectsWindow($user),
             default               => self::notFound(),
         };
         self::notFound();
@@ -121,6 +125,10 @@ final class ConfigController extends Responder
             'entrega'       => ['hand' => Handoff::config(), 'handView' => Handoff::overview(), 'handTargets' => Handoff::targets(), 'once' => self::takeOnce()],
             'correo'        => ['mail' => Sequences::mailSettings(), 'mailWarn' => Sequences::warnings(), 'canDeliver' => Mailer::canDeliver(), 'smtpSet' => Mailer::smtpConfigured(), 'mailFrom' => Mailer::fromAddress()],
             'usuarios'      => ['viewers' => Invites::viewers(), 'once' => self::takeOnce(), 'inviteForm' => ['name' => '', 'email' => '']],
+            'prospectos'    => [
+                'pc' => ProspectConfig::get(), 'pRun' => ProspectImport::state(), 'pComplete' => ProspectImport::completeUntil(), 'pCron' => Settings::get('cron.prospects'),
+                'pSocrata' => Integrations::last('socrata'), 'pToken' => (new \Captacion\Services\SocrataClient())->hasToken(), 'pForm' => null,
+            ],
         };
         self::page('config', $user, 'config', [['Configuración', '/config'], [self::TABS[$tab], null]], $over + $vars, $status);
     }
@@ -290,13 +298,49 @@ final class ConfigController extends Responder
         self::redirect($back);
     }
 
+    // --- Prospectos FMCSA ---------------------------------------------------------------------------------------------------
+
+    private static function prospectsSave(array $user): never
+    {
+        $back = self::guardPost('prospectos');
+        $in = [
+            'enabled' => isset($_POST['enabled']) ? '1' : '0', 'require_phone' => isset($_POST['require_phone']) ? '1' : '0', 'max_age_months' => $_POST['max_age_months'] ?? '', 'max_fleet' => $_POST['max_fleet'] ?? '',
+            'daily_cap' => $_POST['daily_cap'] ?? '', 'states' => is_array($_POST['states'] ?? null) ? array_slice($_POST['states'], 0, 60) : [], 'cargo' => is_array($_POST['cargo'] ?? null) ? array_slice($_POST['cargo'], 0, 10) : [],
+        ];
+        $v = ProspectConfig::normalize($in);
+        if ($v['errors'] || count($v['clean']) < 7) {
+            self::flash(false, $v['errors'] ? 'Revisa los campos marcados.' : 'Faltan datos del formulario.');
+            self::index($user, ['errors' => $v['errors'], 'pForm' => $in], 422, 'prospectos');
+        }
+        $before = ProspectConfig::get();
+        $after = $v['clean'] + $before;
+        Settings::set('prospects.config', $after);
+        $changed = ActivityLog::settingsChange((int) $user['id'], 'prospects', $before, $after);
+        $filters = ['max_age_months', 'states', 'max_fleet', 'require_phone', 'cargo'];
+        $widened = $changed && array_filter($filters, static fn($k) => $before[$k] !== $after[$k]);
+        if ($widened) {
+            ProspectImport::resetWindow();   // la proxima corrida vuelve a evaluar toda la ventana con los filtros nuevos
+        }
+        self::flash(true, !$changed ? 'No había cambios que guardar.' : 'Filtros guardados.' . ($widened ? ' La próxima corrida vuelve a revisar toda la ventana con los filtros nuevos.' : ''));
+        self::redirect($back);
+    }
+
+    private static function prospectsWindow(array $user): never
+    {
+        $back = self::guardPost('prospectos');
+        ProspectImport::resetWindow();
+        ActivityLog::record('prospects_window_reset', (int) $user['id'], 'prospects', null, []);
+        self::flash(true, 'Listo: la próxima corrida revisará de nuevo toda la ventana de antigüedad (lo que ya está en la lista no se duplica).');
+        self::redirect($back);
+    }
+
     // --- Integraciones ----------------------------------------------------------------------------------------------------
 
     private static function integrationTest(array $user): never
     {
         $name = is_string($_POST['name'] ?? null) ? $_POST['name'] : '';
         $back = self::guardPost('integraciones', false, '#int-' . preg_replace('/[^a-z]/', '', $name));
-        if (!in_array($name, ['telegram', 'fmcsa', 'smtp'], true)) {
+        if (!in_array($name, ['telegram', 'fmcsa', 'smtp', 'socrata'], true)) {
             self::notFound();
         }
         $key = 'u' . (int) $user['id'];

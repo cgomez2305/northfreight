@@ -153,6 +153,11 @@ final class LeadActions
             if ($to !== 'new') {
                 Sequences::pauseForLead($leadId, 'stage', $userId);
             }
+            try {
+                Referrals::onStage($leadId, $to);
+            } catch (\Throwable $t) {
+                Storage::error('referral onStage failed', get_class($t) . ': ' . $t->getMessage());
+            }
             if ($to === 'presented') {
                 Handoff::onPresented($leadId, $userId);
             } elseif (in_array($to, self::CLOSED, true)) {
