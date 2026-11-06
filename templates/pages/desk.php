@@ -77,7 +77,7 @@ partial('hero', [
 <section class="section" aria-labelledby="dk-team">
   <div class="container stack sb-dk-stack">
     <?php partial('section-head', ['eyebrow' => 'The team', 'title' => 'The people on your loads', 'id' => 'dk-team']); ?>
-    <ul class="g4">
+    <ul class="<?= count($team) === 3 ? 'g3' : 'g4' ?>">
       <?php foreach ($team as $p): ?>
       <li>
         <article class="sb-dk-person">

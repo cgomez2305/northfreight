@@ -61,7 +61,7 @@ $equip = [
 ?>
 <section class="section" aria-labelledby="co-equip">
   <div class="container stack">
-    <?php partial('section-head', ['id' => 'co-equip', 'eyebrow' => 'Equipment', 'title' => 'Equipment we dispatch', 'lead' => 'We book Amazon Relay and dry van freight. {{ph:confirm other equipment types}}']); ?>
+    <?php partial('section-head', ['id' => 'co-equip', 'eyebrow' => 'Equipment', 'title' => 'Equipment we dispatch', 'lead' => 'We book Amazon Relay, power only and dry van freight.']); ?>
     <div class="cr-rows">
       <?php foreach ($equip as $q): if (!route_is_live($q[0])) { continue; } $th = ns_thumb($q[0], $used); if ($th) { $used[] = $th[0]; }
           partial('row-card', ['href' => url($q[0]), 'title' => $q[1], 'text' => $q[2], 'chips' => $q[3], 'h' => 'p', 'image' => $th ? ['base' => $th[0], 'alt' => $th[1]] : null]);
@@ -89,7 +89,7 @@ $equip = [
     <div class="cr-fee">
       <div class="cr-fee__text">
         <p class="t-body c-slate">Scope is agreed before we start, so you always know what the desk handles and what it costs.</p>
-        <?php $fee = ph('YOUR FEE: % of gross or flat weekly'); if ($fee !== ''): ?><p class="t-body c-slate">Our dispatch fee is <?= $fee ?>.</p><?php endif; ?>
+        <p class="t-body c-slate">NorthStar quotes each operation individually, based on the volume of active trucks and the scope of service. <a href="<?= e(wa($route['wa'])) ?>" rel="noopener">Message the desk on WhatsApp</a> to get a quote for your operation.</p>
       </div>
       <div class="cr-rows">
         <?php

@@ -144,6 +144,7 @@ $routes = [
         'priority'   => 0.6,
         'wa'         => 'default',
         'breadcrumb' => 'Our desk',
+        'cta_coverage' => true,   // fase S: el CTA final añade cobertura (COVERAGE_TEXT) e idiomas (LANGUAGES_TEXT)
         'faq'        => null,
     ],
     '/contact/' => [

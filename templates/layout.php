@@ -3,7 +3,7 @@
  * Layout del sitio. Contrato: recibe $route, $cfg y $content (HTML de la página ya renderizado). No imprime H1
  * (lo pone cada página, normalmente con partial('hero')).
  *
- * Claves de ruta que lee: title, meta, path, template, status, schema, wa, og, motion (GSAP + ScrollTrigger + motion.js/css), css (grupos de CSS; anula el mapa plantilla => grupo), cta (false => sin bloque CTA final), cta_image ('base' de assets/img | '' | false: foto de fondo del CTA; por defecto CTA_IMAGE).
+ * Claves de ruta que lee: title, meta, path, template, status, schema, wa, og, motion (GSAP + ScrollTrigger + motion.js/css), css (grupos de CSS; anula el mapa plantilla => grupo), cta (false => sin bloque CTA final), cta_coverage (true => el CTA añade cobertura e idiomas, fase S), cta_image ('base' de assets/img | '' | false: foto de fondo del CTA; por defecto CTA_IMAGE).
  * Orden: head (SEO, OG, fuentes, CSS, JSON-LD) → skip link → header (tres islas: logo · nav · acciones; megas y menú móvil) →
  *        <main id="main"> → cta → footer → mbar → scripts.
  */
@@ -94,7 +94,7 @@ $jsList = array_values(array_filter($jsList, static fn($j): bool => is_string($j
 <main id="main" tabindex="-1"<?= $ctaOn ? ' class="has-cta"' : '' ?>>
 <?= $content ?>
 </main>
-<?php if ($ctaOn): $ctaBase = array_key_exists('cta_image', $route) ? $route['cta_image'] : CTA_IMAGE; partial('cta', ['wa' => $wa, 'image' => $ctaBase ? ['base' => (string) $ctaBase, 'alt' => ''] : null]); endif; ?>
+<?php if ($ctaOn): $ctaBase = array_key_exists('cta_image', $route) ? $route['cta_image'] : CTA_IMAGE; partial('cta', ['wa' => $wa, 'coverage' => !empty($route['cta_coverage']), 'image' => $ctaBase ? ['base' => (string) $ctaBase, 'alt' => ''] : null]); endif; ?>
 <?php partial('footer', ['wa' => $wa]); ?>
 <?php partial('mbar', ['wa' => $wa]); ?>
 <?php partial('wa-float', ['wa' => $wa]); ?>

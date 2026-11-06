@@ -16,7 +16,8 @@ $val    = static fn (string $k): string => e((string) ($old[$k] ?? ''));
 $err    = static fn (string $k): string => isset($errors[$k]) && $errors[$k] !== '' ? (string) $errors[$k] : '';
 $aria   = static fn (string $k): string => $err($k) !== '' ? ' aria-invalid="true" aria-describedby="ct-err-' . $k . '"' : '';
 $email  = (string) $cfg['email'];
-$hours  = ph('hours · time zone');
+$coverage  = (string) $cfg['coverage_text'];    // COVERAGE_TEXT (config.php): vacío = no se imprime
+$languages = (string) $cfg['languages_text'];   // LANGUAGES_TEXT
 $equip  = (string) ($old['equipment'] ?? '');
 
 ob_start(); ?>
@@ -26,8 +27,11 @@ ob_start(); ?>
 <a class="btn btn--mail" href="mailto:<?= e($email) ?>">
   <span class="btn__stack"><span class="btn__label t-meta">Email</span><span class="btn__mail"><?= e($email) ?></span></span>
 </a>
-<?php if ($hours !== ''): ?>
-<p class="sb-ct-hours"><span class="t-meta">Desk hours</span><span><?= $hours ?></span></p>
+<?php if ($coverage !== ''): ?>
+<p class="sb-ct-hours"><span><?= e($coverage) ?></span></p>
+<?php endif; ?>
+<?php if ($languages !== ''): ?>
+<p class="sb-ct-hours"><span class="t-meta">Languages</span><span><?= e($languages) ?></span></p>
 <?php endif; ?>
 <?php $aside = ob_get_clean();
 
@@ -96,7 +100,7 @@ partial('trio', ['label' => 'Ways to reach the desk', 'cls' => 'sb-ct-trio', 'it
         <select class="input" id="ct-equipment" name="equipment"<?= $aria('equipment') ?>>
           <option value="Dry van"<?= $equip === 'Dry van' ? ' selected' : '' ?>>Dry van</option>
           <option value="Amazon Relay"<?= $equip === 'Amazon Relay' ? ' selected' : '' ?>>Amazon Relay</option>
-          <?php if (!is_production()): ?><option value="Other"<?= $equip === 'Other' ? ' selected' : '' ?>>[other confirmed types]</option><?php endif; ?>
+          <option value="Power only"<?= $equip === 'Power only' ? ' selected' : '' ?>>Power only</option>
         </select>
         <?php if ($err('equipment') !== ''): ?><span class="sb-ct-err" id="ct-err-equipment"><?= e($err('equipment')) ?></span><?php endif; ?>
       </label>

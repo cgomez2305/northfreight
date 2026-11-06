@@ -38,7 +38,7 @@ return [
         ],
         [
             'q' => 'What does it cost?',
-            'a' => 'Our dispatch fee is {{ph:YOUR FEE: % of gross or flat weekly}}. Scope is agreed before we start, so you always know what the desk handles and what it costs.',
+            'a' => 'NorthStar quotes each operation individually, based on the volume of active trucks and the scope of service. Scope is agreed before we start, so you always know what the desk handles. Message the desk on WhatsApp to get a quote for your operation.',
         ],
         [
             'q' => 'What do I need to apply?',
@@ -65,7 +65,7 @@ return [
         ],
         [
             'q' => 'How much does a dispatcher charge an owner-operator?',
-            'a' => '{{ph:YOUR FEE: % of gross or flat weekly}}. Scope is agreed before we start.',
+            'a' => 'NorthStar quotes each operation individually, based on the volume of active trucks and the scope of service. Scope is agreed before we start. Message the desk on WhatsApp to get a quote for your operation.',
         ],
         [
             'q' => 'Who decides which loads I run?',
@@ -73,7 +73,7 @@ return [
         ],
         [
             'q' => 'What equipment do you dispatch?',
-            'a' => '{{ph:confirm equipment types}}.',
+            'a' => 'We dispatch Amazon Relay, power only and dry van freight. Tell us about your trucks and we will tell you honestly if we are a fit.',
         ],
         [
             'q' => 'Can you help if I am just getting my authority?',
@@ -98,7 +98,7 @@ return [
         [
             'q' => 'How much does a truck dispatch service cost?',
             'topic' => 0,
-            'a' => 'Our dispatch fee is {{ph:YOUR FEE: % of gross or flat weekly}}. Scope is agreed before we start, so you always know what the desk handles and what it costs.',
+            'a' => 'NorthStar quotes each operation individually, based on the volume of active trucks and the scope of service. Scope is agreed before we start, so you always know what the desk handles. Message the desk on WhatsApp to get a quote for your operation.',
         ],
         [
             'q' => 'Do you dispatch Amazon Relay loads?',
@@ -118,7 +118,7 @@ return [
         [
             'q' => 'Do you work with owner-operators?',
             'topic' => 3,
-            'a' => 'Yes. We work with owner-operators and small fleets that run {{ph:confirm equipment types}}. Tell us about your trucks and we will tell you honestly if we are a fit.',
+            'a' => 'Yes. We work with owner-operators and small fleets that run Amazon Relay, power only and dry van freight. Tell us about your trucks and we will tell you honestly if we are a fit.',
         ],
         [
             'q' => 'Do I need a contract?',
@@ -131,7 +131,7 @@ return [
     'owner' => [
         [
             'q' => 'How much does a dispatcher charge an owner-operator?',
-            'a' => '{{ph:YOUR FEE: % of gross or flat weekly}}. Scope is agreed before we start.',
+            'a' => 'NorthStar quotes each operation individually, based on the volume of active trucks and the scope of service. Scope is agreed before we start. Message the desk on WhatsApp to get a quote for your operation.',
         ],
         [
             'q' => 'Do I have to take every load you find?',
@@ -139,15 +139,19 @@ return [
         ],
         [
             'q' => 'What equipment do you dispatch?',
-            'a' => '{{ph:confirm equipment types}}.',
+            'a' => 'We dispatch Amazon Relay, power only and dry van freight. Tell us about your trucks and we will tell you honestly if we are a fit.',
         ],
     ],
 
     // /amazon-relay-dispatch/ (copy-relay.md)
     'relay' => [
         [
+            'q' => 'What does Amazon Relay dispatch include?',
+            'a' => 'The desk searches and coordinates loads, plans the work, tracks drivers and trips, monitors your account performance and handles operational or payment disputes with evidence, according to the scope we agree with you.',
+        ],
+        [
             'q' => 'Do you need access to my Relay account?',
-            'a' => '{{ph:confirm how account access is handled}}.',
+            'a' => 'Access is set up with you during onboarding, using the credentials and permissions you provide. Scope is agreed before we start.',
         ],
         [
             'q' => 'Can you help a new Relay carrier?',
@@ -164,7 +168,7 @@ return [
     'dryvan' => [
         [
             'q' => 'Which load boards do you use?',
-            'a' => '{{ph:confirm load boards}}.',
+            'a' => 'We search freight on DAT.',
         ],
         [
             'q' => 'Do you book backhauls?',

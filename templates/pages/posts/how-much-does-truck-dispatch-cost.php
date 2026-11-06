@@ -19,7 +19,6 @@ $related = [
     ['code' => 'TEMPLATE', 'title' => 'Dispatcher-carrier agreement', 'text' => 'What a fair contract covers.', 'href' => '/resources/dispatcher-carrier-agreement/'],
     ['code' => 'SERVICE', 'title' => 'Dispatch for owner-operators', 'text' => 'Let the desk run your loads.', 'href' => '/dispatch-for-owner-operators/', 'dark' => true],
 ];
-$pricing = ph('NorthStar pricing model: percentage, flat fee or plan details to be confirmed by the client.');   // vacío en producción: el texto de respaldo no afirma ningún modelo ni cifra
 ?>
 <h2 class="t-prose-h2" id="models">The three ways dispatchers charge</h2>
 <p><strong>Percentage of the gross.</strong> The dispatcher takes a share of what each load pays. It is the most common model for owner-operators because the fee moves with your revenue: a slow week costs less. What the percentage is calculated on, and what it includes, changes from one service to another.</p>
@@ -58,5 +57,5 @@ $pricing = ph('NorthStar pricing model: percentage, flat fee or plan details to 
 <?php if (route_is_live('/resources/dispatcher-carrier-agreement/')): ?><p>Our free <a href="<?= e(url('/resources/dispatcher-carrier-agreement/')) ?>">dispatcher-carrier agreement template</a> shows what a fair contract covers.</p><?php endif; ?>
 
 <h2 class="t-prose-h2" id="northstar">How NorthStar charges</h2>
-<?php if ($pricing !== ''): ?><p><?= $pricing ?></p><?php else: ?><p>The fee model is something to agree on before you start. To see how NorthStar works, <a href="<?= e(wa('owner')) ?>" rel="noopener">message the desk on WhatsApp</a> and ask.</p><?php endif; ?>
+<p>NorthStar quotes each operation individually, based on the volume of active trucks and the scope of service. <a href="<?= e(wa('owner')) ?>" rel="noopener">Message the desk on WhatsApp</a> to get a quote for your operation.</p>
 <p><a href="<?= e(url('/how-it-works/')) ?>">See how truck dispatching works with us</a>, or explore our <a href="<?= e(url('/dispatch-for-owner-operators/')) ?>">dispatch services for owner-operators</a> and the rest of our <a href="<?= e(url('/')) ?>">truck dispatch services</a>.</p>
