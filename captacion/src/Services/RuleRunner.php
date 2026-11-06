@@ -134,10 +134,15 @@ final class RuleRunner
             return $base;
         }
         $now ??= Clock::time();
-        if ($consent === null && RuleEngine::usesField($sets, 'consent')) {
-            $consent = isset($lead['id']) ? (self::consentMap([$lead])[(int) $lead['id']] ?? []) : self::formConsent($lead);
+        try {
+            if ($consent === null && RuleEngine::usesField($sets, 'consent')) {
+                $consent = isset($lead['id']) ? (self::consentMap([$lead])[(int) $lead['id']] ?? []) : self::formConsent($lead);
+            }
+            return self::combine($lead, $base, $sets, self::facts($lead, $now, $consent), $settings ?? Scoring::settings());
+        } catch (\Throwable $t) {
+            Storage::error('rules score failed', get_class($t) . ': ' . $t->getMessage());   // un fallo de las reglas NUNCA bloquea la captacion: el lead se puntua con el documento
+            return $base;
         }
-        return self::combine($lead, $base, $sets, self::facts($lead, $now, $consent), $settings ?? Scoring::settings());
     }
 
     /** Aplica $sets sobre un resultado base ya calculado (lo usan la vista previa y la simulacion, que calculan la base una sola vez). */

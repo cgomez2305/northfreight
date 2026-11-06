@@ -100,7 +100,7 @@ $run = $recalc !== null && ($recalc['status'] ?? '') === 'running';
 </section>
 <?php endforeach; ?>
 
-<p class="rl-note muted"><?= Ui::icon('info') ?>Las reglas de ejemplo y sus puntos son ilustrativos y provisionales: ajústalos a lo que NorthStar confirme. Cada publicación, reversión o retirada queda en la <a href="/actividad">actividad</a> con lo que cambió.</p>
+<p class="rl-note muted"><?= Ui::icon('info') ?><span>Las reglas de ejemplo y sus puntos son ilustrativos y provisionales: ajústalos a lo que NorthStar confirme. Cada publicación, reversión o retirada queda en la <a href="/actividad">actividad</a> con lo que cambió.</span></p>
 
 <dialog class="dlg" id="newset" aria-labelledby="newset-t">
   <form method="post" action="/config/rules/newset">

@@ -22,12 +22,16 @@
 .rp__note small{font-weight:400}
 .rp__foot{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px 20px;background:var(--surface);border-top:1px solid var(--line);flex:none}
 .rp__foot-sp{flex:1}
+.rp__discard{align-self:flex-start}
 .rp__unlock{padding:14px 20px;background:var(--cyan-tint);border-top:1px solid var(--cyan-line);flex:none;display:flex;flex-direction:column;gap:8px}
 .rp__ulf{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap}
 .rp__ulf .field{width:170px}
 .rp-nojs{align-self:flex-start}
 .js .rp-nojs{display:none}
 .rp__n{font:600 11.5px var(--f-mono);padding:1px 7px;border-radius:var(--r-pill);background:var(--sunk);color:var(--ink-2);margin-left:6px}
+/* carga */
+.rp__sk{display:flex;flex-direction:column;gap:14px;padding:22px 20px}.rp__sk i{display:block;height:18px;border-radius:9px;background:var(--sunk);animation:rpp 1s ease-in-out infinite alternate}.rp__sk i:nth-child(1){height:32px;width:55%}.rp__sk i:nth-child(2){width:35%}.rp__sk i:nth-child(3){height:120px}.rp__sk i:nth-child(5){height:120px}
+@keyframes rpp{from{opacity:.45}to{opacity:1}}
 /* regla */
 .rule{display:flex;flex-direction:column;gap:12px;padding:14px 16px 12px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);counter-increment:rule}
 .rule.is-off{background:var(--sunk)}
@@ -62,7 +66,7 @@
 .rb__items>*+*::before,.rg__items>*+*::before{content:"Y";position:absolute;left:2px;top:-17px;font:600 10.5px var(--f-mono);letter-spacing:.1em;color:var(--ink-3)}
 .rb[data-mode="any"]>.rb__items>*+*::before,.rg[data-mode="any"]>.rg__items>*+*::before{content:"O"}
 .rb__acts{display:flex;gap:6px 16px;flex-wrap:wrap}
-.rc{display:grid;grid-template-columns:minmax(120px,1fr) minmax(120px,.9fr) minmax(150px,1.7fr) 32px;gap:8px;align-items:center;min-width:0}
+.rc{display:grid;grid-template-columns:minmax(120px,1fr) minmax(150px,1fr) minmax(150px,1.6fr) 32px;gap:8px;align-items:center;min-width:0}
 .rc select,.rc input[type=text],.ra select,.ra input[type=text],.rp-scope select,.rp-range input{width:100%;min-height:40px;padding:6px 10px;background:var(--surface);border:1px solid var(--field);border-radius:var(--r-in);outline:0;min-width:0}
 .rc select:focus,.rc input:focus,.ra select:focus,.ra input:focus,.rp-scope select:focus,.rp-range input:focus{border-color:var(--focus);box-shadow:0 0 0 3px var(--cyan-tint)}
 .rc [aria-invalid=true],.ra [aria-invalid=true]{border-color:var(--bad-dot)}
@@ -160,7 +164,7 @@
 /* sin JS: el editor va en linea debajo de la lista */
 html:not(.js) .rp{position:static;width:auto;transform:none;box-shadow:none;border:1px solid var(--line);border-radius:var(--r-card);margin-top:14px}
 html:not(.js) .rp__body{overflow:visible}
-html:not(.js) .rp__main,html:not(.js) .rp__side{overflow:visible}
+html:not(.js) .rp__main,html:not(.js) .rp__side{overflow:visible;min-height:auto}
 html:not(.js) .rp__foot{position:sticky;bottom:0}
 html:not(.js) .rpscrim,html:not(.js) [data-rp-close]{display:none}
 /* hoja inferior */
@@ -170,7 +174,7 @@ html:not(.js) .rpscrim,html:not(.js) [data-rp-close]{display:none}
   .rp__head{position:relative;padding-top:20px}
   .rp__head::before{content:"";position:absolute;left:50%;top:7px;width:38px;height:4px;margin-left:-19px;border-radius:2px;background:var(--line-2)}
   .rp__body{grid-template-columns:1fr;overflow:auto;overscroll-behavior:contain;align-items:start}
-  .rp__main,.rp__side{overflow:visible}
+  .rp__main,.rp__side{overflow:visible;min-height:auto}
   .rp__side{padding:0 20px 24px}
   html:not(.js) .rp{height:auto;border-radius:var(--r-card)}
 }
@@ -181,7 +185,8 @@ html:not(.js) .rpscrim,html:not(.js) [data-rp-close]{display:none}
   .rule{padding:12px}.rule__name{flex-basis:100%;order:3}.rule__ops{order:2}.rule__on{margin-left:auto}
   .rc{grid-template-columns:1fr 1fr 32px}.rc__f{grid-column:1/2}.rc__o{grid-column:2/3}.rc__x{grid-column:3/4;grid-row:1}.rc__v{grid-column:1/-1}
   .ra{grid-template-columns:1fr 32px}.ra__t{grid-column:1/2}.ra__x{grid-column:2/3;grid-row:1}.ra__p{grid-column:1/-1}
-  .rp__foot{padding:10px 14px;gap:8px}.rp__foot .btn{flex:1 1 auto}.rp__foot-sp{display:none}
+  .rp__foot{padding:10px 14px;gap:8px;display:grid;grid-template-columns:1fr 1fr}.rp__foot .btn--primary{grid-column:1/-1}.rp__foot-sp{display:none}
+  .rp__foot .btn{min-width:0;padding:0 12px}
   .rp-kv{grid-template-columns:1fr 1fr}
 }
-@media (prefers-reduced-motion:reduce){.rp,.rpscrim{transition:none}}
+@media (prefers-reduced-motion:reduce){.rp,.rpscrim{transition:none}.rp__sk i{animation:none}}

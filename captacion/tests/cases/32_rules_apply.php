@@ -346,6 +346,21 @@ return static function (array $ctx): void {
         RuleSets::unpublish($x, $uid);
     }
 
+    // ================================================================== Un fallo de las reglas nunca bloquea la captación
+    Db::pdo()->exec('DELETE FROM rule_applications');
+    Db::pdo()->exec('DELETE FROM rule_versions');
+    Db::pdo()->exec('DELETE FROM rule_sets');
+    RuleSets::clearCache();
+    $broken = RuleSets::create('scoring', 'Roto', '', $uid);
+    $bid = (int) $broken['id'];
+    Db::pdo()->exec("INSERT INTO rule_versions (set_id, version, status, rules, rule_count, pub_slot, published_at) VALUES ($bid, 1, 'published', '[{\"id\":7,\"name\":[],\"enabled\":true,\"when\":\"x\",\"then\":5}]', 1, 1, UTC_TIMESTAMP())");
+    RuleSets::clearCache();
+    $lead0 = LeadIngest::handle($payload('9001', ['truck_count' => 2]), 'web_careers');
+    T::ok($lead0['ok'] && $lead0['status'] === 'created' && $lead0['score'] === $base, 'robustez: con un conjunto publicado CORRUPTO el lead se crea igual y con la puntuación del documento (un fallo de las reglas nunca bloquea la captación)');
+    Db::pdo()->exec('DELETE FROM rule_versions');
+    Db::pdo()->exec('DELETE FROM rule_sets');
+    RuleSets::clearCache();
+
     // ================================================================== Plantillas
     Db::pdo()->exec('DELETE FROM rule_applications');
     Db::pdo()->exec('DELETE FROM rule_versions');

@@ -51,6 +51,7 @@ $hasErr = (bool) $errors;
       <button class="btn btn--secondary" type="submit" name="op" value="add_rule" data-add="rule"><?= Ui::icon('plus') ?>Añadir regla</button>
 
       <label class="field rp__note"><span>Nota de esta versión <small>(opcional, se ve en el historial)</small></span><input type="text" name="note" value="<?= $e($meta['note']) ?>" maxlength="200" autocomplete="off" placeholder="Qué cambió y por qué"></label>
+      <?php if ($draft !== null): ?><button class="btn btn--ghost btn--sm rp__discard" type="submit" formaction="/config/rules/discard" data-confirm="¿Descartar el borrador? Se pierden los cambios sin publicar. La versión publicada no se toca."><?= Ui::icon('trash') ?>Descartar el borrador</button><?php endif; ?>
 
       <?php if ($diffDraft): ?>
       <details class="rp__diff" open><summary><?= Ui::icon('layers') ?>Cambios del borrador frente a la versión publicada <span class="rp__n"><?= $e(count($diffDraft)) ?></span></summary>
@@ -106,7 +107,6 @@ $hasErr = (bool) $errors;
   <footer class="rp__foot">
     <button class="btn btn--ghost" type="submit" name="op" value="simulate" data-sim-go><?= Ui::icon('flask') ?>Ejecutar simulación</button>
     <span class="rp__foot-sp"></span>
-    <?php if ($draft !== null): ?><button class="btn btn--ghost btn--sm" type="submit" formaction="/config/rules/discard" data-confirm="¿Descartar el borrador? Se pierden los cambios sin publicar. La versión publicada no se toca."><?= Ui::icon('trash') ?>Descartar borrador</button><?php endif; ?>
     <button class="btn btn--secondary" type="submit" name="op" value="save"><?= Ui::icon('check') ?>Guardar borrador</button>
     <button class="btn btn--primary" type="submit" formaction="/config/rules/publish"<?= $locked ? ' disabled title="Confirma tu identidad para publicar"' : '' ?> data-confirm="¿Publicar la versión <?= $e($nextVer) ?>? Se aplicará a los leads nuevos y a los que cambien; los existentes solo con «Recalcular». Quedará en el registro de actividad."><span class="btn__t">Publicar v<?= $e($nextVer) ?></span><span class="btn__cell"><?= Ui::icon('check') ?></span></button>
   </footer>

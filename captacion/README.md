@@ -1,4 +1,4 @@
-# NorthStar Captación (mini-CRM) — fases Q1, Q2a, Q2b, Q3, Q4a, Q4b y Q5a
+# NorthStar Captación (mini-CRM) — fases Q1, Q2a, Q2b, Q3, Q4a, Q4b, Q5a y Q5b
 
 Aplicación PHP **aparte del sitio** (el sitio sigue sin base de datos) que capta, califica y da seguimiento a owner-operators, carriers pequeños y company drivers. La opera una sola persona (Carlos, ClikRank). Documento maestro: `sistema-captacion-choferes-northstar.md` v2.0.
 
@@ -8,7 +8,8 @@ Aplicación PHP **aparte del sitio** (el sitio sigue sin base de datos) que capt
 **Q3 (entrega, reportes y correo, §18):** entrega de leads a NorthStar (correo y webhook firmado, confirmación sin login), rol de solo lectura para NorthStar, reportes, informes automáticos y plantillas y secuencias de correo.
 **Q4a (captación saliente, §19):** prospectos FMCSA (llamadas en frío manuales), referidos y vacantes publicadas en el sitio.
 **Q4b (canales externos, §20):** webhooks de Meta Lead Ads, Cal.com, Twilio y n8n, API interna para n8n, WhatsApp entrante, reactivación A11 y paquete de integración (`docs/`).
-**Q5a (base de la experiencia, §21):** tema claro/oscuro/automático por usuario, vistazo rápido de un lead, vistas guardadas, tarjetas nuevas del tablero, barra lateral plegable con vistas y bandeja, paleta de comandos, atajos de teclado y «Deshacer». El editor de reglas con simulación (Q5b) y las vistas de tabla, calendario y cronología (Q5c) no están.
+**Q5a (base de la experiencia, §21):** tema claro/oscuro/automático por usuario, vistazo rápido de un lead, vistas guardadas, tarjetas nuevas del tablero, barra lateral plegable con vistas y bandeja, paleta de comandos, atajos de teclado y «Deshacer». Las vistas de tabla, calendario y cronología (Q5c) no están.
+**Q5b (editor de reglas, §22):** reglas CUANDO / ENTONCES / EXCEPTO sobre la puntuación del documento, alertas y tareas, con panel lateral, vista previa de impacto, simulación sin escritura, versiones con historial, diferencias y reversión.
 **Qué NO incluye todavía:** parser de job boards y «Send me my results» (`docs/job-boards.md`); envío saliente de SMS (A2P 10DLC pendiente).
 
 Sin dependencias nuevas: PHP 8.2+ (el servidor tiene 8.3), PDO MySQL, curl, sodium, openssl, mbstring. PHPMailer (el del sitio, `../vendor/`) solo si hay SMTP; el CRM funciona sin él.
@@ -65,6 +66,7 @@ MySQL 8 y MariaDB 10.11 (`utf8mb4`, `utf8mb4_unicode_ci`, InnoDB, borrados lógi
 | `004_panel.sql` | Q2a: tablas `lead_notes` (notas con borrado lógico) y `notification_reads` (avisos de la campana leídos, por usuario); `messages.duration_sec/user_id` (llamadas manuales); `jobs.status` admite `cancelled` (A3 anulada al contactar); `tasks.created_by`; índices `leads(deleted_at,created_at)`, `leads(temperature,first_contact_at,deleted_at)` y `leads(profile,created_at)`. |
 
 | `011_ux_prefs_views.sql` | Q5a: `user_prefs` (tema, barra lateral, densidad, columnas de la lista y leads recientes de la paleta, una fila por usuario y clave) y `saved_views` (vistas guardadas por usuario: filtros en JSON, orden, pipeline, fijada, borrado lógico). `CREATE TABLE IF NOT EXISTS`, idempotente; probada desde cero y sobre la base de Q2b. |
+| `012_rules.sql` | Q5b: `rule_sets` (conjuntos por tipo: puntuación, alertas, tareas y etiquetas), `rule_versions` (versiones con JSON validado; UNA publicada y UN borrador por conjunto garantizados por `pub_slot` y `draft_slot`), `rule_applications` (qué regla influyó en cada lead, con `dedupe_key` único para alertas, tareas y etiquetas), `rule_simulations` y `rule_simulation_rows` (resultado de las simulaciones). `CREATE TABLE IF NOT EXISTS`, idempotente; probada desde cero y sobre la base de Q5a con datos. En el servidor: `php captacion/bin/migrate.php`. |
 
 Columnas añadidas a `leads` respecto al documento (necesarias para esta fase): `site_lead_id` (UNIQUE, id `ld_…` del sitio: idempotencia), `phone_raw`, `authority_status`, `endorsements`, `contact_pref`, `best_time`, `job_slug`, `disqualified_reason`, `lost_at`, `attempt`, `updated_at`. `jobs` añade `dedupe_key` (UNIQUE), `started_at`, `finished_at`.
 
@@ -681,3 +683,86 @@ JS sin comprimir (gzip): `panel.js` 11,9 KB (3,7), `ux.js` 23,4 KB (7,8; todas l
 ### Pruebas (Q5a)
 
 `php captacion/tests/run.php`: nuevo `30_ux_q5a` (preferencias y su aislamiento, tema sin parpadeo y por usuario, vistas guardadas con aislamiento entre usuarios y contadores en vivo, filtros nuevos, vistazo con autorización y datos correctos, acciones rápidas, alta manual por el motor, «Deshacer» de cada acción con caducidad, manipulación y otro usuario, paleta por rol, bandeja leído / no leído, tarjetas del tablero, y la prueba negativa del lector en cada endpoint nuevo). `01_migrations` prueba la 011 sobre una base de Q2b; `12_kanban`, `17_pulido` y `19_viewer` se ajustaron a las pestañas, las hojas por pantalla y las rutas nuevas. No cubierto: el comportamiento del navegador (arrastre, foco, teclado), que se revisó con Chromium a 1440, 1024, 834 y 390 px en claro y oscuro (capturas fuera del repo); Firefox y Safari siguen sin probarse.
+
+---
+
+## 22. Editor de reglas (Q5b): CUANDO / ENTONCES / EXCEPTO con vista previa, simulación y versiones
+
+Migración nueva: **`012_rules.sql`** (§2); en el servidor basta `php captacion/bin/migrate.php` tras el deploy. Sin variables nuevas, sin crons nuevos (la simulación grande y el recálculo corren en la cola que ya existe), sin dependencias. De la referencia de Carlos (un editor de políticas con panel lateral, estado, bloques «cuando / entonces / excepto», vista previa de impacto con muestras, historial y «Guardar borrador» / «Publicar») se tomaron componentes y manera de trabajar, nunca marca, textos ni colores.
+
+**Qué es.** Una capa de reglas legibles que AJUSTA la puntuación del documento (§4) o dispara acciones. La puntuación base no se toca: `Scoring::score()` sigue siendo la del documento y las reglas publicadas se aplican DESPUÉS (`Services\RuleRunner::score()`). **No es un lenguaje**: condiciones, operadores y acciones salen de catálogos cerrados y validados en el servidor (`Services\Rules`); no hay `eval` ni expresiones libres.
+
+### Catálogo
+
+| Condiciones (CUANDO / EXCEPTO) | Tipo y operadores |
+|---|---|
+| Perfil · Estado de EE. UU. · Fuente · Idioma · Etapa · Temperatura | lista cerrada: es, no es, está en, no está en, tiene dato, está vacío |
+| Equipo · Banderas de FMCSA · Consentimiento vigente (llamada, SMS, correo) | varios valores: incluye alguno de, incluye todos, no incluye ninguno de, tiene alguno, no tiene ninguno |
+| Años de experiencia · Camiones · Antigüedad de la autoridad (meses) · Horas desde la llegada · Puntuación actual | número: es, no es, mayor que, al menos, menor que, como máximo, entre, tiene dato, está vacío |
+| Campaña (utm) · Página de llegada | texto: es, no es, está en, contiene, no contiene, tiene dato, está vacío |
+| Tiene USDOT | sí / no |
+
+Un bloque combina condiciones con **Y** u **O** y admite **un nivel de grupos** (un grupo tiene su propio Y/O). EXCEPTO es otro bloque igual: si coincide, la regla no actúa. Los datos ausentes hacen falsa toda comparación salvo las negaciones (no es, no está en, no contiene, vacío).
+
+| Acciones (ENTONCES) | Conjuntos donde se permite |
+|---|---|
+| Sumar o restar puntos (−30 a 30, con tope opcional: al sumar no pasa de ese valor, al restar no baja de él) · Fijar temperatura mínima (Tibio o Caliente) | Puntuación |
+| Avisar por Telegram (urgente o normal, texto con variables) | Alertas |
+| Crear una tarea (título con variables, vence en 1 a 720 h, prioridad) · Poner una etiqueta · Enviar a la cola de revisión | Tareas y etiquetas |
+
+Variables permitidas en textos de alertas y tareas (lista blanca, cualquier otra se rechaza): `{nombre} {perfil} {estado} {equipo} {camiones} {anos} {puntuacion} {temperatura} {fuente} {etapa}`. Nunca teléfono ni correo. Límites: 12 conjuntos, 40 reglas por conjunto, 10 condiciones o grupos por bloque, 8 por grupo, 4 acciones por regla, 30 valores por lista, 60 KB de JSON.
+
+### Evaluación (motor puro, `Services\RuleEngine`)
+
+Sin base de datos, red ni hora oculta (el reloj y los datos del lead llegan resueltos): por eso es determinista y sirve igual para el motor real, la vista previa y la simulación. Orden: conjuntos de puntuación, luego alertas, luego tareas y etiquetas (estos ven la puntuación y la temperatura finales); dentro de un conjunto, de arriba abajo, una sola pasada (**no hay ciclos posibles**: una regla nunca activa a otra y una condición sobre la puntuación solo ve lo que sumaron las reglas anteriores). «Detener al coincidir» corta el resto de ESE conjunto. Topes: cada regla ±30, el ajuste TOTAL de todas las reglas ±40 y la puntuación final 0 a 100. Un lead descartado (CDL no domiciliada, sin inglés) no cambia de puntuación ni de temperatura por reglas. La temperatura mínima manda aunque los puntos bajen.
+
+### Equivalencia sin reglas (cómo se garantiza)
+
+1. `RuleRunner::score()` devuelve **el mismo arreglo** que `Scoring::score()` si el interruptor general está apagado (`rules.enabled`), no hay conjuntos publicados o ninguna regla coincide: no añade ni una clave al desglose.
+2. Prueba con 400 leads aleatorios (igualdad estricta de arreglos) y con los 120 leads de `bin/seed-demo.php`: recalcular el seed sin reglas deja exactamente lo que dan `Scoring::score` y `Flags::derive` (puntuación, temperatura, desglose, banderas y motivo de descarte), con un evento `scored` solo por cada lead que ya cambiaba. Igual con una regla publicada que no coincide con nadie, con el interruptor apagado y con las plantillas publicadas pero desactivadas.
+3. **Restablecer**: «Restablecer a la puntuación del documento» (retira todo lo publicado, queda archivado) y el interruptor «Apagar las reglas».
+4. Un fallo de las reglas nunca bloquea la captación: `RuleRunner::score()` y `RuleEffects::persist()` atrapan cualquier excepción, la registran y siguen con la puntuación del documento (prueba con un conjunto publicado corrupto).
+
+### Integración con el motor
+
+`LeadIngest` (alta, reingreso y reapertura, recálculo) llama a `RuleRunner::score()` y a `RuleEffects::persist()`. El desglose guarda `rules` (qué regla influyó y su efecto), `rules_adjust` y `score_base`; la ficha y el vistazo muestran «Reglas que influyeron». Etiquetas y cola de revisión son banderas del lead (`tag:nombre`, `review_queue`; «Por revisar» es una vista del sistema, y `?fl=tag:nombre` filtra la bandeja) y se recalculan solas: si la regla se retira, la bandera se quita. Alertas, tareas y etiquetas se registran **una vez por regla, lead e intento** (`rule_applications.dedupe_key` único): republicar o recalcular no los repite. La alerta de una regla va por la cola (`rule_alert`): las normales esperan al horario de silencio, las urgentes no, hay un tope de 20 por hora (`rules.alert_cap`; la que excede se omite con el evento «Alerta de regla omitida»), y si la regla se retira o se apaga después de encolarse el job no avisa. El texto sale escapado y sin teléfono ni correo. Las importaciones silenciosas y el recálculo masivo ponen banderas y registran puntos, pero **no crean tareas ni alertas** en masa.
+
+### Versiones
+
+Cada conjunto tiene UN borrador y UNA versión publicada como máximo (lo garantizan `draft_slot` y `pub_slot` con índices UNIQUE). «Guardar borrador» crea o actualiza el borrador; «Publicar» archiva la anterior y activa el borrador en una sola transacción (probado con un fallo forzado a mitad: nada cambia); «Revertir» copia una versión archivada como versión NUEVA publicada (la historia no se borra); «Retirar» deja el conjunto sin versión publicada. El historial muestra autor, fecha, nota y la diferencia legible entre versiones (reglas añadidas, quitadas, cambiadas o movidas, con el antes y el después en español). Todo queda en `activity_log` con la diferencia (anterior / nuevo), sin secretos.
+
+### Pantallas y rutas (solo administradores)
+
+Pestaña **Reglas** de `/config`: lista de conjuntos por tipo con estado (Borrador, Publicada, Publicada con borrador, Retirada), versión y fecha; panel lateral deslizable (hoja inferior en móvil, mismo patrón del vistazo de Q5a: foco, `Esc`, `aria-modal` solo en la hoja) con nombre y descripción, bloques CUANDO / ENTONCES / EXCEPTO con selectores en español y la frase de cada regla («Cuando el perfil es Owner-operator y el estado está en TX, TN…»), reordenar con arrastre, flechas del asa o botones, duplicar, desactivar, borrar, validación en línea, vista previa e historial. Las piezas del editor (filas, reglas, acciones) las construye el servidor (`/ajax/rules/row`), así hay una sola implementación. **Sin JS** el mismo formulario funciona con botones que recargan la página (`Services\RuleForm`).
+
+| Ruta | Qué es |
+|---|---|
+| `POST /config/rules/{newset,starter,save,discard,simcsv}` | Crear conjunto, instalar ejemplos, guardar borrador (y operaciones sin JS, vista previa y simulación sin JS), descartar borrador, descargar el CSV de una simulación. CSRF; no exigen reautenticar. |
+| `POST /config/rules/{publish,revert,unpublish,delete,switch,reset,apply}` | Publicar, revertir, retirar, borrar, interruptor general, restablecer y «Aplicar a leads existentes» (recálculo por la cola con recuento antes y después). CSRF + contraseña y 2FA recientes. |
+| `POST /ajax/rules/{panel,row,preview,simulate,simstatus}` | JSON con `X-CSRF-Token`, rol admin y límite de uso (vista previa 90/min, simulación 8/hora). El lector recibe 403 y el anónimo 401. |
+
+Paleta (`Ctrl/⌘ K`): «Ir a Reglas», «Nueva regla» y «Simular reglas», solo para administradores (el catálogo se arma en el servidor por rol). Plantillas: «Empezar con ejemplos» crea 3 conjuntos y 5 reglas de ejemplo como BORRADOR, todas desactivadas y marcadas «ejemplo»; sus puntos y listas son ilustrativos y provisionales, no cifras del negocio.
+
+### Vista previa y simulación
+
+**Vista previa** (mientras se edita, hasta 1.500 leads y 3 s; si no alcanza, lo dice): cuántos leads cambiarían de puntuación o temperatura, cuántos pasarían a o dejarían de ser calientes, en cuántos actúa, alertas, tareas y etiquetas que se habrían creado, distribución por temperatura antes y después (SVG) y hasta 10 muestras con antes, después y la regla que actuó. «Antes» es lo que dan hoy las reglas publicadas; «después» lo mismo con el borrador en su lugar. **Simulación**: últimos N leads (hasta 20.000), últimos N días o rango de fechas (máximo 400 días); hasta 400 leads corre en el momento y más por la cola en lotes de 250 (`rule_simulate`) con barra de avance; queda asociada al borrador; descarga CSV con código corto y datos de segmentación (sin nombres, teléfonos ni correos), protección contra fórmulas y registro `rules_sim_export`. **No escribe nada del negocio**: ni leads, ni eventos, ni tareas, ni consentimientos, ni mensajes, ni alertas (prueba con `CHECKSUM TABLE` antes y después, inline y por la cola); solo escribe en `rule_simulations` y `rule_simulation_rows`.
+
+### Rendimiento (medido en local, MariaDB 10.11, 5.000 leads sintéticos)
+
+Vista previa de 1.500 leads: 0,07 s; simulación de 5.000 leads: 0,41 s en 21 lotes (≈ 19 ms por lote, 34 MB de pico); CSV de 2.890 filas: 0,03 s. `EXPLAIN`: los lotes usan la clave primaria; «por días» `idx_leads_created`; el recuento por rango un índice cubriente; los conjuntos publicados `uq_rule_versions_pub` (`eq_ref`). El único `filesort` es el del id mínimo de «últimos N» (recorre N filas del índice).
+
+### CSS y JS
+
+Primera pantalla de la pestaña (fonts 2,7 + panel 27,0 + config 6,1 + `cfg-reglas.css` 4,6 KB) = 40,4 KB sin comprimir, por debajo de los 45 KB; `rules.css` (14,5 KB) se pide al abrir el panel y va enlazada en la propia página solo con `?set=ID`. JS: `rules.js` 21,4 KB (solo en esa pestaña; sin librerías, con nonce). Todo son variables de `panel.css`: sin un solo color fijo, ambos temas, `prefers-reduced-motion`, sin scroll horizontal de 360 a 1920 px.
+
+### Pruebas
+
+`php captacion/tests/run.php`: nuevos `31_rules_engine` (validación de cada condición, operador y acción, frases, evaluación con tabla de casos, grupos Y/O, excepciones, orden, «detener», topes, equivalencia sobre 400 leads y sobre el seed demo), `32_rules_apply` (versiones, atomicidad, diferencias, revertir, aplicación en el motor con reloj simulado, alertas con silencio, deduplicación y tope, tareas, etiquetas, cola de revisión, recálculo por la cola, plantillas, robustez), `33_rules_sim` (vista previa y simulación sin escritura, por la cola, CSV) y `34_rules_panel` (HTTP: autorización por rol en CADA ruta nueva, CSRF, reautenticación, formularios sin JS, piezas del servidor, escapado, límites, auditoría, paleta, ficha, vistazo y «Por revisar»); `01_migrations` prueba la 012 sobre la base de Q5a con datos y sus invariantes; `19_viewer` pide también cada ruta nueva como lector. No cubierto: el comportamiento del navegador (arrastre, foco, teclado), que se revisó con Chromium a 1440, 1024, 834 y 390 px en claro y oscuro; Firefox y Safari siguen sin probarse.
+
+### Límites conocidos
+
+- Las condiciones se evalúan cuando el lead llega, cambia o se recalcula: una condición de «horas desde la llegada» no dispara sola con el paso del tiempo (no hay un cron que reevalúe).
+- Las alertas y tareas de reglas no se crean al recalcular en masa ni en importaciones (decisión deliberada).
+- «Aplicar a leads existentes» recalcula todos los leads (como el recálculo de Puntuación); no hay recálculo por conjunto.
+- Una regla duplicada o nueva tiene un id nuevo: si se quiere que una regla vuelva a disparar su alerta o tarea para leads que ya la recibieron, hay que crearla como regla nueva (la deduplicación es por regla, lead e intento).
+- La temperatura mínima puede dejar una temperatura mayor que la que daría la puntuación (así se pidió); el desglose lo dice.

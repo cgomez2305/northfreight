@@ -70,6 +70,15 @@ final class RuleEffects
         if ($fx === null) {
             return;
         }
+        try {
+            self::persistEffects($leadId, $lead, $scored, $prevBreakdown, $attempt, $fire, $fx);
+        } catch (\Throwable $t) {
+            Storage::error('rules effects failed', '#' . $leadId . ' ' . get_class($t) . ': ' . $t->getMessage());   // los efectos de las reglas nunca rompen el alta ni el recalculo de un lead
+        }
+    }
+
+    private static function persistEffects(int $leadId, array $lead, array $scored, ?array $prevBreakdown, int $attempt, bool $fire, array $fx): void
+    {
         // Puntos y temperatura minima: un registro por cada cambio de lo que las reglas de puntuacion hicieron.
         if (self::signature($scored['breakdown']) !== self::signature((array) $prevBreakdown)) {
             foreach ($fx['applied'] as $a) {
