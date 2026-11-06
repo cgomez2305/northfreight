@@ -223,7 +223,7 @@ final class Rules
     private static function rule(array $r, string $kind, string $p, array &$err, array &$ids): array
     {
         $id = strtolower(self::str($r['id'] ?? '', 24));
-        if (preg_match('/^[a-z0-9_]{1,24}$/', $id) !== 1 || isset($ids[$id])) {
+        if (preg_match('/^[a-z0-9_]{1,24}$/D', $id) !== 1 || isset($ids[$id])) {
             $id = self::newId($ids);   // un id repetido (regla duplicada) o ajeno recibe uno nuevo: el id solo sirve para comparar versiones
         }
         $ids[$id] = true;

@@ -14,7 +14,7 @@ namespace Captacion\Services;
 
 final class RuleForm
 {
-    private const KEY = '/^[A-Za-z0-9_]{1,24}$/';
+    private const KEY = '/^[A-Za-z0-9_]{1,24}$/D';
 
     /** Reglas tal cual llegaron, con claves saneadas, en el orden recibido y con topes de tamano (el limite real lo pone Rules::normalize). */
     public static function raw(mixed $in): array
@@ -74,7 +74,7 @@ final class RuleForm
     /** ¿Prefijo de nombre de campo valido? (lo usa el endpoint que devuelve filas sueltas: nunca se imprime algo que no cumpla). */
     public static function validPrefix(string $np): bool
     {
-        return preg_match('/^rules\[[A-Za-z0-9_]{1,24}\](\[(when|except|then|items|[A-Za-z0-9_]{1,24})\]){0,4}$/', $np) === 1;
+        return preg_match('/^rules\[[A-Za-z0-9_]{1,24}\](\[(when|except|then|items|[A-Za-z0-9_]{1,24})\]){0,4}$/D', $np) === 1;
     }
 
     /** «rules[r1][when][items][0]» -> «rules.r1.when.items.0» */

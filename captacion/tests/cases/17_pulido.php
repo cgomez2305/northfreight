@@ -17,7 +17,7 @@ return static function (array $ctx): void {
         '/config' => ['config', 'cfg-puntuacion'], '/config?tab=alertas' => ['config', 'cfg-alertas'], '/config?tab=costos' => ['config', 'cfg-costos'],
         '/config?tab=integraciones' => ['config', 'cfg-integraciones'], '/config?tab=horario' => ['config', 'cfg-horario'], '/config?tab=copias' => ['config', 'cfg-copias'],
         // Q3
-        '/config?tab=entrega' => ['config', 'cfg-entrega'], '/config?tab=correo' => ['config', 'cfg-correo'], '/config?tab=usuarios' => ['config', 'cfg-usuarios'],
+        '/config?tab=reglas' => ['config', 'cfg-reglas'], '/config?tab=entrega' => ['config', 'cfg-entrega'], '/config?tab=correo' => ['config', 'cfg-correo'], '/config?tab=usuarios' => ['config', 'cfg-usuarios'],
         // Q4a
         '/prospectos' => ['prospectos'], '/referidos' => ['referidos'], '/vacantes' => ['vacantes'], '/vacantes/new' => ['vacantes'], '/config?tab=prospectos' => ['config', 'cfg-prospectos'],
         '/reportes' => ['charts', 'reportes'], '/resultados' => ['charts', 'reportes'], '/informes' => ['reportes'], '/comunicaciones' => ['comms'], '/comunicaciones/inscripciones' => ['comms'], '/comunicaciones/envios' => ['comms'],
