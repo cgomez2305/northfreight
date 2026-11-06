@@ -49,7 +49,7 @@ final class PipelineController extends Responder
         }
         $uid = (int) $user['id'];
         self::page('pipeline', $user, 'pipeline', [['Leads', '/leads'], ['Tablero', null]], [
-            'title' => 'Pipeline', 'css' => ['kanban', 'peek'], 'js' => ['kanban', 'peek', 'views'], 'pl' => $pl, 'activeView' => SavedViews::active($uid, $_GET, $f), 'sysViews' => SavedViews::system(), 'myViews' => SavedViews::mine($uid),
+            'title' => 'Pipeline', 'css' => ['kanban', 'views'], 'js' => ['kanban', 'peek', 'views'], 'pl' => $pl, 'activeView' => SavedViews::active($uid, $_GET, $f), 'sysViews' => SavedViews::system(), 'myViews' => SavedViews::mine($uid),
             'density' => Prefs::get($uid, 'density'), 'peekId' => (int) ($_GET['peek'] ?? 0), 'f' => $f, 'stages' => $stages, 'counts' => $counts, 'columns' => $columns,
             'totals' => Kanban::pipelineTotals(), 'canWrite' => $canWrite, 'facets' => LeadQuery::facets(),
             'render' => static fn(array $cards): string => self::renderCards($cards, $canWrite),

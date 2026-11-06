@@ -17,6 +17,13 @@
  function el(tag, cls, text) { var e = D.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
  function icon(name) { var s = D.createElementNS('http://www.w3.org/2000/svg', 'svg'); s.setAttribute('class', 'ic'); s.setAttribute('aria-hidden', 'true'); var u = D.createElementNS('http://www.w3.org/2000/svg', 'use'); u.setAttribute('href', '#i-' + name); s.appendChild(u); return s; }
  NS.el = el; NS.icon = icon;
+ /* Hojas diferidas (ux.css, peek.css): se piden al arrancar, fuera del CSS de la primera pantalla; NS.css(nombre, version) devuelve una promesa. */
+ var cssP = {};
+ NS.css = function (name, v) {
+  if (cssP[name]) return cssP[name];
+  return (cssP[name] = new Promise(function (res) { var l = D.createElement('link'); l.rel = 'stylesheet'; l.href = '/assets/' + name + '.css' + (v ? '?v=' + v : ''); l.onload = l.onerror = function () { res(); }; D.head.appendChild(l); }));
+ };
+ var uxReady = NS.css('ux', D.currentScript && D.currentScript.getAttribute('data-css-v'));
  function norm(s) { return String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, ''); }
 
  /* ---------- Avisos (toast) con «Deshacer» de 6 s ---------- */
@@ -248,7 +255,7 @@
  }
  NS.palette = function (q) {
   if (!sd || !sd.showModal || sd.open) return; D.body.classList.remove('nav-open'); $$('[data-dd] [aria-expanded=true]').forEach(function (b) { b.click(); });
-  leadRows = []; sd.showModal(); sq.value = q || ''; sq.focus(); render(); fetchLeads(''); if (sq.value.trim().length >= 2) fetchLeads(sq.value.trim());
+  uxReady.then(function () { if (sd.open) return; leadRows = []; sd.showModal(); sq.value = q || ''; sq.focus(); render(); fetchLeads(''); if (sq.value.trim().length >= 2) fetchLeads(sq.value.trim()); });
  };
  $$('[data-search]').forEach(function (b) { b.addEventListener('click', function () { NS.palette(''); }); });
  if (sq) {
@@ -264,7 +271,7 @@
  }
 
  /* ---------- Atajos ---------- */
- function openKeys() { if (kd && kd.showModal && !kd.open) kd.showModal(); }
+ function openKeys() { if (kd && kd.showModal && !kd.open) uxReady.then(function () { if (!kd.open) kd.showModal(); }); }
  $$('[data-keys]').forEach(function (b) { b.addEventListener('click', function () { $$('[data-dd] [aria-expanded=true]').forEach(function (x) { x.click(); }); openKeys(); }); });
  var gPending = 0;
  D.addEventListener('keydown', function (e) {

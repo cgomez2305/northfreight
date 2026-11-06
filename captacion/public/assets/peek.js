@@ -5,6 +5,9 @@
  var D = document, W = window, NS = W.NS, pk = D.querySelector('#peek');
  if (!NS || !NS.api || !pk) return;
  var $ = function (s, r) { return (r || D).querySelector(s); }, $$ = function (s, r) { return Array.prototype.slice.call((r || D).querySelectorAll(s)); };
+ var cssV = pk.getAttribute('data-css-v'), cssP = null;
+ function ready() { return cssP || (cssP = NS.css('peek', cssV)); }
+ if (W.requestIdleCallback) W.requestIdleCallback(ready); else setTimeout(ready, 1200);
  var body = $('[data-pk-body]', pk), scrim = $('[data-pk-scrim]'), cur = 0, req = 0, sel = null, origin = null;
  var sheet = function () { return W.matchMedia('(max-width:1024px)').matches; };
  var idOf = function (el) { return parseInt(el.getAttribute('data-peek'), 10); };
@@ -33,6 +36,10 @@
   });
  }
  function open(id, el) {
+  if (!cssP || !isOpen()) { var args = arguments; return ready().then(function () { return open2(id, el); }); }
+  return open2(id, el);
+ }
+ function open2(id, el) {
   if (!isOpen()) { origin = el || D.activeElement; pk.hidden = false; void pk.offsetWidth; pk.classList.add('is-open'); if (sheet()) { scrim.hidden = false; void scrim.offsetWidth; scrim.classList.add('is-open'); D.body.style.overflow = 'hidden'; } }
   pk.setAttribute('aria-modal', sheet() ? 'true' : 'false');
   var row = el || find(id); if (row) select(row);

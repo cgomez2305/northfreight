@@ -1,59 +1,4 @@
-/* NorthStar Captación · Q5a: barra de vistas, vistazo rápido (panel lateral / hoja inferior), etiquetas, barra de puntuación y avance. Solo en /leads y /pipeline. Sin estilos en línea. */
-/* Q5a: reglas que estaban en panel.css y solo usa esta pantalla */
-.mono{font-family:var(--f-mono);font-size:.88em}
-.page-head__a{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.btn--sm{min-height:36px;padding:0 14px;font-size:13.5px}
-.inp{display:flex;align-items:center;gap:8px;padding-left:12px;background:var(--surface);border:1px solid var(--field);border-radius:var(--r-in);color:var(--ink-3)}
-.inp input{border:0;box-shadow:none!important;padding-left:0;background:none}
-.ptabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;margin-bottom:-6px;scrollbar-width:none}
-.ptabs::-webkit-scrollbar{display:none}
-.ptab{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 14px;border-radius:var(--r-pill);border:1px solid var(--line-2);background:var(--surface);color:var(--ink-2);font-weight:500;white-space:nowrap;text-decoration:none!important}
-.ptab:hover{border-color:var(--ink-3)}
-.ptab.is-on{background:var(--navy-2);border-color:var(--navy-2);color:var(--on-fill)}
-.ptab__n{font:600 11.5px var(--f-mono);padding:2px 7px;border-radius:var(--r-pill);background:var(--sunk);color:var(--ink-2)}
-.ptab.is-on .ptab__n{background:var(--navy-3);color:var(--on-fill)}
-@media (max-width:760px){
-  .page-head__a,.page-head__a form{width:100%}
-  .page-head__a .btn,.page-head__a .seg{flex:1}
-  .tab.is-on{color:var(--ink);background:var(--sunk)}
-  .tab.is-on .ic{color:var(--cyan-ink)}
-}
-.vbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-.vtabs{display:inline-flex;gap:2px;padding:3px;background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-pill)}
-.vtab{display:inline-flex;align-items:center;gap:7px;min-height:38px;padding:0 16px;border-radius:var(--r-pill);color:var(--ink-2);font-weight:500;text-decoration:none!important}
-.vtab:hover{color:var(--ink)}.vtab.is-on{background:var(--navy-2);color:var(--on-fill)}
-.vbar__r{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.vbtn{max-width:240px}.vbtn__t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.vdirty{width:8px;height:8px;border-radius:50%;background:var(--warn-dot);flex:none}
-.vmenu{width:340px;max-width:calc(100vw - 24px);padding:6px 0 8px;right:auto;left:0;max-height:70vh;overflow:auto}
-.vmenu--c{width:240px;padding:6px 10px 10px}
-.vmenu__h{padding:10px 14px 6px}.vmenu--c .vmenu__h{padding:10px 4px 6px}
-.vmenu__e{padding:2px 14px 8px;color:var(--ink-3);font-size:13.5px}
-.vlist{display:flex;flex-direction:column;padding:0 6px}
-.vrow{display:flex;align-items:center;gap:2px}
-.vitem{flex:1;min-width:0;display:flex;align-items:center;gap:10px;min-height:40px;padding:0 10px;border-radius:10px;color:var(--ink);text-decoration:none!important}
-.vitem:hover{background:var(--sunk)}.vitem.is-on{background:var(--cyan-tint);color:var(--cyan-ink);font-weight:600}
-.vitem .ic{color:var(--ink-3)}.vitem span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.vrow .icon-btn{border-color:transparent;background:none}.vrow .icon-btn.is-pin{color:var(--cyan-ink)}
-.check--c{min-height:36px;align-items:center}
-.vdens .seg__i{padding:0 10px}
-.tbl tr[data-peek]{cursor:pointer}
-.tbl tr.is-cur td,.tbl tr.is-open td{background:var(--cyan-tint)}
-.c-tk{white-space:nowrap}
-[data-hide~=prof] .k-prof,[data-hide~=st] .k-st,[data-hide~=eq] .k-eq,[data-hide~=pts] .k-pts,[data-hide~=temp] .k-temp,[data-hide~=stage] .k-stage,[data-hide~=src] .k-src,[data-hide~=when] .k-when,[data-hide~=task] .k-task{display:none}
-html[data-density=compact] .tbl--leads td,html[data-density=compact] .tbl--leads th{padding-top:6px;padding-bottom:6px}
-html[data-density=compact] .tbl--leads .av{width:28px;height:28px;font-size:11px}
-/* etiquetas, puntuación y avance (también en el tablero) */
-.tag{display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 8px;border-radius:var(--r-pill);font:500 11.5px var(--f-sans);background:var(--sunk);color:var(--ink-2);border:1px solid var(--line);white-space:nowrap}
-.tag i{width:6px;height:6px;border-radius:50%;background:var(--ink-3)}.tag .ic{width:12px;height:12px}
-.tag--p-owner_operator i{background:var(--st-qualified)}.tag--p-small_carrier i{background:var(--st-contacted)}.tag--p-company_driver i{background:var(--hot-dot)}
-.tag--e-0 i{background:var(--seg-0)}.tag--e-1 i{background:var(--st-closed)}.tag--e-2 i{background:var(--warn-dot)}.tag--e-3 i{background:var(--cold-dot)}.tag--e-4 i{background:var(--st-lost)}
-.tag--bad{background:var(--bad-bg);color:var(--bad);border-color:transparent}
-.sbar{display:inline-flex;align-items:flex-end;gap:2px;height:14px}
-.sbar i{width:4px;border-radius:1px;background:var(--line-2)}.sbar i:nth-child(1){height:5px}.sbar i:nth-child(2){height:8px}.sbar i:nth-child(3){height:11px}.sbar i:nth-child(4){height:14px}
-.sbar--hot .on{background:var(--hot-dot)}.sbar--warm .on{background:var(--warm-dot)}.sbar--cold .on{background:var(--cold-dot)}.sbar--dq .on{background:var(--dq-dot)}
-.prog{display:inline-flex;gap:2px;flex:1;max-width:84px}.prog b{height:3px;flex:1;border-radius:2px;background:var(--line-2)}.prog b.on{background:var(--cyan)}
-.dot--ok{background:var(--ok-dot)}.dot--info{background:var(--cyan)}
+/* NorthStar Captación · Q5a: vistazo rápido de un lead (panel lateral en escritorio, hoja inferior en móvil). Se carga desde peek.js (diferida). Sin estilos en línea. */
 /* vistazo rápido */
 .pkscrim{position:fixed;inset:0;z-index:59;background:var(--scrim);opacity:0;transition:opacity .2s}.pkscrim.is-open{opacity:1}
 .peek{position:fixed;z-index:60;top:64px;right:0;bottom:0;width:min(460px,100vw);display:flex;flex-direction:column;background:var(--surface);border-left:1px solid var(--line);box-shadow:var(--shadow-pop);transform:translateX(100%);transition:transform .22s ease-out;outline:0}
@@ -92,7 +37,6 @@ html[data-density=compact] .tbl--leads .av{width:28px;height:28px;font-size:11px
   .peek.is-open{transform:none}
   .peek__bar::before{content:"";position:absolute;left:50%;top:6px;width:38px;height:4px;margin-left:-19px;border-radius:2px;background:var(--line-2)}.peek__bar{position:relative;padding-top:18px}
   .peek__nav .ic--up,.peek__nav .ic--down{transform:none}
-  .vbar__r{width:100%}.vmenu{left:0}
 }
-@media (max-width:760px){.pk__dl{grid-template-columns:1fr}.vbtn{max-width:170px}}
+@media (max-width:760px){.pk__dl{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){.peek,.pkscrim{transition:none}.pk__sk i{animation:none}}

@@ -226,7 +226,7 @@ $ni = static function (string $href, string $icon, string $label, string $key, a
   </form>
 </dialog>
 <script nonce="<?= $e($nonce) ?>" src="/assets/panel.js?v=<?= $e($assetV('panel.js')) ?>" defer data-csrf="<?= $e($csrf) ?>"></script>
-<?php if (empty($isViewer)): ?><script nonce="<?= $e($nonce) ?>" src="/assets/ux.js?v=<?= $e($assetV('ux.js')) ?>" defer data-csrf="<?= $e($csrf) ?>"></script><?php endif; ?>
+<?php if (empty($isViewer)): ?><script nonce="<?= $e($nonce) ?>" src="/assets/ux.js?v=<?= $e($assetV('ux.js')) ?>" defer data-csrf="<?= $e($csrf) ?>" data-css-v="<?= $e($assetV('ux.css')) ?>"></script><?php endif; ?>
 <?php foreach (($js ?? []) as $script): if (preg_match('/^[a-z0-9-]{2,24}$/', (string) $script) !== 1) { continue; } ?>
 <script nonce="<?= $e($nonce) ?>" src="/assets/<?= $e($script) ?>.js?v=<?= $e($assetV($script . '.js')) ?>" defer data-csrf="<?= $e($csrf) ?>"></script>
 <?php endforeach; ?>
