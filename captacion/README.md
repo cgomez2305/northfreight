@@ -932,7 +932,7 @@ Toda la lógica, rutas, endpoints, CSP y autorización por rol; el movimiento de
 ### Medidas
 
 - Fuentes: 72.356 → 52.528 B (−27 %).
-- CSS de la primera pantalla (sin fuentes), antes → después: `/` 41.983 → 42.240 B · `/leads` 35.435 → 35.423 · `/pipeline` 39.973 → 39.770 · `/leads/{id}` 39.651 → 39.856 · `/tabla` 38.576 → 38.476 · `/calendario` 40.199 → 40.451 · `/config` 36.141 → 36.391 (todas ≤ 45.000 con `fonts.css`). `/reportes` carga ahora también `viz.css` (el gráfico con etiquetas finales la necesitaba y sus etiquetas se salían de la tarjeta).
+- CSS de la primera pantalla (sin fuentes), antes → después: `/` 41.983 → 42.207 B · `/leads` 35.435 → 35.423 · `/pipeline` 39.973 → 39.855 · `/leads/{id}` 39.651 → 39.921 · `/tabla` 38.576 → 38.476 · `/calendario` 40.199 → 40.451 · `/config` 36.141 → 36.391 (todas ≤ 45.000 con `fonts.css`). `/reportes` carga ahora también `viz.css` (el gráfico con etiquetas finales la necesitaba y sus etiquetas se salían de la tarjeta).
 - Accesibilidad: axe-core (reglas WCAG 2 A y AA y 2.1 AA) sin violaciones en `/`, `/leads`, `/pipeline`, `/leads/{id}` y `/login`, claro y oscuro, a 1440 y 390 px. Contraste medido de los pares de §15 y barrido de contraste por texto en las pantallas de administración (solo quedan controles desactivados, exentos). No se pudo correr Lighthouse (no hay binario y el panel exige sesión con 2FA).
 
 ### Pruebas
