@@ -35,6 +35,13 @@ final class Sequences
                 ['day' => 14, 'tkey' => 'a6_d14', 'label' => 'Día 14 · Último intento'],
             ],
         ],
+        'a11_reactivation' => [
+            'name' => 'A11 · Reactivación de leads perdidos', 'pause_on_progress' => true, 'requires_lost' => true,
+            'steps' => [
+                ['day' => 0, 'tkey' => 'a11_react_1', 'label' => 'Mensaje 1 · Reactivación'],
+                ['day' => 10, 'tkey' => 'a11_react_2', 'label' => 'Mensaje 2 · Último mensaje'],
+            ],
+        ],
         'a12_referral' => [
             'name' => 'A12 · Pedido de referidos', 'pause_on_progress' => false,
             'steps' => [['day' => 30, 'tkey' => 'a12_referral', 'label' => '30 días después de firmar']],
@@ -138,6 +145,72 @@ final class Sequences
         $id = (int) Db::pdo()->lastInsertId();
         LeadActions::event($leadId, 'sequence_enrolled', ['sequence' => $key, 'enrollment_id' => $id], $userId);
         return $id;
+    }
+
+    // --- A11: reactivacion de leads perdidos ----------------------------------------------------------------------------------------
+
+    public const REACT_KEY = 'a11_reactivation';
+
+    /** Interruptor propio (apagado por defecto) y dias minimos desde que se perdio. */
+    public static function reactivationConfig(): array
+    {
+        $c = Settings::get('reactivation', []);
+        $c = is_array($c) ? $c : [];
+        $d = (int) ($c['min_days'] ?? 60);
+        return ['enabled' => (bool) ($c['enabled'] ?? false), 'min_days' => $d >= 30 && $d <= 365 ? $d : 60];
+    }
+
+    /**
+     * Reparte los leads perdidos hace N dias o mas segun puedan o no reactivarse. Solo pipeline A (los textos hablan de dispatch).
+     * Motivos de exclusion (en este orden): enrolled, signed, disqualified, rejected, dnc (telefono en la lista de no llamar), stop (STOP o baja), no_email, no_consent.
+     * @return array{eligible:list<int>,excluded:array<string,int>,total:int}
+     */
+    public static function reactivationScan(int $limit = 2000): array
+    {
+        $cfg = self::reactivationConfig();
+        $out = ['eligible' => [], 'excluded' => array_fill_keys(['enrolled', 'signed', 'disqualified', 'rejected', 'dnc', 'stop', 'no_email', 'no_consent'], 0), 'total' => 0];
+        $rows = Db::all(
+            "SELECT l.* FROM leads l WHERE l.deleted_at IS NULL AND l.stage = 'lost' AND l.pipeline = 'A' AND l.lost_at IS NOT NULL AND l.lost_at <= ? ORDER BY l.lost_at ASC LIMIT " . (int) $limit,
+            [Clock::shift(-$cfg['min_days'] * 86400)]
+        );
+        $enrolled = array_flip(array_map('intval', array_column(Db::all('SELECT lead_id FROM sequence_enrollments WHERE sequence_key = ?', [self::REACT_KEY]), 'lead_id')));
+        $dnc = array_flip(array_column(Db::all('SELECT phone_e164 FROM dnc_numbers'), 'phone_e164'));
+        foreach ($rows as $r) {
+            $l = Lead::hydrate($r);
+            $out['total']++;
+            $why = match (true) {
+                isset($enrolled[(int) $l['id']]) => 'enrolled',
+                Dedupe::isSigned($l) => 'signed',
+                $l['temperature'] === 'disqualified' => 'disqualified',
+                $l['lost_reason'] === 'rejected' => 'rejected',
+                $l['phone_e164'] !== null && isset($dnc[$l['phone_e164']]) => 'dnc',
+                in_array('stop', $l['flags'], true) || in_array('stop_email', $l['flags'], true) => 'stop',
+                !self::eligibleEmail($l) => 'no_email',
+                !Consent::isGranted((int) $l['id'], 'email') => 'no_consent',
+                default => null,
+            };
+            if ($why === null) {
+                $out['eligible'][] = (int) $l['id'];
+            } else {
+                $out['excluded'][$why]++;
+            }
+        }
+        return $out;
+    }
+
+    /** Inscribe a los elegibles (lotes de $limit). Solo con las secuencias encendidas, la direccion fisica y el interruptor propio. @return int inscritos */
+    public static function enrollReactivation(int $limit = 25): int
+    {
+        if (!self::enabled() || !self::reactivationConfig()['enabled']) {
+            return 0;
+        }
+        $n = 0;
+        foreach (array_slice(self::reactivationScan()['eligible'], 0, $limit) as $id) {
+            if (self::enroll($id, self::REACT_KEY, Clock::time(), null) !== null) {
+                $n++;
+            }
+        }
+        return $n;
     }
 
     // --- A7: pausar, reanudar, sacar ------------------------------------------------------------------------------------------------
@@ -292,6 +365,16 @@ final class Sequences
         if (!self::enabled()) {
             self::block($e, $cfg['address'] === '' ? 'Falta la dirección física' : 'Secuencias apagadas', 3600);
             return;
+        }
+        if (!empty($def['requires_lost'])) {
+            if ($lead['stage'] !== 'lost') {
+                self::pauseForLead($leadId, 'stage', null);   // el lead se reabrió o avanzó: la reactivación ya no aplica
+                return;
+            }
+            if (!self::reactivationConfig()['enabled']) {
+                self::block($e, 'La reactivación está apagada', 3600);
+                return;
+            }
         }
         if (!self::eligibleEmail($lead)) {
             Db::update('sequence_enrollments', (int) $e['id'], ['status' => 'stopped', 'paused_reason' => 'no_email', 'next_run_at' => null]);

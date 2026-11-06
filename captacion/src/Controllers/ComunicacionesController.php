@@ -18,7 +18,7 @@ use Captacion\Services\Url;
 
 final class ComunicacionesController extends Responder
 {
-    public const TABS = ['plantillas' => 'Plantillas', 'inscripciones' => 'Inscripciones', 'envios' => 'Correos enviados'];
+    public const TABS = ['plantillas' => 'Plantillas', 'inscripciones' => 'Inscripciones', 'reactivacion' => 'Reactivación', 'envios' => 'Correos enviados'];
 
     public static function route(?string $tab, ?string $id, ?string $action): never
     {
@@ -54,6 +54,9 @@ final class ComunicacionesController extends Responder
         }
         if ($id !== null || $action !== null) {
             self::notFound();
+        }
+        if ($tab === 'reactivacion') {
+            strtoupper((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET')) === 'POST' ? self::reactivationSave($user) : self::reactivation($user);
         }
         self::sent($user);
     }
@@ -188,6 +191,47 @@ final class ComunicacionesController extends Responder
         $r = Sequences::manage($id, $action, (int) $user['id']);
         self::flash($r['ok'], $r['msg']);
         self::redirect('/comunicaciones/inscripciones');
+    }
+
+    // --- Reactivacion (A11) ----------------------------------------------------------------------------------------------------------
+
+    private static function reactivation(array $user): never
+    {
+        $scan = Sequences::reactivationScan();
+        $tpl = [];
+        foreach (Sequences::DEFS[Sequences::REACT_KEY]['steps'] as $st) {
+            foreach (['en', 'es'] as $lang) {
+                $t = Templates::byKey($st['tkey'], $lang);
+                $tpl[] = ['step' => $st, 'lang' => $lang, 'tpl' => $t, 'pending' => $t !== null ? Templates::render($t, Templates::sampleLead($lang), $lang, Url::base() . '/u/EJEMPLO')['unresolved'] : ['sin plantilla']];
+            }
+        }
+        $counts = [];
+        foreach (Db::all('SELECT status, COUNT(*) AS n FROM sequence_enrollments WHERE sequence_key = ? GROUP BY status', [Sequences::REACT_KEY]) as $r) {
+            $counts[$r['status']] = (int) $r['n'];
+        }
+        $sent = (int) Db::value("SELECT COUNT(*) FROM messages WHERE sequence_key = ? AND direction = 'out' AND status IN ('sent','logged')", [Sequences::REACT_KEY]);
+        self::shell($user, 'reactivacion', ['view' => 'reactivacion', 'cfg' => Sequences::reactivationConfig(), 'scan' => $scan, 'tpls' => $tpl, 'counts' => $counts, 'sent' => $sent, 'mailOn' => Sequences::enabled(), 'fresh' => \Captacion\Services\Reauth::fresh()]);
+    }
+
+    private static function reactivationSave(array $user): never
+    {
+        $back = '/comunicaciones/reactivacion';
+        self::requirePost($back);
+        if (!\Captacion\Services\Reauth::fresh()) {
+            self::flash(false, 'Confirma tu identidad (contraseña y código) en Configuración > Correo y vuelve: encender envíos masivos lo exige.');
+            self::redirect($back);
+        }
+        $before = Sequences::reactivationConfig();
+        $days = is_numeric($_POST['min_days'] ?? null) ? (int) $_POST['min_days'] : 60;
+        if ($days < 30 || $days > 365) {
+            self::flash(false, 'Los días deben estar entre 30 y 365.');
+            self::redirect($back);
+        }
+        $after = ['enabled' => ($_POST['enabled'] ?? '') === '1', 'min_days' => $days];
+        \Captacion\Services\Settings::set('reactivation', $after);
+        ActivityLog::settingsChange((int) $user['id'], 'reactivation', $before, $after);
+        self::flash(true, $after['enabled'] ? 'Reactivación encendida. Solo se envía a quien cumple las reglas y mientras no haya texto pendiente en las plantillas.' : 'Reactivación apagada.');
+        self::redirect($back);
     }
 
     // --- Correos enviados ---------------------------------------------------------------------------------------------------------------

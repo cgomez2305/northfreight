@@ -217,6 +217,7 @@ final class LeadActions
             Db::update('leads', $leadId, ['stage' => $to, 'stage_changed_at' => Clock::now(), 'lost_reason' => null, 'lost_at' => null]);
             self::event($leadId, 'reopened_manual', ['from_reason' => $lead['lost_reason'], 'to' => $to], $userId);
             ActivityLog::record('lead_reopen', $userId, 'lead', $leadId, ['to' => $to]);
+            Sequences::pauseForLead($leadId, 'stage', $userId);   // A11: un lead reabierto ya no se reactiva
             return self::ok('Lead reabierto en «' . Catalog::stageLabel((string) $lead['pipeline'], $to) . '».');
         });
     }

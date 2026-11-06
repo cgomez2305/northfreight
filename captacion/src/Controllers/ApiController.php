@@ -11,7 +11,10 @@ declare(strict_types=1);
 
 namespace Captacion\Controllers;
 
+use Captacion\Db;
 use Captacion\Env;
+use Captacion\Services\Inbound;
+use Captacion\Services\Webhook;
 use Captacion\Services\LeadIngest;
 use Captacion\Services\RateLimiter;
 use Captacion\Services\Storage;
@@ -71,6 +74,36 @@ final class ApiController extends Responder
             $status = $r['reason'] === 'invalid' ? 422 : ($r['reason'] === 'rate_limited' ? 429 : 422);
             self::json(['ok' => false, 'error' => $r['reason'], 'fields' => $r['errors']], $status);
         }
-        self::json(['ok' => true, 'status' => $r['status'], 'lead_id' => $r['lead_id'], 'score' => $r['score'], 'temperature' => $r['temperature']], $r['status'] === 'created' ? 201 : 200);
+        $out = ['ok' => true, 'status' => $r['status'], 'lead_id' => $r['lead_id'], 'score' => $r['score'], 'temperature' => $r['temperature']];
+        // WhatsApp entrante (Q4b): el lead escribio primero. El primer mensaje abre la ventana de 24 h para responder (consents.channel = whatsapp_inbound);
+        // NO es consentimiento de marketing. Formato: "inbound": {"channel":"whatsapp","text":"…","at":"ISO 8601","message_id":"wamid…"}
+        if (is_array($data['inbound'] ?? null) && $r['lead_id'] !== null) {
+            $out['inbound_recorded'] = self::inbound((int) $r['lead_id'], $data['inbound'], $r['status'] === 'created');
+        }
+        self::json($out, $r['status'] === 'created' ? 201 : 200);
+    }
+
+    private static function inbound(int $leadId, array $in, bool $isNew): bool
+    {
+        $channel = in_array($in['channel'] ?? 'whatsapp', ['whatsapp', 'sms'], true) ? (string) ($in['channel'] ?? 'whatsapp') : '';
+        $mid = is_string($in['message_id'] ?? null) && preg_match('/^[A-Za-z0-9._=+-]{1,120}$/', $in['message_id']) === 1 ? $in['message_id'] : null;
+        if ($channel === '') {
+            return false;
+        }
+        try {
+            return (bool) Db::transaction(static function () use ($leadId, $in, $channel, $mid, $isNew): bool {
+                if ($mid !== null && Webhook::claim('lead_in', Webhook::key($channel, $mid), null, 'mensaje entrante') === null) {
+                    return true;   // el mismo mensaje ya se registro
+                }
+                Inbound::record($leadId, $channel, (string) ($in['text'] ?? ''), Inbound::when($in['at'] ?? null), $mid, 'api');
+                if (!$isNew) {
+                    Inbound::replied($leadId, $channel, (string) ($in['text'] ?? ''));
+                }
+                return true;
+            });
+        } catch (\Throwable $t) {
+            Storage::error('api/lead inbound failed', get_class($t) . ': ' . $t->getMessage());
+            return false;
+        }
     }
 }

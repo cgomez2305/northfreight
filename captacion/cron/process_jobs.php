@@ -37,6 +37,19 @@ try {
     } catch (Throwable $t) {
         Storage::error('sequences enqueue failed', get_class($t) . ': ' . $t->getMessage());
     }
+    try {
+        // A11: reparte los perdidos hace 60 dias o mas (como mucho una vez por hora; solo con el interruptor propio encendido)
+        $last = \Captacion\Services\Settings::get('cron.reactivation');
+        if (!is_array($last) || (int) \Captacion\Clock::parse((string) ($last['at'] ?? '')) < \Captacion\Clock::time() - 3600) {
+            $r = \Captacion\Services\Sequences::enrollReactivation(25);
+            \Captacion\Services\Settings::set('cron.reactivation', ['at' => \Captacion\Clock::now(), 'enrolled' => $r]);
+            if ($r > 0) {
+                fwrite(STDOUT, "reactivation: $r inscritos\n");
+            }
+        }
+    } catch (Throwable $t) {
+        Storage::error('reactivation enroll failed', get_class($t) . ': ' . $t->getMessage());
+    }
     $stats = Queue::runBatch(JobHandlers::all(), Env::int('JOBS_MAX_SECONDS', 50), 20);
     fwrite(STDOUT, 'jobs: ' . json_encode($stats) . "\n");
 } catch (Throwable $t) {
