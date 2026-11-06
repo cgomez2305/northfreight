@@ -139,7 +139,7 @@ $addHref = static fn(string $ymd): string => $q(['nueva' => $ymd]) . '#nueva';
     <?php elseif ($mode === 'semana'): ?>
       <ol class="cal__g cal__g--w">
         <?php foreach ($cal['days'] as $d): ?>
-          <li class="cal__d cal__d--w<?= $d['today'] ? ' is-today' : '' ?>" data-ymd="<?= $e($d['ymd']) ?>"<?= $d['today'] ? ' aria-current="date"' : '' ?>>
+          <li class="cal__d<?= $d['today'] ? ' is-today' : '' ?>" data-ymd="<?= $e($d['ymd']) ?>"<?= $d['today'] ? ' aria-current="date"' : '' ?>>
             <div class="cal__dh">
               <a class="cal__n cal__n--w" href="<?= $e($dayHref($d['ymd'])) ?>" data-day="<?= $e($d['ymd']) ?>" aria-label="<?= $e($d['label'] . ($d['today'] ? ', hoy' : '')) ?>"><span><?= $e($weekdays[$d['dow'] - 1]) ?></span><b><?= $e($d['day']) ?></b></a>
               <?php if ($canWrite): ?><a class="cal__add" href="<?= $e($addHref($d['ymd'])) ?>" data-cal-new="<?= $e($d['ymd']) ?>" aria-label="Nueva tarea el <?= $e($d['label']) ?>"><?= Ui::icon('plus') ?></a><?php endif; ?>
@@ -150,7 +150,7 @@ $addHref = static fn(string $ymd): string => $q(['nueva' => $ymd]) . '#nueva';
       </ol>
     <?php else: $d = $cal['days'][0]; ?>
       <div class="cal__g cal__g--d">
-        <div class="cal__d cal__d--d<?= $d['today'] ? ' is-today' : '' ?>" data-ymd="<?= $e($d['ymd']) ?>"<?= $d['today'] ? ' aria-current="date"' : '' ?>>
+        <div class="cal__d<?= $d['today'] ? ' is-today' : '' ?>" data-ymd="<?= $e($d['ymd']) ?>"<?= $d['today'] ? ' aria-current="date"' : '' ?>>
           <div class="cal__dh"><a class="cal__n cal__n--w" href="<?= $e($dayHref($d['ymd'])) ?>" data-day="<?= $e($d['ymd']) ?>" aria-label="<?= $e($d['label']) ?>"><span><?= $e($weekdays[$d['dow'] - 1]) ?></span><b><?= $e($d['day']) ?></b></a>
             <?php if ($canWrite): ?><a class="cal__add cal__add--t" href="<?= $e($addHref($d['ymd'])) ?>" data-cal-new="<?= $e($d['ymd']) ?>"><?= Ui::icon('plus') ?>Nueva tarea</a><?php endif; ?></div>
           <?php if (!$d['events']): ?><p class="cal__e0">Nada programado para este día.</p><?php else: ?><ul class="cal__c"><?php foreach ($d['events'] as $ev) { echo $card($ev); } ?></ul><?php endif; ?>

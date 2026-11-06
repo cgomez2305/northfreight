@@ -9,7 +9,7 @@ $off = array_values(array_diff(array_keys(LeadTable::COLUMNS), $tcols));
   <summary class="btn btn--secondary btn--sm"><?= Ui::icon('columns') ?>Columnas</summary>
   <form class="tcm__p" method="post" action="/tabla/cols">
     <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="back" value="<?= $e($here) ?>">
-    <p class="label tcm__h">COLUMNAS Y ORDEN</p>
+    <p class="label">COLUMNAS Y ORDEN</p>
     <p class="tcm__fix"><?= Ui::icon('lock') ?>Lead · siempre visible, fija a la izquierda</p>
     <ul class="tcm__l">
       <?php foreach ($tcols as $i => $k): ?>

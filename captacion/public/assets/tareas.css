@@ -48,3 +48,11 @@
   .dlg__row{grid-template-columns:1fr}
   .wk__g{grid-template-columns:1fr}.wk__d{min-height:0}.wk__nav .btn{flex:1}
 }
+/* cabecera de página con acciones compactas en móvil (la misma de /pipeline; se repite aquí porque kanban.css no se carga en /tareas) */
+.page-head--kb>div:first-child{flex:1 1 260px;min-width:0}
+@media (max-width:760px){
+  .page-head--kb .page-head__a{width:auto}
+  .page-head--kb .btn{width:44px;min-height:44px;padding:0;flex:none}
+  .page-head--kb .btn span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .page-head--kb .sub{font-size:14px}
+}
