@@ -90,7 +90,7 @@ return [
         ],
         [
             'q' => 'What happens after I apply?',
-            'a' => 'We confirm we received it, and the team reviews your application during the desk\'s service hours. If it looks like a fit, we get in touch the way you chose, on WhatsApp if you prefer, and together we agree on who approves loads, how and when we report, and which tasks the desk owns.',
+            'a' => 'We confirm we received it, and the team reviews your application. If it looks like a fit, we get in touch the way you chose, on WhatsApp if you prefer, and together we agree on who approves loads, how and when we report, and which tasks the desk owns.',
         ],
     ],
     // FAQ global (doc de copy §FAQ) — textos exactos. Se usa en el home.

@@ -18,7 +18,7 @@ partial('hero', [
     'route' => $route,
     'cls'   => 'cr-hero cr-hero--thanks',
     'h1'    => 'Application {hl}received{/hl}',
-    'lead'  => 'Thanks for applying. We received your application and the team will review it during the desk\'s service hours. You can also message the desk on WhatsApp now.',
+    'lead'  => 'Thanks for applying. We received your application and the team will review it. You can also message the desk on WhatsApp now.',
     'aside' => $aside,
     'stack' => true,
 ]);
@@ -27,7 +27,7 @@ partial('hero', [
   <div class="container stack">
     <?php partial('section-head', ['id' => 'th-next', 'eyebrow' => 'What happens next', 'title' => 'Your next steps']); ?>
     <?php partial('steps', ['label' => 'What happens after you apply', 'items' => [
-        ['title' => 'The desk reads your application', 'text' => 'A dispatcher goes through your answers during the desk\'s service hours.'],
+        ['title' => 'The desk reads your application', 'text' => 'A dispatcher goes through your answers.'],
         ['title' => 'We get in touch if it is a fit', 'text' => 'On WhatsApp or the way you chose, so we can learn your operation.'],
         ['title' => 'We agree on scope & contacts', 'text' => 'Who approves loads, how and when we report, and which tasks the desk owns from day one.'],
     ]]); ?>
