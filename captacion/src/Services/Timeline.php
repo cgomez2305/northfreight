@@ -22,7 +22,7 @@ final class Timeline
         }
         foreach ($messages as $m) {
             $dir = $m['direction'] === 'in' ? 'Mensaje recibido' : 'Mensaje enviado';
-            $out[] = ['at' => (string) $m['created_at'], 'icon' => $m['channel'] === 'email' ? 'mail' : 'chat', 'tone' => $m['direction'] === 'in' ? 'cyan' : 'navy', 'group' => 'contact',
+            $out[] = ['at' => (string) $m['created_at'], 'icon' => $m['channel'] === 'email' ? 'mail' : 'chat', 'tone' => $m['direction'] === 'in' ? 'accent' : 'neutral', 'group' => 'contact',
                 'title' => $dir . ' · ' . ucfirst((string) $m['channel']), 'detail' => mb_substr((string) $m['body'], 0, 240), 'by' => null];
         }
         usort($out, static fn($a, $b) => strcmp($b['at'], $a['at']));
@@ -45,18 +45,18 @@ final class Timeline
         switch ($type) {
             case 'created':
                 $icon = 'inbox';
-                $tone = 'cyan';
+                $tone = 'accent';
                 $detail = 'Fuente: ' . Catalog::source($p['source'] ?? null) . (!empty($p['landing_page']) ? ' · ' . $p['landing_page'] : '');
                 break;
             case 'reentry':
                 $icon = 'refresh';
-                $tone = 'cyan';
+                $tone = 'accent';
                 $detail = !empty($p['filled']) ? 'Campos nuevos: ' . implode(', ', array_map('strval', (array) $p['filled'])) : 'Sin datos nuevos.';
                 break;
             case 'reopened':
             case 'reentry_signed':
                 $icon = 'refresh';
-                $tone = 'cyan';
+                $tone = 'accent';
                 break;
             case 'scored':
                 $icon = 'sliders';
@@ -85,7 +85,7 @@ final class Timeline
                 break;
             case 'stage_changed':
                 $icon = 'layers';
-                $tone = ($p['to'] ?? '') === 'lost' ? 'bad' : (in_array($p['to'] ?? '', ['signed', 'hired'], true) ? 'good' : 'navy');
+                $tone = ($p['to'] ?? '') === 'lost' ? 'bad' : (in_array($p['to'] ?? '', ['signed', 'hired'], true) ? 'good' : 'neutral');
                 $from = Catalog::stageLabel((string) ($p['pipeline'] ?? $pipeline), $p['from'] ?? null);
                 $to = Catalog::stageLabel((string) ($p['pipeline'] ?? $pipeline), $p['to'] ?? null);
                 $title = 'Etapa: ' . $from . ' → ' . $to;
@@ -109,7 +109,7 @@ final class Timeline
                 break;
             case 'reopened_manual':
                 $icon = 'refresh';
-                $tone = 'cyan';
+                $tone = 'accent';
                 $detail = 'Vuelve a «' . Catalog::stageLabel($pipeline, $p['to'] ?? 'new') . '»' . (!empty($p['from_reason']) ? ' · antes: ' . Catalog::label(Catalog::LOSS_REASONS, (string) $p['from_reason']) : '');
                 break;
             case 'call_logged':

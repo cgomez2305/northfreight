@@ -91,7 +91,7 @@ $addHref = static fn(string $ymd): string => $q(['nueva' => $ymd]) . '#nueva';
         $next = $on ? array_values(array_diff($types, [$k])) : array_values(array_unique([...$types, $k]));
         $nextQ = !$next || count($next) === count(LeadCalendar::TYPES) ? null : implode(',', $next);
         $n = $cal['counts'][$k] ?? 0; ?>
-      <li><a class="tchip ev--<?= $e($tone) ?><?= $on ? ' is-on' : '' ?>" href="<?= $e($q(['ev' => $on && count($types) === 1 ? null : $nextQ, 'nueva' => null])) ?>" aria-pressed="<?= $on ? 'true' : 'false' ?>" aria-label="<?= $e($label . ($on ? ': visible. Ocultar' : ': oculto. Mostrar')) ?>"><i></i><?= $e($label) ?><?php if ($on && $cal !== null): ?><b><?= $e($n) ?></b><?php endif; ?></a></li>
+      <li><a class="tchip ev--<?= $e($tone) ?><?= $on ? ' is-on' : '' ?>" href="<?= $e($q(['ev' => $on && count($types) === 1 ? null : $nextQ, 'nueva' => null])) ?>" <?= $on ? 'aria-current="true"' : '' ?> aria-label="<?= $e($label . ($on ? ': visible. Ocultar' : ': oculto. Mostrar')) ?>"><i></i><?= $e($label) ?><?php if ($on && $cal !== null): ?><b><?= $e($n) ?></b><?php endif; ?></a></li>
     <?php endforeach; ?>
   </ul>
 

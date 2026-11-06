@@ -31,7 +31,7 @@ $qsNext = ltrim(Ui::qs(array_merge($f, ['tp' => $allTypes ? null : implode(',', 
         $on = in_array($k, $types, true);
         $next = $on ? array_values(array_diff($types, [$k])) : array_values(array_unique([...$types, $k]));
         $nextQ = !$next || count($next) === count(LeadFeed::TYPES) ? null : implode(',', $next); ?>
-      <li><a class="tchip<?= $on ? ' is-on' : '' ?>" href="<?= $e($q(['tp' => $on && count($types) === 1 ? null : $nextQ])) ?>" aria-pressed="<?= $on ? 'true' : 'false' ?>" aria-label="<?= $e($label . ($on ? ': visible. Ocultar' : ': oculto. Mostrar')) ?>"><?= Ui::icon($ic) ?><?= $e($label) ?></a></li>
+      <li><a class="tchip<?= $on ? ' is-on' : '' ?>" href="<?= $e($q(['tp' => $on && count($types) === 1 ? null : $nextQ])) ?>" <?= $on ? 'aria-current="true"' : '' ?> aria-label="<?= $e($label . ($on ? ': visible. Ocultar' : ': oculto. Mostrar')) ?>"><?= Ui::icon($ic) ?><?= $e($label) ?></a></li>
     <?php endforeach; ?>
     <?php if (!$allTypes): ?><li><a class="link" href="<?= $e($q(['tp' => null])) ?>">Todos los tipos</a></li><?php endif; ?>
   </ul>

@@ -30,5 +30,5 @@ html[data-density=compact] .fe__x{display:none}
 @media (max-width:760px){
   .fe{grid-template-columns:20px minmax(0,1fr) auto;gap:10px;padding:12px 16px}
 }
-.fe--cyan .fe__ic{color:var(--accent-ink)}
-.fe--navy .fe__ic{color:var(--ink-2)}
+.fe--accent .fe__ic{color:var(--accent-ink)}
+.fe--neutral .fe__ic{color:var(--ink-2)}

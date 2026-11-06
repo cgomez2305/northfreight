@@ -86,11 +86,12 @@
 .tl__i:last-child::before{display:none}
 .tl__ic{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--sunk);color:var(--ink-3);position:relative;z-index:1}
 .tl__ic .ic{width:14px;height:14px}
-.tl__i--good .tl__ic{background:var(--ok-bg);color:var(--ok)}
-.tl__i--bad .tl__ic{background:var(--bad-bg);color:var(--bad)}
-.tl__i--cyan .tl__ic{background:var(--accent-tint);color:var(--accent-ink)}
+.tl__i--good .tl__ic{color:var(--ok)}
+.tl__i--bad .tl__ic{color:var(--bad)}
+.tl__i--accent .tl__ic{color:var(--accent-ink)}
+.tl__i--neutral .tl__ic{color:var(--ink-2)}
 .tl__t{font-weight:500;font-size:var(--fs-md);padding-top:4px}
-.tl__d{color:var(--ink-2);font-size:13.5px;overflow-wrap:anywhere}
+.tl__d{color:var(--ink-2);font-size:var(--fs-sm);overflow-wrap:anywhere}
 .tl__w{font-size:var(--fs-xs);color:var(--ink-3);text-align:right;padding-top:6px;white-space:nowrap}
 .tl__w small{display:block;color:var(--ink-3);font-size:11px}
 .cons li{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:8px 0;border-bottom:1px solid var(--line);font-size:13.5px}

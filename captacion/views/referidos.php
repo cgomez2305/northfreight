@@ -36,7 +36,7 @@ $empty = !$ov['codes'] && !$ov['referrals'];
     <li><span class="steps__n">2</span><div><b>Comparte el enlace</b><p><code><?= $e($siteUrl) ?>/careers/?ref=CODIGO</code>. El sitio lo recuerda 60 días y lo manda con la solicitud, sin cookies.</p></div></li>
     <li><span class="steps__n">3</span><div><b>Aprueba el bono</b><p>Cuando el referido firma, el bono pasa a «pendiente de aprobar» y te avisamos.</p></div></li>
   </ol>
-  <button class="btn btn--primary" type="button" data-open="#code-new"><span class="btn__t">Crear el primer código</span></button>
+  <button class="btn btn--secondary" type="button" data-open="#code-new"><span class="btn__t">Crear el primer código</span></button>
 </section>
 <?php else: ?>
 

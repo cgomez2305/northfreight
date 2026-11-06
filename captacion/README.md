@@ -939,7 +939,7 @@ Toda la lógica, rutas, endpoints, CSP y autorización por rol; el movimiento de
 
 Suite en 3239 pruebas. Se actualizaron las que comprobaban literales en mayúsculas de títulos (`'ESTADO DEL SISTEMA'` → `'Estado del sistema'`, etc.; no se debilitó ninguna comprobación) y dos de clases: `Ui::avatar` ya no emite `av-N` y `Ui::score` solo emite `score--dq` (las pruebas `36_css_classes` y `35_modes_q5c` exigen que toda clase usada tenga regla).
 
-### Pendiente para R2 (priorizado)
+### Pendiente para R2 (priorizado; hecho en §26)
 
 1. Calendario: chips de evento con tintes por tipo (`--ev-*`), puntos y cabeceras de semana.
 2. Configuración: las 12 pestañas (tarjetas de estado, interruptores, rejillas de campos numéricos) y el editor de reglas (`rules.css`, `cfg-reglas.css`).
@@ -949,3 +949,37 @@ Suite en 3239 pruebas. Se actualizaron las que comprobaban literales en mayúscu
 6. Páginas públicas (`/c`, `/u`, `/invite`) y `setup.php`: ya heredan la tarjeta centrada; falta revisar textos y estados.
 7. Selects nativos (el `<select>` sigue con el aspecto del navegador) y el tema claro de la barra de desplazamiento.
 8. Firefox y Safari sin probar; el rail de 761 a 1099 px solo probado en Chromium.
+
+---
+
+## 26. Pulido del resto del panel (R2): navegación de Configuración, calendario sin tintes, avisos sobrios y selects propios
+
+R2 lleva el lenguaje de R1 (§25) a TODAS las demás pantallas, a mano, sin cambios de lógica, seguridad ni datos. Referencia visual: las capturas de R1 y la skill «dashboards-vivos».
+
+### Qué cambió
+
+- **Pestañas.** Dos componentes: `.ptab` (filtros con conteo: Leads, Tareas, Prospectos, Referidos, Tablero, Tabla; tinte del acento al seleccionar, igual que R1) y **`.utabs`/`.utab`** (navegación entre secciones; texto gris con subrayado de 2 px del acento en la activa; en `panel.css`). **Configuración** pasa a un **menú lateral** de 184 px (≥ 1280 px; `.cfg-layout`/`.cfg-body` en `views/config.php`, elemento activo con fondo de tarjeta como la barra lateral) y a pestañas subrayadas con desplazamiento horizontal por debajo (la activa se centra con `config.js`). Comunicaciones usa `.utabs`.
+- **Avisos** (`.flash`): fondo tintado al 10 a 12 %, texto en `--ink` y solo el icono en el color semántico; `flash--info` neutro (antes salía verde). El panel «Edición bloqueada» (`.cfg-unlock`) es una tarjeta neutra con icono gris (antes cian tintado); el estado de las reglas igual.
+- **Estados** (`.stat` de integraciones, copias y reactivación): punto de 6 px + texto sobre tinte; los iconos de dentro se ocultan.
+- **Interruptores** (`.tgl`) de 36 × 20 px con pomo de 16; el selector de un valor (`.warm`) es un segmented control.
+- **Selects nativos:** `appearance: none` con flecha SVG por token (`--sel-arrow` en claro y oscuro en `panel.css`; `--sel-arrow-inv` solo en la barra de acciones masivas, que es oscura en los dos temas), borde `--field` (≥ 3:1), 40 px (44 en móvil), foco con el anillo del acento, teclado y selector nativo intactos. `select[multiple]` y con `size` conservan su aspecto.
+- **Calendario:** sin fondos de color por tipo. Eventos como filas con un punto de 6 px (tarea = acento, cita = verde, primer contacto = naranja, secuencia = pizarra, entrega = ámbar; gris si está hecho, rojo si venció solo en el punto y la hora), tarjetas de semana y día planas con borde de 1 px, cabeceras de día en frase y números en Geist, chips de tipo como filtros (activo = borde `--line-2`, desactivado = punteado; antes bajaban a opacidad .7, que restaba contraste). En móvil el número del día es un enlace que cubre toda la celda (≥ 44 px).
+- **Editor de reglas:** número de regla y frase en neutros, bloques CUANDO/ENTONCES/EXCEPTO sin doble borde, conectores «Y»/«O» en Geist, casillas de valor con el tinte de selección, impacto y diferencias sin mono en mayúsculas.
+- **Reportes, Resultados e Informes:** tarjetas de 20 px de relleno con número de 44 px (500, `tabular-nums`), etiquetas en frase normal (`Recibidos`, `Costo por firmado`… estaban en mayúsculas en `RepView` y `ResultadosBoard`), 4 por fila. Reglas de datos de Q6 intactas (base mínima de 5, sin datos personales para el lector).
+- **Tareas, Tabla, Cronología, Actividad:** iconos de tarea y de evento sin círculo tintado (solo el icono en gris y semántico si es bueno o malo), sin la barra roja en filas vencidas, acciones del registro como punto + texto (sin píldoras), cifras y teléfonos de la Tabla en Geist con cifras tabulares (solo `LD-xxxx` y USDOT en mono). Los tonos de la línea de tiempo se llaman ahora `accent` y `neutral` (antes `cyan` y `navy`).
+- **Prospectos, Referidos, Vacantes, Comunicaciones:** botones de resultado de llamada neutros (el verde de «Interesado» y el rojo de «No llamar más» pasan al icono y al texto), «Llamar» secundario, un solo primario por vista (los de fila y los de los estados vacíos pasan a secundarios), tarjetas de KPI de referidos con el número de R1, y **razones sociales legibles** con `Fmt::company()` (solo presentación: FMCSA las manda en mayúsculas; «NORTH FORK CARRIERS LLC» se ve «North Fork Carriers LLC», con LLC, siglas sin vocales y dígitos intactos; un nombre que ya trae minúsculas no se toca; también en la ficha, bloque FMCSA).
+- **Gráfico del dashboard:** la anotación del pico ya no se cruza con la línea del promedio ni con su rótulo (`Charts::line` prueba el lado contrario del punto y, si también choca, la coloca justo encima o debajo de la línea); los textos del gráfico pasan de mono a Geist.
+- **Móvil:** `.seg__i`, `.ptab`, `.vtab` y `.tchip` de 44 px de alto; el campo de búsqueda del dashboard ocupa todo el alto de su caja; el enlace del día del calendario cubre la celda.
+
+### Medidas
+
+- CSS de la primera pantalla (con `fonts.css`), antes → después: `/` 42.696 → 44.2xx · `/leads` 35.912 → 37.964 · `/pipeline` 40.344 → 42.332 · `/leads/{id}` 40.410 → 42.252 · `/tabla` 38.965 → 41.301 · `/calendario` 40.940 → 43.170 · `/cronologia` 34.809 → 36.506 · `/tareas` 33.063 → 34.586 · `/actividad` 35.724 → 38.418 · `/config` (12 pestañas) 33.4xx a 37.804 → 36.3xx a 40.493 · `/prospectos` 34.379 → 36.158 · `/referidos` 30.678 → 32.727 · `/vacantes` 30.344 → 32.209 · `/reportes` 40.114 → 42.126 · `/informes` 33.342 → 35.343 · `/comunicaciones` 30.816 → 32.703. Todas ≤ 45.000 B; la mayor subida (~1,9 KB en `panel.css`) son los tokens de la flecha de los selects, `.utabs` y los avisos. El dashboard queda cerca del tope: cualquier regla nueva allí exige recortar otra.
+- Accesibilidad: axe-core (WCAG 2 A y AA y 2.1 AA) sobre las 48 rutas (demo) y las 44 (base vacía), claro y oscuro, a 1440 y 390 px: resultado en el reporte de la fase.
+
+### Pruebas
+
+Caso nuevo `40_r2_estilo` (la suite protege lo que R2 limpió): ninguna variable CSS sin definir, ninguna hoja por pantalla con colores fijos, degradados, `backdrop-filter`, sombras fuera de las permitidas (aro de 1 px, `--shadow-pop`) ni mayúsculas forzadas o Barlow; flecha de los selects por token en los dos temas; y `Fmt::company` (siglas, apóstrofes, nombres ya legibles). Se actualizaron las pruebas que comprobaban literales que cambiaron a propósito: `RECIBIDOS` → `Recibidos` y los negativos del lector (`Calientes sin contactar`, `Primera respuesta`) en `38_resultados_q6i`, y los nombres de prospecto en `23_prospects_ui` (`FIXTURE CARRIER 04 LLC` → `Fixture Carrier 04 LLC`); `36_css_classes` atrapó `flash--info` sin regla antes de commitear.
+
+### Pendiente
+
+Firefox y Safari sin probar (selects con `appearance: none`, `:has()` en `.check--box`, contenedores `@container` de las tablas); el calendario móvil sigue sin agenda del día bajo la cuadrícula y sin arrastre con el dedo; los botones `btn--sm` y los chips de filtro de escritorio miden 28 a 32 px (el mínimo de 44 px se aplica en móvil); el menú lateral de Configuración no se prueba por debajo de 1280 px con 12 pestañas en una sola fila de desplazamiento (se ve cortada al principio; la activa se centra con JS).

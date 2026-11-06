@@ -37,3 +37,5 @@ html[data-density=compact] .tbl--tabla .who small{display:none}
   .tbl--tabla .c-name{min-width:170px}
   .tcm__p{position:fixed;left:12px;right:12px;top:auto;bottom:12px;width:auto;max-height:70vh}
 }
+/* cifras, teléfonos y estados van en Geist con cifras tabulares; solo el código LD-xxxx y el USDOT quedan en mono */
+.tbl--tabla td:not(.tc-code):not(.tc-usdot) .mono{font-family:var(--f-sans);font-size:inherit;font-variant-numeric:tabular-nums}

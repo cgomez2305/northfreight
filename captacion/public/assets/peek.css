@@ -16,7 +16,7 @@
 .pk__sec{display:flex;flex-direction:column;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line)}
 .pk__row{display:flex;justify-content:space-between;align-items:center;gap:10px}
 .pk__prog{display:inline-flex;align-items:center;gap:8px;font:500 12px var(--f-sans);font-variant-numeric:tabular-nums;color:var(--ink-2)}
-.pk__move{display:flex;gap:8px}.pk__move select{flex:1;min-height:40px;padding:0 10px;background:var(--surface);border:1px solid var(--field);border-radius:var(--r-in)}
+.pk__move{display:flex;gap:8px}.pk__move select{flex:1;min-height:40px;padding:0 34px 0 10px;background-color:var(--surface);border:1px solid var(--field);border-radius:var(--r-in)}
 .pk__dl{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}.pk__dl dt{font-size:12px;color:var(--ink-3)}.pk__dl dd{font-size:14px;overflow-wrap:anywhere}
 .pk__flags{display:flex;gap:6px;flex-wrap:wrap}
 .pk__tasks{display:flex;flex-direction:column;gap:8px}.pk__tasks li{display:flex;align-items:flex-start;gap:10px}.pk__tasks span{display:flex;flex-direction:column;font-size:14px}.pk__tasks small{color:var(--ink-3);font-size:12.5px}

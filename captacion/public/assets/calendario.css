@@ -109,6 +109,7 @@ html[data-density=compact] .evc{padding-top:5px;padding-bottom:5px}
   .cal__dow span{padding:8px 2px;text-align:center;font-size:var(--fs-xs)}
   .cal__g--m .cal__n::after{content:"";position:absolute;inset:0}
   .cal__g--m .cal__n{min-width:44px;height:30px}
+  .cal__n--w{min-height:44px;align-items:center}
   .cal__g--m .cal__add{display:none}
   .cal__g--m .cal__dh{justify-content:center}
   .cal__g--m .cal__e{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:3px}

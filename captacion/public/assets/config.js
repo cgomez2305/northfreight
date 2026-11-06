@@ -3,7 +3,7 @@
  'use strict';
  var D = document, $ = function (s, r) { return (r || D).querySelector(s); }, $$ = function (s, r) { return Array.prototype.slice.call((r || D).querySelectorAll(s)); };
  var on = $('.cfg-tabs .utab.is-on');
- if (on && on.parentNode.scrollWidth > on.parentNode.clientWidth) on.parentNode.scrollLeft = Math.max(0, on.offsetLeft - 24);
+ if (on && on.parentNode.scrollWidth > on.parentNode.clientWidth) on.parentNode.scrollLeft = Math.max(0, on.getBoundingClientRect().left - on.parentNode.getBoundingClientRect().left + on.parentNode.scrollLeft - 24);
  var left = $('[data-left]');
  if (left) {
   var secs = parseInt(left.getAttribute('data-left'), 10) || 0, t0 = Date.now();

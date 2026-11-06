@@ -73,7 +73,7 @@ $run = $recalc !== null && ($recalc['status'] ?? '') === 'running';
   <h3 id="rl-e-t">Todavía no hay reglas</h3>
   <p>La puntuación sigue exactamente la del documento. Crea un conjunto para ajustar puntos, avisar por Telegram o crear tareas, o empieza con cinco ejemplos desactivados que puedes editar.</p>
   <div class="rl-empty__a">
-    <button class="btn btn--primary" type="button" data-open="#newset"><span class="btn__t">Nuevo conjunto</span></button>
+    <button class="btn btn--secondary" type="button" data-open="#newset"><span class="btn__t">Nuevo conjunto</span></button>
     <form method="post" action="/config/rules/starter"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><button class="btn btn--secondary" type="submit">Empezar con ejemplos</button></form>
   </div>
 </section>

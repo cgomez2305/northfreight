@@ -35,7 +35,7 @@ $nActive = count(array_filter($jobs, static fn($j) => $j['status'] === 'active' 
     <li><span class="steps__n">2</span><div><b>Publícala</b><p>El panel escribe <code><?= $e($siteFile) ?></code> y el sitio crea <code>/careers/cdl-a-drivers/&lt;slug&gt;/</code>, su sitemap y su schema.</p></div></li>
     <li><span class="steps__n">3</span><div><b>Pausa o cierra</b><p>La página desaparece (404) y sale del sitemap.</p></div></li>
   </ol>
-  <a class="btn btn--primary" href="/vacantes/new"><span class="btn__t">Crear la primera vacante</span></a>
+  <a class="btn btn--secondary" href="/vacantes/new"><span class="btn__t">Crear la primera vacante</span></a>
 </section>
 <?php else: ?>
 <section class="card">

@@ -41,6 +41,7 @@ h1,h2,h3,p,ul,ol,dl,dd,figure{margin:0}
 ul,ol{padding:0;list-style:none}
 a{color:var(--accent-ink);text-decoration:none}
 a:hover{text-decoration:underline}
+p a:not(.btn):not(.link),.muted a,.sub a,.c-det a,small a{text-decoration:underline;text-underline-offset:2px}
 img,svg{display:block}
 button,input,select,textarea{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:var(--r-sm)}
@@ -343,6 +344,7 @@ html:not([data-theme-pref]) .thm__auto,[data-theme-pref=auto] .thm__auto,[data-t
 .flash--bad .ic{color:var(--bad)}
 .flash--warn{background:var(--warn-bg)}
 .flash--warn .ic{color:var(--warn)}
+.flash a{text-decoration:underline}
 .flash__t{flex:1}
 .flash__u{margin-left:auto}
 .flash__u .link{display:inline-flex;gap:6px;align-items:center;font-weight:500;padding:0;color:inherit;text-decoration:underline}

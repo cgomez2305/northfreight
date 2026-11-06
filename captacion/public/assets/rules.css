@@ -60,14 +60,15 @@
 /* bloque y condiciones */
 .rb{display:flex;flex-direction:column;gap:8px}
 .rb__mode{display:inline-flex;align-items:center;gap:8px;font-size:var(--fs-sm);color:var(--ink-2);align-self:flex-start}
-.rb__mode select{min-height:34px;padding:0 8px;background:var(--surface);border:1px solid var(--field);border-radius:var(--r-ctl)}
+.rb__mode select{min-height:34px;padding:0 32px 0 8px;background-color:var(--surface);border:1px solid var(--field);border-radius:var(--r-ctl)}
 .rb__items,.rg__items{display:flex;flex-direction:column;gap:20px}
 .rb__items>*+*,.rg__items>*+*{position:relative}
 .rb__items>*+*::before,.rg__items>*+*::before{content:"Y";position:absolute;left:2px;top:-18px;font:500 var(--fs-xs) var(--f-sans);color:var(--ink-3)}
 .rb[data-mode="any"]>.rb__items>*+*::before,.rg[data-mode="any"]>.rg__items>*+*::before{content:"O"}
 .rb__acts{display:flex;gap:6px 16px;flex-wrap:wrap}
 .rc{display:grid;grid-template-columns:minmax(120px,1fr) minmax(150px,1fr) minmax(150px,1.6fr) 32px;gap:8px;align-items:center;min-width:0}
-.rc select,.rc input[type=text],.ra select,.ra input[type=text],.rp-scope select,.rp-range input{width:100%;min-height:40px;padding:6px 10px;background:var(--surface);border:1px solid var(--field);border-radius:var(--r-in);outline:0;min-width:0}
+.rc select,.rc input[type=text],.ra select,.ra input[type=text],.rp-scope select,.rp-range input{width:100%;min-height:40px;padding:6px 10px;background-color:var(--surface);border:1px solid var(--field);border-radius:var(--r-in);outline:0;min-width:0}
+.rc select,.ra select,.rp-scope select{padding-right:34px}
 .rc select:focus,.rc input:focus,.ra select:focus,.ra input:focus,.rp-scope select:focus,.rp-range input:focus{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
 .rc [aria-invalid=true],.ra [aria-invalid=true]{border-color:var(--bad-dot)}
 .rc__v{min-width:0}
