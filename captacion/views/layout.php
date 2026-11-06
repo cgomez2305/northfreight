@@ -5,7 +5,7 @@ use Captacion\Middleware\SecurityHeaders;
 $nonce = SecurityHeaders::nonce();
 $assetV = static fn(string $f): string => (string) (@filemtime(CAPTACION_ROOT . '/public/assets/' . $f) ?: 1);
 $shell = !empty($shell);
-$brand = '<a class="brand" href="' . (!empty($isViewer) ? '/resultados' : '/') . '" aria-label="NorthStar Captación, ir al inicio"><img class="brand__mark" src="/assets/isotype.svg" width="30" height="30" alt=""><span class="brand__txt"><b>NORTH<i>STAR</i></b><small>CAPTACIÓN</small></span></a>';
+$brand = '<a class="brand" href="' . (!empty($isViewer) ? '/resultados' : '/') . '" aria-label="NorthStar Captación, ir al inicio" data-tip="NorthStar Captación"><img class="brand__mark" src="/assets/isotype.svg" width="26" height="26" alt=""><span class="brand__txt"><b>NorthStar</b><small>Captación</small></span>' . Ui::icon('chevrons') . '</a>';
 ?>
 <!doctype html>
 <html lang="es"<?= isset($prefs) ? ' data-theme-pref="' . $e($prefs['theme']) . '" data-side="' . $e($prefs['side']) . '" data-density="' . $e($prefs['density']) . '"' : '' ?>>
@@ -16,7 +16,7 @@ $brand = '<a class="brand" href="' . (!empty($isViewer) ? '/resultados' : '/') .
 <meta name="color-scheme" content="light dark">
 <title><?= $e($title ?? 'Captación') ?> · NorthStar Captación</title>
 <link rel="icon" href="/assets/isotype.svg" type="image/svg+xml">
-<link rel="preload" href="/assets/fonts/barlow-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/assets/fonts/geist-var.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/fonts.css?v=<?= $e($assetV('fonts.css')) ?>">
 <link rel="stylesheet" href="/assets/panel.css?v=<?= $e($assetV('panel.css')) ?>">
 <?php foreach (($css ?? ($shell ? [] : ['auth'])) as $sheet): if (preg_match('/^[a-z0-9-]{2,24}$/', (string) $sheet) !== 1) { continue; } ?>
@@ -40,6 +40,9 @@ $brand = '<a class="brand" href="' . (!empty($isViewer) ? '/resultados' : '/') .
       <?= $brand ?>
       <button class="icon-btn side__close" type="button" data-nav-close aria-label="Cerrar menú"><?= Ui::icon('x') ?></button>
     </div>
+<?php if (empty($isViewer)): ?>
+    <button class="side__search" type="button" data-search data-tip="Buscar o ejecutar" aria-haspopup="dialog" aria-keyshortcuts="Control+K Meta+K /"><?= Ui::icon('search') ?><span>Buscar…</span><span class="kbds" aria-hidden="true"><kbd data-mod>Ctrl</kbd><kbd>K</kbd></span></button>
+<?php endif; ?>
     <nav class="side__nav">
 <?php
 $ni = static function (string $href, string $icon, string $label, string $key, array $o = []) use ($e, $active): string {
@@ -111,9 +114,7 @@ $ni = static function (string $href, string $icon, string $label, string $key, a
         </ol>
       </nav>
       <div class="top__tools">
-        <?php if (empty($isViewer)): ?><button class="search-btn" type="button" data-search aria-haspopup="dialog" aria-keyshortcuts="Control+K Meta+K /">
-          <?= Ui::icon('search') ?><span class="search-btn__t">Buscar o ejecutar…</span><span class="kbds" aria-hidden="true"><kbd>/</kbd><kbd data-mod>Ctrl</kbd><kbd>K</kbd></span>
-        </button><?php endif; ?>
+        <?php if (empty($isViewer)): ?><button class="icon-btn top__search" type="button" data-search aria-haspopup="dialog" aria-label="Buscar o ejecutar"><?= Ui::icon('search') ?></button><?php endif; ?>
         <span class="clock" title="Hora en <?= $e(\Captacion\Services\Display::timezone()) ?>"><?= $e(\Captacion\Services\Fmt::zone()) ?> <time data-clock data-tz="<?= $e(\Captacion\Services\Display::timezone()) ?>"><?= $e(\Captacion\Services\Fmt::et(\Captacion\Clock::time())->format('H:i')) ?></time></span>
         <button class="icon-btn thm" type="button" data-theme-cycle aria-label="Cambiar tema de color"><?= Ui::icon('sun', 'thm__sun') ?><?= Ui::icon('moon', 'thm__moon') ?><?= Ui::icon('monitor', 'thm__auto') ?></button>
         <?php if (empty($isViewer)): ?><div class="dd" data-dd data-notes>
@@ -121,7 +122,7 @@ $ni = static function (string $href, string $icon, string $label, string $key, a
             <?= Ui::icon('bell') ?><span class="icon-btn__n" data-unread<?= $unread > 0 ? '' : ' hidden' ?>><?= $e($unread) ?></span>
           </button>
           <div class="dd__panel dd__panel--notes" id="dd-notes" role="dialog" aria-label="Bandeja de avisos" hidden>
-            <div class="dd__bar"><span class="label">BANDEJA</span><button class="link" type="button" data-notes-read<?= $unread > 0 ? '' : ' hidden' ?>>Marcar todo como leído</button></div>
+            <div class="dd__bar"><span class="label">Bandeja</span><button class="link" type="button" data-notes-read<?= $unread > 0 ? '' : ' hidden' ?>>Marcar todo como leído</button></div>
             <?php
             $grp = static fn(array $n): string => str_starts_with($n['href'], '/tareas') ? 'tareas' : (preg_match('#^/(leads|referidos|prospectos)#', $n['href']) === 1 ? 'leads' : 'sistema');
             ?>
@@ -138,12 +139,6 @@ $ni = static function (string $href, string $icon, string $label, string $key, a
             <a class="dd__foot" href="/tareas?tab=overdue"><?= Ui::icon('list-check') ?>Tareas vencidas<?php if ($overdueBadge > 0): ?><b class="badge badge--late"><?= $e($overdueBadge) ?></b><?php endif; ?></a>
           </div>
         </div><?php endif; ?>
-        <div class="dd" data-dd>
-          <button class="icon-btn icon-btn--av" type="button" aria-expanded="false" aria-haspopup="menu" aria-controls="dd-av" aria-label="Cuenta de <?= $e($user['name']) ?>"><?= Ui::avatar((string) $user['name'], 'sm', 0) ?></button>
-          <div class="dd__panel" id="dd-av" role="menu" hidden>
-            <?php require __DIR__ . '/_usermenu.php'; ?>
-          </div>
-        </div>
       </div>
     </header>
     <main id="main" class="main" tabindex="-1">
@@ -191,7 +186,7 @@ $ni = static function (string $href, string $icon, string $label, string $key, a
         'Calendario' => [['← → ↑ ↓', 'Moverse entre días'], ['PgUp PgDn', 'Mes o semana anterior y siguiente'], ['Alt + flechas', 'Mover la tarea enfocada de día']],
         'Con un lead abierto' => [['n', 'Añadir nota'], ['c', 'Registrar llamada'], ['m', 'Mover de etapa']],
     ] as $grp => $rows): ?>
-      <section><h3 class="label"><?= $e(strtoupper($grp)) ?></h3><dl><?php foreach ($rows as [$k, $d]): ?><div><dt><?php foreach (explode(' ', $k) as $i => $part): ?><?= $i ? ' ' : '' ?><kbd><?= $e($part) ?></kbd><?php endforeach; ?></dt><dd><?= $e($d) ?></dd></div><?php endforeach; ?></dl></section>
+      <section><h3 class="label"><?= $e($grp) ?></h3><dl><?php foreach ($rows as [$k, $d]): ?><div><dt><?php foreach (explode(' ', $k) as $i => $part): ?><?= $i ? ' ' : '' ?><kbd><?= $e($part) ?></kbd><?php endforeach; ?></dt><dd><?= $e($d) ?></dd></div><?php endforeach; ?></dl></section>
     <?php endforeach; ?>
   </div>
 </dialog>
@@ -204,7 +199,7 @@ $ni = static function (string $href, string $icon, string $label, string $key, a
       <select name="reason"><option value="">Elige un motivo…</option><?php foreach (\Captacion\Services\Catalog::LOSS_REASONS as $k => $l): ?><option value="<?= $e($k) ?>"><?= $e($l) ?></option><?php endforeach; ?></select></label>
     <label class="field" data-mv-note hidden><span>Nota <small data-mv-note-hint>(opcional)</small></span><textarea name="note" maxlength="500" rows="3"></textarea></label>
     <label class="check" data-mv-override hidden><input type="checkbox" name="override" value="1"><span>Sí, quiero saltarme el orden de las etapas.</span></label>
-    <div class="dlg__a"><button class="btn btn--ghost" type="button" data-close>Cancelar</button><button class="btn btn--primary" type="submit" value="go"><span class="btn__t">Mover</span><span class="btn__cell"><?= Ui::icon('arrow-up-right') ?></span></button></div>
+    <div class="dlg__a"><button class="btn btn--ghost" type="button" data-close>Cancelar</button><button class="btn btn--primary" type="submit" value="go"><span class="btn__t">Mover</span></button></div>
   </form>
 </dialog>
 <dialog class="dlg" id="qc-dlg" aria-labelledby="qc-t">
@@ -215,7 +210,7 @@ $ni = static function (string $href, string $icon, string $label, string $key, a
     <label class="field"><span>Teléfono</span><input type="tel" name="phone" maxlength="40" inputmode="tel" autocomplete="off" required></label>
     <label class="field"><span>Perfil</span><select name="profile" required><option value="">Elige el perfil…</option><?php foreach (\Captacion\Services\Catalog::PROFILES as $k => $l): ?><option value="<?= $e($k) ?>"><?= $e($l) ?></option><?php endforeach; ?></select></label>
     <p class="field__err" role="alert" data-qc-err hidden></p>
-    <div class="dlg__a"><button class="btn btn--ghost" type="button" data-close>Cancelar</button><button class="btn btn--primary" type="submit" value="go"><span class="btn__t">Crear lead</span><span class="btn__cell"><?= Ui::icon('plus') ?></span></button></div>
+    <div class="dlg__a"><button class="btn btn--ghost" type="button" data-close>Cancelar</button><button class="btn btn--primary" type="submit" value="go"><span class="btn__t">Crear lead</span></button></div>
   </form>
 </dialog><?php endif; ?>
 <div class="toasts" id="toasts" aria-live="polite" aria-atomic="false"></div>

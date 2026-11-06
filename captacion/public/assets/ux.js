@@ -160,7 +160,7 @@
  if (fold) { fold.addEventListener('click', NS.toggleSide); setSide(H.getAttribute('data-side') || 'open', false); }
  var tip = null;
  function showTip(t) {
-  if (H.getAttribute('data-side') !== 'collapsed' || !W.matchMedia('(min-width:1024px)').matches) return;
+  if (!((H.getAttribute('data-side') === 'collapsed' && W.matchMedia('(min-width:1100px)').matches) || W.matchMedia('(min-width:761px) and (max-width:1099px)').matches)) return;
   hideTip(); tip = el('div', 'tip', t.getAttribute('data-tip')); tip.setAttribute('role', 'tooltip'); D.body.appendChild(tip);
   var r = t.getBoundingClientRect(); tip.style.left = (r.right + 10) + 'px'; tip.style.top = (r.top + r.height / 2 - tip.offsetHeight / 2) + 'px';
  }

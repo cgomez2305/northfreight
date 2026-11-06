@@ -1,13 +1,3 @@
-/* Fuentes del panel: las mismas del sitio (woff2 locales, subset latino) con los respaldos de metricas ajustadas (ver assets/css/fonts.css del sitio para el calculo). */
-@font-face { font-family: "Barlow"; font-style: normal; font-weight: 400; font-display: swap; src: url("fonts/barlow-400.woff2") format("woff2"); }
-@font-face { font-family: "Barlow"; font-style: normal; font-weight: 500; font-display: swap; src: url("fonts/barlow-500.woff2") format("woff2"); }
-@font-face { font-family: "Barlow"; font-style: normal; font-weight: 600; font-display: swap; src: url("fonts/barlow-600.woff2") format("woff2"); }
-@font-face { font-family: "Barlow Condensed"; font-style: normal; font-weight: 700; font-display: swap; src: url("fonts/barlow-condensed-700.woff2") format("woff2"); }
-@font-face { font-family: "Barlow Condensed"; font-style: normal; font-weight: 900; font-display: swap; src: url("fonts/barlow-condensed-900.woff2") format("woff2"); }
-@font-face { font-family: "JetBrains Mono"; font-style: normal; font-weight: 400 600; font-display: swap; src: url("fonts/jetbrains-mono-var.woff2") format("woff2"); }
-@font-face { font-family: "Barlow Fallback"; font-style: normal; font-weight: 400; src: local("Arial"), local("Liberation Sans"), local("Arimo"); size-adjust: 96.44%; ascent-override: 103.69%; descent-override: 20.74%; line-gap-override: 0%; }
-@font-face { font-family: "Barlow Fallback"; font-style: normal; font-weight: 500; src: local("Arial"), local("Liberation Sans"), local("Arimo"); size-adjust: 97.49%; ascent-override: 102.57%; descent-override: 20.51%; line-gap-override: 0%; }
-@font-face { font-family: "Barlow Fallback"; font-style: normal; font-weight: 600; src: local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"), local("Arimo Bold"); size-adjust: 91.47%; ascent-override: 109.33%; descent-override: 21.87%; line-gap-override: 0%; }
-@font-face { font-family: "Barlow Condensed Fallback"; font-style: normal; font-weight: 700; src: local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"), local("Arimo Bold"); size-adjust: 75.85%; ascent-override: 131.85%; descent-override: 26.37%; line-gap-override: 0%; }
-@font-face { font-family: "Barlow Condensed Fallback"; font-style: normal; font-weight: 900; src: local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"), local("Arimo Bold"); size-adjust: 79.2%; ascent-override: 126.26%; descent-override: 25.25%; line-gap-override: 0%; }
-@font-face { font-family: "JetBrains Mono Fallback"; font-style: normal; font-weight: 400 600; src: local("Courier New"), local("Liberation Mono"), local("Cousine"); size-adjust: 99.98%; ascent-override: 102.02%; descent-override: 30.0%; line-gap-override: 0%; }
+/* Fuentes del panel (R1): Geist para interfaz y números, Geist Mono solo para IDs, metadatos y atajos. Locales, subset latino variable; origen y licencia en fonts/README.md. */
+@font-face { font-family: "Geist"; font-style: normal; font-weight: 100 900; font-display: swap; src: url("fonts/geist-var.woff2") format("woff2"); }
+@font-face { font-family: "Geist Mono"; font-style: normal; font-weight: 100 900; font-display: swap; src: url("fonts/geist-mono-var.woff2") format("woff2"); }
