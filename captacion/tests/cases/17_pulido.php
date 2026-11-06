@@ -13,7 +13,7 @@ return static function (array $ctx): void {
     $size = static fn(string $f): int => (int) @filesize($assets . '/' . $f . '.css');
     // ------------------------------------------------------------------ Hojas por pantalla
     $screens = [
-        '/' => ['charts', 'dashboard'], '/leads' => ['leads', 'views', 'filtros'], '/pipeline' => ['kanban', 'views', 'etiquetas'],
+        '/' => ['charts', 'viz', 'dashboard'], '/leads' => ['leads', 'views', 'filtros'], '/pipeline' => ['kanban', 'views', 'etiquetas'],
         // Q5c
         '/tabla' => ['leads', 'views', 'filtros', 'tabla'], '/calendario' => ['views', 'filtros', 'calendario'], '/cronologia' => ['views', 'filtros', 'cronologia'], '/tareas' => ['tareas'], '/actividad' => ['config', 'actividad'],
         '/config' => ['config', 'cfg-puntuacion'], '/config?tab=alertas' => ['config', 'cfg-alertas'], '/config?tab=costos' => ['config', 'cfg-costos'],
@@ -22,7 +22,7 @@ return static function (array $ctx): void {
         '/config?tab=reglas' => ['config', 'cfg-reglas'], '/config?tab=entrega' => ['config', 'cfg-entrega'], '/config?tab=correo' => ['config', 'cfg-correo'], '/config?tab=usuarios' => ['config', 'cfg-usuarios'],
         // Q4a
         '/prospectos' => ['prospectos'], '/referidos' => ['referidos'], '/vacantes' => ['vacantes'], '/vacantes/new' => ['vacantes'], '/config?tab=prospectos' => ['config', 'cfg-prospectos'],
-        '/reportes' => ['charts', 'reportes'], '/resultados' => ['charts', 'reportes'], '/informes' => ['reportes'], '/comunicaciones' => ['comms'], '/comunicaciones/inscripciones' => ['comms'], '/comunicaciones/envios' => ['comms'],
+        '/reportes' => ['charts', 'reportes'], '/resultados' => ['charts', 'viz', 'reportes'], '/informes' => ['reportes'], '/comunicaciones' => ['comms'], '/comunicaciones/inscripciones' => ['comms'], '/comunicaciones/envios' => ['comms'],
     ];
     $s = Panel::start($ctx, 'panel-pol');
     $admin = Panel::user('admin');

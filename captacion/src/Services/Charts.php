@@ -118,6 +118,7 @@ final class Charts
      * @param list<string> $tipLabels titulo del tooltip por punto
      * Q6, opciones ($o) del grafico «vivo» del dashboard (sin ellas el marcado es el de siempre, el de los reportes):
      *   uid  identificador unico del panel (para el degradado); area  clase de la serie con area degradada; note  {i,l1,l2} anotacion sobre el punto i; avg  promedio (linea punteada)
+     *   delta  indice de la serie cuya variacion dice el tooltip (sin el, la suma de todas); prev  frase del periodo anterior del tooltip («frente al día anterior»); avgu  unidad del promedio (« al día»)
      *   Todo lo que va sobre las curvas se pinta en un SVG de superposicion SIN viewBox: sus coordenadas son porcentajes (atributos), asi el texto no se deforma y no hace falta ningun estilo en linea.
      */
     public static function line(string $id, array $labels, array $series, array $tipLabels, string $unit = 'leads', array $o = []): string
@@ -142,6 +143,7 @@ final class Charts
         $py = static fn(float $v): float => 100 * (1 - (($H - 6) * ($v / $top) + 1) / $H);
         $out = '<div class="lc' . ($live ? ' lc--d' : '') . '" data-chart="' . htmlspecialchars((string) json_encode([
             'labels' => $tipLabels, 'max' => $top, 'unit' => $unit,
+            'dk' => isset($o['delta']) ? (int) $o['delta'] : null, 'pv' => isset($o['prev']) ? (string) $o['prev'] : null,
             'series' => array_map(static fn($s) => ['n' => $s['name'], 'c' => $s['cls'], 'v' => array_values($s['values'])], $series),
         ], JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8') . '"' . ($live ? ' data-lc2' : '') . '>';
         $out .= '<div class="lc__y" aria-hidden="true">';
@@ -189,7 +191,7 @@ final class Charts
             $ov = '<svg class="lc__ov" aria-hidden="true" focusable="false">';
             if (isset($o['avg']) && $o['avg'] !== null) {
                 $ay = $py((float) $o['avg']);
-                $ov .= '<line class="lc__ref" x1="0" x2="100%" y1="' . self::n($ay) . '%" y2="' . self::n($ay) . '%"/><text class="lc__ref-t" x="4" y="' . self::n($ay) . '%" dy="-5">Promedio ' . self::n(round((float) $o['avg'], 1)) . '</text>';
+                $ov .= '<line class="lc__ref" x1="0" x2="100%" y1="' . self::n($ay) . '%" y2="' . self::n($ay) . '%"/><text class="lc__ref-t" x="4" y="' . self::n($ay) . '%" dy="-5">Promedio ' . self::n(round((float) $o['avg'], 1)) . $esc((string) ($o['avgu'] ?? '')) . '</text>';
             }
             if (is_array($o['note'] ?? null)) {
                 $note = $o['note'];

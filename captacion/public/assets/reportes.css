@@ -1,4 +1,4 @@
-/* NorthStar Captación · reportes, resultados e informes (/reportes, /resultados, /informes). Encima de panel.css + charts.css. Sin estilos en línea (CSP): clases y variables. Incluye la hoja de impresión. */
+/* NorthStar Captación · reportes, resultados e informes (/reportes, /resultados, /informes). Encima de panel.css + charts.css (y viz.css en /resultados). Sin estilos en línea (CSP): clases y variables. Incluye la hoja de impresión. */
 /* Q5a: reglas que estaban en panel.css y solo usa esta pantalla */
 .rk{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:14px}
 .rk__c{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);padding:14px 18px 16px;display:flex;flex-direction:column;gap:6px;min-width:0}
@@ -32,6 +32,19 @@
 .rep-print-h{display:none}
 .inl{display:inline-block}
 .q3a{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+/* Q6-I: /resultados con las piezas del dashboard vivo (tarjetas .kpi de viz.css): 3 + 2 en escritorio, 2 por fila y la última a lo ancho por debajo de 1024 */
+.kpis--rs{grid-template-columns:repeat(6,minmax(0,1fr))}
+.kpis--rs .kpi{grid-column:span 2}
+.kpis--rs .kpi:nth-child(n+4){grid-column:span 3}
+.kpi__s{font-size:12.5px;line-height:1.4;color:var(--ink-3)}
+.kpi__v--na{font-size:22px;line-height:1.15;letter-spacing:-.01em;color:var(--ink-2)}
+.rs-meta{margin-top:6px}
+.fn-note{margin-top:16px;padding-top:12px;border-top:1px solid var(--line);font-size:13px;line-height:1.45;color:var(--ink-2)}
+.fn-note b{font-weight:600;color:var(--ink)}
+@media (max-width:1023px){
+.kpis--rs .kpi,.kpis--rs .kpi:nth-child(n+4){grid-column:span 3}
+.kpis--rs .kpi:last-child{grid-column:1/-1}
+}
 @media (max-width:1100px){.rep-grid--3{grid-template-columns:1fr}}
 @media (max-width:1024px){.rep-grid{grid-template-columns:1fr}}
 @media (max-width:760px){
@@ -56,7 +69,10 @@
   .shell{display:block}
   .col,.main{display:block;padding:0;margin:0;max-width:none}
   .rep-print-h{display:block;font:600 11px var(--f-mono);letter-spacing:.06em;color:var(--ink-2);border-bottom:2px solid var(--navy);padding-bottom:8px;margin-bottom:12px}
-  .card,.rk__c{box-shadow:none;break-inside:avoid;border-color:#bbb}
+  .card,.rk__c,.kpi{box-shadow:none;break-inside:avoid;border-color:#bbb}
+  .kpis--rs{grid-template-columns:repeat(3,1fr);gap:8px}
+  .kpis--rs .kpi,.kpis--rs .kpi:nth-child(n+4),.kpis--rs .kpi:last-child{grid-column:auto}
+  .info,.lc__tip,.lc__cross{display:none!important}
   .rk{grid-template-columns:repeat(3,1fr);gap:8px}
   .rep-grid,.rep-grid--3{grid-template-columns:1fr 1fr;gap:10px}
   .h1{font-size:28px}

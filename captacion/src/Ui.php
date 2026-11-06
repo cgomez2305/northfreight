@@ -137,7 +137,7 @@ final class Ui
 
     /**
      * Numero protagonista (Q6): la parte entera grande y los decimales y la unidad atenuados (`79<small>.0%</small>`). El texto accesible final va en un `.sr` y lo pintado en un span aria-hidden,
-     * asi el conteo animado nunca cambia lo que lee un lector de pantalla. $count = ['v'=>valor,'dec'=>decimales,'suf'=>sufijo] activa el conteo (data-*); sin el, el numero es estatico.
+     * asi el conteo animado nunca cambia lo que lee un lector de pantalla. $count = ['v'=>valor,'dec'=>decimales,'suf'=>sufijo,'pre'=>prefijo opcional, p. ej. «$»] activa el conteo (data-*); sin el, el numero es estatico.
      * @param string $text texto final: «1,234», «79.0%», «13 min», «4 h 52 min»
      */
     public static function big(string $text, string $cls = 'kpi__v', ?array $count = null): string
@@ -147,7 +147,7 @@ final class Ui
         if (preg_match('/^(\d[\d,]*)(.*)$/su', $text, $m) === 1) {
             [$head, $rest] = [$m[1], $m[2]];
         }
-        $attr = $count !== null ? ' data-count="' . self::e(rtrim(rtrim(number_format((float) $count['v'], 4, '.', ''), '0'), '.') ?: '0') . '" data-dec="' . (int) $count['dec'] . '" data-suf="' . self::e((string) $count['suf']) . '"' : '';
+        $attr = $count !== null ? ' data-count="' . self::e(rtrim(rtrim(number_format((float) $count['v'], 4, '.', ''), '0'), '.') ?: '0') . '" data-dec="' . (int) $count['dec'] . '" data-suf="' . self::e((string) $count['suf']) . '"' . (($count['pre'] ?? '') !== '' ? ' data-pre="' . self::e((string) $count['pre']) . '"' : '') : '';
         return '<p class="' . self::e($cls) . '"' . $attr . '><span class="sr">' . self::e($text) . '</span><span class="kpi__n" aria-hidden="true">' . self::e($head) . ($rest !== '' ? '<small>' . self::e($rest) . '</small>' : '') . '</span></p>';
     }
 
