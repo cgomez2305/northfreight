@@ -61,6 +61,9 @@ RewriteCond %{REQUEST_URI} !\.[A-Za-z0-9]{1,6}$
 RewriteRule ^(.+[^/])$ https://%{HTTP_HOST}/$1/ [L,R=301]
 
 # ---- 5) Todo lo que no sea archivo real -> front controller ---------
+# /favicon.ico: los navegadores lo piden siempre; se sirve el .ico de assets/img (respaldo: index.php).
+RewriteRule ^favicon\.ico$ assets/img/favicon.ico [L]
+
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^ index.php [L]
