@@ -385,6 +385,9 @@ Tokens (modo claro / oscuro) y contrastes medidos (WCAG, texto salvo donde se in
 | Blanco sobre `--accent` / `--accent-hover` | 5,7 / 7,8 | `--on-accent` `#0D0D0C` sobre `--accent` / `--accent-hover` | 9,0 / 11,3 |
 | Blanco sobre `--bad-solid` | 5,1 | `#0D0D0C` sobre `--bad-solid` | 7,1 |
 | `--ok` / `--bad` / `--warn` sobre su fondo | 5,6 / 5,2 / 5,1 | ídem | 7,2 / 7,2 / 7,4 |
+| R2: texto de avisos (`--ink` sobre `--ok-bg` / `--bad-bg` / `--warn-bg` / `--sunk`) | 15,1 / 14,6 / 15,0 / 15,3 | ídem | 11,0 / 13,6 / 12,1 / 14,1 |
+| R2: icono semántico de un aviso (`--ok` / `--bad` / `--warn` sobre su fondo, componente ≥ 3:1) | 5,6 / 5,2 / 5,1 | ídem | 7,2 / 7,1 / 7,4 |
+| R2: `--ink-2` sobre `--warn-bg` · `--ink-3` sobre `--sunk` (filas del calendario al pasar el ratón, estado «apagada») | 7,8 · 4,7 | ídem | 7,7 · 5,7 |
 | `--field` (borde, componente) sobre surface / bg | 3,5 / 3,3 | ídem | 3,7 / 3,9 |
 | Texto de tooltips y avisos sobre `--pop` | 15,4 | ídem | 11,1 |
 | Puntos de estado (gráficos, ≥ 3:1) sobre surface: caliente / tibio / frío / OK / error | 4,2 / 3,0 / 3,5 / 5,1 / 5,1 | ídem | 5,7 / 7,5 / 6,0 / 6,9 / 5,0 |
@@ -973,8 +976,9 @@ R2 lleva el lenguaje de R1 (§25) a TODAS las demás pantallas, a mano, sin camb
 
 ### Medidas
 
-- CSS de la primera pantalla (con `fonts.css`), antes → después: `/` 42.696 → 44.2xx · `/leads` 35.912 → 37.964 · `/pipeline` 40.344 → 42.332 · `/leads/{id}` 40.410 → 42.252 · `/tabla` 38.965 → 41.301 · `/calendario` 40.940 → 43.170 · `/cronologia` 34.809 → 36.506 · `/tareas` 33.063 → 34.586 · `/actividad` 35.724 → 38.418 · `/config` (12 pestañas) 33.4xx a 37.804 → 36.3xx a 40.493 · `/prospectos` 34.379 → 36.158 · `/referidos` 30.678 → 32.727 · `/vacantes` 30.344 → 32.209 · `/reportes` 40.114 → 42.126 · `/informes` 33.342 → 35.343 · `/comunicaciones` 30.816 → 32.703. Todas ≤ 45.000 B; la mayor subida (~1,9 KB en `panel.css`) son los tokens de la flecha de los selects, `.utabs` y los avisos. El dashboard queda cerca del tope: cualquier regla nueva allí exige recortar otra.
-- Accesibilidad: axe-core (WCAG 2 A y AA y 2.1 AA) sobre las 48 rutas (demo) y las 44 (base vacía), claro y oscuro, a 1440 y 390 px: resultado en el reporte de la fase.
+- CSS de la primera pantalla (con `fonts.css`), antes → después: `/` 42.696 → 44.497 · `/leads` 35.912 → 38.115 · `/pipeline` 40.344 → 42.234 · `/leads/{id}` 40.410 → 42.154 · `/tabla` 38.965 → 41.452 · `/calendario` 40.940 → 43.072 · `/cronologia` 34.809 → 36.408 · `/tareas` 33.063 → 34.488 · `/actividad` 35.724 → 38.320 · `/config` (12 pestañas) 33.432 a 37.804 → 36.238 a 40.395 · `/prospectos` 34.379 → 36.060 · `/referidos` 30.678 → 32.629 · `/vacantes` 30.344 → 32.111 · `/reportes` 40.114 → 42.028 · `/informes` 33.342 → 35.245 · `/comunicaciones` 30.816 → 32.605 (38.845 en Reactivación). Todas ≤ 45.000 B; el editor de reglas (`rules.css`) sigue diferido. La subida de ~1,8 KB en `panel.css` son el token de la flecha de los selects (claro y oscuro), `.utabs`, los avisos y los subrayados de enlaces en texto. El dashboard queda a 503 B del tope: cualquier regla nueva allí exige recortar otra.
+- Accesibilidad: axe-core (WCAG 2 A y AA y 2.1 AA) sin violaciones en las 48 rutas de administrador con la base de demostración (+ 15 rutas extra: editor de plantillas, vacantes, ficha, panel de reglas…), las 44 con la base vacía, `/resultados` e `/informes` como lector y las páginas sin sesión (`/login`, `/c/{token}` con firma y rechazo, `/u/{token}`, `/invite/{token}`, enlace inválido, 404), en claro y oscuro, a 1440 y 390 px. El barrido de contraste por texto solo deja controles desactivados (exentos). Sin scroll horizontal a 360, 390, 834, 1024, 1440 y 1920 px (con `overflow-x: clip` desactivado). No se pudo correr Lighthouse (sin binario; el panel exige sesión con 2FA).
+- Lo que axe encontró al barrer TODAS las pantallas (R1 solo había pasado las clave): `aria-pressed` en enlaces (los chips de tipo del calendario y la cronología; ahora `aria-current` en el activo) y enlaces en texto corrido que solo se distinguían por el color (los avisos y los párrafos en gris ahora los subrayan).
 
 ### Pruebas
 
@@ -982,4 +986,4 @@ Caso nuevo `40_r2_estilo` (la suite protege lo que R2 limpió): ninguna variable
 
 ### Pendiente
 
-Firefox y Safari sin probar (selects con `appearance: none`, `:has()` en `.check--box`, contenedores `@container` de las tablas); el calendario móvil sigue sin agenda del día bajo la cuadrícula y sin arrastre con el dedo; los botones `btn--sm` y los chips de filtro de escritorio miden 28 a 32 px (el mínimo de 44 px se aplica en móvil); el menú lateral de Configuración no se prueba por debajo de 1280 px con 12 pestañas en una sola fila de desplazamiento (se ve cortada al principio; la activa se centra con JS).
+Firefox y Safari sin probar (selects con `appearance: none`, `:has()` en `.check--box`, contenedores `@container` de las tablas); el calendario móvil sigue sin agenda del día bajo la cuadrícula y sin arrastre con el dedo; los botones `btn--sm` y los chips de filtro de escritorio miden 28 a 32 px (el mínimo de 44 px se aplica en móvil); por debajo de 1280 px las 12 pestañas de Configuración van en una sola fila con desplazamiento horizontal sin barra visible (la activa se centra con `config.js`; sin JS queda la fila desde el principio).

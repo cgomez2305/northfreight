@@ -113,7 +113,7 @@
 .rp-note{display:flex;gap:8px;align-items:flex-start;color:var(--ink-2);font-size:var(--fs-sm)}
 .rp-note .ic{flex:none;margin-top:2px;color:var(--ink-3)}
 .rp-note--warn .ic{color:var(--warn)}
-.rp-chart svg{width:100%;height:auto;overflow:visible}
+.rp-chart svg{width:100%;max-width:380px;height:auto;overflow:visible}
 .rp-chart__l{font:400 10px var(--f-mono);fill:var(--ink-3)}
 .rp-bar--hot{fill:var(--hot-dot)}.rp-bar--warm{fill:var(--warm-dot)}.rp-bar--cold{fill:var(--cold-dot)}.rp-bar--disqualified{fill:var(--dq-dot)}
 .rp-legend{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:6px;font-size:var(--fs-sm);color:var(--ink-2)}

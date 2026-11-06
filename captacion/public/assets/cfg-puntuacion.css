@@ -6,7 +6,7 @@
 .num__in input{width:100%;min-height:42px;border:0;background:none;padding:0 10px;outline:0;font:500 15px var(--f-sans);font-variant-numeric:tabular-nums;color:var(--ink);min-width:0}
 .num__in:focus-within{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
 .num__in i{font:500 11px var(--f-sans);font-variant-numeric:tabular-nums;color:var(--ink-3);font-style:normal}
-.numgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px 14px}
+.numgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px 14px;align-items:end}
 .numgrid--2{grid-template-columns:repeat(2,minmax(0,260px))}
 .tiergrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:16px}
 .tiers{border:1px solid var(--line);border-radius:var(--r-card);padding:12px 14px 8px;min-width:0;margin:0}
@@ -46,6 +46,8 @@
 }
 @media (max-width:760px){
   .numgrid,.numgrid--2{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .tier{grid-template-columns:minmax(0,.8fr) minmax(0,1fr) minmax(0,1fr)}
+  .tier{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .tier__l{grid-column:1/-1}
+  .tier--h{display:none}
   .hist li{grid-template-columns:1fr;gap:2px}
 }
