@@ -70,6 +70,53 @@ return static function (array $ctx): void {
     T::throws(static fn() => $q2b->exec("INSERT INTO webhook_events (source, event_key) VALUES ('meta', 'k1')"), '  010: el mismo evento dos veces no entra (UNIQUE source + event_key)', 'Duplicate');
     $rootPdo->exec('DROP DATABASE cap_mig_q2b');
 
+    // Q5b: la 012 se aplica SOBRE la base de Q5a (001 a 011) con datos reales, sin tocarlos, y es idempotente
+    $rootPdo->exec('DROP DATABASE IF EXISTS cap_mig_q5a');
+    $rootPdo->exec('CREATE DATABASE cap_mig_q5a CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+    $q5a = new PDO('mysql:host=127.0.0.1;port=' . $ctx['dbPort'] . ';dbname=cap_mig_q5a;charset=utf8mb4', 'root', '', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
+    $tmp5 = $ctx['work'] . '/mig-q5a';
+    @mkdir($tmp5, 0777, true);
+    foreach (glob($tmp5 . '/*.sql') ?: [] as $f) {
+        unlink($f);
+    }
+    foreach (array_filter($files, static fn($f) => (int) substr($f, 0, 3) <= 11) as $f) {
+        copy("$dir/$f.sql", "$tmp5/$f.sql");
+    }
+    T::eq(count(Migrator::run($q5a, $tmp5)), 11, 'base de Q5a: se aplican 001 a 011');
+    $q5a->exec("INSERT INTO users (name, email, password_hash, role) VALUES ('Carlos', 'c@example.com', 'x', 'admin')");
+    $q5a->exec("INSERT INTO leads (profile, first_name, last_name, source, stage, temperature, score) VALUES ('owner_operator', 'Real', 'Lead', 'web_careers', 'new', 'warm', 55)");
+    $q5a->exec("INSERT INTO saved_views (user_id, name, filters) VALUES (1, 'Mi vista', '{\"t\":\"hot\"}')");
+    $q5a->exec("INSERT INTO user_prefs (user_id, pkey, pvalue) VALUES (1, 'theme', 'dark')");
+    T::eq(Migrator::run($q5a, $dir), ['012_rules'], '  sobre ella se aplica solo 012_rules');
+    T::eq([(int) $q5a->query('SELECT COUNT(*) FROM leads')->fetchColumn(), (int) $q5a->query('SELECT COUNT(*) FROM saved_views')->fetchColumn(), (int) $q5a->query('SELECT COUNT(*) FROM user_prefs')->fetchColumn(), $q5a->query('SELECT score FROM leads')->fetchColumn()], [1, 1, 1, 55], '  los datos de Q5a siguen ahi, sin cambios');
+    T::eq(Migrator::run($q5a, $dir), [], '  repetirla no hace nada');
+    $q5aTables = $q5a->query('SHOW TABLES')->fetchAll(PDO::FETCH_COLUMN);
+    T::ok(!array_diff(['rule_sets', 'rule_versions', 'rule_applications', 'rule_simulations', 'rule_simulation_rows'], $q5aTables), '  tablas nuevas: rule_sets, rule_versions, rule_applications, rule_simulations y rule_simulation_rows');
+    // Idempotencia a nivel de sentencias: ejecutar el archivo dos veces no falla ni duplica
+    $sql012 = (string) file_get_contents("$dir/012_rules.sql");
+    foreach (array_filter(array_map('trim', preg_split('/;\s*\n/', (string) preg_replace('/^\s*--.*$/m', '', $sql012)) ?: [])) as $stmt) {
+        $q5a->exec($stmt);
+    }
+    T::eq(count(array_filter($q5a->query('SHOW TABLES')->fetchAll(PDO::FETCH_COLUMN), static fn($t) => str_starts_with($t, 'rule_'))), 5, '  012 ejecutada de nuevo a mano: sigue habiendo 5 tablas (CREATE TABLE IF NOT EXISTS)');
+    // Invariantes del esquema de reglas
+    $q5a->exec("INSERT INTO rule_sets (kind, name) VALUES ('scoring', 'A')");
+    $q5a->exec("INSERT INTO rule_versions (set_id, version, status, rules, pub_slot) VALUES (1, 1, 'published', '[]', 1)");
+    T::throws(static fn() => $q5a->exec("INSERT INTO rule_versions (set_id, version, status, rules, pub_slot) VALUES (1, 2, 'published', '[]', 1)"), '  esquema: una sola versión publicada por conjunto (UNIQUE set_id + pub_slot)', 'Duplicate');
+    $q5a->exec("INSERT INTO rule_versions (set_id, version, status, rules, draft_slot) VALUES (1, 2, 'draft', '[]', 1)");
+    T::throws(static fn() => $q5a->exec("INSERT INTO rule_versions (set_id, version, status, rules, draft_slot) VALUES (1, 3, 'draft', '[]', 1)"), '  esquema: un solo borrador por conjunto', 'Duplicate');
+    $q5a->exec("INSERT INTO rule_versions (set_id, version, status, rules) VALUES (1, 3, 'archived', '[]'), (1, 4, 'archived', '[]')");
+    T::eq((int) $q5a->query('SELECT COUNT(*) FROM rule_versions WHERE set_id = 1')->fetchColumn(), 4, '  esquema: puede haber muchas archivadas (slot NULL no choca)');
+    T::throws(static fn() => $q5a->exec("INSERT INTO rule_versions (set_id, version, status, rules) VALUES (1, 4, 'archived', '[]')"), '  esquema: el número de versión no se repite', 'Duplicate');
+    T::throws(static fn() => $q5a->exec("INSERT INTO rule_versions (set_id, version, status, rules) VALUES (1, 9, 'archived', 'no es json')"), '  esquema: las reglas deben ser JSON válido');
+    T::throws(static fn() => $q5a->exec("INSERT INTO rule_versions (set_id, version, status, rules) VALUES (999, 9, 'archived', '[]')"), '  esquema: la versión exige un conjunto existente', 'foreign key');
+    $q5a->exec("INSERT INTO rule_applications (lead_id, set_id, version_id, rule_id, rule_name, kind, action, dedupe_key) VALUES (1, 1, 1, 'r', 'R', 'alerts', 'telegram_alert', 'k1')");
+    T::throws(static fn() => $q5a->exec("INSERT INTO rule_applications (lead_id, set_id, version_id, rule_id, rule_name, kind, action, dedupe_key) VALUES (1, 1, 1, 'r', 'R', 'alerts', 'telegram_alert', 'k1')"), '  esquema: un efecto con la misma clave no se repite (dedupe_key único)', 'Duplicate');
+    $q5a->exec("INSERT INTO rule_simulations (set_id, params, rules) VALUES (1, '{}', '[]')");
+    $q5a->exec("INSERT INTO rule_simulation_rows (sim_id, lead_id, before_score, before_temp, after_score, after_temp) VALUES (1, 1, 50, 'warm', 60, 'warm')");
+    $q5a->exec('DELETE FROM rule_simulations WHERE id = 1');
+    T::eq((int) $q5a->query('SELECT COUNT(*) FROM rule_simulation_rows')->fetchColumn(), 0, '  esquema: borrar una simulación borra sus filas (ON DELETE CASCADE)');
+    $rootPdo->exec('DROP DATABASE cap_mig_q5a');
+
     $tables = $pdo->query('SHOW TABLES')->fetchAll(PDO::FETCH_COLUMN);
     foreach (['prospect_calls', 'dnc_numbers', 'users', 'leads', 'lead_events', 'consents', 'prospects_fmcsa', 'tasks', 'appointments', 'messages', 'sequence_enrollments', 'referral_codes', 'referrals', 'job_postings', 'channel_costs', 'settings', 'jobs', 'activity_log', 'recovery_codes', 'login_attempts', 'schema_migrations', 'handoffs', 'handoff_deliveries', 'user_invites', 'reports', 'email_templates', 'backups', 'lead_notes'] as $t) {
         T::ok(in_array($t, $tables, true), "tabla $t existe");

@@ -294,6 +294,72 @@ return static function (array $ctx): void {
         $diffDq += RuleRunner::score($l, null, null, $all)['score'] !== 0 ? 1 : 0;
     }
     T::ok(count($dq) > 10 && $diffDq === 0, '  y los ' . count($dq) . ' descartados siguen en 0 aunque una regla coincida con todos');
+    // Equivalencia sobre los datos de demostración (bin/seed-demo.php, ~120 leads con eventos): recalcular sin reglas no cambia NADA
+    T::reset(true);
+    $seedEnv = $ctx['work'] . '/seed31.env';
+    file_put_contents($seedEnv, implode("\n", array_map(static fn($k, $v) => "$k=$v", array_keys($ctx['env']), $ctx['env'])) . "\n");
+    $sd = Infra::cli([$ctx['root'] . '/bin/seed-demo.php', '--reset'], ['CAPTACION_ENV_FILE' => $seedEnv]);
+    $seeded = (int) Db::value('SELECT COUNT(*) FROM leads');
+    T::ok($sd['code'] === 0 && $seeded >= 100, 'datos de demostración: seed-demo sembró ' . $seeded . ' leads');
+    $eventsBefore = (int) Db::value("SELECT COUNT(*) FROM lead_events WHERE type = 'scored'");
+    // Resultado ESPERADO con las funciones originales (Scoring::score + Flags::derive), sin pasar por RuleRunner
+    $expected = [];
+    $changedExpected = 0;
+    foreach (Db::all('SELECT * FROM leads ORDER BY id') as $row) {
+        $hl = Lead::hydrate($row);
+        $sc = Scoring::score($hl);
+        $expected[(int) $row['id']] = ['score' => $sc['score'], 'temperature' => $sc['temperature'], 'breakdown' => json_decode((string) json_encode($sc['breakdown']), true), 'flags' => \Captacion\Services\Flags::derive($hl['flags'], $hl), 'dq' => $sc['disqualified_reason']];
+        $changedExpected += ((int) $row['score'] !== $sc['score'] || $row['temperature'] !== $sc['temperature']) ? 1 : 0;
+    }
+    $actual = static function () use ($expected): int {
+        $bad = 0;
+        foreach (Db::all('SELECT id, score, temperature, score_breakdown, flags, disqualified_reason FROM leads ORDER BY id') as $r) {
+            $e = $expected[(int) $r['id']];
+            $got = ['score' => (int) $r['score'], 'temperature' => $r['temperature'], 'breakdown' => json_decode((string) $r['score_breakdown'], true), 'flags' => Db::decode($r['flags']), 'dq' => $r['disqualified_reason']];
+            sort($e['flags']);
+            sort($got['flags']);
+            $bad += $got === $e ? 0 : 1;
+        }
+        return $bad;
+    };
+    $diffs = 0;
+    foreach (Db::all('SELECT * FROM leads ORDER BY id') as $row) {
+        $hl = Lead::hydrate($row);
+        $diffs += RuleRunner::score($hl) === Scoring::score($hl) ? 0 : 1;
+    }
+    T::eq($diffs, 0, 'EQUIVALENCIA sobre el seed demo: RuleRunner::score() es idéntico a Scoring::score() en los ' . $seeded . ' leads');
+    $jobsBefore = (int) Db::value('SELECT COUNT(*) FROM jobs');
+    foreach (Db::all('SELECT id FROM leads ORDER BY id') as $row) {
+        LeadIngest::rescore((int) $row['id'], 'equivalencia', false);
+    }
+    $scoredAfter = (int) Db::value("SELECT COUNT(*) FROM lead_events WHERE type = 'scored'");
+    T::eq($actual(), 0, 'EQUIVALENCIA: recalcular los ' . $seeded . ' leads del seed SIN reglas deja exactamente lo que dan Scoring::score y Flags::derive (puntuación, temperatura, desglose, banderas y motivo de descarte)');
+    T::eq([$scoredAfter - $eventsBefore, (int) Db::value('SELECT COUNT(*) FROM jobs') - $jobsBefore, (int) Db::value('SELECT COUNT(*) FROM rule_applications')], [$changedExpected, 0, 0], '  con un evento «scored» solo por cada lead cuya puntuación o temperatura cambió (' . $changedExpected . '), sin jobs y sin registros de reglas');
+    $sNoMatch = RuleSets::create('scoring', 'Sin coincidencias', '', $uid);
+    RuleSets::saveDraft($sNoMatch['id'], Rules::normalize([$rule(['id' => 'nada', 'when' => ['mode' => 'all', 'items' => [$cond('state', 'is', 'AK'), $cond('years', 'gt', 79)]]])], 'scoring')['rules'], null, $uid);
+    RuleSets::publish($sNoMatch['id'], $uid);
+    foreach (Db::all('SELECT id FROM leads ORDER BY id') as $row) {
+        LeadIngest::rescore((int) $row['id'], 'equivalencia', false);
+    }
+    T::ok($actual() === 0 && (int) Db::value("SELECT COUNT(*) FROM lead_events WHERE type = 'scored'") === $scoredAfter && (int) Db::value('SELECT COUNT(*) FROM rule_applications') === 0, '  y con una regla publicada que no coincide con nadie, también idéntico y sin eventos nuevos');
+    Settings::set('rules.enabled', false);
+    $allRule = RuleSets::create('scoring', 'Todos', '', $uid);
+    RuleSets::saveDraft($allRule['id'], Rules::normalize([$rule(['id' => 'todos', 'when' => ['mode' => 'all', 'items' => [$cond('profile', 'exists')]]])], 'scoring')['rules'], null, $uid);
+    RuleSets::publish($allRule['id'], $uid);
+    foreach (Db::all('SELECT id FROM leads ORDER BY id') as $row) {
+        LeadIngest::rescore((int) $row['id'], 'equivalencia', false);
+    }
+    T::ok($actual() === 0, '  y con el interruptor general apagado aunque haya una regla que coincide con todos, también idéntico');
+    Settings::set('rules.enabled', true);
+    $dis = Db::value("SELECT COUNT(*) FROM leads WHERE temperature = 'disqualified'");
+    T::ok($dis > 0, '  (el seed incluye ' . $dis . ' descartados, que las reglas no tocan)');
+    RuleSets::retireAll($uid);
+    Db::pdo()->exec('DELETE FROM rule_versions');
+    Db::pdo()->exec('DELETE FROM rule_sets');
+    RuleSets::clearCache();
+    T::reset(true);
+    $uid = (int) \CaptacionTests\Panel::user('admin')['id'];
+
     // Interruptor general
     $setIds = [];
     $s1 = RuleSets::create('scoring', 'Conjunto de prueba', '', $uid);
