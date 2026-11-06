@@ -435,6 +435,7 @@ function org_services(): array
         '/dispatch-for-owner-operators/' => 'Owner-operator dispatch',
         '/amazon-relay-dispatch/'        => 'Amazon Relay dispatch',
         '/dry-van-dispatch/'             => 'Dry van dispatch',
+        '/power-only-dispatch/'          => 'Power only dispatch',
         '/load-tracking/'                => 'Load tracking',
         '/trucking-back-office/'         => 'Trucking back office',
     ];
@@ -489,7 +490,7 @@ function organization_schema(string $type = 'Organization'): array
             'contactType'       => 'customer service',
             'telephone'         => PHONE,
             'email'             => EMAIL,
-            'availableLanguage' => 'English',
+            'availableLanguage' => (defined('LANGUAGES_TEXT') && stripos((string) LANGUAGES_TEXT, 'spanish') !== false) ? ['English', 'Spanish'] : 'English',   // LANGUAGES_TEXT (fase S)
         ],
     ];
     if ($type === 'Organization' && $services) {

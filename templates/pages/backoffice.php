@@ -6,11 +6,13 @@
  */
 require_once NS_ROOT . '/templates/partials/kit.php';
 
+// Alcance confirmado por el cliente (fase S), siempre "según el alcance contratado": liquidaciones preparadas y revisadas, soportes organizados, seguimiento de diferencias de pago y disputas,
+// altas y documentación de conductores e información operativa organizada. NO se afirma que NorthStar ejecute o apruebe pagos, ni se distingue base de adicional (pendiente del cliente).
 $jobs = [
-    ['Settlement preparation', 'Every load reconciled against its rate confirmation.'],
-    ['Dispute management', 'Claims followed with the evidence our desk collected on the road.'],
-    ['Document organization', 'Rate cons, BOLs, PODs and receipts filed per load.'],
-    ['Driver onboarding', 'New drivers set up in your accounts.'],
+    ['Settlement preparation', 'Settlements prepared and reviewed, every load reconciled against its rate confirmation.'],
+    ['Dispute management', 'Payment differences and disputes followed with the evidence our desk collected on the road.'],
+    ['Document organization', 'Rate cons, BOLs, PODs, receipts and operational information organized per load.'],
+    ['Driver onboarding', 'New drivers set up in your accounts, with their documentation organized.'],
     ['Account performance', 'Follow-up on scorecards and account health on Amazon Relay.'],
 ];
 $flow = ['Book', 'Track', 'Document', 'Get paid'];
@@ -26,7 +28,7 @@ partial('hero', [
     'cls'     => 'sb-bo-hero',
     'h1'      => 'Trucking back office {hl}services{/hl}',
     'tagline' => 'The work behind the load, done right.',
-    'lead'    => 'Paperwork organized, settlements prepared and disputes followed until they close.',
+    'lead'    => 'Paperwork organized, settlements prepared and disputes followed until they close, according to the scope we agree with you.',
     'ctas'    => [['label' => 'Talk to the desk', 'href' => wa($route['wa']), 'wa' => true, 'arrow' => true]],
     'image'   => ['base' => 'nf-hero-back-office', 'alt' => 'Desk with a lamp, a stamp, a stack of blank forms and a laptop beside a rain-covered window at night', 'pos' => '60% 50%'],
 ]);

@@ -1,7 +1,8 @@
 <?php
 /**
  * Contenido de las páginas por equipo (Equip*.html del prototipo). Todas son status 'draft' hasta que el cliente
- * confirme los equipos que despacha (§7.4). Clave = $route['equip']. Textos de la maqueta, sin revisar con el cliente.
+ * confirme los equipos que despacha (§7.4), salvo 'power-only' que pasó a live en la fase S (el cliente lo incluye en su oferta: Amazon Relay, power only y dry van;
+ * por confirmar cuáles se atienden hoy). Clave = $route['equip']. Textos de la maqueta, sin revisar con el cliente.
  * Las 5 páginas comparten FAQ y 'needs' salvo la línea de detalles del equipo.
  */
 
@@ -113,12 +114,12 @@ return [
     ],
     'power-only' => [
         'path'    => '/power-only-dispatch/',
-        'image'   => ['base' => 'nf-setup-amazon-relay', 'alt' => 'White semi truck at a warehouse dock wall at night under tall floodlights'],   // foto ambiental provisional (páginas en draft)
+        'image'   => ['base' => 'nf-setup-amazon-relay', 'alt' => 'White semi truck at a warehouse dock wall at night under tall floodlights'],   // foto ambiental de marca (no muestra al equipo real)
         'name'    => 'Power only',
         'h1'      => 'Power only dispatch services',
         'tagline' => 'Your tractor, their trailer',
         'lead'    => 'Power only loads let you haul trailers owned by shippers, brokers or Amazon. We find the loads, confirm trailer pickup and drop details and track every move.',
-        'sheet'   => ['equipment' => 'Tractor with fifth wheel', 'freight' => 'Drop trailers, Amazon Relay, shipper pools', 'confirm' => 'Trailer location, interchange, drop yard'],
+        'sheet'   => ['equipment' => 'Tractor with fifth wheel', 'freight' => 'Drop trailers and Amazon Relay power only loads', 'confirm' => 'Trailer location, interchange, drop yard'],
         'handles_title' => 'Built around your power only',
         'handles' => [
             ['Power only load search', 'Broker and Amazon Relay power-only freight that fits your lanes.'],
@@ -127,21 +128,20 @@ return [
             ['Paperwork handled', 'Interchange documents, BOLs and PODs filed per load.'],
         ],
         'checks'  => [
-            'Trailer interchange coverage on your insurance',
+            'Trailer pickup and interchange details confirmed',
             'Trailer number and condition checked at pickup',
             'Drop location and hours confirmed',
             'Empty-trailer moves priced in',
         ],
         'needs'   => [
-            'MC and USDOT authority',
-            'Certificate of insurance',
-            'W-9',
-            'Your power only details and photos',
+            'Your carrier details',
+            'Your tractor details',
             'Preferred lanes and home time',
+            'How you want to get updates',
         ],
         'faq_title' => 'Power only dispatch questions',
         'faq'     => [
-            ['q' => 'Do you dispatch power onlys under my own authority?', 'a' => 'Yes. We book loads under your MC and USDOT. You keep your authority and decide which loads to take.'],
+            ['q' => 'Do you dispatch power only under my own authority?', 'a' => 'Yes. We book loads under your MC and USDOT. You keep your authority and decide which loads to take.'],
             ['q' => 'Can I refuse a load you find?', 'a' => 'Always. We send the details first (rate, miles, stops and requirements) and book only what you approve.'],
             ['q' => 'How do you send updates?', 'a' => 'On WhatsApp, where you already work: load offers, confirmations, check calls and paperwork reminders.'],
         ],

@@ -239,6 +239,7 @@ function ns_menu(): array
             ['Dispatch for owner-operators', 'Loads booked, brokers handled, you approve every load', '/dispatch-for-owner-operators/', 'star', null],
             ['Amazon Relay dispatch', 'Load board, trips, scorecard and disputes', '/amazon-relay-dispatch/', 'star', null],
             ['Dry van dispatch', 'Dry van freight booked and followed by one desk', '/dry-van-dispatch/', 'star', null],
+            ['Power only dispatch', 'Power only loads booked, trailer details confirmed', '/power-only-dispatch/', 'star', null],
         ],
         'ops' => [
             ['Load tracking & check calls', 'Pickup to POD, every load logged', '/load-tracking/', 'star', 'Load tracking'],

@@ -20,7 +20,7 @@
  *   lastmod    (opcional) 'YYYY-MM-DD' real del último cambio de contenido: lo único que emite <lastmod> en el sitemap (no se inventan fechas)
  *   noindex    (opcional) true => <meta robots noindex, follow> en producción, aunque la ruta sea live (apply, gracias); no entra en sitemap ni llms
  *   gate       (opcional) 'lead-thanks' => solo se sirve con el token firmado de un envío real (?t=…); sin él, 303 a /careers/apply/ (sin sesiones)
- *   needs_files (opcional) lista de archivos bajo assets/ que la página promete (descargas). En ENV=production, si falta alguno la ruta pasa a draft (404, fuera de sitemap, llms, menús y enlaces); en staging se ve igual para poder revisar el diseño
+ *   needs_files (opcional) lista de archivos bajo assets/ que la página promete (descargas). En ENV=production, si falta alguno o DOWNLOADS_APPROVED es false la ruta pasa a draft (404, fuera de sitemap, llms, menús y enlaces); en staging se ve igual para poder revisar el diseño
  *   schema_name (opcional) nombre del nodo Service/WebPage cuando el H1 no sirve como nombre
  *
  * La clave especial '404' no es una URL: es la ruta que usa index.php para el error 404.
@@ -510,9 +510,9 @@ $routes = [
         'meta'       => 'Power only dispatch for owner-operators: loads for your tractor, trailer pickup and drop details confirmed, and every move tracked and documented.', // TODO
         'h1'         => 'Power only dispatch services',
         'schema'     => ['Service', 'FAQPage', 'BreadcrumbList'],
-        'status'     => 'draft',
-        'sitemap'    => false,
-        'priority'   => 0.6,
+        'status'     => 'live',   // fase S: en la oferta del cliente (Amazon Relay, power only y dry van); contenido sin placeholders. Carlos debe validar title/meta (TODO).
+        'sitemap'    => true,
+        'priority'   => 0.7,
         'wa'         => 'equip-power-only',
         'breadcrumb' => 'Power only',
         'crumbs'     => [['Home', '/'], ['Services', '/dispatch-for-owner-operators/'], ['Power only', '/power-only-dispatch/']],   // maqueta: Home / Services / equipo
@@ -595,10 +595,15 @@ foreach (jobs_all() as $nsSlug => $nsJob) {
     ];
 }
 
-// Guarda de archivos (B1): una página que promete una descarga solo es pública en producción si el archivo existe.
-// Se aplica aquí, al construir el mapa, para que sitemap, llms, menús y route_is_live() lo vean igual.
+// Guarda de archivos (B1) y de aprobación (fase S): una página que promete una descarga solo es pública en producción si el cliente aprobó los descargables
+// (DOWNLOADS_APPROVED = true) Y el archivo existe. Se aplica aquí, al construir el mapa, para que sitemap, llms, menús, listados, footer y route_is_live() lo vean igual.
 if (is_production()) {
     foreach ($routes as $nsKey => $nsR) {
+        if (!empty($nsR['needs_files']) && !(defined('DOWNLOADS_APPROVED') && DOWNLOADS_APPROVED)) {
+            $routes[$nsKey]['status'] = 'draft';
+            $routes[$nsKey]['sitemap'] = false;
+            continue;
+        }
         foreach ($nsR['needs_files'] ?? [] as $nsFile) {
             if (!is_file(NS_ROOT . '/assets/' . $nsFile)) {
                 $routes[$nsKey]['status'] = 'draft';

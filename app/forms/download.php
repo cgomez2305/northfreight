@@ -36,6 +36,10 @@ declare(strict_types=1);
     if ($doc === null) {
         ns_plain(405, 'Method not allowed', ['Allow: GET, HEAD']);
     }
+    // Fase S: sin aprobación del cliente (DOWNLOADS_APPROVED) no se entrega nada en producción (la ruta ya da 404; esto es la segunda barrera). En staging sigue funcionando para revisar.
+    if (is_production() && !(defined('DOWNLOADS_APPROVED') && DOWNLOADS_APPROVED)) {
+        ns_plain(404, 'Not found');
+    }
 
     $in = $_POST;
     $guard = ns_form_guard($in, $form);
