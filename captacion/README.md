@@ -1,4 +1,4 @@
-# NorthStar Captación (mini-CRM) — fases Q1, Q2a, Q2b, Q3, Q4a y Q4b
+# NorthStar Captación (mini-CRM) — fases Q1, Q2a, Q2b, Q3, Q4a, Q4b y Q5a
 
 Aplicación PHP **aparte del sitio** (el sitio sigue sin base de datos) que capta, califica y da seguimiento a owner-operators, carriers pequeños y company drivers. La opera una sola persona (Carlos, ClikRank). Documento maestro: `sistema-captacion-choferes-northstar.md` v2.0.
 
@@ -8,6 +8,7 @@ Aplicación PHP **aparte del sitio** (el sitio sigue sin base de datos) que capt
 **Q3 (entrega, reportes y correo, §18):** entrega de leads a NorthStar (correo y webhook firmado, confirmación sin login), rol de solo lectura para NorthStar, reportes, informes automáticos y plantillas y secuencias de correo.
 **Q4a (captación saliente, §19):** prospectos FMCSA (llamadas en frío manuales), referidos y vacantes publicadas en el sitio.
 **Q4b (canales externos, §20):** webhooks de Meta Lead Ads, Cal.com, Twilio y n8n, API interna para n8n, WhatsApp entrante, reactivación A11 y paquete de integración (`docs/`).
+**Q5a (base de la experiencia, §21):** tema claro/oscuro/automático por usuario, vistazo rápido de un lead, vistas guardadas, tarjetas nuevas del tablero, barra lateral plegable con vistas y bandeja, paleta de comandos, atajos de teclado y «Deshacer». El editor de reglas con simulación (Q5b) y las vistas de tabla, calendario y cronología (Q5c) no están.
 **Qué NO incluye todavía:** parser de job boards y «Send me my results» (`docs/job-boards.md`); envío saliente de SMS (A2P 10DLC pendiente).
 
 Sin dependencias nuevas: PHP 8.2+ (el servidor tiene 8.3), PDO MySQL, curl, sodium, openssl, mbstring. PHPMailer (el del sitio, `../vendor/`) solo si hay SMTP; el CRM funciona sin él.
@@ -62,6 +63,8 @@ MySQL 8 y MariaDB 10.11 (`utf8mb4`, `utf8mb4_unicode_ci`, InnoDB, borrados lógi
 | `002_auth.sql` | `users.totp_confirmed_at`, `users.totp_last_step` (anti-reutilización), `users.password_algo`; tablas `recovery_codes` (solo hash) y `login_attempts`. |
 | `003_settings_seed.sql` | Pesos y umbrales de puntuación y los ajustes **provisionales** (ver §4). Deben coincidir con `Scoring::DEFAULTS` (lo comprueba `tests/run.php`). |
 | `004_panel.sql` | Q2a: tablas `lead_notes` (notas con borrado lógico) y `notification_reads` (avisos de la campana leídos, por usuario); `messages.duration_sec/user_id` (llamadas manuales); `jobs.status` admite `cancelled` (A3 anulada al contactar); `tasks.created_by`; índices `leads(deleted_at,created_at)`, `leads(temperature,first_contact_at,deleted_at)` y `leads(profile,created_at)`. |
+
+| `011_ux_prefs_views.sql` | Q5a: `user_prefs` (tema, barra lateral, densidad, columnas de la lista y leads recientes de la paleta, una fila por usuario y clave) y `saved_views` (vistas guardadas por usuario: filtros en JSON, orden, pipeline, fijada, borrado lógico). `CREATE TABLE IF NOT EXISTS`, idempotente; probada desde cero y sobre la base de Q2b. |
 
 Columnas añadidas a `leads` respecto al documento (necesarias para esta fase): `site_lead_id` (UNIQUE, id `ld_…` del sitio: idempotencia), `phone_raw`, `authority_status`, `endorsements`, `contact_pref`, `best_time`, `job_slug`, `disqualified_reason`, `lost_at`, `attempt`, `updated_at`. `jobs` añade `dedupe_key` (UNIQUE), `started_at`, `finished_at`.
 
@@ -363,13 +366,38 @@ Derivada del navy y el cian del sitio, con neutros de tinte azul. Contrastes med
 
 El cian `#06A6CC` solo va en rellenos, puntos y la línea de «company drivers» (`#0691B3`, 3,7:1 sobre blanco para gráficos). Los bordes de campos de formulario usan `#7D8EA5` (3,3:1). Foco: contorno de 2 px `--focus` (`#036E8A`). Significado constante: **temperatura** (caliente = único acento cálido, tibio = cian, frío = azul pizarra, descartado = gris) y **etapa** (punto de color en un chip neutro: gris → azul pizarra → cian → navy → verde al firmar → rojo apagado al perder).
 
+### Tema oscuro (Q5a)
+
+El tema se elige por usuario (**Claro / Oscuro / Auto**, en el menú del usuario y con el botón de la barra superior; el lector de NorthStar también puede cambiarlo y es lo único nuevo que ve). La preferencia vive en `user_prefs` y `<html>` la trae ya escrita (`data-theme-pref`); un script con nonce al inicio del `<head>` resuelve `auto` con `prefers-color-scheme` y fija `data-theme` ANTES de pintar (sin parpadeo; sin JS queda claro). Las páginas sin sesión (acceso, 2FA, `/c`, `/u`, `/invite`) usan lo último elegido en ese navegador (`localStorage.ns-theme`) o el modo automático. Los informes impresos vuelven siempre a claro (`beforeprint`/`afterprint` cambian `data-theme` mientras se imprime).
+
+Todo son variables en `:root[data-theme="dark"]` de `public/assets/panel.css`; las hojas por pantalla solo usan variables (no hay un solo color fijo fuera de `:root`, salvo el bloque `@media print`). Lienzo navy del sitio (`#04101F` fondo, `#0A1D33` tarjetas y barra lateral, `#0F2A47` hover y menús), nunca negro puro; el cian `#06A6CC` sí es texto legible aquí (5,9:1 sobre las tarjetas). `--navy-2` pasa a ser el relleno cian de los controles activos (con texto `--on-fill` `#04132A`), `--pop` es la superficie de avisos y tooltips (`#16385C`), y la temperatura y las etapas se reajustaron a tintes claros sobre fondos oscuros del mismo matiz. El logo cambia al isotipo blanco con `content:url()`.
+
+Contrastes medidos (WCAG, texto):
+
+| Par (oscuro) | Contraste |
+|---|---|
+| `--ink` `#EEF3F8` / `--ink-2` `#B9C8D8` / `--ink-3` `#8FA3B8` sobre `--bg` `#04101F` | 17,1 / 11,2 / 7,4:1 |
+| ídem sobre `--surface` `#0A1D33` | 15,2 / 10,0 / 6,6:1 |
+| ídem sobre `--sunk` `#0E2540` | 13,9 / 9,1 / 6,0:1 |
+| `--ink` / `--ink-2` / `--ink-3` sobre hover y menús `#0F2A47` | 13,0 / 8,5 / 5,6:1 |
+| Enlaces `--cyan-ink` `#4FC3E3` sobre bg / surface / sunk / tinte `#0B3350` | 9,3 / 8,3 / 7,6 / 6,4:1 |
+| Cian `#06A6CC` como texto sobre surface / bg | 5,9 / 6,7:1 |
+| `--on-fill` `#04132A` sobre el relleno cian `#06A6CC` (botón primario, pestaña activa) / sobre `--navy-3` `#0691B3` | 6,5 / 5,0:1 |
+| Texto de avisos y tooltips `#EEF3F8` / `#B9C8D8` sobre `--pop` `#16385C` | 10,7 / 7,0:1 |
+| Caliente `#FFB38A` / tibio `#7FD6EE` / frío `#A9BBE8` / descartado `#B4C2D2` sobre su fondo | 8,9 / 7,4 / 7,3 / 7,9:1 |
+| OK `#6EE0A0`, error `#FF9C93`, aviso `#F5B866` sobre su fondo | 8,5 / 7,3 / 7,7:1 |
+| `--on-fill` sobre los puntos de color (naranja, verde, rojo) en insignias y casillas | 8,2 / 9,4 / 6,7:1 |
+| Iniciales de los 8 avatares sobre su fondo | 7,2 a 8,3:1 |
+| Borde de campos `#6683A5` sobre surface / sunk / bg (mínimo 3:1 en componentes) | 4,3 / 3,95 / 4,9:1 |
+| Foco `#6FD3EC` sobre surface / bg | 9,9 / 11,1:1 |
+
 ### Tipografía y marca
 
 Las del sitio, copiadas a `public/assets/fonts/` (woff2) con los respaldos de métricas ajustadas (`fonts.css`): Barlow (texto y números de UI), Barlow Condensed (títulos y cifras grandes de KPI), JetBrains Mono (rótulos, cabeceras de tabla, chips, ejes). Isotipo oscuro y claro en `public/assets/`. Botón primario navy con celda circular de flecha cian (solo `transform`), chips píldora, estrella de marca en estados vacíos y login.
 
 ### Pantallas y comportamiento
 
-- **Shell**: barra lateral (Principal: Dashboard, Leads; Atajos: calientes pendientes, llegaron hoy, descartados; estado del sistema y usuario abajo), barra superior con migas, **buscador global** (`Ctrl/⌘ K` o `/`, panel de resultados con flechas/Enter, diálogo nativo `<dialog>`), reloj ET, **campana** (leads calientes sin contactar, trabajos fallidos, Telegram sin configurar, FMCSA pendiente/sin llave, cron detenido; la clave de cada aviso incluye su estado, así que uno resuelto y vuelto a ocurrir sale otra vez) y menú del usuario. En ≤ 1023 px la barra lateral es un cajón; en ≤ 760 px hay barra inferior (Inicio, Leads, Buscar, Menú) y la ficha trae su propia barra fija (Llamar, WhatsApp, Correo, Etapa).
+- **Shell** (desde Q5a, §21: la sección «Atajos» es ahora «Vistas» con contador en vivo, hay bloque «Bandeja», barra plegable, tema y paleta de comandos): barra lateral (Principal: Dashboard, Leads; Atajos: calientes pendientes, llegaron hoy, descartados; estado del sistema y usuario abajo), barra superior con migas, **buscador global** (`Ctrl/⌘ K` o `/`, panel de resultados con flechas/Enter, diálogo nativo `<dialog>`), reloj ET, **campana** (leads calientes sin contactar, trabajos fallidos, Telegram sin configurar, FMCSA pendiente/sin llave, cron detenido; la clave de cada aviso incluye su estado, así que uno resuelto y vuelto a ocurrir sale otra vez) y menú del usuario. En ≤ 1023 px la barra lateral es un cajón; en ≤ 760 px hay barra inferior (Inicio, Leads, Buscar, Menú) y la ficha trae su propia barra fija (Llamar, WhatsApp, Correo, Etapa).
 - **Dashboard**: 4 KPI (leads con sparkline y variación; calificados con anillo; calientes sin contactar con la espera del más antiguo; mediana de primera respuesta), selector Hoy / Semana / Mes (hoy se compara con ayer a la misma hora; semana y mes, con los 7 / 30 días previos), «Exportar CSV» del periodo, gráfico de líneas semanal / mensual / anual (las pestañas solo aparecen si hay datos para ellas), desglose por fuente (90 días) con una línea de insight solo si hay ≥ 10 leads y una fuente que crece (≥ 3 leads y ≥ 1 en el periodo previo), franja secundaria (12 semanas; el costo por lead dice «Sin costos cargados» mientras `channel_costs` esté vacía), tabla de leads recientes con búsqueda y paginación, mapa de calor de 13 semanas, lista «Hoy» y estado del sistema. Los cálculos de día/semana/mes son en hora ET; el agrupado por día se hace en PHP (no hace falta `CONVERT_TZ`).
 - **Bandeja**: pestañas por temperatura con conteos (respetan el resto de filtros), filtros con chips activos y URL compartible, orden por columnas, paginación, selección múltiple con barra de acciones, exportación, filas urgentes marcadas y tarjetas apiladas en móvil. Estados vacíos distintos para «no hay leads» (explica cómo llegan) y «ningún lead coincide».
 - **Ficha**: cabecera con nombre, perfil, temperatura, etapa, banderas y puntuación; Llamar (`tel:`), WhatsApp (`wa.me` con saludo en el idioma del lead; WhatsApp **no** está cubierto por `CONSENT_TEXT_V1`: es un mensaje manual), Correo, Registrar llamada, Cambiar etapa / Reabrir; datos de contacto; avance en el pipeline; tareas, notas (editar, borrado lógico), línea de tiempo unificada con filtros, puntuación desglosada, elegibilidad y operación, FMCSA con banderas rojas, atribución, consentimientos (texto, fecha, canal, revocar) y otros leads con el mismo teléfono o correo.
@@ -611,3 +639,45 @@ Ningún formato se probó contra el servicio real; todo se probó con fixtures y
 ### 20.9 Pruebas
 
 `php captacion/tests/run.php`: `25_meta_calcom` (firma válida/inválida/ausente/manipulada, repetición, cuerpo enorme, límites, e2e Meta → lead puntuado y alertado, Cal.com → cita, etapa, tarea y recordatorios con reloj simulado, eventos fuera de orden), `26_sms_n8n` (Twilio y n8n.php, STOP/START/HELP, respuesta → pausa y aviso, WhatsApp entrante), `27_internal_api` (autorización, lista blanca, consentimiento, pasos y recordatorios, idempotencia, campana y «Probar»), `28_reactivation` (reloj simulado) y `29_docs_pack` (JSON de n8n válidos y sin secretos). `19_viewer` comprueba que el lector no accede a nada de esto. **No cubierto:** Meta, Cal.com, Twilio, WhatsApp y n8n reales, MySQL 8, `.htaccess` (la regla `^internal(/|$)` no se probó con Apache/LiteSpeed).
+
+---
+
+## 21. Experiencia del panel (Q5a): tema, vistazo, vistas, tablero, paleta, atajos y «Deshacer»
+
+Migración nueva: **`011_ux_prefs_views.sql`** (§2); en el servidor basta `php captacion/bin/migrate.php` tras el deploy. Sin variables nuevas, sin crons nuevos, sin dependencias. De las dos referencias de Carlos (un editor de políticas con panel lateral y un tablero de proyectos oscuro) se tomaron **componentes y maneras de trabajar**, nunca marca, textos ni colores: panel lateral deslizable con cabecera, acciones y datos clave; barra de pestañas de vistas con filtro y orden; tarjetas con etiquetas, código corto, barras de prioridad y avance; sidebar plegable con contadores y atajo de búsqueda visible; todo con la identidad NorthStar (navy y cian, Barlow, Barlow Condensed y JetBrains Mono).
+
+| Entregable | Qué quedó |
+|---|---|
+| **A. Tema** | §15 «Tema oscuro». `Services\Prefs` (lista blanca de claves y valores), `POST /ajax/prefs` (CSRF; el lector solo puede cambiar `theme`). |
+| **B. Vistazo rápido** | Clic en una fila de la bandeja o una tarjeta del tablero abre un panel a la derecha (≥ 1025 px) o una hoja inferior casi a pantalla completa (móvil) sin salir de la lista: cabecera (nombre, código, perfil, temperatura, etapa, puntuación), Llamar / WhatsApp / Correo, cambiar etapa (mismas reglas: pide motivo, nota o confirmación en el diálogo compartido), datos clave y banderas de FMCSA, hasta 4 tareas abiertas (se completan con un clic), las últimas 5 actividades, formularios de nota, tarea y llamada, y «Abrir ficha completa» (`/leads/{id}` sigue siendo la URL canónica; las alertas de Telegram no cambian). Carga: `POST /ajax/peek {id}` (JSON con CSRF y rol de administrador; nada en la URL salvo `?peek=ID` en la barra, para compartir y recargar), esqueleto de carga, error con «Reintentar», foco al título y de vuelta a la fila al cerrar, `Esc`, trampa de foco y `aria-modal` solo en la hoja móvil. `J`/`K` y flechas recorren la lista visible (el vistazo abierto sigue al cursor), `Enter` y doble clic abren la ficha, `Espacio` abre el vistazo. Sin JS la fila sigue siendo un enlace a la ficha. |
+| **C. Vistas** | Pestañas **Lista / Tablero** que comparten filtros (`Kanban::filters` ya acepta todos los de la bandeja salvo la etapa), chips de filtros activos y «Limpiar» en ambas pantallas. Vistas del sistema (en código): Calientes pendientes, Llegaron hoy, Sin tarea, Descartados y Presentados sin respuesta (filtros nuevos `nt`, `op`, `hs`). Vistas del usuario (`saved_views`, privadas: toda operación comprueba `user_id`): guardar filtros y orden con un nombre (único sin importar mayúsculas, 60 caracteres, máximo 30), renombrar, fijar (aparecen en la barra lateral bajo «Vistas» con contador en vivo: se recalcula en cada página y cada 60 s con `POST /ajax/counters`), borrar (lógico) y «Guardar cambios» cuando una vista abierta fue modificada. Todo con formularios (`/vistas/...`) que funcionan sin JS. Densidad (cómoda / compacta) y columnas visibles de la lista (incluye «Próxima tarea»), guardadas por usuario. |
+| **D. Tablero** | Encabezado de columna con icono de etapa, conteo y «+» en «Nuevo» (alta manual rápida: nombre, teléfono y perfil, fuente `manual`, pasa por `LeadIngest` con validación, deduplicación y puntuación, sin consentimiento de mensajería ni alertas; si el teléfono ya existe abre el lead existente). Tarjeta: etiquetas de perfil y equipo, nombre, código corto `LD-0142` (también se busca), barra de puntuación de 4 segmentos, fecha de la próxima tarea (roja si venció), avance del pipeline `3/6` con barra fina, antigüedad en la etapa y bandera de FMCSA. Se mantienen arrastrar, «Mover a…» (ahora un botón de icono), «Ver más» por columna y todas las reglas de etapa. Densidad compacta opcional. **No hay responsable** en el modelo de datos (una sola persona opera el CRM), así que no se muestra avatar de responsable; el código ya lo pinta si la fila trae `assignee`. |
+| **E. Sidebar y barra superior** | Barra lateral plegable (solo iconos con tooltip; estado por usuario sin parpadeo; en móvil sigue siendo cajón), bloque «Bandeja» (avisos sin leer + tareas vencidas, abre la bandeja de avisos), sección «Vistas» con las fijadas, buscador con `/` y `Ctrl/⌘ K` visibles, selector de tema. La bandeja de avisos es la campana mejorada: lista completa con leído / no leído por aviso, filtro por tipo (Todos, Sin leer, Leads, Tareas, Sistema), «Marcar todo» y acceso a las tareas vencidas. |
+| **F. Paleta (`Ctrl/⌘ K`, `/`)** | Resultados agrupados: **Acciones** (Nuevo lead, Nueva tarea, Cambiar tema, Atajos, Plegar la barra lateral y, con un lead abierto en la ficha o en el vistazo, «Mover a …» cada etapa, Registrar llamada, Añadir nota, Añadir tarea y Marcar respondió), **Leads** (búsqueda por nombre, teléfono, correo, USDOT o código), **Recientes** (los últimos abiertos por ese usuario, solo ids en `user_prefs`), **Pantallas** y **Vistas**. Flechas, `Enter`, foco atrapado (diálogo nativo) y `Esc`. El catálogo (`Services\Commands`) se arma en el servidor por rol: solo los administradores lo reciben; el lector no tiene paleta ni buscador. |
+| **G. Atajos y «Deshacer»** | `?` abre la hoja de atajos (`/` buscar, `g d`/`g l`/`g p`/`g t` ir a Dashboard, Leads, Pipeline o Tareas, `j`/`k`, `Enter`, `Espacio`, `n` nota, `c` llamada, `m` mover, `Esc`); se desactivan dentro de campos de texto y de diálogos, y nada depende solo del teclado. **«Deshacer»** (aviso de 6 s con acción; sin JS el aviso queda con su botón): cambio de etapa en la ficha, el tablero, el vistazo y la paleta; cambio masivo; completar una tarea; borrar una nota. El servidor emite un token firmado (HMAC con `APP_KEY`, atado al usuario, 10 min) y al aplicarlo vuelve a validar el estado actual con las mismas funciones del panel (`LeadActions::undoStage`, `Tasks::reopen`, `LeadActions::restoreNote`) y deja evento en el historial (`stage_changed` con `undo`) y en `activity_log`. **Límites decididos:** no se ofrece deshacer cuando el cambio genera una entrega a NorthStar (a o desde «Presentado», «Firmado», «Contratado»), ni desde «Perdido» (se reabre); deshacer no restaura la segunda alerta A3 cancelada ni las secuencias pausadas; «añadir o quitar de la selección masiva» se interpretó como el propio cambio masivo (la casilla de selección es estado de pantalla, no un cambio en el servidor). |
+| **H. Pulido** | Estados vacíos, de carga (esqueleto del vistazo) y de error (con reintento) en lo nuevo; transiciones solo de `transform` y `opacity`, desactivadas con `prefers-reduced-motion`; 360 a 1920 sin scroll horizontal; foco visible; textos en español. |
+
+### Rutas y endpoints nuevos
+
+| Ruta | Qué es |
+|---|---|
+| `POST /ajax/prefs {key,value}` | Tema, barra lateral, densidad y columnas. Lista blanca; el lector solo `theme`. |
+| `POST /ajax/peek {id}` | Fragmento HTML del vistazo (ya escapado) + etapa y etapas del pipeline. |
+| `POST /ajax/lead/act {id,act,...}` | `note`, `task`, `task_done`, `call`, `responded`: las mismas funciones que la ficha. Devuelve el token de «Deshacer» cuando aplica. |
+| `POST /ajax/lead/create {name,phone,profile}` | Alta manual rápida por el motor. |
+| `POST /ajax/undo {token}` · `POST /undo` | Deshacer (JSON y formulario sin JS; `back` solo admite rutas internas). |
+| `POST /ajax/counters` | Contadores de las vistas fijadas y de la bandeja. |
+| `POST /ajax/pipeline/card {lead_id}` | La tarjeta actual de un lead (tras deshacer o un cambio hecho fuera del tablero). |
+| `POST /vistas/new` · `POST /vistas/{id}/{rename\|pin\|unpin\|delete\|update}` | Vistas guardadas (formularios con CSRF). |
+
+Todo POST con sesión, 2FA, CSRF y rol comprobado en el servidor, con límite de uso por usuario (`ux_peek` 240/min, `ux_act` 120/min, `ux_create` 30/min, `ux_prefs` 90/min). El lector responde 403 sin datos en todo lo anterior salvo `theme`.
+
+### CSS y JS (Q5a)
+
+El presupuesto es **≤ 45 KB de CSS sin comprimir por pantalla** (base + hoja de pantalla + fuentes). El tema oscuro, el vistazo y los avisos no cabían, así que se partió: `panel.css` pasa a ~27 KB (se le quitó lo que solo usan algunas pantallas, que ahora vive en la hoja de cada una; análisis hecho midiendo qué reglas coinciden con el DOM de 45 rutas y verificado con 180 capturas antes y después) y hay dos hojas **diferidas** que el navegador pide fuera del primer pintado: `ux.css` (paleta, atajos, avisos, tooltips, bandeja, menús de vistas y «Mover a…», ~7,7 KB) y `peek.css` (el panel del vistazo, ~4,8 KB), cargadas desde `ux.js` y `peek.js`. Total de la primera pantalla (fonts + panel + hojas): Leads 38,6 KB, Pipeline 41,1, Ficha 43,1 (la más pesada), Dashboard 42,8, Configuración (Puntuación) 39,6. `fonts.css` bajó de 3,5 a 2,7 KB (sin `unicode-range`: ya son subsets latinos). La prueba `17_pulido` comprueba el tope por cada ruta.
+
+JS sin comprimir (gzip): `panel.js` 11,9 KB (3,7), `ux.js` 23,4 KB (7,8; todas las pantallas de administración, no el lector), `peek.js` 9,3 KB (3,3) y `views.js` 2,2 KB (0,9) en Leads y Pipeline, `kanban.js` 17,3 KB (5,7).
+
+### Pruebas (Q5a)
+
+`php captacion/tests/run.php`: nuevo `30_ux_q5a` (preferencias y su aislamiento, tema sin parpadeo y por usuario, vistas guardadas con aislamiento entre usuarios y contadores en vivo, filtros nuevos, vistazo con autorización y datos correctos, acciones rápidas, alta manual por el motor, «Deshacer» de cada acción con caducidad, manipulación y otro usuario, paleta por rol, bandeja leído / no leído, tarjetas del tablero, y la prueba negativa del lector en cada endpoint nuevo). `01_migrations` prueba la 011 sobre una base de Q2b; `12_kanban`, `17_pulido` y `19_viewer` se ajustaron a las pestañas, las hojas por pantalla y las rutas nuevas. No cubierto: el comportamiento del navegador (arrastre, foco, teclado), que se revisó con Chromium a 1440, 1024, 834 y 390 px en claro y oscuro (capturas fuera del repo); Firefox y Safari siguen sin probarse.
