@@ -168,7 +168,7 @@ final class Appointments
             $common = ['starts_at' => $startS, 'ends_at' => $endS, 'title' => $ev['title'] !== '' ? $ev['title'] : null, 'meeting_url' => $ev['meeting_url'] !== '' ? $ev['meeting_url'] : null, 'tz' => $ev['tz'] !== '' ? $ev['tz'] : null, 'last_event_at' => $eventAt];
 
             if ($row === null) {
-                $id = Db::insert('appointments', $common + ['lead_id' => $leadId, 'calcom_id' => $ev['uid'], 'status' => $cancel ? 'cancelled' : 'booked', 'cancelled_at' => $cancel ? $eventAt : null, 'source' => 'calcom', 'created_at' => Clock::now()]);
+                $id = Db::insert('appointments', $common + ['lead_id' => $leadId, 'calcom_id' => $ev['uid'], 'prev_calcom_id' => $ev['trigger'] === 'BOOKING_RESCHEDULED' && $ev['reschedule_uid'] !== '' ? $ev['reschedule_uid'] : null, 'status' => $cancel ? 'cancelled' : 'booked', 'cancelled_at' => $cancel ? $eventAt : null, 'source' => 'calcom', 'created_at' => Clock::now()]);
                 $kind = $cancel ? 'cancelled' : ($ev['trigger'] === 'BOOKING_RESCHEDULED' ? 'rescheduled' : 'booked');
             } else {
                 $id = (int) $row['id'];

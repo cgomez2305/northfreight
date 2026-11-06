@@ -21,12 +21,19 @@ final class Panel
     public string $csrf = '';
 
     /** Arranca php -S sobre public/ con un .env propio (la base de pruebas + $extra). */
-    public static function start(array $ctx, string $name, array $extra = []): self
+    public static function start(array $ctx, string $name, array $extra = [], bool $selfCall = false): self
     {
         $envFile = $ctx['work'] . "/$name.env";
+        $from = 18900;
+        $procEnv = ['CAPTACION_ENV_FILE' => $envFile, 'NO_PROXY' => '127.0.0.1,localhost'];
+        if ($selfCall) {   // el boton «Probar» de los webhooks se llama a si mismo por HTTP: hace falta SELF_BASE_URL con el puerto real y varios procesos de php -S
+            $from = Infra::freePort(19600);
+            $extra += ['SELF_BASE_URL' => "http://127.0.0.1:$from"];
+            $procEnv['PHP_CLI_SERVER_WORKERS'] = '4';
+        }
         $vars = $extra + $ctx['env'];
         file_put_contents($envFile, implode("\n", array_map(static fn($k, $v) => "$k=$v", array_keys($vars), $vars)) . "\n");
-        $port = Infra::phpServer($name, $ctx['root'] . '/public', ['CAPTACION_ENV_FILE' => $envFile, 'NO_PROXY' => '127.0.0.1,localhost']);
+        $port = Infra::phpServer($name, $ctx['root'] . '/public', $procEnv, null, $from);
         $c = new self();
         $c->base = "http://127.0.0.1:$port";
         $c->jar = $ctx['work'] . "/jar-$name-" . bin2hex(random_bytes(3)) . '.txt';

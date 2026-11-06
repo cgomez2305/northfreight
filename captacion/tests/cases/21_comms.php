@@ -57,16 +57,16 @@ return static function (array $ctx): void {
 
     // ------------------------------------------------------------------ Plantillas de fabrica
     Templates::ensure();
-    T::eq((int) Db::value('SELECT COUNT(*) FROM email_templates'), 10, 'se siembran 10 plantillas de fábrica (A6 día 1, 3, 7, 14 y A12, en inglés y español)');
+    T::eq((int) Db::value('SELECT COUNT(*) FROM email_templates'), 18, 'se siembran 18 plantillas de fábrica (A6 día 1, 3, 7, 14, A11 x2, A5 x2 y A12, en inglés y español)');
     Db::run("UPDATE email_templates SET subject = 'Editado por Carlos' WHERE tkey = 'a6_d3' AND lang = 'en'");
     Templates::resetEnsure();
     Templates::ensure();
-    T::ok((int) Db::value('SELECT COUNT(*) FROM email_templates') === 10 && Db::value("SELECT subject FROM email_templates WHERE tkey = 'a6_d3' AND lang = 'en'") === 'Editado por Carlos', 'sembrar otra vez no duplica ni pisa lo que Carlos editó');
+    T::ok((int) Db::value('SELECT COUNT(*) FROM email_templates') === 18 && Db::value("SELECT subject FROM email_templates WHERE tkey = 'a6_d3' AND lang = 'en'") === 'Editado por Carlos', 'sembrar otra vez no duplica ni pisa lo que Carlos editó');
     Templates::restore((int) Db::value("SELECT id FROM email_templates WHERE tkey = 'a6_d3' AND lang = 'en'"), $aid);
     T::ok(Db::value("SELECT subject FROM email_templates WHERE tkey = 'a6_d3' AND lang = 'en'") !== 'Editado por Carlos', 'restaurar devuelve el texto de fábrica');
     $all = implode("\n", array_map(static fn($t) => $t['subject'] . "\n" . $t['body'], \Captacion\Services\TemplateDefaults::all()));
     T::ok(!preg_match('/\d+\s?%|\$\s?\d|guarantee|garant[ií]a|24\/7|within \d+ (hours|minutes)|en menos de/i', $all), 'los textos de fábrica no traen cifras, porcentajes, garantías ni tiempos de respuesta');
-    T::ok(substr_count($all, '[[CONFIRMAR') === 4, 'solo dos plantillas (día 1 y día 7, en 2 idiomas) llevan marcadores [[CONFIRMAR…]] pendientes');
+    T::ok(substr_count($all, '[[CONFIRMAR') === 8, 'solo las plantillas de A6 día 1 y 7 y de A11 (en 2 idiomas) llevan marcadores [[CONFIRMAR…]] pendientes');
     // validacion
     $v = Templates::validate(['name' => 'ab', 'lang' => 'fr', 'subject' => 'x', 'body' => 'corto'], true);
     T::ok(!$v['ok'] && isset($v['errors']['name'], $v['errors']['lang'], $v['errors']['subject'], $v['errors']['body']), 'validar: nombre, idioma, asunto y mensaje inválidos se rechazan');

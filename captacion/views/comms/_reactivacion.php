@@ -28,7 +28,7 @@ $blocked = $pending !== [];
     <header class="card__h"><h2 class="label" id="re-q">QUIÉN ENTRA</h2><span class="muted"><?= $e($scan['total']) ?> perdidos hace <?= $e($cfg['min_days']) ?>+ días</span></header>
     <div class="card__b">
       <p class="re-big"><b><?= $e(count($scan['eligible'])) ?></b> elegible<?= count($scan['eligible']) === 1 ? '' : 's' ?></p>
-      <dl class="intg__d"><?php foreach ($why as $k => $l): ?><div><dt><?= $e($l) ?></dt><dd><?= $e($scan['excluded'][$k] ?? 0) ?></dd></div><?php endforeach; ?></dl>
+      <dl class="re-d"><?php foreach ($why as $k => $l): ?><div><dt><?= $e($l) ?></dt><dd><?= $e($scan['excluded'][$k] ?? 0) ?></dd></div><?php endforeach; ?></dl>
       <p class="muted cm-note">Solo pipeline A (owner-operators y carriers). Inscritos: <?= $e(($counts['active'] ?? 0)) ?> activos · <?= $e($counts['paused'] ?? 0) ?> en pausa · <?= $e($counts['completed'] ?? 0) ?> completados · <?= $e($counts['stopped'] ?? 0) ?> detenidos · <?= $e($sent) ?> correos enviados. Se pausa sola si el lead se reabre, responde o se da de baja.</p>
     </div>
   </section>

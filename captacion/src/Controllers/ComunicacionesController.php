@@ -64,7 +64,7 @@ final class ComunicacionesController extends Responder
     private static function shell(array $user, string $tab, array $vars, int $status = 200): never
     {
         self::page('comunicaciones', $user, 'comunicaciones', [['Comunicaciones', '/comunicaciones'], [self::TABS[$tab], null]], $vars + [
-            'title' => 'Comunicaciones', 'css' => ['comms'], 'tab' => $tab, 'tabs' => self::TABS, 'warnings' => Sequences::warnings(), 'canDeliver' => Mailer::canDeliver(),
+            'title' => 'Comunicaciones', 'css' => $tab === 'reactivacion' ? ['config', 'comms'] : ['comms'], 'tab' => $tab, 'tabs' => self::TABS, 'warnings' => Sequences::warnings(), 'canDeliver' => Mailer::canDeliver(),
         ], $status);
     }
 

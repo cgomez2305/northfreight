@@ -145,7 +145,7 @@ return static function (array $ctx): void {
     $csrf = $viewer->csrf;
     $getRoutes = ['/leads', "/leads/$lA", "/leads/$lB", '/leads?q=Zebulon', '/leads?t=hot&ct=none', '/pipeline', '/pipeline?pl=B', '/tareas', '/tareas?tab=overdue', '/config', '/config?tab=alertas', '/config?tab=costos', '/config?tab=integraciones', '/config?tab=horario', '/config?tab=copias',
         '/config?tab=entrega', '/config?tab=correo', '/config?tab=usuarios', '/actividad', '/actividad?q=Zebulon', '/reportes', '/reportes?r=90d', '/comunicaciones', '/comunicaciones/plantillas', '/comunicaciones/plantillas/1', '/comunicaciones/plantillas/new', '/comunicaciones/inscripciones',
-        '/comunicaciones/envios', '/ajax/search', '/ajax/notifications/read', '/ajax/pipeline/cards', '/ajax/pipeline/move', "/informes/$draftId", '/informes/generate', "/informes/$pubId/publish", "/informes/$pubId/actions", '/setup.php', '/api/lead.php', '/config/backups/download',
+        '/comunicaciones/envios', '/comunicaciones/reactivacion', '/config?tab=canales', '/internal/ping', '/internal/sequences/due', '/api/webhooks/meta.php', '/api/webhooks/calcom.php', '/api/webhooks/sms.php', '/api/webhooks/n8n.php', '/ajax/search', '/ajax/notifications/read', '/ajax/pipeline/cards', '/ajax/pipeline/move', "/informes/$draftId", '/informes/generate', "/informes/$pubId/publish", "/informes/$pubId/actions", '/setup.php', '/api/lead.php', '/config/backups/download',
         '/leads/export', '/leads/bulk', '/reportes/export'];
     $bad = [];
     foreach ($getRoutes as $path) {
@@ -163,7 +163,7 @@ return static function (array $ctx): void {
         '/tareas/new' => ['title' => 'x'], '/tareas/1/done' => [], '/tareas/1/delete' => [], '/config/alerts' => ['hot_telegram' => '1'], '/config/unlock' => ['password' => 'x', 'code' => '1'], '/config/handoff/save' => ['email' => 'x@x.com'], '/config/handoff/test' => [],
         '/config/mail/save' => ['enabled' => '1'], '/config/users/invite' => ['name' => 'Intruso', 'email' => 'intruso@example.com'], '/config/users/deactivate' => ['id' => $aid], '/config/users/reset' => ['id' => $aid], '/config/backups/download' => ['id' => 1], '/config/backups/run' => [],
         '/actividad/export' => [], '/reportes/export' => ['table' => 'canales'], '/informes/generate' => ['period' => ReportJobs::previousMonth(Clock::time() - 90 * 86400)], "/informes/$draftId/publish" => [], "/informes/$draftId/actions" => ['action' => ['x']], "/informes/$pubId/resend" => [],
-        '/comunicaciones/plantillas/new' => ['name' => 'Intruso', 'lang' => 'en', 'subject' => 'abc', 'body' => str_repeat('x', 30)], '/comunicaciones/plantillas/1/save' => ['subject' => 'x'], '/comunicaciones/plantillas/1/test' => ['to' => 'a@b.com'], '/comunicaciones/inscripciones/1/pause' => []];
+        '/comunicaciones/plantillas/new' => ['name' => 'Intruso', 'lang' => 'en', 'subject' => 'abc', 'body' => str_repeat('x', 30)], '/comunicaciones/plantillas/1/save' => ['subject' => 'x'], '/comunicaciones/plantillas/1/test' => ['to' => 'a@b.com'], '/comunicaciones/inscripciones/1/pause' => [], '/comunicaciones/reactivacion' => ['enabled' => '1', 'min_days' => '60'], '/config/canales/meta' => ['consent_text' => 'x'], '/config/canales/n8n' => ['wa_steps' => ['a1_welcome']], '/config/integrations/test' => ['name' => 'meta']];
     $badP = [];
     foreach ($postRoutes as $path => $body) {
         $r = $viewer->post($path, ['_csrf' => $csrf] + $body);
