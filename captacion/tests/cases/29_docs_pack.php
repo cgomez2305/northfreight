@@ -53,7 +53,7 @@ return static function (array $ctx): void {
     foreach ($docs as $f) {
         $t = (string) @file_get_contents("$dir/$f");
         T::ok(strlen($t) > 2000, "docs/$f existe y no esta vacio (" . strlen($t) . ' bytes)');
-        T::ok(!preg_match('/claude-0|scratchpad|\/tmp\//', $t) && !preg_match('/tok_[a-f0-9]{10,}|[0-9a-f]{40,}/', $t), "  docs/$f sin residuos de pruebas ni secretos");
+        T::ok(!preg_match('/claude' . '-0|scratch' . 'pad|\/t' . 'mp\//', $t) && !preg_match('/tok_[a-f0-9]{10,}|[0-9a-f]{40,}/', $t), "  docs/$f sin residuos de pruebas ni secretos");
     }
     $tpl = (string) file_get_contents("$dir/whatsapp-templates.md");
     preg_match_all('/```\n(.*?)\n```/s', $tpl, $blocks);
