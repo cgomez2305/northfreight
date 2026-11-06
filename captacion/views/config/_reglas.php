@@ -41,7 +41,7 @@ $run = $recalc !== null && ($recalc['status'] ?? '') === 'running';
     <?php if ($recalc !== null): ?>
       <div class="rl-recalc__s<?= $run ? ' is-run' : '' ?>"<?= $run ? ' data-running' : '' ?>>
         <p><b><?= $run ? 'Recalculando…' : 'Último recálculo terminado' ?></b> <?= $e(Fmt::num((int) $recalc['processed'])) ?> de <?= $e(Fmt::num((int) $recalc['total'])) ?> leads · <?= $e(Fmt::num((int) $recalc['changed'])) ?> cambiaron · <?= $e(Fmt::dateTime((string) $recalc['started_at'])) ?></p>
-        <?php if ($run): $pct = $recalc['total'] > 0 ? (int) round($recalc['processed'] / $recalc['total'] * 100) : 100; ?><progress class="rl-bar" max="100" value="<?= $e($pct) ?>"><?= $e($pct) ?> %</progress><p class="muted">Esta página se actualiza sola.</p>
+        <?php if ($run): $pct = $recalc['total'] > 0 ? (int) round($recalc['processed'] / $recalc['total'] * 100) : 100; ?><progress class="rl-prog" max="100" value="<?= $e($pct) ?>"><?= $e($pct) ?> %</progress><p class="muted">Esta página se actualiza sola.</p>
         <?php elseif (is_array($recalc['after'] ?? null) && is_array($recalc['before'] ?? null)): ?>
           <ul class="rl-ba" aria-label="Recuento antes y después"><?php foreach ($tl as $k => $l): ?><li><span><?= $e($l) ?></span><b class="mono"><?= $e((int) ($recalc['before'][$k] ?? 0)) ?> → <?= $e((int) ($recalc['after'][$k] ?? 0)) ?></b></li><?php endforeach; ?></ul>
         <?php endif; ?>

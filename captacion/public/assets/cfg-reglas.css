@@ -1,0 +1,51 @@
+/* NorthStar Captación · Q5b: pestaña «Reglas» (lista de conjuntos). El editor (panel lateral) vive en rules.css, que se pide al abrirlo. Sin estilos en línea (CSP). */
+.rl-state{display:flex;gap:16px 24px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:18px 22px;border-color:var(--cyan-line);background:var(--cyan-tint)}
+.rl-state.is-off{border-color:var(--warn-dot);background:var(--warn-bg)}
+.rl-state__t{display:flex;gap:16px;align-items:center;min-width:0;flex:1 1 360px}
+.rl-state__i{flex:none;width:44px;height:44px;border-radius:50%;background:var(--navy-2);color:var(--on-fill);display:grid;place-items:center}
+.rl-state.is-off .rl-state__i{background:var(--warn-dot);color:var(--on-fill)}
+.rl-state h2{font:700 24px/1.1 var(--f-cond)}
+.rl-state p{color:var(--ink-2);font-size:14px;margin-top:3px;max-width:62ch}
+.rl-state.is-off p{color:var(--warn)}
+.rl-state__a{display:flex;gap:8px;flex-wrap:wrap}
+.rl-recalc{display:flex;gap:16px 28px;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;padding:16px 22px}
+.rl-recalc__t{flex:1 1 380px;min-width:0;display:flex;flex-direction:column;gap:8px}
+.rl-recalc__t p{color:var(--ink-2);font-size:14px;max-width:70ch}
+.rl-recalc__s p{color:var(--ink)}
+.rl-recalc__f{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+.rl-prog{width:100%;height:10px;accent-color:var(--cyan)}
+.rl-ba{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.rl-ba li{display:flex;gap:8px;align-items:center;padding:5px 10px;border-radius:var(--r-pill);background:var(--sunk);border:1px solid var(--line);font-size:13px;color:var(--ink-2)}
+.rl-ba b{color:var(--ink)}
+.rl-bar__t{display:flex;align-items:center;gap:10px}
+.rl-bar__n{font:600 12px var(--f-mono);padding:2px 8px;border-radius:var(--r-pill);background:var(--sunk);color:var(--ink-2)}
+.rl-bar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-top:6px}
+.rl-bar__t{margin:0}
+.rl-bar__a{display:flex;gap:8px;flex-wrap:wrap}
+.rl-group{display:flex;flex-direction:column;gap:10px}
+.rl-group__h{display:flex;gap:6px 14px;align-items:baseline;flex-wrap:wrap}
+.rl-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,340px),1fr));gap:12px}
+.rl-card{position:relative;display:flex;flex-direction:column;gap:8px;height:100%;padding:16px 46px 16px 18px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);color:var(--ink);text-decoration:none!important;transition:border-color .15s,transform .15s}
+.rl-card:hover{border-color:var(--cyan);transform:translateY(-1px)}
+.rl-card.is-cur{border-color:var(--cyan-ink);box-shadow:0 0 0 3px var(--cyan-tint)}
+.rl-card__top{display:flex;gap:8px 10px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+.rl-card__n{font:700 22px/1.1 var(--f-cond);overflow-wrap:anywhere}
+.rl-card__d{color:var(--ink-2);font-size:13.5px}
+.rl-card__m{display:flex;flex-direction:column;gap:3px;color:var(--ink-3);font-size:12.5px}
+.rl-card__m span{display:flex;gap:6px;align-items:center}
+.rl-card__m .ic{width:14px;height:14px;flex:none}
+.rl-card__r{display:flex;gap:6px;flex-wrap:wrap}
+.rl-tag{display:inline-flex;max-width:100%;padding:2px 9px;border-radius:var(--r-pill);background:var(--sunk);border:1px solid var(--line);font-size:12px;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rl-tag.is-off{color:var(--ink-3);text-decoration:line-through}
+.rl-card__go{position:absolute;right:14px;top:50%;margin-top:-14px;width:28px;height:28px;border-radius:50%;background:var(--sunk);display:grid;place-items:center;color:var(--ink-2)}
+.rl-card:hover .rl-card__go{background:var(--cyan);color:var(--navy)}
+.rl-empty__a{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.rl-note{display:flex;gap:8px;align-items:flex-start;max-width:78ch}
+.rl-note .ic{flex:none;margin-top:3px}
+.rl-kinds{border:0;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;min-width:0}
+.rl-kind{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line-2);border-radius:var(--r-in);cursor:pointer}
+.rl-kind:has(input:checked){border-color:var(--cyan-ink);background:var(--cyan-tint)}
+.rl-kind input{margin-top:4px;accent-color:var(--cyan-ink)}
+.rl-kind span{display:flex;flex-direction:column;gap:2px}
+.rl-kind small{color:var(--ink-3);font-size:12.5px}
+@media (max-width:640px){.rl-state{padding:16px}.rl-state h2{font-size:22px}.rl-list{grid-template-columns:1fr}}

@@ -204,9 +204,10 @@
  function themeAct(v) { return function () { NS.setTheme(v); NS.toast('Tema ' + { light: 'claro', dark: 'oscuro', auto: 'automático' }[v] + '.'); }; }
  var ACT = {
   new_lead: function () { NS.openQC(); }, new_task: function () { location.href = '/tareas?new=1'; }, keys: function () { openKeys(); }, side: function () { NS.toggleSide(); },
-  theme_light: themeAct('light'), theme_dark: themeAct('dark'), theme_auto: themeAct('auto')
+  theme_light: themeAct('light'), theme_dark: themeAct('dark'), theme_auto: themeAct('auto'),
+  rules_go: function () { location.href = '/config?tab=reglas'; }, rules_new: function () { location.href = '/config?tab=reglas&nueva=1'; }, rules_sim: function () { location.href = '/config?tab=reglas&simular=1'; }
  };
- var ACT_ICON = { new_lead: 'user-plus', new_task: 'list-check', keys: 'keyboard', side: 'panel-left', theme_light: 'sun', theme_dark: 'moon', theme_auto: 'monitor', call: 'phone', note: 'note', task: 'calendar', responded: 'check-circle' };
+ var ACT_ICON = { new_lead: 'user-plus', new_task: 'list-check', keys: 'keyboard', side: 'panel-left', theme_light: 'sun', theme_dark: 'moon', theme_auto: 'monitor', rules_go: 'sliders', rules_new: 'plus', rules_sim: 'flask', call: 'phone', note: 'note', task: 'calendar', responded: 'check-circle' };
  function allItems(q) {
   var out = [], c = NS.ctx, nq = norm(q), toks = nq.split(/\s+/).filter(Boolean);
   var hit = function (t, k) { var h = norm(t + ' ' + (k || '')); return toks.every(function (x) { return h.indexOf(x) >= 0; }); };
