@@ -4,7 +4,7 @@
  * Orden: hero (texto + WhatsApp / correo / horario) · triada WhatsApp / Email / Short form (iconos sin tarjeta, cada columna es un enlace) · formulario SECUNDARIO "Tell us about your trucks" · CTA final (layout).
  * Formulario (CLAUDE.md §9): POST /contact/ -> app/forms/contact.php (lote D), PRG.
  * Campos EXACTOS: name, contact (correo o teléfono de respuesta), company, mc, trucks, equipment, message; honeypot "website"; form_ts; csrf.
- * Tras un error (422/429/503) la página se re-renderiza con un resumen (role=alert, tabindex=-1, autofocus) que recibe el foco y enlaza a cada campo con error; el action lleva #write para que el navegador baje al formulario.
+ * Tras un error (422/429/503) la página se re-renderiza con un resumen (role=alert, tabindex=-1, autofocus) que recibe el foco y enlaza a cada campo con error; el action lleva #ct-summary: el navegador salta al resumen y, al ser focusable (tabindex=-1), lo enfoca sin JS (con #write el salto desenfocaba el autofocus).
  * Flash opcional ($flash): ['ok'=>bool|string, 'errors'=>[campo=>texto], 'old'=>[campo=>valor]]. Sin $flash no imprime mensajes.
  */
 require_once NS_ROOT . '/templates/partials/kit.php';
@@ -63,7 +63,7 @@ partial('trio', ['label' => 'Ways to reach the desk', 'cls' => 'sb-ct-trio', 'it
     <div class="sb-ct-status" role="status" aria-live="polite"></div>
     <?php endif; ?>
 
-    <form class="sb-ct-form g2" method="post" action="<?= e(url('/contact/')) ?>#write">
+    <form class="sb-ct-form g2" method="post" action="<?= e(url("/contact/")) ?>#ct-summary">
       <input type="hidden" name="form_ts" value="<?= time() ?>">
       <input type="hidden" name="csrf" value="<?= function_exists('csrf_token') ? e(csrf_token()) : '' ?>">
       <div class="sr-only" aria-hidden="true">
