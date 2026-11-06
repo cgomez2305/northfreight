@@ -36,6 +36,44 @@ final class Integrations
         }
     }
 
+    /** Resultado de un webhook ENTRANTE: ok | err | sig (firma rechazada). Lleva la racha de errores y las firmas malas recientes (avisos de la campana). */
+    public static function webhook(string $name, string $outcome, string $msg = ''): void
+    {
+        try {
+            $key = 'integration.' . $name;
+            $cur = Settings::get($key, []);
+            $cur = is_array($cur) ? $cur : [];
+            $now = Clock::now();
+            $cur['msg'] = mb_substr(Storage::redact($msg), 0, 160);
+            if ($outcome === 'ok') {
+                $cur['last'] = 'ok';
+                $cur['ok_at'] = $now;
+                $cur['streak'] = 0;
+            } elseif ($outcome === 'err') {
+                $cur['last'] = 'err';
+                $cur['err_at'] = $now;
+                $cur['err'] = mb_substr(Storage::redact($msg), 0, 200);
+                $cur['streak'] = (int) ($cur['streak'] ?? 0) + 1;
+            } else {
+                $cur['last'] = 'sig';
+                $cur['sig_at'] = $now;
+                $sig = array_values(array_filter((array) ($cur['sig'] ?? []), static fn($t) => is_int($t) && $t > Clock::time() - 86400));
+                $sig[] = Clock::time();
+                $cur['sig'] = array_slice($sig, -20);
+            }
+            Settings::set($key, $cur);
+        } catch (\Throwable) {
+            // el estado es un extra: nunca rompe el webhook
+        }
+    }
+
+    /** Firmas rechazadas en la ultima hora. */
+    public static function sigFails(string $name): int
+    {
+        $l = self::last($name);
+        return count(array_filter((array) ($l['sig'] ?? []), static fn($t) => is_int($t) && $t > Clock::time() - 3600));
+    }
+
     public static function last(string $name): array
     {
         $v = Settings::get('integration.' . $name, []);
@@ -160,6 +198,10 @@ final class Integrations
             'last' => $sok > 0 ? 'Última consulta correcta ' . Fmt::ago((string) $so['ok_at']) : 'Sin consultas todavía', 'error' => $sbad ? (string) ($so['err'] ?? '') : '',
             'help' => 'Es de solo lectura y no necesita llave. Con SOCRATA_APP_TOKEN (gratis en data.transportation.gov) sube el límite de consultas.',
         ];
+        // Canales externos (Q4b): webhooks entrantes
+        foreach (Webhook::SOURCES as $src) {
+            $cards[] = self::webhookCard($src);
+        }
         // Copia diaria de la base
         $bk = Backup::health($now);
         $bs = Settings::get('cron.backup');
@@ -173,6 +215,99 @@ final class Integrations
         return $cards;
     }
 
+    private static function webhookCard(string $src): array
+    {
+        $l = self::last($src);
+        $missing = Webhook::missing($src);
+        $conf = $missing === [];
+        $streak = (int) ($l['streak'] ?? 0);
+        $sig = self::sigFails($src);
+        $ev = Webhook::recent($src);
+        $extra = [];
+        $help = '';
+        if ($src === 'meta' && $conf && (Env::get('META_PAGE_TOKEN') ?? '') === '') {
+            $extra[] = ['Token de página', 'falta META_PAGE_TOKEN: no se pueden traer los leads'];
+            $help = 'Falta META_PAGE_TOKEN en config/.env: el webhook responde 503 y Meta reintenta; no se pierde nada, pero ningún lead entra hasta que lo pongas.';
+        } elseif ($src === 'meta') {
+            $extra[] = ['Token de página', (Env::get('META_PAGE_TOKEN') ?? '') !== '' ? 'configurado' : 'sin configurar'];
+        }
+        if ($src === 'twilio') {
+            $extra[] = ['Cuenta (SID)', (Env::get('TWILIO_SID') ?? '') !== '' ? 'configurado' : 'sin configurar (solo hará falta para enviar)'];
+        }
+        $level = !$conf ? 'off' : ($streak >= 3 ? 'bad' : ($sig >= 3 || ($l['last'] ?? '') === 'err' || ($l['last'] ?? '') === 'sig' ? 'warn' : 'ok'));
+        $headline = !$conf ? 'Sin configurar' : ($streak >= 3 ? $streak . ' errores seguidos' : ($sig >= 3 ? 'Firma rechazada ' . $sig . ' veces en la última hora' : (($l['last'] ?? '') === 'err' ? 'El último evento falló' : (isset($l['ok_at']) ? 'Recibiendo' : 'Listo, sin eventos todavía'))));
+        $details = [['Variables', $conf ? 'completas' : 'faltan: ' . implode(', ', $missing)]];
+        $details = array_merge($details, $extra, [['Eventos (7 días)', $ev['processed'] . ' procesados · ' . $ev['ignored'] . ' ignorados · ' . $ev['error'] . ' con error']]);
+        if (!$conf) {
+            $help = 'Pon ' . implode(' y ', $missing) . ' en config/.env y pega la URL del webhook en ' . Webhook::TITLES[$src] . '. Sin eso el endpoint responde 503 y no hace nada. Guía: captacion/docs/setup-guide.md.';
+        } elseif ($sig >= 3) {
+            $help = 'La firma no coincide: casi seguro la clave del .env no es la que tiene ' . Webhook::TITLES[$src] . '. Revísala y pulsa «Probar».';
+        }
+        $lastTxt = isset($l['ok_at']) ? 'Último evento correcto ' . Fmt::ago((string) $l['ok_at']) . (($l['last'] ?? '') === 'ok' && ($l['msg'] ?? '') !== '' ? ' (' . $l['msg'] . ')' : '') : 'Sin eventos todavía';
+        return [
+            'key' => $src, 'title' => Webhook::TITLES[$src], 'testable' => $conf, 'webhook' => true, 'url' => Webhook::url($src), 'level' => $level, 'headline' => $headline,
+            'details' => $details, 'last' => $lastTxt, 'error' => ($l['last'] ?? '') === 'err' ? (string) ($l['err'] ?? '') : (($l['last'] ?? '') === 'sig' ? 'Firma rechazada ' . Fmt::ago((string) ($l['sig_at'] ?? Clock::now())) : ''),
+            'help' => $help, 'link' => '/config?tab=canales',
+        ];
+    }
+
+    /**
+     * «Probar» de un webhook: construye un evento de PRUEBA, lo firma con el secreto del .env y lo envia por HTTP al PROPIO endpoint (SELF_BASE_URL o APP_URL). No toca ningun servicio
+     * externo ni crea datos: cada endpoint reconoce su evento de prueba (PING, leadgen nstest_…, NSTEST-PING, ping) y responde sin efectos.
+     * @return array{ok:bool,level:string,msg:string}
+     */
+    public static function probe(string $src): array
+    {
+        if (!Webhook::configured($src)) {
+            return ['ok' => false, 'level' => 'warn', 'msg' => Webhook::TITLES[$src] . ' no está configurado: faltan ' . implode(', ', Webhook::missing($src)) . ' en config/.env.'];
+        }
+        $base = rtrim((string) (Env::get('SELF_BASE_URL') ?? Url::base()), '/');
+        $url = $base . Webhook::PATHS[$src];
+        $secret = Webhook::secret($src);
+        $t0 = microtime(true);
+        $steps = [];
+        if ($src === 'meta') {
+            $ch = 'nstest' . bin2hex(random_bytes(4));
+            $r = Http::request('GET', $url . '?hub.mode=subscribe&hub.verify_token=' . rawurlencode((string) Env::get('META_VERIFY_TOKEN')) . '&hub.challenge=' . $ch, null, [], 8, 3);
+            $steps[] = ['Verificación (GET)', $r['status'] === 200 && trim($r['body']) === $ch, $r];
+            $body = (string) json_encode(['object' => 'page', 'entry' => [['id' => '0', 'time' => time(), 'changes' => [['field' => 'leadgen', 'value' => ['leadgen_id' => MetaLeads::TEST_PREFIX . bin2hex(random_bytes(6)), 'form_id' => '0', 'page_id' => '0', 'created_time' => time()]]]]]]);
+            $r = Http::request('POST', $url, $body, ['Content-Type: application/json', 'X-Hub-Signature-256: sha256=' . Webhook::hmacHex('sha256', $secret, $body)], 8, 3);
+            $steps[] = ['Evento firmado (POST)', $r['status'] === 200, $r];
+        } elseif ($src === 'calcom') {
+            $body = (string) json_encode(['triggerEvent' => 'PING', 'createdAt' => gmdate('c'), 'payload' => ['note' => 'prueba de NorthStar Captación']]);
+            $r = Http::request('POST', $url, $body, ['Content-Type: application/json', 'X-Cal-Signature-256: ' . Webhook::hmacHex('sha256', $secret, $body)], 8, 3);
+            $steps[] = ['PING firmado', $r['status'] === 200, $r];
+        } elseif ($src === 'twilio') {
+            $params = ['AccountSid' => 'ACnstest', 'Body' => SmsInbound::TEST_BODY, 'From' => SmsInbound::TEST_FROM, 'MessageSid' => 'SMnstest' . bin2hex(random_bytes(8)), 'To' => '+10000000000'];
+            ksort($params, SORT_STRING);
+            $data = Webhook::url('twilio');
+            foreach ($params as $k => $v) {
+                $data .= $k . $v;
+            }
+            $r = Http::request('POST', $url, http_build_query($params), ['Content-Type: application/x-www-form-urlencoded', 'X-Twilio-Signature: ' . base64_encode(hash_hmac('sha1', $data, $secret, true))], 8, 3);
+            $steps[] = ['SMS de prueba firmado', $r['status'] === 200 && str_contains($r['body'], '<Response'), $r];
+        } else {
+            $body = (string) json_encode(['event' => 'ping']);
+            $ts = (string) time();
+            $r = Http::request('POST', $url, $body, ['Content-Type: application/json', 'X-NS-Timestamp: ' . $ts, 'X-NS-Signature: sha256=' . Webhook::hmacHex('sha256', $secret, $ts . '.' . $body)], 8, 3);
+            $steps[] = ['ping firmado', $r['status'] === 200, $r];
+        }
+        $ms = (int) round((microtime(true) - $t0) * 1000);
+        $bad = array_values(array_filter($steps, static fn($x) => !$x[1]));
+        if ($bad === []) {
+            return ['ok' => true, 'level' => 'ok', 'msg' => 'Firma aceptada: ' . implode(' y ', array_map(static fn($x) => $x[0], $steps)) . ' respondieron bien en ' . $ms . ' ms. Es un evento de prueba: no creó ningún lead ni dato.'];
+        }
+        $r = $bad[0][2];
+        $why = match (true) {
+            $r['status'] === 0 => 'no se pudo llegar a ' . $url . ($r['error'] !== '' ? ' (' . $r['error'] . ')' : '') . '. Revisa APP_URL (o SELF_BASE_URL) en config/.env.',
+            $r['status'] === 401, $r['status'] === 403 => 'el endpoint rechazó la firma (HTTP ' . $r['status'] . '): la clave del .env no coincide con la que usa el endpoint. Si acabas de cambiarla, ¿se guardó el .env?',
+            $r['status'] === 503 => 'el endpoint responde 503 (sin configurar): ' . mb_substr(trim((string) $r['body']), 0, 120),
+            $r['status'] === 429 => 'el endpoint limitó las peticiones (429): espera unos minutos.',
+            default => 'HTTP ' . $r['status'] . ' inesperado: ' . mb_substr(Storage::redact(trim((string) $r['body'])), 0, 120),
+        };
+        return ['ok' => false, 'level' => 'bad', 'msg' => $bad[0][0] . ' falló: ' . $why];
+    }
+
     /**
      * «Probar»: un uso real de la integracion. @return array{ok:bool,level:string,msg:string}  level: ok | warn | bad
      */
@@ -184,6 +319,7 @@ final class Integrations
                 'fmcsa'    => self::testFmcsa($usdot),
                 'smtp'     => self::testSmtp(),
                 'socrata'  => self::testSocrata(),
+                'meta', 'calcom', 'twilio', 'n8n' => self::probe($name),
                 default    => ['ok' => false, 'level' => 'bad', 'msg' => 'Integración desconocida.'],
             };
         } catch (\Throwable $t) {

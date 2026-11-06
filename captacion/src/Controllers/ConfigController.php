@@ -18,6 +18,13 @@ use Captacion\Services\Costs;
 use Captacion\Services\Display;
 use Captacion\Services\Handoff;
 use Captacion\Services\Integrations;
+use Captacion\Services\MetaLeads;
+use Captacion\Services\Appointments;
+use Captacion\Services\SmsInbound;
+use Captacion\Services\N8nBridge;
+use Captacion\Services\Webhook;
+use Captacion\Services\Catalog;
+use Captacion\Services\LeadPayload;
 use Captacion\Services\Invites;
 use Captacion\Services\Mailer;
 use Captacion\Services\ProspectConfig;
@@ -33,10 +40,10 @@ final class ConfigController extends Responder
 {
     public const TABS = [
         'puntuacion' => 'Puntuación', 'alertas' => 'Alertas', 'costos' => 'Costos por canal', 'integraciones' => 'Integraciones', 'horario' => 'Horario y zona', 'copias' => 'Copias de seguridad',
-        'entrega' => 'Entrega a NorthStar', 'correo' => 'Correo y secuencias', 'usuarios' => 'Usuarios', 'prospectos' => 'Prospectos',
+        'entrega' => 'Entrega a NorthStar', 'correo' => 'Correo y secuencias', 'usuarios' => 'Usuarios', 'prospectos' => 'Prospectos', 'canales' => 'Canales externos',
     ];
     /** Pestañas cuyos formularios exigen confirmacion reciente. */
-    public const LOCKED_TABS = ['puntuacion', 'alertas', 'costos', 'horario', 'copias', 'entrega', 'correo', 'usuarios', 'prospectos'];
+    public const LOCKED_TABS = ['puntuacion', 'alertas', 'costos', 'horario', 'copias', 'entrega', 'correo', 'usuarios', 'prospectos', 'canales'];
     public const TEST_LIMIT = 6;   // pruebas de integracion por minuto y usuario
 
     public static function route(?string $a, ?string $b): never
@@ -73,6 +80,10 @@ final class ConfigController extends Responder
             'users/activate'      => self::usersAction($user, 'activate'),
             'prospects/save'      => self::prospectsSave($user),
             'prospects/window'    => self::prospectsWindow($user),
+            'canales/meta'        => self::canalesSave($user, 'meta'),
+            'canales/calcom'      => self::canalesSave($user, 'calcom'),
+            'canales/twilio'      => self::canalesSave($user, 'twilio'),
+            'canales/n8n'         => self::canalesSave($user, 'n8n'),
             default               => self::notFound(),
         };
         self::notFound();
@@ -125,6 +136,8 @@ final class ConfigController extends Responder
             'entrega'       => ['hand' => Handoff::config(), 'handView' => Handoff::overview(), 'handTargets' => Handoff::targets(), 'once' => self::takeOnce()],
             'correo'        => ['mail' => Sequences::mailSettings(), 'mailWarn' => Sequences::warnings(), 'canDeliver' => Mailer::canDeliver(), 'smtpSet' => Mailer::smtpConfigured(), 'mailFrom' => Mailer::fromAddress()],
             'usuarios'      => ['viewers' => Invites::viewers(), 'once' => self::takeOnce(), 'inviteForm' => ['name' => '', 'email' => '']],
+            'canales'       => ['meta' => MetaLeads::config(), 'metaTargets' => MetaLeads::TARGETS, 'metaDefaults' => MetaLeads::DEFAULT_MAP, 'cal' => Appointments::config(), 'tw' => SmsInbound::config(), 'n8n' => N8nBridge::config(),
+                'steps' => N8nBridge::STEP_LABELS, 'profiles' => Catalog::PROFILES, 'urls' => ['meta' => Webhook::url('meta'), 'calcom' => Webhook::url('calcom'), 'twilio' => Webhook::url('twilio'), 'n8n' => Webhook::url('n8n')]],
             'prospectos'    => [
                 'pc' => ProspectConfig::get(), 'pRun' => ProspectImport::state(), 'pComplete' => ProspectImport::completeUntil(), 'pCron' => Settings::get('cron.prospects'),
                 'pSocrata' => Integrations::last('socrata'), 'pToken' => (new \Captacion\Services\SocrataClient())->hasToken(), 'pForm' => null,
@@ -340,7 +353,7 @@ final class ConfigController extends Responder
     {
         $name = is_string($_POST['name'] ?? null) ? $_POST['name'] : '';
         $back = self::guardPost('integraciones', false, '#int-' . preg_replace('/[^a-z]/', '', $name));
-        if (!in_array($name, ['telegram', 'fmcsa', 'smtp', 'socrata'], true)) {
+        if (!in_array($name, ['telegram', 'fmcsa', 'smtp', 'socrata', 'meta', 'calcom', 'twilio', 'n8n'], true)) {
             self::notFound();
         }
         $key = 'u' . (int) $user['id'];
@@ -352,6 +365,51 @@ final class ConfigController extends Responder
         $res = Integrations::test($name, is_string($_POST['usdot'] ?? null) ? $_POST['usdot'] : null);
         ActivityLog::record('integration_test', (int) $user['id'], 'integration', $name, ['ok' => $res['ok'], 'level' => $res['level']]);
         $_SESSION['test_result'] = ['name' => $name] + $res + ['at' => Clock::now()];
+        self::redirect($back);
+    }
+
+    // --- Canales externos (Meta, Cal.com, Twilio, n8n) ---------------------------------------------------------------------------------
+
+    private static function canalesSave(array $user, string $which): never
+    {
+        $back = self::guardPost('canales', true, '#cn-' . $which);
+        $in = $_POST;
+        $str = static fn(string $k, int $max): string => is_string($in[$k] ?? null) ? mb_substr(trim((string) preg_replace('/[^\P{C}\n\t]/u', '', $in[$k])), 0, $max) : '';
+        $before = Settings::get($which === 'twilio' ? 'twilio' : $which, []);
+        if ($which === 'meta') {
+            $map = [];
+            $from = is_array($in['map_from'] ?? null) ? $in['map_from'] : [];
+            $to = is_array($in['map_to'] ?? null) ? $in['map_to'] : [];
+            foreach ($from as $i => $f) {
+                $f = MetaLeads::fieldKey(is_string($f) ? $f : '');
+                $t = is_string($to[$i] ?? null) ? $to[$i] : '';
+                if ($f !== '' && isset(MetaLeads::TARGETS[$t]) && count($map) < 40) {
+                    $map[] = ['from' => $f, 'to' => $t];
+                }
+            }
+            $profile = in_array($in['default_profile'] ?? '', LeadPayload::PROFILES, true) ? (string) $in['default_profile'] : 'owner_operator';
+            $ch = array_values(array_intersect(['call', 'sms', 'email', 'whatsapp'], array_map('strval', is_array($in['consent_channels'] ?? null) ? $in['consent_channels'] : [])));
+            $new = ['default_profile' => $profile, 'map' => $map, 'consent_text' => $str('consent_text', 4000), 'consent_channels' => $ch, 'disclaimer_key' => MetaLeads::fieldKey($str('disclaimer_key', 120))];
+            if ($new['consent_text'] !== '' && $ch === []) {
+                self::flash(false, 'Con un texto de consentimiento hay que marcar al menos un canal que cubra.');
+                self::redirect($back);
+            }
+            Settings::set('meta', $new);
+        } elseif ($which === 'calcom') {
+            $url = $str('booking_url', 200);
+            if ($url !== '' && preg_match('#^https://[^\s<>"\']{4,200}$#', $url) !== 1) {
+                self::flash(false, 'El enlace de reserva debe empezar por https://.');
+                self::redirect($back);
+            }
+            Settings::set('calcom', ['default_profile' => in_array($in['default_profile'] ?? '', LeadPayload::PROFILES, true) ? (string) $in['default_profile'] : 'owner_operator', 'booking_url' => $url]);
+        } elseif ($which === 'twilio') {
+            Settings::set('twilio', ['help_text' => $str('help_text', 320)]);
+        } else {
+            $steps = array_values(array_intersect(array_keys(N8nBridge::STEP_LABELS), array_map('strval', is_array($in['wa_steps'] ?? null) ? $in['wa_steps'] : [])));
+            Settings::set('n8n', ['wa_steps' => $steps, 'sms_enabled' => !empty($in['sms_enabled'])]);
+        }
+        ActivityLog::settingsChange((int) $user['id'], 'canales_' . $which, is_array($before) ? $before : [], (array) Settings::get($which, []));
+        self::flash(true, 'Ajustes guardados.');
         self::redirect($back);
     }
 

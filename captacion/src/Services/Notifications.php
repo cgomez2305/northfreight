@@ -42,6 +42,23 @@ final class Notifications
                 'href' => '/#cola',
             ];
         }
+        // Q4b: webhooks entrantes configurados que fallan seguido o rechazan la firma (posible clave mal puesta)
+        foreach (Webhook::SOURCES as $src) {
+            if (!Webhook::configured($src)) {
+                continue;
+            }
+            $l = Integrations::last($src);
+            $streak = (int) ($l['streak'] ?? 0);
+            if ($streak >= 3) {
+                $items[] = ['key' => 'webhook_err:' . $src . ':' . $streak, 'kind' => 'bad', 'title' => 'El webhook de ' . Webhook::TITLES[$src] . ' falla (' . $streak . ' errores seguidos)',
+                    'meta' => mb_substr((string) ($l['err'] ?? ''), 0, 90), 'href' => '/config?tab=integraciones#int-' . $src];
+            }
+            $sig = Integrations::sigFails($src);
+            if ($sig >= 5) {
+                $items[] = ['key' => 'webhook_sig:' . $src . ':' . $sig, 'kind' => 'warn', 'title' => 'Firma rechazada ' . $sig . ' veces en ' . Webhook::TITLES[$src],
+                    'meta' => 'Posible clave mal puesta en config/.env (o alguien probando el endpoint)', 'href' => '/config?tab=integraciones#int-' . $src];
+            }
+        }
         $over = Tasks::overdueCount();
         if ($over > 0) {
             $oldest = Db::one('SELECT id, due_at FROM tasks WHERE deleted_at IS NULL AND done_at IS NULL AND due_at IS NOT NULL AND due_at < ? ORDER BY due_at ASC LIMIT 1', [Clock::now()]);

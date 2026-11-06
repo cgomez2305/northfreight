@@ -1,0 +1,12 @@
+/* NorthStar Captación · configuración, pestaña «canales». Se carga solo en esa pantalla, encima de panel.css. Sin estilos en línea (CSP). */
+.cn-def{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:12px 0}
+.cn-def code,.cfg-card code{font:500 12px var(--f-mono)}
+.cn-map{display:grid;gap:8px;margin:14px 0 18px}
+.cn-map__h,.cn-map__r{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:10px}
+.cn-map__h{font:500 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.cn-w{max-width:520px;margin-top:14px}
+.cn-h{font:700 22px/1 var(--f-cond);margin:22px 0 6px}
+@media (max-width:760px){
+  .cn-map__h{display:none}
+  .cn-map__r{grid-template-columns:1fr}
+}

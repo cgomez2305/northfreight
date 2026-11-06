@@ -19,3 +19,9 @@
 @media (max-width:760px){
   .intg__f .btn,.intg__u{width:100%}
 }
+.intg__u2{display:grid;gap:6px}
+.intg__k{font:500 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.intg__u2 .rlink{display:flex;gap:8px;align-items:center}
+.intg__u2 .rlink input{flex:1;min-width:0}
+.intg__lnk{margin:0;font-size:14px}
+.intg__lnk .ic{width:14px;height:14px;margin-left:4px;vertical-align:-2px}
