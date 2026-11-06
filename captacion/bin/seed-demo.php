@@ -61,6 +61,7 @@ if (isset($opts['reset'])) {
     Db::pdo()->exec("DELETE FROM referrals WHERE referral_code_id IN (SELECT id FROM referral_codes WHERE note = 'demo')");
     Db::pdo()->exec("DELETE FROM referral_codes WHERE note = 'demo'");
     Db::pdo()->exec('DELETE FROM job_postings WHERE created_by = 0');
+    Db::pdo()->exec("DELETE FROM webhook_events WHERE event_key LIKE 'demo\\_%'");
     Db::pdo()->exec('SET FOREIGN_KEY_CHECKS = 1');
     $ids = array_column(Db::all("SELECT id FROM leads WHERE site_lead_id LIKE 'demo\\_%'"), 'id');
     if ($ids) {
@@ -498,6 +499,20 @@ try {
 $out['prospects'] = count($companies);
 $out['referral_codes'] = count($codeIds);
 $out['job_postings'] = count($jobsDemo);
+
+// Q4b: citas de Cal.com de demostracion (una cancelada), estado de los webhooks y un mapeo de Meta de ejemplo
+foreach (Db::all('SELECT id FROM appointments ORDER BY id LIMIT 6') as $i => $a) {
+    Db::run("UPDATE appointments SET source = 'calcom', calcom_id = ?, title = ?, tz = 'America/Chicago', meeting_url = 'https://meet.example.com/demo', last_event_at = ?, status = ? WHERE id = ?",
+        ['demo-cal-' . ($i + 1), '30 min · Llamada con NorthStar', Clock::now(), $i === 5 ? 'cancelled' : 'booked', (int) $a['id']]);
+}
+Settings::set('integration.meta', ['last' => 'ok', 'ok_at' => Clock::at($now - 420), 'msg' => '2 lead(s) en cola', 'streak' => 0]);
+Settings::set('integration.calcom', ['last' => 'ok', 'ok_at' => Clock::at($now - 3600), 'msg' => 'cita creada', 'streak' => 0]);
+Settings::set('integration.twilio', ['last' => 'err', 'err_at' => Clock::at($now - 600), 'err' => 'Error interno: PDOException', 'streak' => 3, 'msg' => '']);
+Settings::set('meta', ['default_profile' => 'owner_operator', 'consent_channels' => ['call', 'sms', 'email'], 'consent_text' => '',
+    'map' => [['from' => 'what_type_of_equipment_do_you_run?', 'to' => 'equipment'], ['from' => 'how_many_trucks_do_you_have?', 'to' => 'trucks'], ['from' => 'usdot_number', 'to' => 'usdot'], ['from' => 'preferred_language', 'to' => 'language']]]);
+foreach ([['meta', 'demo_lead_1', 'processed', 'created · 1 campos sin mapear'], ['meta', 'demo_lead_2', 'processed', 'created'], ['calcom', 'demo_c1', 'processed', 'cita creada'], ['calcom', 'demo_c2', 'ignored', 'evento obsoleto (ya se aplicó uno más reciente)'], ['twilio', 'demo_t1', 'processed', 'STOP: 2 consentimientos revocados']] as [$src, $k, $st, $sm]) {
+    Db::run('INSERT IGNORE INTO webhook_events (source, event_key, status, summary, created_at) VALUES (?, ?, ?, ?, ?)', [$src, $k, $st, $sm, Clock::at($now - 1800)]);
+}
 
 Settings::set('cron.process_jobs', ['at' => Clock::now(), 'processed' => 3, 'done' => 3, 'retried' => 0, 'failed' => 0, 'seconds' => 0.4]);
 fwrite(STDOUT, 'Sembrados: ' . json_encode($out) . "\n");

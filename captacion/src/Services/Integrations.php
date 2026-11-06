@@ -295,7 +295,7 @@ final class Integrations
         $ms = (int) round((microtime(true) - $t0) * 1000);
         $bad = array_values(array_filter($steps, static fn($x) => !$x[1]));
         if ($bad === []) {
-            return ['ok' => true, 'level' => 'ok', 'msg' => 'Firma aceptada: ' . implode(' y ', array_map(static fn($x) => $x[0], $steps)) . ' respondieron bien en ' . $ms . ' ms. Es un evento de prueba: no creó ningún lead ni dato.'];
+            return ['ok' => true, 'level' => 'ok', 'msg' => 'Firma aceptada (' . implode(' + ', array_map(static fn($x) => $x[0], $steps)) . '): respuesta correcta en ' . $ms . ' ms. Es un evento de prueba: no creó ningún lead ni dato.'];
         }
         $r = $bad[0][2];
         $why = match (true) {

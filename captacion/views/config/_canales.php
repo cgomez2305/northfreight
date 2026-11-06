@@ -3,7 +3,7 @@ use Captacion\Ui;
 
 /** Variables: $meta, $metaTargets, $metaDefaults, $cal, $tw, $n8n, $steps, $profiles, $urls, $locked, $csrf */
 $rows = $meta['map'];
-while (count($rows) < max(4, count($rows) + 2)) {
+for ($i = 0; $i < 3; $i++) {   // tres filas vacias para añadir preguntas
     $rows[] = ['from' => '', 'to' => ''];
 }
 $chan = ['call' => 'Llamada', 'sms' => 'SMS', 'email' => 'Correo', 'whatsapp' => 'WhatsApp'];

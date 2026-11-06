@@ -24,4 +24,5 @@
 .intg__u2 .rlink{display:flex;gap:8px;align-items:center}
 .intg__u2 .rlink input{flex:1;min-width:0}
 .intg__lnk{margin:0;font-size:14px}
+.intg__lnk a{display:inline-flex;gap:4px;align-items:center}
 .intg__lnk .ic{width:14px;height:14px;margin-left:4px;vertical-align:-2px}

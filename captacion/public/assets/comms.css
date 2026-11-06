@@ -39,3 +39,4 @@
 .re-d div{display:flex;justify-content:space-between;gap:12px;padding-bottom:8px;border-bottom:1px solid var(--line);font-size:14px}
 .re-d dt{color:var(--ink-3)}
 .re-d dd{margin:0;font:500 13px var(--f-mono)}
+.cm-seqs .flash{margin:12px 0 0}

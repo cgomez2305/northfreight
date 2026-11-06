@@ -1,4 +1,4 @@
-# NorthStar Captación (mini-CRM) — fases Q1, Q2a, Q2b, Q3 y Q4a
+# NorthStar Captación (mini-CRM) — fases Q1, Q2a, Q2b, Q3, Q4a y Q4b
 
 Aplicación PHP **aparte del sitio** (el sitio sigue sin base de datos) que capta, califica y da seguimiento a owner-operators, carriers pequeños y company drivers. La opera una sola persona (Carlos, ClikRank). Documento maestro: `sistema-captacion-choferes-northstar.md` v2.0.
 
@@ -7,7 +7,8 @@ Aplicación PHP **aparte del sitio** (el sitio sigue sin base de datos) que capt
 **Q2b (panel de trabajo, §17 y §16):** kanban del pipeline con arrastre, tareas y agenda, configuración (puntuación, alertas, costos por canal, integraciones, horario), registro de actividad y copias de seguridad.
 **Q3 (entrega, reportes y correo, §18):** entrega de leads a NorthStar (correo y webhook firmado, confirmación sin login), rol de solo lectura para NorthStar, reportes, informes automáticos y plantillas y secuencias de correo.
 **Q4a (captación saliente, §19):** prospectos FMCSA (llamadas en frío manuales), referidos y vacantes publicadas en el sitio.
-**Qué NO incluye todavía:** WhatsApp/SMS/Cal.com/n8n (Q4b), Meta y job boards (Q6).
+**Q4b (canales externos, §20):** webhooks de Meta Lead Ads, Cal.com, Twilio y n8n, API interna para n8n, WhatsApp entrante, reactivación A11 y paquete de integración (`docs/`).
+**Qué NO incluye todavía:** parser de job boards y «Send me my results» (`docs/job-boards.md`); envío saliente de SMS (A2P 10DLC pendiente).
 
 Sin dependencias nuevas: PHP 8.2+ (el servidor tiene 8.3), PDO MySQL, curl, sodium, openssl, mbstring. PHPMailer (el del sitio, `../vendor/`) solo si hay SMTP; el CRM funciona sin él.
 
@@ -535,3 +536,78 @@ Alta, edición, publicar, pausar, cerrar, reabrir y borrar borradores, con valid
 ### 19.7 Pruebas
 
 `php captacion/tests/run.php`: nuevos `22_prospects` (horario por zona con cambio de hora y estados de dos zonas, filtros, cliente Socrata con token/reintentos/errores, corrida con **fixtures reales** `tests/fixtures/socrata/`, dedupe contra leads y no llamar, tope diario, cursor y reanudación, compuerta por hora ET, resultados, intentos, no llamar más, conversión), `23_prospects_ui` (pantalla, HTTP con CSRF, CSV, campana, configuración, autorización por rol en cada ruta nueva y el cron por CLI contra un Socrata simulado, con `flock`) y `24_referrals_jobs` (referidos con el sitio real y vacantes de punta a punta, y `jobs.php` con JSON vacío, corrupto y malicioso). `01_migrations` prueba la 009 sobre una base con filas previas. No cubierto: Socrata fuera de la prueba manual del 2026-11-05, el `tel:` en un celular real, LiteSpeed y su caché.
+
+---
+
+## 20. Canales externos, puente con n8n y reactivación (Q4b)
+
+Migración nueva: **`010_channels.sql`** (idempotente; probada desde cero y sobre la base de Q2b con datos): tabla `webhook_events` (idempotencia: `UNIQUE(source, event_key)`), columnas de citas de Cal.com en `appointments` (`calcom_id` único, `prev_calcom_id`, `last_event_at`, `tz`, `meeting_url`, recordatorios por WhatsApp), `tasks.appointment_id`, `leads.last_inbound_at` y `wa_last_inbound_at` (ventana de 24 h), `sequence_enrollments.wa_step` y un índice en `messages.provider_id`. **Sin crons nuevos**: todo corre en `process_jobs.php` (cada minuto). Los textos operativos de las cuentas están en `captacion/docs/` (`setup-guide.md`, `compliance.md`, `whatsapp-templates.md`, `bot-whatsapp-spec.md`, `job-boards.md`, `n8n/*.json`).
+
+### 20.1 Reglas comunes de toda entrada pública
+
+Cada integración se activa **solo si sus variables existen en el `.env`**; si no, el endpoint responde `503 {"error":"not_configured"}` con el nombre de lo que falta y el panel la muestra «Sin configurar». Orden fijo: método (405) → configurada (503) → límite por IP (`WEBHOOK_RATE_LIMIT`, 1200/h; 429) → tamaño (`WEBHOOK_MAX_BODY`, 128 KB; 413) → **firma en tiempo constante antes de interpretar nada** (401; `WEBHOOK_SIG_FAILS`, 15 firmas malas/15 min por IP bloquean con 429) → idempotencia (`webhook_events`; el mismo evento dos veces responde 200 y no se repite) → trabajo (lo pesado, a la cola). Cada evento se procesa en **una transacción** junto con su registro: si algo falla, no queda marcado como recibido y el emisor reintenta. No se registran secretos ni cuerpos de mensajes (`webhook_events.summary` es una frase corta; `Storage::redact` quita también `access_token=` y los secretos nuevos). La campana avisa si un webhook configurado lleva 3 errores seguidos o si la firma se rechaza 5 veces en una hora (posible clave mal puesta).
+
+### 20.2 Webhooks (`public/api/webhooks/`)
+
+| Archivo | Variables | Qué hace |
+|---|---|---|
+| `meta.php` | `META_VERIFY_TOKEN`, `META_APP_SECRET`, `META_PAGE_TOKEN` (+ `META_GRAPH_VERSION`, `META_GRAPH_BASE` solo pruebas) | GET: verificación (`hub.mode=subscribe`, token en tiempo constante, responde el `hub.challenge` en texto plano). POST: `X-Hub-Signature-256`; por cada `leadgen_id` registra el evento y encola `meta_fetch_lead`, que consulta Graph API, traduce los campos con el **mapeo** (Configuración > Canales externos) y llama a `LeadIngest::handle(…, 'meta_ads')` (antispam, dedupe, FMCSA, puntuación, alertas). UTM: campaña, anuncio y formulario. **Sin consentimiento de mensajería salvo que el formulario lo traiga** (texto exacto + canales + pregunta mapeada). Errores de Graph: reintento 1/5/15 min; lead inexistente (404): fallo definitivo; lead inutilizable (sin nombre ni contacto): `ignored`. Sin `META_PAGE_TOKEN` el POST da 503 y Meta reintenta |
+| `calcom.php` | `CALCOM_WEBHOOK_SECRET` | `X-Cal-Signature-256` (HMAC hex). Reserva creada/reprogramada/cancelada: enlaza o crea el lead (fuente `calcom`), crea o mueve la cita y la tarea «Llamada con X», pasa a «Llamada agendada» (pipeline A, mismas reglas de etapa; nunca mueve un lead presentado, firmado o perdido), programa recordatorios por **correo** 24 h y 1 h antes (consentimiento de correo y dirección física obligatorios; si no, se omiten y se anota). Cancelar: cita `cancelled`, tarea borrada, recordatorios cancelados y vuelve a «Calificado» si no queda otra cita. **Eventos desordenados:** cada cita guarda `last_event_at`; un evento más viejo es «obsoleto»; una reprogramación conserva una sola fila (`prev_calcom_id`) |
+| `sms.php` | `TWILIO_TOKEN` (+ `TWILIO_WEBHOOK_URL`) | `X-Twilio-Signature` (HMAC-SHA1 de URL + parámetros ordenados; se prueban las variantes con y sin puerto). STOP/STOPALL/UNSUBSCRIBE/CANCEL/END/QUIT revocan **SMS y WhatsApp** (`Consent::revokeChannels`); START/YES/UNSTOP restablecen **solo SMS** y solo con consentimiento previo; HELP responde TwiML con el texto configurable; cualquier otra cosa: guarda, **pausa las secuencias** (A7), anota y avisa a Carlos por Telegram. `MessageStatus` actualiza `messages.status`. Responde TwiML válido |
+| `n8n.php` | `N8N_WEBHOOK_SECRET` | `X-NS-Timestamp` (±5 min) + `X-NS-Signature: sha256=` HMAC de `timestamp.cuerpo`. JSON con `event_id` (8 a 80 caracteres, idempotente), `event` y `lead_id`: `message_sent`, `message_failed`, `sequence_step_sent`, `reminder_sent`, `reply_received`, `bot_finished`, `error` |
+
+### 20.3 API interna para n8n (`public/internal/`, Bearer `INTERNAL_API_TOKEN`)
+
+Mismas protecciones que `/api/lead.php` (10 fallos de autenticación/15 min, `INTERNAL_RATE_LIMIT` 1500/h, sin CORS, 503 sin token) y cuerpos de hasta 16 KB. **Permisos acotados:** solo estas rutas, solo estos campos y solo los datos personales que hacen falta para enviar (el teléfono solo si el canal tiene consentimiento vigente).
+
+```bash
+H='Authorization: Bearer '$INTERNAL_API_TOKEN
+curl -sS -H "$H" "$B/internal/sequences/due?channel=whatsapp&limit=20"
+# {"ok":true,"channel":"whatsapp","items":[{"lead_id":12,"sequence":"a1_welcome","step":0,"template":"a1_welcome","to":"+13055550100","language":"es","basis":"opt_in","free_text_allowed":false,"vars":{"nombre":"Mike","equipo":"Reefer","estado":"FL"},"due_at":"…"}]}
+curl -sS -H "$H" "$B/internal/reminders/due"                      # recordatorios de cita por WhatsApp (24 h y 1 h)
+curl -sS -H "$H" "$B/internal/leads/by-phone?phone=%2B13055550100"   # {"ok":true,"found":true,"lead_id":12,"language":"es"}
+curl -sS -X PATCH -H "$H" -H 'Content-Type: application/json' "$B/internal/leads/12" -d '{"state":"TX","truck_count":3,"equipment_types":["reefer"]}'
+# {"ok":true,"updated":["state","truck_count","equipment_types"],"rejected":{},"score":72,"temperature":"hot"}
+curl -sS -X POST -H "$H" -H 'Content-Type: application/json' "$B/internal/leads/12/consent-check" -d '{"channel":"whatsapp"}'
+# {"ok":true,"allowed":true,"channel":"whatsapp","basis":"inbound_window","reason":null,"free_text_allowed":true,"window_expires_at":"2026-11-06 18:00:00"}
+curl -sS -X POST -H "$H" -H 'Content-Type: application/json' "$B/internal/leads/12/events" -d '{"event":"message_sent","channel":"whatsapp","template":"a1_welcome","message_id":"wamid.X","event_id":"a1-12"}'
+curl -sS -X POST -H "$H" -H 'Content-Type: application/json' "$B/internal/leads/12/handoff-ready" -d '{"summary":"Quiere hablar hoy"}'
+```
+
+- **`PATCH`**: lista blanca `phone`, `email` (solo si el lead no los tiene), `language`, `state`, `city`, `equipment_types`, `truck_count`, `years_experience`, `usdot`, `english_level`, `cdl_type`, `authority_status`, `best_time`, `contact_pref`. Cualquier otro campo → 422 y no se aplica nada. Valida con el mismo normalizador del motor, rechaza campo a campo (`invalid`, `already_set`, `phone_in_use`), recalcula la puntuación y deja el evento `lead_updated` (nombres de campo, sin valores). Un USDOT nuevo deja `fmcsa_pending` y encola la consulta.
+- **`sequences/due`**: A1 (`a1_welcome`, leads de los últimos 3 días no descartados), A4 (`a4_booking`, en «Calificado» con enlace de Cal.com configurado), A6 (`a6_d1/d3/d7/d14`) y A12. Solo los pasos que Carlos habilita en Configuración > Canales externos > n8n y solo con consentimiento vigente en ese canal (`consent-check`). `channel=sms` queda vacío salvo permiso explícito (A2P pendiente); `channel=email` da 400 (el correo lo envía el CRM). El avance por WhatsApp (`wa_step`) es independiente del paso de correo.
+- **`consent-check`**: `email`/`sms`/`call` = consentimiento vigente sin STOP. `whatsapp` = `opt_in` (consentimiento de canal vigente) o `inbound_window` (el lead escribió primero hace menos de 24 h, solo para responder).
+- **`events`** exige `event_id` o cabecera `Idempotency-Key`. **`handoff-ready`** crea la tarea «Llamar a X», el evento y el aviso por Telegram; no cambia la etapa.
+
+### 20.4 WhatsApp entrante en `/api/lead.php`
+
+El lead que escribe primero se crea con `"inbound": {"channel":"whatsapp","text":"…","at":"ISO 8601","message_id":"wamid…"}` (también `sms`). Registra el mensaje, abre la ventana de 24 h y guarda `consents` con canal **`whatsapp_inbound`** (texto y hora del primer mensaje, versión `wa-inbound-1`). **No da consentimiento de marketing** (`isGranted('whatsapp')` sigue en falso). Un segundo mensaje de un lead existente se guarda sin nuevo consentimiento y cuenta como respuesta (A7). Idempotente por `message_id`; la respuesta trae `inbound_recorded`.
+
+### 20.5 Panel
+
+`Configuración > Integraciones`: tarjetas de **Meta, Cal.com, Twilio y n8n** con estado (configurado o no y qué variables faltan), eventos de 7 días, último evento correcto o error, URL del webhook lista para copiar y **«Probar»**: construye un evento de prueba, lo firma con el secreto del `.env` y lo envía por HTTP al **propio endpoint** (`SELF_BASE_URL` o `APP_URL`), sin servicios externos y sin crear datos (Meta: verificación + `leadgen_id` `nstest_…`; Cal.com: `PING`; Twilio: `NSTEST-PING`; n8n: `ping`). `Configuración > Canales externos` (admin, con confirmación reciente): mapeo de campos de Meta, perfil por defecto, texto y canales del consentimiento de Meta, enlace de reserva de Cal.com, texto de HELP y pasos de WhatsApp que n8n puede enviar. `/comunicaciones/reactivacion`: interruptor, elegibles con cada motivo de exclusión y estado de las plantillas.
+
+### 20.6 Reactivación A11 (por correo)
+
+Secuencia `a11_reactivation` sobre el motor de `Sequences` (2 mensajes EN/ES: día 0 y día 10). **Interruptor propio, apagado por defecto** (`settings['reactivation']`), además de las secuencias de correo y la dirección física. Elegibles: perdidos hace ≥ 60 días (30 a 365), pipeline A, con correo y consentimiento de correo vigente. Excluidos: «No llamar más» (teléfono en `dnc_numbers`; los leads no tienen ese motivo de pérdida), STOP/baja, descartados, firmados, rechazados por NorthStar, ya inscritos (una vez por lead). Los textos llevan `[[CONFIRMAR]]`: **no se envía nada hasta que Carlos los edite**. Se pausa sola si el lead se reabre, responde o cambia de etapa, y se detiene sin consentimiento. `process_jobs.php` inscribe en lotes de 25 como máximo una vez por hora. Los recordatorios de cita por correo usan las plantillas `appt_reminder_24h/1h` (variables `{cita_fecha}`, `{cita_enlace}`), sin consumir los topes de las secuencias.
+
+### 20.7 Formatos: qué viene de documentación y qué es supuesto
+
+Ningún formato se probó contra el servicio real; todo se probó con fixtures y servidores simulados.
+
+| Formato | Origen |
+|---|---|
+| Twilio: `application/x-www-form-urlencoded`, `MessageSid`, `From`, `Body`, `OptOutType`, `MessageStatus`; firma HMAC-SHA1 de URL + parámetros ordenados; TwiML | Documentación de Twilio **de memoria**. Palabras clave STOP/START/HELP: lista estándar de Twilio |
+| Meta: verificación `hub.mode/verify_token/challenge`, firma `X-Hub-Signature-256` (HMAC-SHA256 con la clave de la app), estructura `entry[].changes[].value.leadgen_id` | Documentación de Meta **de memoria**; ajustar `MetaLeads::parseWebhook` |
+| Graph API: `GET /{leadgen_id}?fields=…&access_token=…` con `field_data[{name,values}]`, `ad_name`, `campaign_name`, `platform`, `custom_disclaimer_responses` | **Supuesto** (nombres de campos y de la casilla del aviso personalizado por confirmar con un lead real). Versión de Graph: `META_GRAPH_VERSION` (vacío = sin versión) |
+| Cal.com: `X-Cal-Signature-256` (hex, sin prefijo), `triggerEvent`, `payload.uid/startTime/endTime/attendees/metadata.videoCallUrl/rescheduleUid` | **Supuesto** razonable; el teléfono puede venir en varios sitios (`Appointments::phoneOf`) |
+| n8n → CRM (`X-NS-*`, `event_id`, eventos) y todo `/internal/*` | Diseño propio de este proyecto (misma firma que el webhook de entrega de Q3) |
+| Flujos de n8n (`docs/n8n/*.json`): nodos y parámetros | **No probados en una instancia real de n8n**; marcadores `REEMPLAZAR_*` en credenciales |
+
+### 20.8 Variables nuevas del `.env`
+
+`META_VERIFY_TOKEN` · `META_APP_SECRET` · `META_PAGE_TOKEN` · `META_GRAPH_VERSION` (opcional) · `CALCOM_WEBHOOK_SECRET` · `TWILIO_TOKEN` · `TWILIO_SID`/`TWILIO_FROM` (reservadas) · `TWILIO_WEBHOOK_URL` (opcional) · `N8N_WEBHOOK_SECRET` · `WEBHOOK_RATE_LIMIT` (1200) · `WEBHOOK_MAX_BODY` (131072) · `WEBHOOK_SIG_FAILS` (15) · `INTERNAL_RATE_LIMIT` (1500) · `SELF_BASE_URL` (solo pruebas) · `META_GRAPH_BASE` (solo pruebas). Detalle en `config/.env.example`.
+
+### 20.9 Pruebas
+
+`php captacion/tests/run.php`: `25_meta_calcom` (firma válida/inválida/ausente/manipulada, repetición, cuerpo enorme, límites, e2e Meta → lead puntuado y alertado, Cal.com → cita, etapa, tarea y recordatorios con reloj simulado, eventos fuera de orden), `26_sms_n8n` (Twilio y n8n.php, STOP/START/HELP, respuesta → pausa y aviso, WhatsApp entrante), `27_internal_api` (autorización, lista blanca, consentimiento, pasos y recordatorios, idempotencia, campana y «Probar»), `28_reactivation` (reloj simulado) y `29_docs_pack` (JSON de n8n válidos y sin secretos). `19_viewer` comprueba que el lector no accede a nada de esto. **No cubierto:** Meta, Cal.com, Twilio, WhatsApp y n8n reales, MySQL 8, `.htaccess` (la regla `^internal(/|$)` no se probó con Apache/LiteSpeed).
