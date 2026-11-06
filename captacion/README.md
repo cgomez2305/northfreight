@@ -353,51 +353,51 @@ Necesita `mariadbd`/`mariadb-install-db` en el PATH. No toca ningún servidor re
 | `POST /ajax/search` | Buscador global (JSON, cabecera `X-CSRF-Token`, 90 peticiones/min por usuario → 429) |
 | `POST /ajax/notifications/read` | Marca los avisos de la campana como leídos (guardado en `notification_reads`) |
 
-### Paleta (solo en `public/assets/panel.css`, `:root`)
+### Paleta (R1; solo en `public/assets/panel.css`, `:root`)
 
-Derivada del navy y el cian del sitio, con neutros de tinte azul. Contrastes medidos (WCAG, texto):
+Desde la fase R1 (2026-11-06) el panel ya no usa la identidad navy y cian del sitio: neutros CÁLIDOS con un único acento (cian profundo, para que el isotipo de NorthStar siga encajando). Superficies sólidas: cero `backdrop-filter`, cero degradados decorativos (solo el área tenue bajo la línea de los gráficos), cero glows y sin sombras salvo `0 1px 2px` en menús, diálogos y avisos. Todos los colores viven en `:root` y `:root[data-theme="dark"]`; las hojas por pantalla solo usan variables.
 
-| Par | Contraste |
-|---|---|
-| Texto `#0A1B2E` / `#3B4D63` / `#586A80` sobre blanco | 17,4 / 8,7 / 5,5:1 |
-| Texto terciario `#586A80` sobre el lienzo `#F1F4F8` | 5,0:1 |
-| Enlaces y acentos `--cyan-ink #036E8A` sobre blanco / lienzo / tinte cian | 5,8 / 5,3 / 5,2:1 |
-| Blanco sobre navy `#0A1D33` (botón primario, píldora activa) | 17,0:1 |
-| Navy `#04101F` sobre cian `#06A6CC` (celda de flecha) | 6,7:1 |
-| Caliente `#9A3407` / tibio `#045F78` / frío `#394D7C` / descartado `#4E5F73` sobre su fondo | 6,3 / 6,2 / 7,0 / 5,6:1 |
-| OK `#17673C`, error `#B42318`, aviso `#8A4B0B` sobre su fondo | 6,1 / 5,8 / 6,1:1 |
-| Iniciales de los 8 avatares sobre su fondo | 5,7 a 8,1:1 |
+Tokens (modo claro / oscuro) y contrastes medidos (WCAG, texto salvo donde se indica):
 
-El cian `#06A6CC` solo va en rellenos, puntos y la línea de «company drivers» (`#0691B3`, 3,7:1 sobre blanco para gráficos). Los bordes de campos de formulario usan `#7D8EA5` (3,3:1). Foco: contorno de 2 px `--focus` (`#036E8A`). Significado constante: **temperatura** (caliente = único acento cálido, tibio = cian, frío = azul pizarra, descartado = gris) y **etapa** (punto de color en un chip neutro: gris → azul pizarra → cian → navy → verde al firmar → rojo apagado al perder).
+| Token | Claro | Oscuro | Uso |
+|---|---|---|---|
+| `--canvas` | `#EFEEEA` | `#0D0D0C` | Lienzo: barra lateral y páginas sin sesión |
+| `--bg` | `#F7F6F3` | `#141413` | Fondo de la aplicación |
+| `--surface` | `#FFFFFF` | `#1B1B19` | Tarjetas, menús, diálogos, campos |
+| `--sunk` | `#F1F0EC` | `#222220` | Hover de filas, segmented control, notas |
+| `--line` / `--line-2` | `#E7E5E0` / `#D6D3CC` | `#2A2A27` / `#3A3A36` | Separadores y borde de botones secundarios |
+| `--field` | `#8A8882` | `#75746E` | Borde de campos (≥ 3:1) |
+| `--ink` / `--ink-2` / `--ink-3` | `#1A1A18` / `#4A4945` / `#6B6A66` | `#F2F1EE` / `#C4C2BC` / `#9C9A95` | Texto principal, secundario y de etiquetas (todos AA) |
+| `--ink-4` | `#A3A19C` | `#5F5E5A` | Solo decorativo (separadores, iconos inactivos); nunca texto útil |
+| `--accent` / `--accent-hover` | `#087089` / `#065A70` | `#3FBFDF` / `#6FD3EC` | Botón primario, selección, serie principal, punto «en vivo» |
+| `--accent-ink` | `#087089` | `#5FCDE8` | Enlaces y texto de acento |
+| `--accent-tint` / `--accent-line` | `#EEF5F7` / `#B4D4DD` | `#162A30` / `#24505C` | Fila o elemento seleccionado (6 a 8 %) |
+| `--ok` · `--ok-bg` · `--ok-dot` | `#1F6B40` · `#E6F1EA` · `#2E7D4F` | `#7BD99A` · `#1F3A27` · `#4CB874` | Estados y variaciones |
+| `--bad` · `--bad-bg` · `--bad-dot` · `--bad-solid` | `#B3321F` · `#F8E7E3` · `#C2412D` · `#C2412D` | `#F29A8C` · `#3A1D17` · `#E5604B` · `#EE7A66` | Errores, retrasos, botón destructivo |
+| `--warn` · `--warn-bg` · `--warn-dot` | `#8A5A0B` · `#F8EDD6` · `#C7881A` | `#E8B65A` · `#3A2B0F` · `#D9A23A` | Avisos |
 
-### Tema oscuro (Q5a)
+| Par (claro) | Contraste | Par (oscuro) | Contraste |
+|---|---|---|---|
+| `--ink` sobre surface / bg / canvas | 17,4 / 16,1 / 15,0 | `--ink` sobre surface / bg / canvas | 15,3 / 16,3 / 17,2 |
+| `--ink-2` sobre surface / canvas | 9,0 / 7,8 | `--ink-2` sobre surface / canvas | 9,7 / 10,9 |
+| `--ink-3` sobre surface / bg / canvas / sunk | 5,4 / 5,0 / 4,7 / 4,8 | `--ink-3` sobre surface / bg / canvas / sunk | 6,1 / 6,6 / 6,9 / 5,7 |
+| `--accent-ink` sobre surface / bg / canvas / tinte | 5,7 / 5,3 / 4,9 / 5,2 | `--accent-ink` sobre surface / tinte | 9,4 / 8,1 |
+| Blanco sobre `--accent` / `--accent-hover` | 5,7 / 7,8 | `--on-accent` `#0D0D0C` sobre `--accent` / `--accent-hover` | 9,0 / 11,3 |
+| Blanco sobre `--bad-solid` | 5,1 | `#0D0D0C` sobre `--bad-solid` | 7,1 |
+| `--ok` / `--bad` / `--warn` sobre su fondo | 5,6 / 5,2 / 5,1 | ídem | 7,2 / 7,2 / 7,4 |
+| `--field` (borde, componente) sobre surface / bg | 3,5 / 3,3 | ídem | 3,7 / 3,9 |
+| Texto de tooltips y avisos sobre `--pop` | 15,4 | ídem | 11,1 |
+| Puntos de estado (gráficos, ≥ 3:1) sobre surface: caliente / tibio / frío / OK / error | 4,2 / 3,0 / 3,5 / 5,1 / 5,1 | ídem | 5,7 / 7,5 / 6,0 / 6,9 / 5,0 |
 
-El tema se elige por usuario (**Claro / Oscuro / Auto**, en el menú del usuario y con el botón de la barra superior; el lector de NorthStar también puede cambiarlo y es lo único nuevo que ve). La preferencia vive en `user_prefs` y `<html>` la trae ya escrita (`data-theme-pref`); un script con nonce al inicio del `<head>` resuelve `auto` con `prefers-color-scheme` y fija `data-theme` ANTES de pintar (sin parpadeo; sin JS queda claro). Las páginas sin sesión (acceso, 2FA, `/c`, `/u`, `/invite`) usan lo último elegido en ese navegador (`localStorage.ns-theme`) o el modo automático. Los informes impresos vuelven siempre a claro (`beforeprint`/`afterprint` cambian `data-theme` mientras se imprime).
+Significado constante: **temperatura** y **etapa** se muestran con un punto de 6 px y texto neutro (nunca fondos de color en filas ni tarjetas): caliente = naranja rojizo, tibio = ámbar, frío = azul pizarra, descartado = gris; etapa = gris → pizarra → azul → acento → verde al firmar → rojo al perder. Con 5 series (fuentes) se usa una paleta categórica apagada (`--seg-0` a `--seg-4`: acento, pizarra, arena, salvia, gris); con 2 series, la principal en el acento y la otra en gris. Los avatares son neutros (iniciales sobre `--av`). Foco: contorno de 2 px `--focus`; campos con borde y anillo de 1 px del acento. El texto pequeño útil nunca va en `--ink-4`.
 
-Todo son variables en `:root[data-theme="dark"]` de `public/assets/panel.css`; las hojas por pantalla solo usan variables (no hay un solo color fijo fuera de `:root`, salvo el bloque `@media print`). Lienzo navy del sitio (`#04101F` fondo, `#0A1D33` tarjetas y barra lateral, `#0F2A47` hover y menús), nunca negro puro; el cian `#06A6CC` sí es texto legible aquí (5,9:1 sobre las tarjetas). `--navy-2` pasa a ser el relleno cian de los controles activos (con texto `--on-fill` `#04132A`), `--pop` es la superficie de avisos y tooltips (`#16385C`), y la temperatura y las etapas se reajustaron a tintes claros sobre fondos oscuros del mismo matiz. El logo cambia al isotipo blanco con `content:url()`.
+### Tema oscuro (Q5a, recolorado en R1)
 
-Contrastes medidos (WCAG, texto):
+El tema se elige por usuario (**Claro / Oscuro / Auto**, en el menú del usuario y con el botón de la barra superior; el lector de NorthStar también puede cambiarlo). La preferencia vive en `user_prefs` y `<html>` la trae ya escrita (`data-theme-pref`); un script con nonce al inicio del `<head>` resuelve `auto` con `prefers-color-scheme` y fija `data-theme` ANTES de pintar (sin parpadeo; sin JS queda claro). Las páginas sin sesión usan lo último elegido en ese navegador (`localStorage.ns-theme`) o el modo automático. Los informes impresos vuelven siempre a claro (`beforeprint`/`afterprint`). El logo cambia al isotipo blanco con `content:url()`. Los pares del tema oscuro están en la tabla de arriba.
 
-| Par (oscuro) | Contraste |
-|---|---|
-| `--ink` `#EEF3F8` / `--ink-2` `#B9C8D8` / `--ink-3` `#8FA3B8` sobre `--bg` `#04101F` | 17,1 / 11,2 / 7,4:1 |
-| ídem sobre `--surface` `#0A1D33` | 15,2 / 10,0 / 6,6:1 |
-| ídem sobre `--sunk` `#0E2540` | 13,9 / 9,1 / 6,0:1 |
-| `--ink` / `--ink-2` / `--ink-3` sobre hover y menús `#0F2A47` | 13,0 / 8,5 / 5,6:1 |
-| Enlaces `--cyan-ink` `#4FC3E3` sobre bg / surface / sunk / tinte `#0B3350` | 9,3 / 8,3 / 7,6 / 6,4:1 |
-| Cian `#06A6CC` como texto sobre surface / bg | 5,9 / 6,7:1 |
-| `--on-fill` `#04132A` sobre el relleno cian `#06A6CC` (botón primario, pestaña activa) / sobre `--navy-3` `#0691B3` | 6,5 / 5,0:1 |
-| Texto de avisos y tooltips `#EEF3F8` / `#B9C8D8` sobre `--pop` `#16385C` | 10,7 / 7,0:1 |
-| Caliente `#FFB38A` / tibio `#7FD6EE` / frío `#A9BBE8` / descartado `#B4C2D2` sobre su fondo | 8,9 / 7,4 / 7,3 / 7,9:1 |
-| OK `#6EE0A0`, error `#FF9C93`, aviso `#F5B866` sobre su fondo | 8,5 / 7,3 / 7,7:1 |
-| `--on-fill` sobre los puntos de color (naranja, verde, rojo) en insignias y casillas | 8,2 / 9,4 / 6,7:1 |
-| Iniciales de los 8 avatares sobre su fondo | 7,2 a 8,3:1 |
-| Borde de campos `#6683A5` sobre surface / sunk / bg (mínimo 3:1 en componentes) | 4,3 / 3,95 / 4,9:1 |
-| Foco `#6FD3EC` sobre surface / bg | 9,9 / 11,1:1 |
+### Tipografía y marca (R1)
 
-### Tipografía y marca
-
-Las del sitio, copiadas a `public/assets/fonts/` (woff2) con los respaldos de métricas ajustadas (`fonts.css`): Barlow (texto y números de UI), Barlow Condensed (títulos y cifras grandes de KPI), JetBrains Mono (rótulos, cabeceras de tabla, chips, ejes). Isotipo oscuro y claro en `public/assets/`. Botón primario navy con celda circular de flecha cian (solo `transform`), chips píldora, estrella de marca en estados vacíos y login.
+Dos familias, ambas locales en `public/assets/fonts/` (subset latino variable, `font-display: swap`, `font-src 'self'`; origen y licencia OFL en `fonts/README.md`): **Geist** (interfaz, tablas, títulos y números grandes; 29.400 B) y **Geist Mono** (solo IDs y códigos `LD-0142`, metadatos, ejes de gráficos y atajos de teclado; 23.128 B). Total 52.528 B frente a 72.356 B antes (Barlow, Barlow Condensed y JetBrains Mono, retirados del panel). Escala en tokens: `--fs-xs` 12 · `--fs-sm` 13 (etiquetas, en gris) · `--fs-md` 14 (cuerpo y tablas) · `--fs-lg` 16 · `--fs-xl` 20 · `--fs-h1` 26 a 30 (peso 600) · `--fs-num` 44 (números protagonistas, peso 500, `tabular-nums`, `-0.02em`, decimales y unidades atenuados). Isotipo oscuro y claro en `public/assets/`. Botón primario relleno con el acento (8 px de radio, 40 px de alto; 44 px en móvil), un solo primario por vista.
 
 ### Pantallas y comportamiento
 
@@ -648,6 +648,8 @@ Ningún formato se probó contra el servicio real; todo se probó con fixtures y
 
 ## 21. Experiencia del panel (Q5a): tema, vistazo, vistas, tablero, paleta, atajos y «Deshacer»
 
+> Nota R1: la identidad visual descrita en esta sección (navy, cian, Barlow, celda de flecha) fue sustituida en la fase R1; la vigente está en §15 y §25. La lógica no cambió.
+
 Migración nueva: **`011_ux_prefs_views.sql`** (§2); en el servidor basta `php captacion/bin/migrate.php` tras el deploy. Sin variables nuevas, sin crons nuevos, sin dependencias. De las dos referencias de Carlos (un editor de políticas con panel lateral y un tablero de proyectos oscuro) se tomaron **componentes y maneras de trabajar**, nunca marca, textos ni colores: panel lateral deslizable con cabecera, acciones y datos clave; barra de pestañas de vistas con filtro y orden; tarjetas con etiquetas, código corto, barras de prioridad y avance; sidebar plegable con contadores y atajo de búsqueda visible; todo con la identidad NorthStar (navy y cian, Barlow, Barlow Condensed y JetBrains Mono).
 
 | Entregable | Qué quedó |
@@ -852,6 +854,8 @@ Se partió `views.css` (ahora 2,9 KB) en `filtros.css` (1,3 KB: el formulario de
 
 ## 24. Dashboard vivo (Q6): narrativa, medidores, gráfico anotado, siguiente mejor acción y refresco
 
+> Nota R1: la identidad visual descrita en esta sección (navy, cian, Barlow, celda de flecha) fue sustituida en la fase R1; la vigente está en §15 y §25. La lógica no cambió.
+
 Se aplicó la skill «dashboards-vivos» al dashboard (`/`) **con la identidad de NorthStar** (mandan sobre la skill: tokens navy y cian de §15 en ambos temas, un solo acento = el cian, Barlow, Barlow Condensed y JetBrains Mono; no se añadió ningún color ni fuente). De la skill se tomó: narrativa antes que números, anotaciones, KPI con contexto, números protagonistas (Barlow 500 tabular, decimales y unidades atenuados; los titulares siguen en Barlow Condensed), microvisualizaciones propias en SVG/CSS, etiquetas directas, movimiento que demuestra datos vivos y estados vacíos cuidados. Se descartó: los neutros cálidos y los acentos de la skill (colisionan con el navy/cian), la barra de progreso de meta (no existe ningún ajuste de meta: no se inventa), el sidebar de la skill (ya hay uno) y las sombras/`glass`.
 
 ### Datos reales, nunca inventados
@@ -905,3 +909,43 @@ La vista del rol `viewer` recibió las piezas visuales y de movimiento reutiliza
 
 - Firefox y Safari sin probar. El destello del delta usa `transform` sobre un pseudo-elemento y no se probó con lector de pantalla.
 - Q6-I: `/resultados` probado solo en Chromium (a 1440, 1024, 834 y 390, claro y oscuro, con base de demostración y vacía). Con series diarias muy irregulares la anotación del pico puede cruzarse con la línea (se lee gracias al halo del texto); el tooltip no se probó con lector de pantalla.
+
+
+## 25. Rediseño minimalista del panel (R1): neutros cálidos, un acento y Geist
+
+Carlos pidió un panel «minimalista y limpio», sin glassmorphism y con solo colores y tipografías que tengan sentido en un CRM profesional (autorizó cambiar paleta, fuentes y componentes del PANEL; el sitio público conserva su identidad). R1 cubre los fundamentos y las pantallas clave; R2 pule el resto. **Sin cambios de lógica, seguridad ni datos.** Referencia: skill «dashboards-vivos» (neutros cálidos, un acento, números protagonistas, microvisualizaciones, movimiento sobrio).
+
+### Qué cambió
+
+- **Tokens** (§15): paleta cálida de dos temas, un acento (`--accent`, antes `--navy-2`/`--cyan`), semánticos solo para estados, radios (`--r-card` 14, `--r-ctl` 8, `--r-pill` solo para estados pequeños), escala tipográfica (`--fs-*`) y alto de cabecera `--top-h` (56 px; el vistazo, el panel de reglas y los chips del tablero lo usan para su `top`). Variables renombradas en todas las hojas: `--navy-2`/`--navy-3` → `--accent`/`--accent-hover`, `--cyan*` → `--accent*`, `--on-fill` → `--on-accent`; retiradas `--navy*`, `--on-navy*`, `--urgent-bg` y los 8 pares de color de avatar (un solo `--av`).
+- **Fuentes:** Geist y Geist Mono locales; fuera Barlow, Barlow Condensed y JetBrains Mono (72.356 → 52.528 B). La mono quedó solo para IDs (`LD-0142`), metadatos, ejes de gráficos y atajos; cifras, puntuaciones, contadores y paginación pasaron a Geist con `tabular-nums`. Las etiquetas ya no van en mayúsculas mono espaciadas: texto de 13 px en gris (los literales en mayúsculas de las vistas se pasaron a frase normal).
+- **Componentes:** botón primario relleno de 40 px (sin la celda circular con flecha, que se retiró del marcado; 44 px en móvil), un solo primario por vista («Nuevo lead»; «Exportar CSV» pasó a secundario), segmented control con pastilla blanca, pestañas de temperatura con tinte del acento al seleccionar, tablas con cabecera de 13 px sin fondo y filas de 56 px (sin fondo de color en filas urgentes: la temperatura y la etapa son un punto de 6 px + texto), chips sin borde ni fondo, etiquetas del tablero como texto gris separado por puntos, KPIs de 20 px de relleno con número de 44 px, avatares neutros, diálogos y menús sólidos con sombra mínima, campos de 40 px con borde ≥ 3:1 y anillo del acento.
+- **Shell:** barra lateral de 248 px sobre el lienzo (selector de espacio de trabajo con el isotipo, búsqueda con atajo, grupos con etiquetas pequeñas, contadores grises o del acento si requieren acción, elemento activo con fondo de tarjeta, tarjeta de estado del sistema y usuario); **riel de 68 px** de 761 a 1099 px y al plegar (≥ 1100), **cajón** en ≤ 760 px con barra inferior. La cabecera ya no lleva buscador ancho ni avatar (el usuario vive en la barra lateral; en móvil hay un icono de búsqueda).
+- **Pantallas clave rehechas:** dashboard (`/`), lista de leads, tablero, ficha y vistazo rápido, y las pantallas sin sesión (una tarjeta centrada sobre el lienzo, sin panel lateral). El resto hereda los tokens y los componentes y está comprobado sin roturas; su pulido manual es R2.
+- **Tablero:** columnas con fondo y sin borde, tarjetas planas con borde de 1 px, puntuación como número con barra de 4 rayas en gris.
+- **Gráficos:** serie principal en el acento y la secundaria en gris; barra segmentada con paleta categórica apagada (5 fuentes); mapa de calor de un solo tono; el tooltip oscuro se conserva; el destello de carga ya no usa degradado.
+
+### Qué se mantiene
+
+Toda la lógica, rutas, endpoints, CSP y autorización por rol; el movimiento de Q6 (entrada, conteos, líneas dibujadas, punto «en vivo», refresco cada 60 s) con `prefers-reduced-motion`; el reparto de CSS por pantalla con hojas diferidas.
+
+### Medidas
+
+- Fuentes: 72.356 → 52.528 B (−27 %).
+- CSS de la primera pantalla (sin fuentes), antes → después: `/` 41.983 → 42.240 B · `/leads` 35.435 → 35.423 · `/pipeline` 39.973 → 39.770 · `/leads/{id}` 39.651 → 39.856 · `/tabla` 38.576 → 38.476 · `/calendario` 40.199 → 40.451 · `/config` 36.141 → 36.391 (todas ≤ 45.000 con `fonts.css`). `/reportes` carga ahora también `viz.css` (el gráfico con etiquetas finales la necesitaba y sus etiquetas se salían de la tarjeta).
+- Accesibilidad: axe-core (reglas WCAG 2 A y AA y 2.1 AA) sin violaciones en `/`, `/leads`, `/pipeline`, `/leads/{id}` y `/login`, claro y oscuro, a 1440 y 390 px. Contraste medido de los pares de §15 y barrido de contraste por texto en las pantallas de administración (solo quedan controles desactivados, exentos). No se pudo correr Lighthouse (no hay binario y el panel exige sesión con 2FA).
+
+### Pruebas
+
+Suite en 3239 pruebas. Se actualizaron las que comprobaban literales en mayúsculas de títulos (`'ESTADO DEL SISTEMA'` → `'Estado del sistema'`, etc.; no se debilitó ninguna comprobación) y dos de clases: `Ui::avatar` ya no emite `av-N` y `Ui::score` solo emite `score--dq` (las pruebas `36_css_classes` y `35_modes_q5c` exigen que toda clase usada tenga regla).
+
+### Pendiente para R2 (priorizado)
+
+1. Calendario: chips de evento con tintes por tipo (`--ev-*`), puntos y cabeceras de semana.
+2. Configuración: las 12 pestañas (tarjetas de estado, interruptores, rejillas de campos numéricos) y el editor de reglas (`rules.css`, `cfg-reglas.css`).
+3. Reportes y `/resultados`: tarjetas KPI de `reportes.css`, embudo y tablas.
+4. Tareas, Prospectos, Referidos, Vacantes, Comunicaciones: filas con iconos en círculos, `steps`, tarjetas de prospecto.
+5. Cronología y Actividad: iconos de evento con tinte, píldoras de acción.
+6. Páginas públicas (`/c`, `/u`, `/invite`) y `setup.php`: ya heredan la tarjeta centrada; falta revisar textos y estados.
+7. Selects nativos (el `<select>` sigue con el aspecto del navegador) y el tema claro de la barra de desplazamiento.
+8. Firefox y Safari sin probar; el rail de 761 a 1099 px solo probado en Chromium.
