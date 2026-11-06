@@ -21,7 +21,7 @@ final class Catalog
 
     public const SOURCES = [
         'web_careers' => 'Sitio · Careers', 'web' => 'Sitio web', 'n8n_whatsapp' => 'WhatsApp', 'manual' => 'Carga manual', 'import' => 'Importación',
-        'meta' => 'Meta Ads', 'indeed' => 'Indeed', 'fmcsa_outbound' => 'FMCSA saliente', 'referral' => 'Referido',
+        'meta' => 'Meta Ads', 'meta_ads' => 'Meta Ads', 'calcom' => 'Cal.com', 'indeed' => 'Indeed', 'fmcsa_outbound' => 'FMCSA saliente', 'referral' => 'Referido',
     ];
 
     public const EQUIPMENT = [
@@ -69,6 +69,10 @@ final class Catalog
         'handoff_failed' => 'La entrega falló', 'handoff_confirmed' => 'NorthStar confirmó la firma', 'handoff_rejected' => 'NorthStar rechazó el lead', 'conversion' => 'Conversión registrada',
         'sequence_enrolled' => 'Inscrito en una secuencia', 'sequence_paused' => 'Secuencia en pausa', 'sequence_resumed' => 'Secuencia reanudada', 'sequence_stopped' => 'Secuencia detenida',
         'sequence_step_skipped' => 'Paso de secuencia omitido', 'sequence_email' => 'Correo de secuencia', 'lead_responded' => 'Marcado como respondido',
+        'appointment_booked' => 'Cita agendada (Cal.com)', 'appointment_rescheduled' => 'Cita reprogramada', 'appointment_cancelled' => 'Cita cancelada', 'reminder_sent' => 'Recordatorio de cita enviado',
+        'reminder_skipped' => 'Recordatorio de cita omitido', 'inbound_message' => 'Mensaje recibido', 'lead_replied' => 'El lead respondió', 'consent_restored' => 'Consentimiento de SMS restablecido',
+        'message_sent' => 'Mensaje enviado (n8n)', 'message_failed' => 'Falló un mensaje (n8n)', 'sequence_message_sent' => 'Paso de secuencia enviado por WhatsApp', 'bot_finished' => 'El bot de WhatsApp terminó',
+        'handoff_ready' => 'Listo para hablar con Carlos', 'automation_error' => 'Error de una automatización', 'lead_updated' => 'Datos actualizados por una automatización', 'meta_fields_unmapped' => 'Campos de Meta sin mapear',
         'prospect_converted' => 'Convertido desde un prospecto FMCSA', 'referral_linked' => 'Llegó por un código de referido', 'referral_signed' => 'Su referido firmó',
     ];
 

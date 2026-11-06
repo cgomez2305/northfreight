@@ -59,7 +59,7 @@ final class T
     {
         $pdo = Db::pdo();
         $pdo->exec('SET FOREIGN_KEY_CHECKS = 0');
-        foreach (['lead_events', 'consents', 'leads', 'jobs', 'activity_log', 'login_attempts', 'recovery_codes', 'lead_notes', 'notification_reads', 'tasks', 'appointments', 'messages', 'sequence_enrollments', 'referrals', 'referral_codes', 'prospect_calls', 'dnc_numbers', 'prospects_fmcsa', 'job_postings', 'backups', 'handoff_deliveries', 'handoffs', 'user_invites', 'reports'] as $t) {
+        foreach (['lead_events', 'consents', 'leads', 'jobs', 'activity_log', 'login_attempts', 'recovery_codes', 'lead_notes', 'notification_reads', 'tasks', 'appointments', 'messages', 'sequence_enrollments', 'referrals', 'referral_codes', 'prospect_calls', 'dnc_numbers', 'prospects_fmcsa', 'job_postings', 'backups', 'handoff_deliveries', 'handoffs', 'user_invites', 'reports', 'webhook_events'] as $t) {
             $pdo->exec("TRUNCATE TABLE `$t`");
         }
         if ($withUsers) {

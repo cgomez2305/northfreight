@@ -21,6 +21,9 @@ RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 RewriteRule (^|/)\.(?!well-known) - [F,L]
 RewriteRule \.(md|sql|log|env|ini|sh|lock|bak)$ - [F,L,NC]
 
+# API interna de n8n: sin extension, va a su propio front controller
+RewriteRule ^internal(/|$) internal/index.php [L]
+
 # Todo lo que no sea un archivo real -> front controller
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d

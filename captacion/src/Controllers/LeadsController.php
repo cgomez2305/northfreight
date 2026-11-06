@@ -48,7 +48,7 @@ final class LeadsController extends Responder
         $messages = Db::all("SELECT channel, direction, body, created_at FROM messages WHERE lead_id = ? AND channel <> 'call' ORDER BY created_at DESC LIMIT 100", [$id]);
         $calls = Db::all("SELECT status, duration_sec, created_at FROM messages WHERE lead_id = ? AND channel = 'call' ORDER BY created_at DESC LIMIT 5", [$id]);
         $consents = Db::all('SELECT id, channel, consent_text, consent_version, granted_at, revoked_at, revoked_via FROM consents WHERE lead_id = ? ORDER BY granted_at DESC, id DESC', [$id]);
-        $appts = Db::all("SELECT starts_at, status FROM appointments WHERE lead_id = ? AND deleted_at IS NULL AND starts_at >= ? ORDER BY starts_at ASC LIMIT 3", [$id, Clock::shift(-3600)]);
+        $appts = Db::all("SELECT starts_at, status FROM appointments WHERE lead_id = ? AND deleted_at IS NULL AND status <> 'cancelled' AND starts_at >= ? ORDER BY starts_at ASC LIMIT 3", [$id, Clock::shift(-3600)]);
         $users = [];
         foreach (Db::all('SELECT id, name FROM users') as $u) {
             $users[(int) $u['id']] = (string) $u['name'];

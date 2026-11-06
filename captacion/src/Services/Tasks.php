@@ -216,8 +216,8 @@ final class Tasks
                FROM tasks WHERE deleted_at IS NULL AND done_at IS NULL',
             [$nowS, $nowS, $endToday, $endToday]
         ) ?? [];
-        $apptToday = (int) Db::value('SELECT COUNT(*) FROM appointments WHERE deleted_at IS NULL AND starts_at >= ? AND starts_at < ?', [$startToday, $endToday]);
-        $apptNext = (int) Db::value('SELECT COUNT(*) FROM appointments WHERE deleted_at IS NULL AND starts_at >= ?', [$endToday]);
+        $apptToday = (int) Db::value('SELECT COUNT(*) FROM appointments WHERE deleted_at IS NULL AND status <> "cancelled" AND starts_at >= ? AND starts_at < ?', [$startToday, $endToday]);
+        $apptNext = (int) Db::value('SELECT COUNT(*) FROM appointments WHERE deleted_at IS NULL AND status <> "cancelled" AND starts_at >= ?', [$endToday]);
         return [
             'overdue'  => (int) ($row['overdue'] ?? 0),
             'today'    => (int) ($row['today'] ?? 0) + $apptToday,
@@ -248,15 +248,15 @@ final class Tasks
                 break;
             case 'upcoming':
                 $tasks = Db::all(self::TASK_SQL . ' WHERE t.deleted_at IS NULL AND t.done_at IS NULL AND (t.due_at >= ? OR t.due_at IS NULL) ORDER BY t.due_at IS NULL, t.due_at ASC, t.id ASC LIMIT ' . self::LIMIT, [$endToday]);
-                $appts = Db::all(self::APPT_SQL . ' WHERE a.deleted_at IS NULL AND a.starts_at >= ? ORDER BY a.starts_at ASC LIMIT ' . self::LIMIT, [$endToday]);
+                $appts = Db::all(self::APPT_SQL . ' WHERE a.deleted_at IS NULL AND a.status <> "cancelled" AND a.starts_at >= ? ORDER BY a.starts_at ASC LIMIT ' . self::LIMIT, [$endToday]);
                 break;
             case 'done':
                 $tasks = Db::all(self::TASK_SQL . ' WHERE t.deleted_at IS NULL AND t.done_at >= ? ORDER BY t.done_at DESC LIMIT ' . self::LIMIT, [Clock::at($now - 30 * 86400)]);
-                $appts = Db::all(self::APPT_SQL . ' WHERE a.deleted_at IS NULL AND a.starts_at < ? AND a.starts_at >= ? ORDER BY a.starts_at DESC LIMIT 100', [$nowS, Clock::at($now - 30 * 86400)]);
+                $appts = Db::all(self::APPT_SQL . ' WHERE a.deleted_at IS NULL AND a.status <> "cancelled" AND a.starts_at < ? AND a.starts_at >= ? ORDER BY a.starts_at DESC LIMIT 100', [$nowS, Clock::at($now - 30 * 86400)]);
                 break;
             default:   // today
                 $tasks = Db::all(self::TASK_SQL . ' WHERE t.deleted_at IS NULL AND t.done_at IS NULL AND t.due_at >= ? AND t.due_at < ? ORDER BY t.due_at ASC LIMIT ' . self::LIMIT, [$nowS, $endToday]);
-                $appts = Db::all(self::APPT_SQL . ' WHERE a.deleted_at IS NULL AND a.starts_at >= ? AND a.starts_at < ? ORDER BY a.starts_at ASC LIMIT 100', [$startToday, $endToday]);
+                $appts = Db::all(self::APPT_SQL . ' WHERE a.deleted_at IS NULL AND a.status <> "cancelled" AND a.starts_at >= ? AND a.starts_at < ? ORDER BY a.starts_at ASC LIMIT 100', [$startToday, $endToday]);
         }
         return self::group($tasks, $appts, $tab === 'done', $now);
     }
@@ -312,7 +312,7 @@ final class Tasks
         $startD = Fmt::et($start);
         $end = Fmt::weekStart($ts, 1);
         $tasks = Db::all(self::TASK_SQL . ' WHERE t.deleted_at IS NULL AND t.due_at >= ? AND t.due_at < ? ORDER BY t.due_at ASC LIMIT 400', [Fmt::utc($start), Fmt::utc($end)]);
-        $appts = Db::all(self::APPT_SQL . ' WHERE a.deleted_at IS NULL AND a.starts_at >= ? AND a.starts_at < ? ORDER BY a.starts_at ASC LIMIT 200', [Fmt::utc($start), Fmt::utc($end)]);
+        $appts = Db::all(self::APPT_SQL . ' WHERE a.deleted_at IS NULL AND a.status <> "cancelled" AND a.starts_at >= ? AND a.starts_at < ? ORDER BY a.starts_at ASC LIMIT 200', [Fmt::utc($start), Fmt::utc($end)]);
         $by = [];
         foreach ($tasks as $t) {
             $by[Fmt::et($t['due_at'])->format('Y-m-d')][] = $t + ['kind' => 'task', 'at' => $t['due_at']];

@@ -418,7 +418,7 @@ final class Dashboard
         $appts = Db::all(
             'SELECT a.id, a.starts_at, a.status, a.lead_id, l.first_name, l.last_name
                FROM appointments a JOIN leads l ON l.id = a.lead_id
-              WHERE a.deleted_at IS NULL AND a.starts_at >= ? AND a.starts_at < ?
+              WHERE a.deleted_at IS NULL AND a.status <> "cancelled" AND a.starts_at >= ? AND a.starts_at < ?
               ORDER BY a.starts_at ASC LIMIT 4',
             [Fmt::utc($startToday), Fmt::utc($endToday)]
         );

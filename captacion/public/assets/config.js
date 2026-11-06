@@ -22,6 +22,13 @@
   var calc = function () { var s = 0; flat.forEach(function (i) { s += num(i); }); tiers.forEach(function (g) { s += Math.max.apply(null, g.map(num).concat([0])); }); sum.textContent = s; };
   flat.concat(tiers[0], tiers[1]).forEach(function (i) { i.addEventListener('input', calc); });
  }
+ $$('[data-copy]').forEach(function (b) {
+  b.addEventListener('click', function () {
+   var t = b.getAttribute('data-copy') || '', done = function () { var o = b.innerHTML; b.textContent = 'Copiado'; setTimeout(function () { b.innerHTML = o; }, 1600); };
+   if (navigator.clipboard && navigator.clipboard.writeText) { navigator.clipboard.writeText(t).then(done, function () {}); return; }
+   var i = b.parentNode.querySelector('input'); if (i) { i.select(); try { document.execCommand('copy'); done(); } catch (e) { /* sin portapapeles */ } }
+  });
+ });
  var q = $('[data-quiet]');
  if (q) {
   var ti = $$('input[type=time]', q.closest('.card'));

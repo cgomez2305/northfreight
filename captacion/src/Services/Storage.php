@@ -23,7 +23,7 @@ final class Storage
     /** Quita de un texto los secretos conocidos (valores del .env) y patrones de token de Telegram o webKey de FMCSA. */
     public static function redact(string $s): string
     {
-        foreach (['TELEGRAM_BOT_TOKEN', 'FMCSA_WEBKEY', 'DB_PASS', 'APP_KEY', 'SMTP_PASS', 'INTERNAL_API_TOKEN', 'SETUP_TOKEN'] as $k) {
+        foreach (['TELEGRAM_BOT_TOKEN', 'FMCSA_WEBKEY', 'DB_PASS', 'APP_KEY', 'SMTP_PASS', 'INTERNAL_API_TOKEN', 'SETUP_TOKEN', 'META_PAGE_TOKEN', 'META_APP_SECRET', 'META_VERIFY_TOKEN', 'CALCOM_WEBHOOK_SECRET', 'TWILIO_TOKEN', 'N8N_WEBHOOK_SECRET'] as $k) {
             $v = Env::get($k);
             if ($v !== null && strlen($v) >= 6) {
                 $s = str_replace($v, '[redacted]', $s);
@@ -31,6 +31,7 @@ final class Storage
         }
         $s = (string) preg_replace('/bot\d{5,}:[A-Za-z0-9_-]{20,}/', 'bot[redacted]', $s);
         $s = (string) preg_replace('/(webKey=)[^&\s"\']+/i', '$1[redacted]', $s);
+        $s = (string) preg_replace('/(access_token=)[^&\s"\']+/i', '$1[redacted]', $s);
         $s = str_replace(CAPTACION_ROOT, '[captacion]', $s);
         return (string) preg_replace('/[\r\n]+/', ' ', $s);
     }
