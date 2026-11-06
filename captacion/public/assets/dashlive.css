@@ -34,3 +34,4 @@
   .live__dot::after,.sys .dot.is-ok::after,.is-flash::after,.is-loading .kpi::after,.acts__b.is-loading::after{animation:none}
   .seg__pill{transition:none}
 }
+.btn:active{transform:scale(.98)}

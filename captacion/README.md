@@ -849,3 +849,48 @@ Se partió `views.css` (ahora 2,9 KB) en `filtros.css` (1,3 KB: el formulario de
 - El primer contacto pendiente se pinta el día de llegada del lead (no hay un SLA propio que lo mueva) y desaparece al contactarlo.
 - Las entregas programadas casi siempre son inmediatas (el cron las toma en un minuto): solo se ven en el calendario mientras esperan o si reintentan.
 - Una tarea sin lead abre `/tareas` en su semana (no hay diálogo de edición en el calendario).
+
+## 24. Dashboard vivo (Q6): narrativa, medidores, gráfico anotado, siguiente mejor acción y refresco
+
+Se aplicó la skill «dashboards-vivos» al dashboard (`/`) **con la identidad de NorthStar** (mandan sobre la skill: tokens navy y cian de §15 en ambos temas, un solo acento = el cian, Barlow, Barlow Condensed y JetBrains Mono; no se añadió ningún color ni fuente). De la skill se tomó: narrativa antes que números, anotaciones, KPI con contexto, números protagonistas (Barlow 500 tabular, decimales y unidades atenuados; los titulares siguen en Barlow Condensed), microvisualizaciones propias en SVG/CSS, etiquetas directas, movimiento que demuestra datos vivos y estados vacíos cuidados. Se descartó: los neutros cálidos y los acentos de la skill (colisionan con el navy/cian), la barra de progreso de meta (no existe ningún ajuste de meta: no se inventa), el sidebar de la skill (ya hay uno) y las sombras/`glass`.
+
+### Datos reales, nunca inventados
+
+- **Base mínima.** `Dashboard::MIN_BASE = 5`: con menos de 5 leads en el periodo previo NO hay porcentaje de variación; `Dashboard::deltaCount()` dice el conteo («+4 leads», «+7 nuevos» sin base). La comparación de calificados en puntos exige 5 o más en AMBOS periodos y la de la mediana de respuesta 3 contactados en cada uno; si no, «Pocos datos». `Dashboard::delta()` (porcentajes) sigue siendo el de los reportes.
+- **Subtítulo-conclusión** (`Services/DashboardNarrative`, sin IA): 1) «{Hoy | En los últimos 7 días | En los últimos 30 días} llegaron **N leads**» + calientes (o tibios) del periodo, con «(+N% frente a …)» solo si el periodo previo tiene 5 o más; 2) fuente: con dos o más fuentes de 5 o más leads cada una y 15 puntos o más de diferencia en % de calificados, «**X** califica mejor (**62%** calificados)»; si no, «Vino de X» (1 lead), «Todos vienen de X» o «X es la fuente principal (a de n)» (más de la mitad); 3) «**N calientes** esperan contacto (el más antiguo, desde hace …)» o «Ningún caliente espera contacto.». Base vacía: «Aún no hay leads. Cuando llegue el primero aparecerá aquí.»; periodo sin leads: «Aún no hay leads en los últimos 7 días; en los 7 días previos llegaron N leads.» La negrita va solo en cifras y sustantivos clave.
+- **Gráfico.** Una anotación (`Dashboard::annotate`): el pico, o «+N leads en total frente al periodo anterior» si el periodo en curso ya es el máximo; solo con 8 leads o más repartidos en 3 periodos o más. Línea punteada de promedio solo con 4 periodos completos con datos; el último periodo (en curso, marcado «· en curso») no entra en el promedio.
+- **Mini barras y variación por fuente**: los últimos 30 días contra los 30 previos, solo con 5 leads o más entre los dos.
+
+### Siguiente mejor acción (`Services/DashboardActions`)
+
+Hasta 3 acciones por impacto (0 a 100, medidor de 20 rayas). Reglas fijas; orden por impacto y, con empate, el orden de esta tabla. Sin acciones: «Todo al día».
+
+| Regla | Cuenta | Impacto | Botón |
+|---|---|---|---|
+| `hot` | calientes en «Nuevo» sin primer contacto | 60 + 6·min(n,5) + 10 si el más antiguo espera más de 15 min | `/leads?t=hot&ct=none` |
+| `failed` | trabajos fallidos en la cola | 55 + 5·min(n,5) | `/#cola` |
+| `overdue` | tareas vencidas | 30 + 4·min(n,10) + 10 si la más antigua tiene más de 2 días | `/tareas?tab=overdue` |
+| `presented` | presentados a NorthStar sin respuesta | 25 + 5·min(n,5) | `/leads?hs=wait` |
+| `followups` | seguimientos de prospectos de hoy o vencidos | 25 + 3·min(n,8) | `/prospectos` |
+| `no_task` | leads abiertos sin ninguna tarea | 20 + 2·min(n,10) | `/leads?nt=1&op=1` |
+| `referrals` | bonos de referidos por aprobar | 20 + 2·min(n,5) | `/referidos` |
+| `review` | leads en la cola de revisión de las reglas | 15 + 2·min(n,10) | `/leads?fl=review_queue` |
+
+Nivel: alto (70 o más, rayas naranja), medio (40 a 69) y bajo. Tope 100.
+
+### Refresco ligero y movimiento
+
+- `POST /ajax/dashboard {p}`: solo administradores (el lector recibe 403 y nada de datos), sesión con 2FA, CSRF en `X-CSRF-Token`, 24 por minuto y usuario (429), tope de 4 s de consulta (503) y **solo agregados** (fragmentos HTML de KPI, subtítulo y acciones; ningún nombre, teléfono, correo ni id de lead; nada personal en la URL). `Dashboard::pulse()` mira 60 días, no 26 semanas. El navegador lo pide cada 60 s solo con la pestaña visible (con retroceso 2×, 4×, 8× si falla), al volver a la pestaña tras más de 60 s, y al cambiar de periodo (Hoy/Semana/Mes cambian en el sitio sin recargar; si falla se cae a la navegación normal).
+- `dashboard.js` (nonce, sin librerías; 17,2 KB, 6,1 KB gzip) anima con Web Animations solo `transform`, `opacity` y `stroke-dashoffset`: entrada una vez (KPI con 50 ms de desfase, conteo de 800 ms con separadores y decimales, líneas que se dibujan, rayas que se llenan de 15 ms en 15 ms, barras y puntos del mapa que crecen, 10 filas como máximo), pulso del punto «en vivo», pastilla deslizante en los segmentados, rodado del valor y destello de 600 ms del delta al refrescar, esqueleto solo en el refresco, estado de error con «Reintentar». El gráfico tiene cruce y tooltip oscuros que siguen al cursor con suavizado, teclado (flechas, Inicio, Fin) y la tabla `sr` como alternativa textual. El texto accesible de cada número es un `.sr` fijo (el conteo vive en un span `aria-hidden`).
+- Con `prefers-reduced-motion` o sin JS la pantalla es idéntica y completa: todo viene en el HTML.
+
+### CSS y rendimiento
+
+- Primera pantalla de `/`: 44.996 → **44.618 B** (tope 45.000, sin subirlo): se movieron los diálogos de `panel.css` a `ux.css` (diferida), las reglas de acceso a `auth.css`, `.legend` a `reportes.css`, se quitaron donut/barras/insight del dashboard y se unificaron `.strip` y `.duo`. `dashlive.css` (3,2 KB, 1,3 KB gzip, diferida y pedida por `dashboard.js`) lleva tooltips al pasar el ratón, pulso, pastilla, destellos y esqueletos.
+- `Dashboard::build` con 5.000 leads: 2.437 → **~90 ms** (el mapa de calor recalculaba el inicio de semana por cada lead); con 120 leads 135 → ~20 ms. `pulse`: ~17 ms con 5.000 leads. Las consultas nuevas usan índice (`idx_tasks_open_due`, `idx_jobs_status_run`, `idx_referrals_bonus`, `idx_leads_hot_contact`).
+
+### Pendiente
+
+- `/resultados` (lector de NorthStar) NO recibió las piezas visuales (medidor, conteo, línea dibujada): su JS no carga `ux.js` (sin `NS.api` ni `NS.css`) y hay que partir `dashboard.js` en un módulo visual compartido sin tocar el refresco; el presupuesto de CSS alcanza (37,6 KB) si se mueven `.tk` y el bloque `.lc--d` a `charts.css`. Queda para una fase propia para no arriesgar la vista del cliente.
+- Firefox y Safari sin probar. El destello del delta usa `transform` sobre un pseudo-elemento y no se probó con lector de pantalla.
+

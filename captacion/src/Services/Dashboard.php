@@ -449,9 +449,13 @@ final class Dashboard
         $counts = [];   // 'w-d' => n
         $prevTotal = 0;
         $prevFrom = Fmt::weekStart($now, -($weeks * 2 - 1));
-        $wStarts = [];   // Q6: inicios de semana calculados UNA vez (antes se recalculaban por cada lead: 2,5 s con 4.500 leads)
+        $wStarts = [];   // Q6: inicios de semana y de dia calculados UNA vez (antes se recalculaban por cada lead: 2,5 s con 4.500 leads)
+        $dStarts = [];
         for ($w = 0; $w < $weeks; $w++) {
             $wStarts[$w] = Fmt::weekStart($now, -($weeks - 1 - $w));
+            for ($d = 0; $d < 7; $d++) {
+                $dStarts[$w][$d] = Fmt::et($wStarts[$w])->modify('+' . $d . ' days')->setTime(0, 0, 0)->getTimestamp();   // medianoches reales: respeta el cambio de hora
+            }
         }
         foreach ($rows as $r) {
             $t = $r['t'];
@@ -465,7 +469,11 @@ final class Dashboard
             while ($w > 0 && $wStarts[$w] > $t) {
                 $w--;
             }
-            $key = $w . '-' . ((int) Fmt::et($t)->format('N') - 1);
+            $d = 6;
+            while ($d > 0 && $dStarts[$w][$d] > $t) {
+                $d--;
+            }
+            $key = $w . '-' . $d;
             $counts[$key] = ($counts[$key] ?? 0) + 1;
         }
         $cells = [];

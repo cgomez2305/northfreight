@@ -1,7 +1,7 @@
 <?php
 /**
  * Front controller del panel (subdominio captacion.). Rutas: / (dashboard), /pipeline, /tareas, /config, /actividad, /leads, /leads/{id}, /leads/{id}/{accion}, /leads/bulk, /leads/export, /ajax/search, /ajax/notifications/read, /login, /login/2fa, /logout,
- * Q5a: /ajax/prefs, /ajax/peek, /ajax/lead/act, /ajax/lead/create, /ajax/undo, /ajax/counters, /undo, /vistas/*. Q4a: /prospectos, /referidos, /vacantes (solo administradores). Q3: /reportes, /resultados, /informes, /comunicaciones; publicas con token: /c/{token}, /u/{token}, /invite/{token}. Autorizacion por rol DENEGADA POR DEFECTO en Responder::user().
+ * Q6: /ajax/dashboard (refresco ligero del dashboard, solo administradores). Q5a: /ajax/prefs, /ajax/peek, /ajax/lead/act, /ajax/lead/create, /ajax/undo, /ajax/counters, /undo, /vistas/*. Q4a: /prospectos, /referidos, /vacantes (solo administradores). Q3: /reportes, /resultados, /informes, /comunicaciones; publicas con token: /c/{token}, /u/{token}, /invite/{token}. Autorizacion por rol DENEGADA POR DEFECTO en Responder::user().
  * setup.php y api/lead.php son puntos de entrada propios. Cualquier otra ruta: 404.
  */
 
