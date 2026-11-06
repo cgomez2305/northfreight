@@ -28,14 +28,7 @@ partial('hero', [
 ]);
 
 // Resumen "In short" (SEO/GEO): editable aquí. Solo información que ya está en el copy de esta página; sin cifras, tarifas ni promesas nuevas.
-partial('summary', [
-    'text'   => 'Truck dispatching with NorthStar starts with four steps: we learn your operation, define scope and contacts, run the day-to-day and review and improve together. You keep control of your trucks.',
-    'points' => [
-        'One channel for every update',
-        'A record of every load',
-        'A team, not a single dispatcher',
-    ],
-]);
+partial('summary', summary_for($route));
 
 // Triada bajo el hero: las tres palabras del titular del home con el copy que ya describe cada una (servicios del home y del resumen). Sin H2 nuevos: los títulos son <p>.
 partial('trio', ['label' => 'Booked, tracked, documented', 'items' => [

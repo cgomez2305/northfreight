@@ -36,6 +36,11 @@ define('SMTP_SECURE', 'ssl');      // 'ssl' | 'tls'
 // Destino de los mensajes y avisos de descarga.
 define('MAIL_TO', 'nfreightsolutionsllc@gmail.com');
 
+// IP real detrás de un proxy/CDN: por defecto el límite por IP usa REMOTE_ADDR. Si en el servidor REMOTE_ADDR llega con la IP del proxy (todos los visitantes compartirían el mismo límite),
+// indica aquí la cabecera que el proxy SOBRESCRIBE con la IP del visitante, p. ej. 'HTTP_X_FORWARDED_FOR' o 'HTTP_CF_CONNECTING_IP' (se usa el primer valor que sea una IP válida).
+// COMPROBAR primero en el servidor real (var_dump de $_SERVER['REMOTE_ADDR'] y de la cabecera desde una petición de prueba); activarlo mal permite falsear la IP.
+// define('TRUSTED_PROXY_HEADER', 'HTTP_X_FORWARDED_FOR');
+
 // Límite de envíos por IP y ventana (segundos). Defecto: 5 por hora; el siguiente recibe 429.
 define('RATE_LIMIT', 5);
 // define('RATE_WINDOW', 3600);

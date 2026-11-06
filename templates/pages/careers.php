@@ -25,14 +25,7 @@ partial('hero', [
 ]);
 
 // Resumen "In short" (SEO/GEO): solo información ya afirmada en el sitio; sin cifras, tarifas ni promesas nuevas.
-partial('summary', [
-    'text'   => 'Truck driver jobs and owner operator partnerships at NorthStar work like this: if you run your own truck, the dispatch desk finds and books your loads, deals with brokers, tracks every trip and keeps the paperwork, and you approve every load. It is a dispatch service, not employment. Company driver jobs are listed only when real openings exist.',
-    'points' => [
-        'You approve every load',
-        'Updates on WhatsApp, where you already work',
-        'Company driver openings listed only when real',
-    ],
-]);
+partial('summary', summary_for($route));
 
 $driverCard = $jobs
     ? ['tag' => 'Company drivers', 'title' => 'CDL-A company driver jobs', 'text' => 'See the open positions, what each job involves and how to apply.',

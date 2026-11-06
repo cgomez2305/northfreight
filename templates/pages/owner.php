@@ -39,14 +39,7 @@ partial('hero', [
 ]);
 
 // Resumen "In short" (SEO/GEO): editable aquí. Solo información que ya está en el copy de esta página; sin cifras, tarifas ni promesas nuevas.
-partial('summary', [
-    'text'   => 'Dispatch services for owner-operators put a dispatch desk behind your truck: the desk finds and books your loads, deals with brokers, tracks every trip and keeps the paperwork that gets you paid. NorthStar runs that desk for you.',
-    'points' => [
-        'You approve every load',
-        'Updates on WhatsApp, where you already work',
-        'Arrival timestamps and photos kept on file',
-    ],
-]);
+partial('summary', summary_for($route));
 ?>
 <section class="section" aria-labelledby="owner-gets">
   <div class="container stack">

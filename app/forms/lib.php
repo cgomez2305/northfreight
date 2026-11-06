@@ -175,11 +175,31 @@ function ns_lead_thanks_profile(mixed $token): ?string
 
 // --- Cliente / limite por IP -----------------------------------------------------------------------
 
-/** Hash corto de la IP con sal (nunca se guarda la IP en claro). REMOTE_ADDR: no se confia en X-Forwarded-For. */
-function ns_ip_hash(): string
+/**
+ * IP del visitante. Por defecto REMOTE_ADDR (no se confia en cabeceras que el visitante puede falsear).
+ * Si app/config.local.php define TRUSTED_PROXY_HEADER (p. ej. 'HTTP_X_FORWARDED_FOR' o 'HTTP_CF_CONNECTING_IP'), se lee esa cabecera y se usa el PRIMER valor que sea una IP valida;
+ * sin cabecera o sin valor valido, vuelve a REMOTE_ADDR. Activarlo SOLO si el servidor esta detras de un proxy/CDN que sobrescribe esa cabecera (si el proxy la anade al final
+ * en vez de reemplazarla, un visitante podria falsear la IP y saltarse el limite): comprobarlo en el servidor real antes de activarlo (ver config.local.example.php).
+ */
+function ns_client_ip(): string
 {
     $ip = (string) ($_SERVER['REMOTE_ADDR'] ?? '');
-    return substr(hash_hmac('sha256', 'ip|' . $ip, ns_secret()), 0, 20);
+    $header = defined('TRUSTED_PROXY_HEADER') ? strtoupper(trim((string) TRUSTED_PROXY_HEADER)) : '';
+    if ($header !== '' && preg_match('/^HTTP_[A-Z0-9_]{1,60}$/', $header) === 1) {
+        foreach (explode(',', (string) ($_SERVER[$header] ?? '')) as $candidate) {
+            $candidate = trim($candidate);
+            if ($candidate !== '' && filter_var($candidate, FILTER_VALIDATE_IP) !== false) {
+                return $candidate;
+            }
+        }
+    }
+    return $ip;
+}
+
+/** Hash corto de la IP con sal (nunca se guarda la IP en claro). Ver ns_client_ip(). */
+function ns_ip_hash(): string
+{
+    return substr(hash_hmac('sha256', 'ip|' . ns_client_ip(), ns_secret()), 0, 20);
 }
 
 function ns_rate_limit(): int

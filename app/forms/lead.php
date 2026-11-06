@@ -103,7 +103,7 @@ function ns_lead_crm_ingest(array $lead): array
             return ['ok' => false, 'reason' => 'not_installed', 'lead_id' => null];
         }
         require_once $boot;
-        $r = \Captacion\Services\LeadIngest::handle(\Captacion\Services\LeadIngest::fromSiteLead($lead), 'web_careers', ['ip' => (string) ($_SERVER['REMOTE_ADDR'] ?? ''), 'public' => true]);
+        $r = \Captacion\Services\LeadIngest::handle(\Captacion\Services\LeadIngest::fromSiteLead($lead), 'web_careers', ['ip' => ns_client_ip(), 'public' => true]);
         return ['ok' => (bool) $r['ok'], 'reason' => $r['ok'] ? null : (string) ($r['reason'] ?? 'rejected'), 'lead_id' => $r['lead_id'] ?? null];
     } catch (Throwable $t) {
         ns_log_error('lead-crm ' . get_class($t), $t->getMessage());   // sin datos del lead
@@ -251,7 +251,7 @@ function ns_lead_mail_body(array $l, array $opt): string
 
     $consentGiven = $old['consent'] === '1';
     $now = gmdate('c');
-    $ip = (string) ($_SERVER['REMOTE_ADDR'] ?? '');
+    $ip = ns_client_ip();
     $phoneE164 = ((!str_starts_with(ltrim($phoneRaw), '+') && strlen($digits) === 10) ? '+1' : '+') . $digits;   // 10 digitos sin + = EE. UU.
     $lead = [
         'id'           => 'ld_' . bin2hex(random_bytes(6)),

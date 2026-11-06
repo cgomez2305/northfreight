@@ -26,14 +26,7 @@ partial('hero', [
 ]);
 
 // Resumen "In short" (SEO/GEO): editable aquí. Solo información que ya está en el copy de esta página; sin cifras, tarifas ni promesas nuevas.
-partial('summary', [
-    'text'   => 'Dry van dispatch service means a desk that finds and books dry van freight, negotiates the rate, coordinates pickup and delivery and keeps every document on file. NorthStar handles it from one dispatch desk.',
-    'points' => [
-        'Load search and rate negotiation',
-        'Check calls and ETAs while the load moves',
-        'BOL and POD collected, detention documented',
-    ],
-]);
+partial('summary', summary_for($route));
 ?>
 <section class="section" aria-labelledby="dv-steps">
   <div class="container stack">

@@ -148,16 +148,7 @@ $figures = [
   </div>
 </section>
 
-<?php partial('summary', [
-    'variant' => 'lead',
-    'textfill' => true,   // relleno de texto palabra a palabra con el scroll (motion.js textScene): usado una sola vez; quitar esta línea lo desactiva
-    'text'    => 'NorthStar is a remote truck dispatch company for owner-operators and small fleets. Our trucking dispatch services cover load booking on Amazon Relay and dry van, load tracking from pickup to POD and back-office work, all from one dispatch desk.',
-    'points'  => [
-        'Amazon Relay and dry van booking',
-        'Load tracking and check calls',
-        'Settlements, disputes and paperwork',
-    ],
-]); ?>
+<?php partial('summary', summary_for($route) + ['variant' => 'lead', 'textfill' => true]   /* relleno de texto con el scroll (motion.js textScene): usado una sola vez; quitar 'textfill' lo desactiva */); ?>
 
 <!-- 01 SERVICES: rejilla de 3 tarjetas con foto; con html.js-motion y ≥1025px motion.js la convierte en un carril horizontal fijado (.home-services__pin) -->
 <section class="section home-services" id="services" aria-labelledby="services-title">

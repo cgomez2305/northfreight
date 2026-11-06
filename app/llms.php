@@ -155,6 +155,21 @@ function llms_full_txt(): string
                 $out[] = '';
             }
 
+            // Bloque "In short" de la página (misma fuente que la plantilla: app/data/summaries.php): la frase que un motor generativo extrae.
+            $sum = summary_for($r + ['path' => $path]);
+            $sumText = llms_clean((string) ($sum['text'] ?? ''));
+            if ($sumText !== '') {
+                $out[] = '**In short:** ' . $sumText;
+                $out[] = '';
+                foreach (array_slice((array) ($sum['points'] ?? []), 0, 3) as $pt) {
+                    $pt = llms_clean((string) $pt);
+                    if ($pt !== '') {
+                        $out[] = '- ' . $pt;
+                    }
+                }
+                $out[] = '';
+            }
+
             // Artículos: categoría, fechas reales (si existen), entrada y extracto de posts.php.
             if (($r['template'] ?? '') === 'post') {
                 $post = post_by_slug((string) ($r['slug'] ?? ''));

@@ -560,6 +560,13 @@ function service_schema(array $route): array
     ];
 }
 
+/** Bloque "In short" de una ruta (app/data/summaries.php): ['text' => …, 'points' => […]] o [] si la ruta no tiene. Fuente única de las plantillas y de /llms-full.txt. */
+function summary_for(array $route): array
+{
+    $s = data('summaries')[(string) ($route['path'] ?? '')] ?? [];
+    return is_array($s) ? $s : [];
+}
+
 /** Nodo FAQPage a partir de ítems [['q','a'],…]; null si no hay ítems. */
 function faq_schema(array $items): ?array
 {

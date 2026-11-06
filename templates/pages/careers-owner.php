@@ -30,14 +30,7 @@ partial('hero', [
     'image'   => ['base' => 'nf-setup-owner-operator', 'alt' => 'White semi truck parked alone in an empty lot at dusk, with bare trees behind', 'pos' => '66% 50%'],
 ]);
 
-partial('summary', [
-    'text'   => 'Owner operator jobs at NorthStar are a dispatch partnership, not employment: you keep your truck and approve every load, and the desk books the freight, deals with brokers, tracks every trip and keeps the paperwork that gets you paid.',
-    'points' => [
-        'You approve every load',
-        'Updates on WhatsApp, where you already work',
-        'A team, not a single dispatcher',
-    ],
-]);
+partial('summary', summary_for($route));
 ?>
 <section class="section" aria-labelledby="co-included">
   <div class="container stack">
