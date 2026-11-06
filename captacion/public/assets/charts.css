@@ -1,22 +1,17 @@
-/* NorthStar Captación · componentes compartidos por el dashboard y la ficha (gráficos, anillo de puntuación, segmentos). Se carga solo en esa pantalla, encima de panel.css. Sin estilos en línea (CSP): clases y variables. */
-/* Q5a: reglas que estaban en panel.css y solo usa esta pantalla */
 .delta{display:inline-flex;align-items:center;gap:3px;height:22px;padding:0 8px 0 5px;border-radius:var(--r-pill);font:600 12px/1 var(--f-mono);white-space:nowrap;text-decoration:none!important}
 .delta .ic{width:13px;height:13px;stroke-width:2.2}
 .delta--good{background:var(--ok-bg);color:var(--ok)}
 .delta--bad{background:var(--bad-bg);color:var(--bad)}
 .delta--warn{background:var(--hot-bg);color:var(--hot)}
 .delta--flat{background:var(--dq-bg);color:var(--dq)}
-.legend{display:flex;gap:16px;flex-wrap:wrap;font:500 10.5px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
-.legend li{display:flex;align-items:center;gap:7px}
-@media (max-width:760px){
-  .legend{gap:8px 14px}
-}
 .sw{width:9px;height:9px;border-radius:50%}
 .seg--sm .seg__i{min-height:30px;padding:0 12px;font-size:13px}
-.spark__line{stroke:var(--cyan);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.spark__dot{fill:var(--cyan);stroke:var(--surface);stroke-width:2}
-.bars__b{fill:var(--seg-3)}
-.bars__b.is-on{fill:var(--navy-2)}
+.spark{color:var(--c-drv)}
+.gs0,.gs1{stop-color:currentColor}
+.gs0{stop-opacity:.16}
+.gs1{stop-opacity:0}
+.spark__line{stroke:var(--c-drv);stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.spark__dot{fill:var(--c-drv);stroke:var(--surface);stroke-width:2}
 .donut__bg{stroke:var(--line)}
 .donut__fg{stroke:var(--cyan)}
 .lc{display:grid;grid-template-columns:30px minmax(0,1fr);grid-template-rows:220px auto;column-gap:10px;row-gap:8px}

@@ -21,6 +21,10 @@ final class Dashboard
     private const WINDOW_LABEL = ['today' => 'hoy', 'week' => 'los últimos 7 días', 'month' => 'los últimos 30 días'];
     public const WEEKS = 12;
     public const HEAT_WEEKS = 13;
+    /** Q6: con menos leads que esto en la base previa NO se muestra un porcentaje de variacion (un +400 % sobre 1 lead engaña): se dice el conteo. */
+    public const MIN_BASE = 5;
+    /** Q6: contactados minimos (en cada periodo) para comparar la mediana de primera respuesta. */
+    public const MIN_SAMPLES = 3;
 
     /** @return array{0:int,1:int,2:int,3:int} [inicio actual, fin actual, inicio previo, fin previo] como timestamps */
     public static function window(string $period, ?int $now = null): array
@@ -52,6 +56,23 @@ final class Dashboard
         return ['text' => $txt, 'dir' => $dir, 'good' => $good];
     }
 
+    /**
+     * Variacion de un CONTEO (leads) con la regla de base minima (Q6): con 5 o mas en el periodo previo, porcentaje; con 1 a 4, la diferencia en leads; con 0, «+N nuevos».
+     * Nunca devuelve un porcentaje sobre una base minuscula.
+     */
+    public static function deltaCount(int $cur, int $prev, string $one = 'lead', string $many = 'leads'): array
+    {
+        if ($prev >= self::MIN_BASE || $prev === 0) {
+            return self::delta($cur, $prev);
+        }
+        $d = $cur - $prev;
+        if ($d === 0) {
+            return ['text' => 'Sin cambio', 'dir' => 'flat', 'good' => null];
+        }
+        $abs = abs($d);
+        return ['text' => ($d > 0 ? '+' : '−') . $abs . ' ' . ($abs === 1 ? $one : $many), 'dir' => $d > 0 ? 'up' : 'down', 'good' => $d > 0];
+    }
+
     public static function median(array $values): ?int
     {
         $values = array_values(array_map('intval', $values));
@@ -63,14 +84,21 @@ final class Dashboard
         return $n % 2 === 1 ? $values[intdiv($n, 2)] : (int) round(($values[$n / 2 - 1] + $values[$n / 2]) / 2);
     }
 
-    /** Filas livianas de las ultimas 26 semanas (suficiente para el periodo, el grafico semanal, su comparativa y el mapa de calor). */
-    public static function recentRows(int $now): array
+    /**
+     * Filas livianas de las ultimas 26 semanas (suficiente para el periodo, el grafico semanal, su comparativa y el mapa de calor). Q6: cada fila lleva `t` (marca de tiempo ya
+     * convertida, una sola vez) y $from permite pedir menos (el refresco ligero solo necesita 60 dias).
+     */
+    public static function recentRows(int $now, ?int $from = null): array
     {
-        $from = Fmt::weekStart($now, -(self::HEAT_WEEKS * 2 - 1));
-        return Db::all(
+        $from ??= Fmt::weekStart($now, -(self::HEAT_WEEKS * 2 - 1));
+        $rows = Db::all(
             'SELECT created_at, profile, temperature, source, first_contact_at FROM leads WHERE deleted_at IS NULL AND created_at >= ? AND created_at <= ?',
             [Fmt::utc($from), Fmt::utc($now)]
         );
+        foreach ($rows as &$r) {
+            $r['t'] = (int) Clock::parse((string) $r['created_at']);
+        }
+        return $rows;
     }
 
     /** @param list<array> $rows */
@@ -78,8 +106,7 @@ final class Dashboard
     {
         $out = [];
         foreach ($rows as $r) {
-            $t = (int) Clock::parse((string) $r['created_at']);
-            if ($t >= $from && $t < $to) {
+            if ($r['t'] >= $from && $r['t'] < $to) {
                 $out[] = $r;
             }
         }
@@ -95,7 +122,7 @@ final class Dashboard
         }
         $buckets = array_fill(0, $days, 0);
         foreach ($rows as $r) {
-            $t = (int) Clock::parse((string) $r['created_at']);
+            $t = $r['t'];
             if ($t < $starts[0]) {
                 continue;
             }
@@ -113,32 +140,81 @@ final class Dashboard
         $now ??= Clock::time();
         $period = isset(self::PERIODS[$period]) ? $period : 'today';
         $rows = self::recentRows($now);
+        $out = self::kpis($period, $now, $rows);
+
+        // Grafico de leads por semana (12 semanas, dos series), reparto por fuente, franja, mapa de calor y lista de hoy
+        $out['chart'] = self::charts($rows, $now);
+        $out['sources'] = self::sources($now);
+        $out['strip'] = self::strip($rows, $now);
+        $out['heat'] = self::heat($rows, $now);
+        $out['today'] = self::today($now);
+        return self::finish($out, $now);
+    }
+
+    /**
+     * Q6: refresco ligero (POST /ajax/dashboard): solo lo que cambia con el tiempo (KPI, subtitulo y siguientes acciones) y solo AGREGADOS: ningun nombre, telefono ni id de lead.
+     * Mira 60 dias atras (lo que piden el mes y su periodo previo), no las 26 semanas del dashboard completo.
+     */
+    public static function pulse(string $period, ?int $now = null): array
+    {
+        $now ??= Clock::time();
+        $period = isset(self::PERIODS[$period]) ? $period : 'today';
+        $out = self::kpis($period, $now, self::recentRows($now, Fmt::dayStart($now, -59)), false);
+        return self::finish($out, $now);
+    }
+
+    /** Subtitulo-conclusion y siguientes acciones (reglas deterministas en DashboardNarrative y DashboardActions) sobre los KPI ya calculados. */
+    private static function finish(array $out, int $now): array
+    {
+        $out['any'] = (int) Db::value('SELECT COUNT(*) FROM (SELECT 1 FROM leads WHERE deleted_at IS NULL LIMIT 1) x') > 0;   // hay al menos un lead en toda la base
+        $out['actions'] = DashboardActions::compute($now, $out['hot']);
+        $out['narrative'] = DashboardNarrative::headline($out);
+        $out['updated_at'] = $now;
+        return $out;
+    }
+
+    /** @param list<array> $rows filas de recentRows() */
+    private static function kpis(string $period, int $now, array $rows, bool $withHot = true): array
+    {
         [$cs, $ce, $ps, $pe] = self::window($period, $now);
         $cur = self::between($rows, $cs, $ce + 1);
         $prev = self::between($rows, $ps, $pe);
 
         $out = ['period' => $period, 'window' => ['from' => $cs, 'to' => $ce], 'prev_label' => self::PREV_LABEL[$period], 'window_label' => self::WINDOW_LABEL[$period]];
 
-        // KPI 1: leads
-        $spDays = $period === 'month' ? 30 : 14;
-        $out['leads'] = ['n' => count($cur), 'prev' => count($prev), 'delta' => self::delta(count($cur), count($prev)), 'spark' => self::daily($rows, $spDays, $now), 'spark_days' => $spDays];
+        // KPI 1: leads (la microlinea es de 7 dias; en el periodo «mes», de 30)
+        $spDays = $period === 'month' ? 30 : 7;
+        $out['leads'] = ['n' => count($cur), 'prev' => count($prev), 'delta' => self::deltaCount(count($cur), count($prev)), 'spark' => self::daily($rows, $spDays, $now), 'spark_days' => $spDays];
 
-        // KPI 2: calificados (caliente + tibio) sobre el total del periodo
+        // KPI 2: calificados (caliente + tibio) sobre el total del periodo. La comparacion en puntos exige base minima en AMBOS periodos.
         $qual = static fn(array $set): int => count(array_filter($set, static fn($r) => in_array($r['temperature'], ['hot', 'warm'], true)));
         $qc = $qual($cur);
         $qp = $qual($prev);
         $pc = count($cur) > 0 ? $qc / count($cur) * 100 : 0.0;
         $pp = count($prev) > 0 ? $qp / count($prev) * 100 : 0.0;
-        $out['qualified'] = ['n' => $qc, 'of' => count($cur), 'pct' => $pc, 'prev_pct' => $pp, 'delta' => self::delta($pc, $pp, true, true), 'has_prev' => count($prev) > 0];
+        $both = count($cur) >= self::MIN_BASE && count($prev) >= self::MIN_BASE;
+        $out['qualified'] = ['n' => $qc, 'of' => count($cur), 'pct' => $pc, 'prev_pct' => $pp, 'delta' => self::delta($pc, $pp, true, true), 'has_prev' => $both];
 
-        // KPI 3: calientes sin contactar (estado actual, no depende del periodo)
+        // Mezcla del periodo (para el subtitulo): calientes, tibios y calificados por fuente
+        $hotC = count(array_filter($cur, static fn($r) => $r['temperature'] === 'hot'));
+        $by = [];
+        foreach ($cur as $r) {
+            $k = (string) $r['source'];
+            $by[$k] ??= ['key' => $k, 'label' => Catalog::source($k), 'n' => 0, 'q' => 0];
+            $by[$k]['n']++;
+            $by[$k]['q'] += in_array($r['temperature'], ['hot', 'warm'], true) ? 1 : 0;
+        }
+        uasort($by, static fn($a, $b) => [$b['n'], $a['key']] <=> [$a['n'], $b['key']]);
+        $out['mix'] = ['hot' => $hotC, 'warm' => $qc - $hotC, 'sources' => array_values($by)];
+
+        // KPI 3: calientes sin contactar (estado actual, no depende del periodo). Cada raya del dial = 15 min de espera del mas antiguo (tope 16 = 4 h).
         $where = "deleted_at IS NULL AND temperature = 'hot' AND first_contact_at IS NULL AND stage = 'new'";
         $hotN = (int) Db::value("SELECT COUNT(*) FROM leads WHERE $where");
         $hot = Db::all("SELECT id, first_name, last_name, created_at FROM leads WHERE $where ORDER BY created_at ASC, id ASC LIMIT 4");
         $oldest = $hot ? Fmt::secondsBetween((string) $hot[0]['created_at'], Clock::now()) : null;
-        $out['hot'] = ['n' => $hotN, 'sample' => $hot, 'oldest_secs' => $oldest, 'late' => $oldest !== null && $oldest > 900];
+        $out['hot'] = ['n' => $hotN, 'sample' => $withHot ? $hot : [], 'oldest_secs' => $oldest, 'late' => $oldest !== null && $oldest > 900, 'ticks' => $oldest === null ? 0 : max(1, min(16, (int) ceil($oldest / 900)))];
 
-        // KPI 4: primera respuesta (mediana)
+        // KPI 4: primera respuesta (mediana) y que parte se atendio en menos de 15 minutos
         $resp = static function (array $set): array {
             $v = [];
             foreach ($set as $r) {
@@ -158,16 +234,9 @@ final class Dashboard
             $bands[$s < 900 ? 0 : ($s < 3600 ? 1 : ($s < 14400 ? 2 : 3))]++;
         }
         $out['response'] = [
-            'median' => $mc, 'prev' => $mp, 'n' => count($rc), 'bands' => $bands,
-            'delta' => $mc !== null && $mp !== null ? self::delta($mc, $mp, false) : null,
+            'median' => $mc, 'prev' => $mp, 'n' => count($rc), 'bands' => $bands, 'share15' => $rc ? $bands[0] / count($rc) * 100 : null,
+            'delta' => $mc !== null && $mp !== null && count($rc) >= self::MIN_SAMPLES && count($rp) >= self::MIN_SAMPLES ? self::delta($mc, $mp, false) : null,
         ];
-
-        // Grafico de leads por semana (12 semanas, dos series)
-        $out['chart'] = self::charts($rows, $now);
-        $out['sources'] = self::sources($now);
-        $out['strip'] = self::strip($rows, $now);
-        $out['heat'] = self::heat($rows, $now);
-        $out['today'] = self::today($now);
         return $out;
     }
 
@@ -190,7 +259,7 @@ final class Dashboard
         $prevTotal = 0;
         $prevFrom = Fmt::weekStart($now, -($weeks * 2 - 1));
         foreach ($rows as $r) {
-            $t = (int) Clock::parse((string) $r['created_at']);
+            $t = $r['t'];
             if ($t >= $start) {
                 $i = $weeks - 1;
                 while ($i > 0 && $starts[$i] > $t) {
@@ -206,7 +275,9 @@ final class Dashboard
             }
         }
         $total = array_sum($ops) + array_sum($drv);
-        $weekly = ['labels' => $labels, 'tips' => $tips, 'ops' => $ops, 'drv' => $drv, 'total' => $total, 'prev_total' => $prevTotal, 'delta' => self::delta($total, $prevTotal)];
+        $tips[$weeks - 1] .= ' · en curso';
+        $tot = array_map(static fn($a, $b) => $a + $b, $ops, $drv);
+        $weekly = ['labels' => $labels, 'tips' => $tips, 'ops' => $ops, 'drv' => $drv, 'total' => $total, 'prev_total' => $prevTotal, 'delta' => self::deltaCount($total, $prevTotal)] + self::annotate($tot, $tips);
 
         // Mensual (12 meses) y anual: todo el historial, agrupado en ET
         $all = Db::all('SELECT created_at, profile FROM leads WHERE deleted_at IS NULL');
@@ -248,7 +319,8 @@ final class Dashboard
                         $mo[$i]++;
                     }
                 }
-                $out['monthly'] = ['labels' => $mLabels, 'tips' => $mTips, 'ops' => $mo, 'drv' => $md, 'total' => array_sum($mo) + array_sum($md)];
+                $mTips[$months - 1] .= ' · en curso';
+                $out['monthly'] = ['labels' => $mLabels, 'tips' => $mTips, 'ops' => $mo, 'drv' => $md, 'total' => array_sum($mo) + array_sum($md)] + self::annotate(array_map(static fn($a, $b) => $a + $b, $mo, $md), $mTips);
             }
             $y0 = (int) Fmt::et($first)->format('Y');
             $y1 = (int) Fmt::et($now)->format('Y');
@@ -264,10 +336,38 @@ final class Dashboard
                         $yo[$i]++;
                     }
                 }
-                $out['yearly'] = ['labels' => array_map('strval', $years), 'tips' => array_map('strval', $years), 'ops' => $yo, 'drv' => $yd, 'total' => array_sum($yo) + array_sum($yd)];
+                $out['yearly'] = ['labels' => array_map('strval', $years), 'tips' => array_map('strval', $years), 'ops' => $yo, 'drv' => $yd, 'total' => array_sum($yo) + array_sum($yd), 'note' => null, 'avg' => null];
             }
         }
         return $out;
+    }
+
+    /**
+     * Q6: anotacion y promedio del grafico, calculados SOLO de los datos mostrados. El ultimo periodo esta en curso, asi que no entra en el promedio.
+     * Anotacion (una sola, solo con datos suficientes: 8 leads o mas repartidos en 3 periodos o mas): el pico, o «+N frente al periodo anterior» si el periodo en curso ya es el maximo y supera al anterior.
+     * Promedio (linea punteada): solo con 4 periodos completos con datos.
+     * @param list<int> $tot total por periodo; @param list<string> $tips titulo de cada periodo
+     * @return array{note:?array{i:int,l1:string,l2:string},avg:?float}
+     */
+    public static function annotate(array $tot, array $tips): array
+    {
+        $tot = array_values($tot);
+        $n = count($tot);
+        $full = array_slice($tot, 0, max(0, $n - 1));
+        $avg = count(array_filter($full)) >= 4 ? array_sum($full) / count($full) : null;
+        $note = null;
+        if ($n >= 3 && array_sum($tot) >= 8 && count(array_filter($tot)) >= 3) {
+            $max = max($tot);
+            $idx = array_keys($tot, $max);
+            $i = (int) end($idx);   // si hay empate, el mas reciente
+            $diff = $i === $n - 1 ? $tot[$n - 1] - $tot[$n - 2] : 0;
+            if ($i === $n - 1 && $diff > 0) {
+                $note = ['i' => $i, 'l1' => '+' . $diff . ' ' . ($diff === 1 ? 'lead' : 'leads') . ' en total', 'l2' => 'frente al periodo anterior'];
+            } else {
+                $note = ['i' => $i, 'l1' => 'Pico: ' . $max . ' ' . ($max === 1 ? 'lead' : 'leads') . ' en total', 'l2' => (string) ($tips[$i] ?? '')];
+            }
+        }
+        return ['note' => $note, 'avg' => $avg];
     }
 
     /** Leads por fuente en los ultimos 90 dias + una linea de insight calculada (la fuente que mas crece) solo si hay datos suficientes. */
@@ -299,7 +399,9 @@ final class Dashboard
         $other = 0;
         foreach ($count as $src => $n) {
             if ($i < 4) {
-                $list[] = ['key' => $src, 'label' => Catalog::source($src), 'n' => $n, 'pct' => $total90 > 0 ? $n / $total90 * 100 : 0];
+                $n30 = $last30[$src] ?? 0;
+                $p30 = $prev30[$src] ?? 0;
+                $list[] = ['key' => $src, 'label' => Catalog::source($src), 'n' => $n, 'pct' => $total90 > 0 ? $n / $total90 * 100 : 0, 'delta' => $n30 + $p30 >= self::MIN_BASE ? self::deltaCount($n30, $p30) : null];
             } else {
                 $other += $n;
             }
@@ -347,20 +449,23 @@ final class Dashboard
         $counts = [];   // 'w-d' => n
         $prevTotal = 0;
         $prevFrom = Fmt::weekStart($now, -($weeks * 2 - 1));
+        $wStarts = [];   // Q6: inicios de semana calculados UNA vez (antes se recalculaban por cada lead: 2,5 s con 4.500 leads)
+        for ($w = 0; $w < $weeks; $w++) {
+            $wStarts[$w] = Fmt::weekStart($now, -($weeks - 1 - $w));
+        }
         foreach ($rows as $r) {
-            $t = (int) Clock::parse((string) $r['created_at']);
+            $t = $r['t'];
             if ($t < $start) {
                 if ($t >= $prevFrom) {
                     $prevTotal++;
                 }
                 continue;
             }
-            $d = Fmt::et($t);
             $w = $weeks - 1;
-            while ($w > 0 && Fmt::weekStart($now, -($weeks - 1 - $w)) > $t) {
+            while ($w > 0 && $wStarts[$w] > $t) {
                 $w--;
             }
-            $key = $w . '-' . ((int) $d->format('N') - 1);
+            $key = $w . '-' . ((int) Fmt::et($t)->format('N') - 1);
             $counts[$key] = ($counts[$key] ?? 0) + 1;
         }
         $cells = [];
@@ -397,7 +502,7 @@ final class Dashboard
             $lastM = $m;
         }
         return [
-            'cells' => $cells, 'weeks' => $weeks, 'total' => $total, 'prev_total' => $prevTotal, 'delta' => self::delta($total, $prevTotal),
+            'cells' => $cells, 'weeks' => $weeks, 'total' => $total, 'prev_total' => $prevTotal, 'delta' => self::deltaCount($total, $prevTotal),
             'avg_day' => $daysElapsed > 0 ? $total / $daysElapsed : 0, 'busiest_dow' => $total > 0 ? $dayNames[$bestDow] : null, 'busiest' => $busiest, 'months' => $months,
         ];
     }

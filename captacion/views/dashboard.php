@@ -6,29 +6,29 @@ use Captacion\Services\Dashboard;
 use Captacion\Services\Fmt;
 
 $leads = $d['leads'];
-$qual = $d['qualified'];
-$hot = $d['hot'];
-$resp = $d['response'];
 $ch = $d['chart'];
 $src = $d['sources'];
 $strip = $d['strip'];
 $heat = $d['heat'];
 $today = $d['today'];
+$narr = $d['narrative'];
+$actions = $d['actions'];
 $tabs = ['weekly' => 'Semanal'] + ($ch['monthly'] ? ['monthly' => 'Mensual'] : []) + ($ch['yearly'] ? ['yearly' => 'Anual'] : []);
 $chartTitle = ['weekly' => 'Leads por semana, últimas 12 semanas', 'monthly' => 'Leads por mes, últimos 12 meses', 'yearly' => 'Leads por año'];
-$tip = static fn(string $t): string => '<button class="info" type="button" aria-label="Qué mide: ' . $e($t) . '" data-tip="' . $e($t) . '">' . Ui::icon('info') . '</button>';
-$avatarsMore = max(0, $hot['n'] - count($hot['sample']));
-$days = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
+$tabSub = ['weekly' => 'de las últimas 12 semanas', 'monthly' => 'de los últimos 12 meses', 'yearly' => 'histórico'];
+$tip = static fn(string $t): string => Ui::tip($t);
 ?>
-<div class="page-head">
+<div class="page-head" data-dash data-period="<?= $e($period) ?>" data-live-v="<?= $e($liveV) ?>">
   <div>
     <h1 class="h1"><?= $e($greeting) ?></h1>
-    <p class="sub">Así va la captación de NorthStar · <?= $e(Fmt::weekdayShort((int) $nowEt->format('N'))) ?> <?= $e(Fmt::dayLabel($nowEt)) ?>, <?= $e($nowEt->format('H:i')) ?> <?= $e(Fmt::zone()) ?></p>
+    <?php require __DIR__ . '/_dash_narr.php'; ?>
+    <p class="live mono"><i class="live__dot" aria-hidden="true"></i><span data-live="stamp" data-at="<?= $e($d['updated_at']) ?>">Actualizado a las <?= $e($nowEt->format('H:i')) ?> <?= $e(Fmt::zone()) ?></span> · <?= $e(Fmt::weekdayShort((int) $nowEt->format('N'))) ?> <?= $e(Fmt::dayLabel($nowEt)) ?></p>
+    <p class="live__err" role="status" hidden>No se pudo actualizar el dashboard. <button class="link" type="button" data-retry>Reintentar</button></p>
   </div>
   <div class="page-head__a">
-    <div class="seg" role="group" aria-label="Periodo">
+    <div class="seg" role="group" aria-label="Periodo" data-pill>
       <?php foreach (Dashboard::PERIODS as $k => $label): ?>
-        <a class="seg__i<?= $period === $k ? ' is-on' : '' ?>" href="/<?= $e(Ui::qs(['p' => $k === 'today' ? null : $k])) ?>"<?= $period === $k ? ' aria-current="true"' : '' ?>><?= $e($label) ?></a>
+        <a class="seg__i<?= $period === $k ? ' is-on' : '' ?>" href="/<?= $e(Ui::qs(['p' => $k === 'today' ? null : $k])) ?>" data-p="<?= $e($k) ?>"<?= $period === $k ? ' aria-current="true"' : '' ?>><?= $e($label) ?></a>
       <?php endforeach; ?>
     </div>
     <form method="post" action="/leads/export">
@@ -38,71 +38,38 @@ $days = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domin
   </div>
 </div>
 
-<section class="kpis" aria-label="Indicadores del periodo">
-  <article class="kpi">
-    <header class="kpi__h"><span class="label">LEADS</span><?= $tip('Leads recibidos en ' . $d['window_label'] . '. Variación frente al periodo anterior de la misma duración.') ?></header>
-    <div class="kpi__m"><p class="kpi__v"><?= $e(Fmt::num($leads['n'])) ?></p><?= Charts::spark($leads['spark']) ?></div>
-    <footer class="kpi__f"><?= Ui::delta($leads['delta']) ?><span><?= $e($d['prev_label']) ?></span></footer>
-  </article>
-  <article class="kpi">
-    <header class="kpi__h"><span class="label">CALIFICADOS</span><?= $tip('Porcentaje de leads calientes y tibios sobre el total recibido en ' . $d['window_label'] . '.') ?></header>
-    <div class="kpi__m"><p class="kpi__v"><?= $qual['of'] > 0 ? $e(Fmt::num($qual['pct'], 0)) . '<small>%</small>' : '<span class="kpi__na">—</span>' ?></p>
-      <div class="kpi__ring"><?= Charts::donut($qual['pct']) ?><span><b><?= $e($qual['n']) ?></b> de <?= $e($qual['of']) ?></span></div></div>
-    <footer class="kpi__f"><?= $qual['has_prev'] && $qual['of'] > 0 ? Ui::delta($qual['delta']) : '<span class="delta delta--flat">' . Ui::icon('minus') . 'Sin comparación</span>' ?><span><?= $e($d['prev_label']) ?></span></footer>
-  </article>
-  <article class="kpi<?= $hot['n'] > 0 ? ' kpi--alert' : '' ?>">
-    <header class="kpi__h"><span class="label">CALIENTES SIN CONTACTAR</span><?= $tip('Leads calientes en etapa «Nuevo» sin primer contacto registrado, sin importar el periodo.') ?></header>
-    <div class="kpi__m"><p class="kpi__v"><?= $e($hot['n']) ?></p>
-      <?php if ($hot['sample']): ?>
-        <div class="avs" aria-hidden="true"><?php foreach ($hot['sample'] as $i => $h): ?><?= Ui::avatar(Fmt::name($h), 'sm') ?><?php endforeach; ?><?php if ($avatarsMore > 0): ?><span class="av av--sm av--more">+<?= $e($avatarsMore) ?></span><?php endif; ?></div>
-      <?php endif; ?></div>
-    <footer class="kpi__f">
-      <?php if ($hot['n'] > 0): ?>
-        <a class="delta delta--<?= $hot['late'] ? 'bad' : 'warn' ?>" href="/leads?t=hot&amp;ct=none"><?= Ui::icon('clock') ?>Espera <?= $e(Fmt::dur($hot['oldest_secs'])) ?></a><span>el más antiguo</span>
-      <?php else: ?>
-        <span class="delta delta--good"><?= Ui::icon('check') ?>Todo al día</span><span>ningún caliente esperando</span>
-      <?php endif; ?>
-    </footer>
-  </article>
-  <article class="kpi">
-    <header class="kpi__h"><span class="label">PRIMERA RESPUESTA</span><?= $tip('Mediana del tiempo entre la llegada del lead y su primer contacto, en los leads de ' . $d['window_label'] . ' que ya fueron contactados.') ?></header>
-    <div class="kpi__m"><p class="kpi__v kpi__v--t"><?= $resp['median'] !== null ? $e(Fmt::dur($resp['median'])) : '<span class="kpi__na">—</span>' ?></p>
-      <?php if ($resp['n'] > 0): ?><div class="kpi__bars"><?= Charts::bars($resp['bands']) ?><small>&lt;15m · 1h · 4h · +</small></div><?php endif; ?></div>
-    <footer class="kpi__f">
-      <?php if ($resp['delta'] !== null): ?><?= Ui::delta($resp['delta']) ?><span><?= $e($d['prev_label']) ?></span>
-      <?php else: ?><span class="delta delta--flat"><?= Ui::icon('minus') ?><?= $resp['n'] > 0 ? 'Sin comparación' : 'Sin contactos aún' ?></span><span><?= $resp['n'] > 0 ? $e($resp['n']) . ' contactados' : $e($d['window_label']) ?></span><?php endif; ?>
-    </footer>
-  </article>
+<section class="kpis" aria-label="Indicadores del periodo" data-live="kpis"><?php require __DIR__ . '/_dash_kpis.php'; ?></section>
+
+<section class="card acts" aria-labelledby="h-next">
+  <header class="card__h"><h2 class="label" id="h-next">SIGUIENTE MEJOR ACCIÓN</h2><?= $tip('Hasta tres acciones, ordenadas por impacto (0 a 100). Reglas fijas sobre los datos de hoy: calientes sin contactar, trabajos fallidos, tareas vencidas, presentados sin respuesta, prospectos, leads sin tarea, bonos y cola de revisión.') ?></header>
+  <div class="acts__b" data-live="actions"><?php require __DIR__ . '/_dash_actions.php'; ?></div>
 </section>
 
 <div class="grid grid--main">
   <section class="card chart" aria-labelledby="h-chart" data-tabs>
-    <header class="card__h"><h2 class="label" id="h-chart">LEADS POR SEMANA</h2><?= $tip('Leads recibidos por semana (lunes a domingo, hora del este), separados entre owner-operators y carriers, y company drivers.') ?></header>
+    <header class="card__h"><h2 class="label" id="h-chart">LEADS POR SEMANA</h2><?= $tip('Leads recibidos por semana (lunes a domingo, hora del este), separados entre owner-operators y carriers, y company drivers. El último periodo está en curso: no entra en el promedio.') ?></header>
     <div class="card__b">
       <div class="chart__top">
         <div>
-          <p class="muted">Total <?= $e(['weekly' => 'de las últimas 12 semanas', 'monthly' => 'de los últimos 12 meses', 'yearly' => 'histórico'][array_key_first($tabs)]) ?></p>
+          <p class="muted">Total <?= $e($tabSub[array_key_first($tabs)]) ?></p>
           <p class="chart__v"><span data-chart-total><?= $e(Fmt::num($ch['weekly']['total'])) ?></span> <?= Ui::delta($ch['weekly']['delta'], 'data-chart-delta') ?></p>
         </div>
-        <div class="chart__ctl">
-          <ul class="legend"><li><i class="sw sw--ops"></i>Owner-operators y carriers</li><li><i class="sw sw--drv"></i>Company drivers</li></ul>
-          <?php if (count($tabs) > 1): ?>
-          <div class="seg seg--sm" role="tablist" aria-label="Agrupación del gráfico">
-            <?php $first = true; foreach ($tabs as $k => $label): ?>
-              <button class="seg__i<?= $first ? ' is-on' : '' ?>" type="button" role="tab" id="tab-<?= $e($k) ?>" aria-selected="<?= $first ? 'true' : 'false' ?>" aria-controls="pn-<?= $e($k) ?>" data-total="<?= $e(Fmt::num($ch[$k]['total'])) ?>" data-sub="<?= $e(['weekly' => 'de las últimas 12 semanas', 'monthly' => 'de los últimos 12 meses', 'yearly' => 'histórico'][$k]) ?>" data-delta="<?= $e($k === 'weekly' ? '1' : '0') ?>"><?= $e($label) ?></button>
-            <?php $first = false; endforeach; ?>
-          </div>
-          <?php endif; ?>
+        <?php if (count($tabs) > 1): ?>
+        <div class="seg seg--sm" role="tablist" aria-label="Agrupación del gráfico" data-pill>
+          <?php $first = true; foreach ($tabs as $k => $label): ?>
+            <button class="seg__i<?= $first ? ' is-on' : '' ?>" type="button" role="tab" id="tab-<?= $e($k) ?>" aria-selected="<?= $first ? 'true' : 'false' ?>" aria-controls="pn-<?= $e($k) ?>" data-total="<?= $e(Fmt::num($ch[$k]['total'])) ?>" data-sub="<?= $e($tabSub[$k]) ?>" data-delta="<?= $e($k === 'weekly' ? '1' : '0') ?>"><?= $e($label) ?></button>
+          <?php $first = false; endforeach; ?>
         </div>
+        <?php endif; ?>
       </div>
       <?php $first = true; foreach ($tabs as $k => $label): $c = $ch[$k]; ?>
         <div id="pn-<?= $e($k) ?>" role="tabpanel" aria-labelledby="tab-<?= $e($k) ?>"<?= $first ? '' : ' hidden' ?>>
-          <?= Charts::line($chartTitle[$k], $c['labels'], [['name' => 'Owner-operators y carriers', 'cls' => 'ops', 'values' => $c['ops']], ['name' => 'Company drivers', 'cls' => 'drv', 'values' => $c['drv']]], $c['tips']) ?>
+          <?= Charts::line($chartTitle[$k], $c['labels'], [['name' => 'Owner-operators y carriers', 'cls' => 'ops', 'values' => $c['ops'], 'end' => 'Owner-ops'], ['name' => 'Company drivers', 'cls' => 'drv', 'values' => $c['drv'], 'end' => 'Drivers']], $c['tips'], 'leads', ['uid' => $k, 'area' => 'ops', 'note' => $c['note'], 'avg' => $c['avg']]) ?>
         </div>
       <?php $first = false; endforeach; ?>
       <dl class="strip">
-        <div><dt>Calificados (caliente + tibio)</dt><dd><?= $strip['qualified_pct'] !== null ? $e(Fmt::pct($strip['qualified_pct'], 1)) : '—' ?></dd></div>
-        <div><dt>Tasa de descarte</dt><dd><?= $strip['discard_pct'] !== null ? $e(Fmt::pct($strip['discard_pct'], 1)) : '—' ?></dd></div>
+        <div><dt>Calificados (caliente + tibio)</dt><dd><?php if ($strip['qualified_pct'] !== null): ?><?= $e(Fmt::num($strip['qualified_pct'], 1)) ?><small>%</small><?= Ui::ticks((int) round($strip['qualified_pct'] / 100 * 24), 24, 'Calificados: ' . Fmt::pct($strip['qualified_pct'], 1), 'tk--q') ?><?php else: ?>—<?php endif; ?></dd></div>
+        <div><dt>Tasa de descarte</dt><dd><?php if ($strip['discard_pct'] !== null): ?><?= $e(Fmt::num($strip['discard_pct'], 1)) ?><small>%</small><?= Ui::ticks((int) round($strip['discard_pct'] / 100 * 24), 24, 'Descartados: ' . Fmt::pct($strip['discard_pct'], 1), 'tk--d') ?><?php else: ?>—<?php endif; ?></dd></div>
         <div><dt>Costo por lead</dt><dd><?php if ($strip['cpl'] !== null): ?>$<?= $e(Fmt::num($strip['cpl'], 2)) ?><?php if ($strip['cps'] !== null): ?> <span class="dd-na">· $<?= $e(Fmt::num($strip['cps'], 0)) ?> por firmado</span><?php endif; ?><?php else: ?><span class="dd-na"><?= $strip['has_costs'] ? 'Sin leads con costo este mes' : 'Sin costos cargados' ?></span><?php endif; ?></dd></div>
       </dl>
       <p class="foot-note">Franja: últimas 12 semanas<?= $strip['n'] > 0 ? ' · ' . $e(Fmt::num($strip['n'])) . ' leads' : '' ?>.</p>
@@ -110,7 +77,7 @@ $days = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domin
   </section>
 
   <section class="card" aria-labelledby="h-src">
-    <header class="card__h"><h2 class="label" id="h-src">LEADS POR FUENTE</h2><?= $tip('Reparto de los leads recibidos en los últimos 90 días según su fuente.') ?></header>
+    <header class="card__h"><h2 class="label" id="h-src">LEADS POR FUENTE</h2><?= $tip('Reparto de los leads recibidos en los últimos 90 días según su fuente. La variación compara los últimos 30 días con los 30 previos y solo aparece con ' . Dashboard::MIN_BASE . ' leads o más entre los dos.') ?></header>
     <div class="card__b">
       <p class="pillnote"><?= Ui::icon('calendar') ?><?= $e($src['label']) ?></p>
       <p class="muted">Total</p>
@@ -119,10 +86,9 @@ $days = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domin
         <?= Charts::segbar(array_map(static fn($s) => ['value' => $s['n'], 'label' => $s['label']], $src['list'])) ?>
         <ul class="srclist">
           <?php foreach ($src['list'] as $i => $s): ?>
-            <li><i class="sq seg-<?= $e(min(4, $i)) ?>"></i><span class="srclist__n"><?= $s['key'] === '_other' ? $e($s['label']) : '<a href="/leads' . $e(Ui::qs(['src' => $s['key']])) . '">' . $e($s['label']) . '</a>' ?></span><b class="mono"><?= $e(Fmt::num($s['n'])) ?></b><span class="mono muted"><?= $e(Fmt::num($s['pct'])) ?>%</span></li>
+            <li><i class="sq seg-<?= $e(min(4, $i)) ?>"></i><span class="srclist__n"><?= $s['key'] === '_other' ? $e($s['label']) : '<a href="/leads' . $e(Ui::qs(['src' => $s['key']])) . '">' . $e($s['label']) . '</a>' ?></span><?= Charts::hbar($s['pct'], '', 'seg-' . min(4, $i)) ?><b class="mono"><?= $e(Fmt::num($s['n'])) ?></b><span class="mono muted"><?= $e(Fmt::num($s['pct'])) ?>%</span><?= ($s['delta'] ?? null) !== null ? Ui::delta($s['delta']) : '' ?></li>
           <?php endforeach; ?>
         </ul>
-        <?php if ($src['insight']): ?><p class="insight"><?= Ui::icon('star', 'ic--star') ?><span><?= $e($src['insight']) ?></span></p><?php endif; ?>
       <?php else: ?>
         <div class="empty empty--sm"><svg class="empty__star" aria-hidden="true"><use href="#i-star"/></svg><p>Aún no hay leads en los últimos 90 días.</p></div>
       <?php endif; ?>
@@ -150,20 +116,17 @@ $days = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domin
   <?php else: ?>
   <div class="tw">
     <table class="tbl tbl--dash">
-      <thead><tr><th scope="col" class="c-id">ID</th><th scope="col">Lead</th><th scope="col" class="c-prof">Perfil</th><th scope="col" class="c-st">Est.</th><th scope="col" class="c-eq">Equipo</th><th scope="col" class="c-n">Pts</th><th scope="col">Temp.</th><th scope="col" class="c-stage">Etapa</th><th scope="col" class="c-src">Fuente</th><th scope="col" class="c-when">Recibido</th></tr></thead>
+      <thead><tr><th scope="col">Lead</th><th scope="col">Temp.</th><th scope="col" class="c-n">Pts</th><th scope="col" class="c-stage">Etapa</th><th scope="col" class="c-src">Fuente</th><th scope="col" class="c-when">Recibido</th><th scope="col" class="c-act"><span class="sr">Abrir</span></th></tr></thead>
       <tbody>
-      <?php foreach ($rows as $r): $name = Fmt::name($r); ?>
-        <tr>
-          <td class="c-id mono" data-l="ID">#<?= $e(str_pad((string) $r['id'], 4, '0', STR_PAD_LEFT)) ?></td>
-          <th scope="row" class="c-name"><a class="who" href="/leads/<?= $e($r['id']) ?>"><?= Ui::avatar($name, 'sm') ?><span><?= $e($name) ?></span></a></th>
-          <td class="c-prof" data-l="Perfil"><?= $e(Catalog::label(Catalog::PROFILES_SHORT, $r['profile'])) ?></td>
-          <td class="c-st mono" data-l="Estado"><?= $e($r['state'] ?? '—') ?></td>
-          <td class="c-eq" data-l="Equipo"><?= $e(Ui::equipment($r['equipment_types'], 1)) ?></td>
-          <td class="c-n" data-l="Puntos"><?= Ui::score((int) $r['score'], $r['temperature']) ?></td>
+      <?php foreach ($rows as $r): $name = Fmt::name($r); $sub = array_filter([Catalog::label(Catalog::PROFILES_SHORT, $r['profile']), $r['state'] ?? null, Ui::equipment($r['equipment_types'], 1)]); ?>
+        <tr data-peek="<?= $e($r['id']) ?>"<?= $r['temperature'] === 'hot' && $r['stage'] === 'new' ? ' class="is-urgent"' : '' ?>>
+          <th scope="row" class="c-name"><a class="who" href="/leads/<?= $e($r['id']) ?>" data-peek-link><?= Ui::avatar($name, 'md') ?><span><b><?= $e($name) ?></b><small><span class="mono"><?= $e(Fmt::code((int) $r['id'])) ?></span> · <?= $e(implode(' · ', $sub)) ?></small></span></a></th>
           <td class="c-tmp" data-l="Temperatura"><?= Ui::temp($r['temperature']) ?></td>
+          <td class="c-n" data-l="Puntos"><span class="sc"><?= Ui::ticks((int) round($r['score'] / 10), 10, 'Puntuación ' . (int) $r['score'] . ' de 100', 'tk--s tk--' . ($r['temperature'] === 'disqualified' ? 'dq' : $r['temperature'])) ?><b class="mono"><?= $e((int) $r['score']) ?></b></span></td>
           <td class="c-stage" data-l="Etapa"><?= Ui::stage($r['stage'], $r['pipeline']) ?></td>
           <td class="c-src" data-l="Fuente"><?= $e(Catalog::source($r['source'])) ?></td>
           <td class="c-when mono" data-l="Recibido" title="<?= $e(Fmt::dateTime($r['created_at'])) ?>"><?= $e(Fmt::ago($r['created_at'])) ?></td>
+          <td class="c-act"><a class="rowa" href="/leads/<?= $e($r['id']) ?>" aria-label="Abrir la ficha de <?= $e($name) ?>"><?= Ui::icon('arrow-up-right') ?></a></td>
         </tr>
       <?php endforeach; ?>
       </tbody>
@@ -178,7 +141,7 @@ $days = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domin
 
 <div class="grid grid--3">
   <section class="card" aria-labelledby="h-heat">
-    <header class="card__h"><h2 class="label" id="h-heat">ACTIVIDAD</h2><?= $tip('Leads recibidos por día de la semana en las últimas 13 semanas (hora del este). Más oscuro = más leads.') ?></header>
+    <header class="card__h"><h2 class="label" id="h-heat">ACTIVIDAD</h2><?= $tip('Leads recibidos por día de la semana en las últimas 13 semanas (hora del este). Más intenso = más leads; los puntos huecos son días sin leads.') ?></header>
     <div class="card__b">
       <p class="muted">Leads en 13 semanas</p>
       <p class="chart__v"><?= $e(Fmt::num($heat['total'])) ?> <?= Ui::delta($heat['delta']) ?></p>
@@ -235,3 +198,4 @@ $days = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domin
     </div>
   </section>
 </div>
+<?php require __DIR__ . '/_peekshell.php'; ?>

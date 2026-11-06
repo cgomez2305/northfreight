@@ -108,3 +108,17 @@ body.is-dragging *{cursor:grabbing!important}
 .lp__o{display:flex;align-items:center;gap:10px;width:100%;min-height:48px;padding:6px 8px;border:0;border-radius:10px;background:none;text-align:left;cursor:pointer;color:var(--ink)}
 .lp__o:hover,.lp__o[aria-selected=true]{background:var(--cyan-tint)}.lp__o span:not(.av){display:flex;flex-direction:column;min-width:0}.lp__o small{color:var(--ink-3);font-size:12.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .lp__msg{padding:10px 12px;font-size:13.5px;color:var(--ink-3)}
+/* Diálogos (antes en panel.css: hasta que el JS los abre están ocultos, así que no cuentan en la primera pantalla) */
+.dlg{border:0;padding:0;border-radius:20px;background:var(--surface);color:var(--ink);box-shadow:var(--shadow-pop);width:min(520px,calc(100vw - 24px));max-height:calc(100vh - 24px);overflow:auto}
+.dlg::backdrop{background:var(--scrim)}
+.dlg form{padding:22px;display:flex;flex-direction:column;gap:14px}
+.dlg__h{display:flex;justify-content:space-between;align-items:center}
+.dlg__t{font:700 26px/1 var(--f-cond)}
+.dlg__m{color:var(--ink-2);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.dlg__m.small{font-size:13px;color:var(--ink-3)}
+.dlg__a{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+.dlg__row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:760px){
+  .dlg__row{grid-template-columns:1fr}
+  .dlg{border-radius:18px}
+}

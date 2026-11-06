@@ -89,6 +89,8 @@ switch (true) {
         ModosController::cronoMore();
     case $path === '/leads/export':
         LeadsController::export();
+    case $path === '/ajax/dashboard':
+        DashboardController::pulse();
     case $path === '/ajax/search':
         AjaxController::search();
     case $path === '/ajax/notifications/read':

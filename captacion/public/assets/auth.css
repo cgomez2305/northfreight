@@ -35,3 +35,10 @@
 @media (max-width:760px){
   .auth__t{font-size:34px}
 }
+:root[data-theme="dark"] .auth__side{background:var(--surface);border:1px solid var(--line)}
+:root[data-theme="dark"] .auth__star{color:var(--sunk)}
+.bare{background:var(--surface)}
+.auth{min-height:100vh;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);padding:12px;gap:12px}
+@media (max-width:760px){
+  .auth{grid-template-columns:1fr}
+}

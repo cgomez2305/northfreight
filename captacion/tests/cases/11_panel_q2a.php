@@ -55,7 +55,7 @@ return static function (array $ctx): void {
     $w = Dashboard::build('week', $now);
     T::eq($w['leads']['n'], 5, 'dashboard (semana): 5 leads en los ultimos 7 dias');
     T::eq($w['leads']['prev'], 2, 'dashboard (semana): 2 leads en los 7 dias previos');
-    T::eq([$w['leads']['delta']['dir'], $w['leads']['delta']['text']], ['up', '+150%'], 'dashboard: variacion +150 % (5 vs 2)');
+    T::eq([$w['leads']['delta']['dir'], $w['leads']['delta']['text']], ['up', '+3 leads'], 'dashboard: base previa de 2 leads (menos de 5): se dice la diferencia, no un porcentaje (Q6)');
     T::eq([$w['qualified']['n'], $w['qualified']['of'], round($w['qualified']['pct'])], [3, 5, 60.0], 'dashboard: calificados = caliente + tibio = 3 de 5 (60 %)');
     T::eq($w['hot']['n'], 1, 'dashboard: calientes sin contactar = 1 (el contactado no cuenta)');
     T::ok($w['hot']['oldest_secs'] !== null && $w['hot']['oldest_secs'] >= 590 && $w['hot']['oldest_secs'] <= 700, 'dashboard: espera del mas antiguo ~10 min');

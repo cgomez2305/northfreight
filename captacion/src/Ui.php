@@ -123,4 +123,37 @@ final class Ui
     {
         return self::icon(['new' => 'inbox', 'contacted' => 'phone', 'qualified' => 'check-circle', 'prequalified' => 'check-circle', 'call_booked' => 'calendar', 'presented' => 'send', 'signed' => 'shield', 'hired' => 'shield', 'lost' => 'x'][$stage] ?? 'layers', 'ic--st st-' . $stage);
     }
+
+    /** Medidor de rayas (Q6): $on de $total rayas llenas. El valor va en el texto accesible; las rayas son decorativas. */
+    public static function ticks(int $on, int $total, string $label, string $cls = ''): string
+    {
+        $on = max(0, min($total, $on));
+        $h = '';
+        for ($i = 1; $i <= $total; $i++) {
+            $h .= '<i' . ($i <= $on ? ' class="on"' : '') . '></i>';
+        }
+        return '<span class="tk' . ($cls !== '' ? ' ' . self::e($cls) : '') . '" role="img" aria-label="' . self::e($label) . '">' . $h . '</span>';
+    }
+
+    /**
+     * Numero protagonista (Q6): la parte entera grande y los decimales y la unidad atenuados (`79<small>.0%</small>`). El texto accesible final va en un `.sr` y lo pintado en un span aria-hidden,
+     * asi el conteo animado nunca cambia lo que lee un lector de pantalla. $count = ['v'=>valor,'dec'=>decimales,'suf'=>sufijo] activa el conteo (data-*); sin el, el numero es estatico.
+     * @param string $text texto final: «1,234», «79.0%», «13 min», «4 h 52 min»
+     */
+    public static function big(string $text, string $cls = 'kpi__v', ?array $count = null): string
+    {
+        $head = $text;
+        $rest = '';
+        if (preg_match('/^(\d[\d,]*)(.*)$/su', $text, $m) === 1) {
+            [$head, $rest] = [$m[1], $m[2]];
+        }
+        $attr = $count !== null ? ' data-count="' . self::e(rtrim(rtrim(number_format((float) $count['v'], 4, '.', ''), '0'), '.') ?: '0') . '" data-dec="' . (int) $count['dec'] . '" data-suf="' . self::e((string) $count['suf']) . '"' : '';
+        return '<p class="' . self::e($cls) . '"' . $attr . '><span class="sr">' . self::e($text) . '</span><span class="kpi__n" aria-hidden="true">' . self::e($head) . ($rest !== '' ? '<small>' . self::e($rest) . '</small>' : '') . '</span></p>';
+    }
+
+    /** Boton «i» con la explicacion de lo que mide una tarjeta (tooltip por hover y foco). */
+    public static function tip(string $t): string
+    {
+        return '<button class="info" type="button" aria-label="Qué mide: ' . self::e($t) . '" data-tip="' . self::e($t) . '">' . self::icon('info') . '</button>';
+    }
 }

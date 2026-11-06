@@ -45,9 +45,10 @@ final class Charts
         return $d;
     }
 
-    /** Micrografico de linea (tarjeta KPI). */
+    /** Micrografico de linea con area degradada del 16 % a 0 (tarjeta KPI, Q6). El degradado usa currentColor, asi que el color lo pone la clase .spark. */
     public static function spark(array $values, int $w = 96, int $h = 36): string
     {
+        static $n = 0;
         $values = array_map('floatval', array_values($values));
         $c = count($values);
         if ($c < 2) {
@@ -61,27 +62,11 @@ final class Charts
             $pts[] = [3 + ($w - 6) * $i / ($c - 1), 4 + ($h - 8) * (1 - ($v - $min) / $span)];
         }
         $last = $pts[$c - 1];
-        return '<svg class="spark" viewBox="0 0 ' . $w . ' ' . $h . '" width="' . $w . '" height="' . $h . '" aria-hidden="true" focusable="false">'
-            . '<path class="spark__line" d="' . self::smooth($pts) . '" fill="none"/><circle class="spark__dot" cx="' . self::n($last[0]) . '" cy="' . self::n($last[1]) . '" r="2.6"/></svg>';
-    }
-
-    /** Barras crecientes (tarjeta KPI): la ultima en navy. */
-    public static function bars(array $values, int $w = 76, int $h = 36): string
-    {
-        $values = array_map('floatval', array_values($values));
-        $c = count($values);
-        if ($c === 0) {
-            return '';
-        }
-        $max = max(1.0, max($values));
-        $gap = 3;
-        $bw = ($w - $gap * ($c - 1)) / $c;
-        $out = '<svg class="bars" viewBox="0 0 ' . $w . ' ' . $h . '" width="' . $w . '" height="' . $h . '" aria-hidden="true" focusable="false">';
-        foreach ($values as $i => $v) {
-            $bh = max(3.0, ($h - 2) * $v / $max);
-            $out .= '<rect class="bars__b' . ($i === $c - 1 ? ' is-on' : '') . '" x="' . self::n($i * ($bw + $gap)) . '" y="' . self::n($h - $bh) . '" width="' . self::n($bw) . '" height="' . self::n($bh) . '" rx="1.5"/>';
-        }
-        return $out . '</svg>';
+        $id = 'sg' . (++$n);
+        $line = self::smooth($pts);
+        return '<svg class="spark" viewBox="0 0 ' . $w . ' ' . $h . '" width="' . $w . '" height="' . $h . '" aria-hidden="true" focusable="false"><defs><linearGradient id="' . $id . '" x1="0" y1="0" x2="0" y2="1"><stop class="gs0" offset="0"/><stop class="gs1" offset="1"/></linearGradient></defs>'
+            . '<path class="spark__area" fill="url(#' . $id . ')" d="' . $line . ' L' . self::n($last[0]) . ' ' . $h . ' L' . self::n($pts[0][0]) . ' ' . $h . ' Z"/>'
+            . '<path class="spark__line" d="' . $line . '" fill="none"/><circle class="spark__dot" cx="' . self::n($last[0]) . '" cy="' . self::n($last[1]) . '" r="2.6"/></svg>';
     }
 
     /** Anillo de progreso (0 a 100). */
@@ -95,12 +80,12 @@ final class Charts
             . '<circle class="donut__fg" cx="22" cy="22" r="16" fill="none" stroke-width="5" stroke-linecap="round" transform="rotate(-90 22 22)" stroke-dasharray="' . self::n($circ * $pct / 100) . ' ' . self::n($circ) . '"/></svg>';
     }
 
-    /** Barra horizontal de proporcion (0 a 100) para embudos y rankings. */
-    public static function hbar(float $pct, string $cls = ''): string
+    /** Barra horizontal de proporcion (0 a 100) para embudos y rankings. $fg: clase extra del relleno (p. ej. seg-1, el color de una fuente en el dashboard). */
+    public static function hbar(float $pct, string $cls = '', string $fg = ''): string
     {
         $pct = max(0.0, min(100.0, $pct));
-        return '<svg class="hb' . ($cls !== '' ? ' ' . htmlspecialchars($cls, ENT_QUOTES) : '') . '" viewBox="0 0 100 8" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect class="hb__bg" width="100" height="8" rx="4"/>'
-            . ($pct > 0 ? '<rect class="hb__fg" width="' . self::n(max(2.0, $pct)) . '" height="8" rx="4"/>' : '') . '</svg>';
+        return '<svg class="hb' . ($cls !== '' ? ' ' . htmlspecialchars($cls, ENT_QUOTES) : '') . '" viewBox="0 0 100 8" preserveAspectRatio="none" aria-hidden="true" focusable="false"><rect class="hb__bg seg-e" width="100" height="8" rx="4"/>'
+            . ($pct > 0 ? '<rect class="hb__fg' . ($fg !== '' ? ' ' . htmlspecialchars($fg, ENT_QUOTES) : '') . '" width="' . self::n(max(2.0, $pct)) . '" height="8" rx="4"/>' : '') . '</svg>';
     }
 
     /**
@@ -129,10 +114,13 @@ final class Charts
 
     /**
      * Grafico de lineas con ejes en HTML (el texto no se deforma) y curvas en SVG sin escala de trazo.
-     * @param list<string> $labels etiquetas del eje X; @param list<array{name:string,cls:string,values:list<int|float>}> $series
+     * @param list<string> $labels etiquetas del eje X; @param list<array{name:string,cls:string,values:list<int|float>,end?:string}> $series ($series[k]['end'] = rotulo directo al final de la linea)
      * @param list<string> $tipLabels titulo del tooltip por punto
+     * Q6, opciones ($o) del grafico «vivo» del dashboard (sin ellas el marcado es el de siempre, el de los reportes):
+     *   uid  identificador unico del panel (para el degradado); area  clase de la serie con area degradada; note  {i,l1,l2} anotacion sobre el punto i; avg  promedio (linea punteada)
+     *   Todo lo que va sobre las curvas se pinta en un SVG de superposicion SIN viewBox: sus coordenadas son porcentajes (atributos), asi el texto no se deforma y no hace falta ningun estilo en linea.
      */
-    public static function line(string $id, array $labels, array $series, array $tipLabels, string $unit = 'leads'): string
+    public static function line(string $id, array $labels, array $series, array $tipLabels, string $unit = 'leads', array $o = []): string
     {
         $n = count($labels);
         $max = 1;
@@ -148,28 +136,84 @@ final class Charts
         $stepY = $top / $ticks;
         $W = 600;
         $H = 220;
-        $out = '<div class="lc" data-chart="' . htmlspecialchars((string) json_encode([
+        $live = isset($o['uid']);
+        $esc = static fn(string $t): string => htmlspecialchars($t, ENT_QUOTES, 'UTF-8');
+        $px = static fn(int $i): float => 100 * ($i + 0.5) / max(1, $n);
+        $py = static fn(float $v): float => 100 * (1 - (($H - 6) * ($v / $top) + 1) / $H);
+        $out = '<div class="lc' . ($live ? ' lc--d' : '') . '" data-chart="' . htmlspecialchars((string) json_encode([
             'labels' => $tipLabels, 'max' => $top, 'unit' => $unit,
             'series' => array_map(static fn($s) => ['n' => $s['name'], 'c' => $s['cls'], 'v' => array_values($s['values'])], $series),
-        ], JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8') . '">';
+        ], JSON_UNESCAPED_UNICODE), ENT_QUOTES, 'UTF-8') . '"' . ($live ? ' data-lc2' : '') . '>';
         $out .= '<div class="lc__y" aria-hidden="true">';
         for ($i = $ticks; $i >= 0; $i--) {
             $out .= '<span>' . self::n($stepY * $i) . '</span>';
         }
-        $out .= '</div><div class="lc__plot" tabindex="0" role="group" aria-label="' . htmlspecialchars($id, ENT_QUOTES) . '">';
+        $out .= '</div><div class="lc__plot" tabindex="0" role="group" aria-label="' . $esc($id) . '">';
         $out .= '<svg viewBox="0 0 ' . $W . ' ' . $H . '" preserveAspectRatio="none" aria-hidden="true" focusable="false">';
+        if ($live) {
+            $out .= '<defs><linearGradient id="lg-' . $esc((string) $o['uid']) . '" x1="0" y1="0" x2="0" y2="1"><stop class="gs0" offset="0"/><stop class="gs1" offset="1"/></linearGradient></defs>';
+        }
         for ($i = 0; $i <= $ticks; $i++) {
             $y = $H * $i / $ticks;
             $out .= '<line class="lc__grid' . ($i === $ticks ? ' is-base' : '') . '" x1="0" x2="' . $W . '" y1="' . self::n($y) . '" y2="' . self::n($y) . '" vector-effect="non-scaling-stroke"/>';
         }
-        foreach ($series as $s) {
+        $ends = [];
+        foreach ($series as $k => $s) {
             $pts = [];
             foreach (array_values($s['values']) as $i => $v) {
                 $pts[] = [$W * ($i + 0.5) / max(1, $n), $H - ($H - 6) * ((float) $v / $top) - 1];
             }
-            $out .= '<path class="lc__line lc__line--' . htmlspecialchars($s['cls'], ENT_QUOTES) . '" d="' . self::smooth($pts) . '" fill="none" vector-effect="non-scaling-stroke"/>';
+            $d = self::smooth($pts);
+            if ($live && ($o['area'] ?? '') === $s['cls'] && count($pts) > 1) {
+                $out .= '<path class="lc__area lc__area--' . $esc($s['cls']) . '" fill="url(#lg-' . $esc((string) $o['uid']) . ')" d="' . $d . ' L' . self::n($pts[count($pts) - 1][0]) . ' ' . $H . ' L' . self::n($pts[0][0]) . ' ' . $H . ' Z"/>';
+            }
+            $out .= '<path class="lc__line lc__line--' . $esc($s['cls']) . '" d="' . $d . '" fill="none" vector-effect="non-scaling-stroke"/>';
+            $vals = array_values($s['values']);
+            $ends[$k] = $py((float) ($vals ? $vals[count($vals) - 1] : 0));
         }
-        $out .= '</svg><div class="lc__band" hidden></div>';
+        $out .= '</svg>';
+        if ($live && $n > 0) {
+            // Rotulos al final de cada linea: si dos caen a menos de 9 % de alto, el de abajo se corre (sin pisarse)
+            $order = array_keys($ends);
+            usort($order, static fn($a, $b) => $ends[$a] <=> $ends[$b]);
+            $ly = [];
+            $prev = null;
+            foreach ($order as $k) {
+                $y = $ends[$k];
+                if ($prev !== null && $y - $prev < 9.0) {
+                    $y = $prev + 9.0;
+                }
+                $ly[$k] = $y;
+                $prev = $y;
+            }
+            $ov = '<svg class="lc__ov" aria-hidden="true" focusable="false">';
+            if (isset($o['avg']) && $o['avg'] !== null) {
+                $ay = $py((float) $o['avg']);
+                $ov .= '<line class="lc__ref" x1="0" x2="100%" y1="' . self::n($ay) . '%" y2="' . self::n($ay) . '%"/><text class="lc__ref-t" x="4" y="' . self::n($ay) . '%" dy="-5">Promedio ' . self::n(round((float) $o['avg'], 1)) . '</text>';
+            }
+            if (is_array($o['note'] ?? null)) {
+                $note = $o['note'];
+                $i = (int) $note['i'];
+                $x = $px($i);
+                $yp = 100.0;
+                foreach ($series as $s) {
+                    $yp = min($yp, $py((float) ($s['values'][$i] ?? 0)));
+                }
+                $ty = $yp > 26 ? $yp - 12 : $yp + 10;
+                $anchor = $i <= 1 ? 'start' : ($i >= $n - 3 ? 'end' : 'middle');
+                $ov .= '<g class="lc__note"><circle class="lc__ring" cx="' . self::n($x) . '%" cy="' . self::n($yp) . '%" r="8"/>'
+                    . '<text x="' . self::n($x) . '%" y="' . self::n($ty) . '%" text-anchor="' . $anchor . '"><tspan class="lc__n1" x="' . self::n($x) . '%">' . $esc((string) $note['l1']) . '</tspan><tspan class="lc__n2" x="' . self::n($x) . '%" dy="13">' . $esc((string) $note['l2']) . '</tspan></text></g>';
+            }
+            foreach ($series as $k => $s) {
+                $vals = array_values($s['values']);
+                $ov .= '<circle class="lc__pt lc__pt--' . $esc($s['cls']) . '" cx="' . self::n($px($n - 1)) . '%" cy="' . self::n($ends[$k]) . '%" r="4"/>';
+                if (($s['end'] ?? '') !== '') {
+                    $ov .= '<text class="lc__end lc__end--' . $esc($s['cls']) . '" x="100%" dx="12" y="' . self::n($ly[$k]) . '%" dy="4">' . $esc((string) $s['end']) . '<tspan class="lc__ev" dx="6">' . (int) ($vals ? $vals[count($vals) - 1] : 0) . '</tspan></text>';
+                }
+            }
+            $out .= $ov . '</svg><i class="lc__cross" hidden></i>';
+        }
+        $out .= '<div class="lc__band" hidden></div>';
         foreach ($series as $s) {
             $out .= '<span class="lc__dot lc__dot--' . htmlspecialchars($s['cls'], ENT_QUOTES) . '" hidden></span>';
         }
@@ -193,8 +237,8 @@ final class Charts
     }
 
     /**
-     * Mapa de calor: 7 filas (lunes a domingo) por $weeks columnas. $cells[w][d] = ['n'=>int,'label'=>string]. Niveles 0 a 4 por cuartiles del maximo.
-     * @return string SVG (las cabeceras de mes y dia las pone la vista en HTML)
+     * Mapa de calor tipo dot-matrix (Q6): 7 filas (lunes a domingo) por $weeks columnas de puntos de 7 px de radio. $cells[w][d] = ['n'=>int,'label'=>string]. Niveles 0 a 4 por cuartiles del maximo,
+     * un solo tono (las celdas vacias se ven: nivel 0 con borde fino). @return string SVG (las cabeceras de mes y dia las pone la vista en HTML)
      */
     public static function heat(array $cells, int $weeks): string
     {
@@ -204,10 +248,9 @@ final class Charts
                 $max = max($max, (int) $c['n']);
             }
         }
-        $cell = 14;
-        $gap = 3;
-        $W = $weeks * ($cell + $gap) - $gap;
-        $H = 7 * ($cell + $gap) - $gap;
+        $pitch = 24;
+        $W = $weeks * $pitch;
+        $H = 7 * $pitch;
         $out = '<svg class="heat" viewBox="0 0 ' . $W . ' ' . $H . '" role="img" aria-label="Mapa de calor de leads por día de la semana, últimas ' . $weeks . ' semanas">';
         for ($w = 0; $w < $weeks; $w++) {
             for ($d = 0; $d < 7; $d++) {
@@ -217,7 +260,7 @@ final class Charts
                 }
                 $n = (int) $c['n'];
                 $lvl = $n === 0 || $max === 0 ? 0 : min(4, max(1, (int) ceil(4 * $n / $max)));
-                $out .= '<rect class="ht' . $lvl . '" x="' . $w * ($cell + $gap) . '" y="' . $d * ($cell + $gap) . '" width="' . $cell . '" height="' . $cell . '" rx="4" data-n="' . $n . '" data-d="' . htmlspecialchars((string) $c['label'], ENT_QUOTES, 'UTF-8') . '"/>';
+                $out .= '<circle class="ht' . $lvl . '" cx="' . ($w * $pitch + $pitch / 2) . '" cy="' . ($d * $pitch + $pitch / 2) . '" r="7" data-n="' . $n . '" data-d="' . htmlspecialchars((string) $c['label'], ENT_QUOTES, 'UTF-8') . '"/>';
             }
         }
         return $out . '</svg>';

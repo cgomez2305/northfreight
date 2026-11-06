@@ -43,6 +43,11 @@ return static function (array $ctx): void {
         'cfg-unlock__t' => 'texto del aviso de edición bloqueada (hereda de .cfg-unlock)',
         'rl-empty' => 'estado vacío de Reglas: usa .card .empty .empty--lg',
         'vstat' => 'resumen de vacantes: usa .pstat',
+        'kpi__n' => 'Q6: span del número protagonista (el estilo va en .kpi__v y su <small>)',
+        'spark__area' => 'Q6: área de la microlínea (el relleno va en el atributo fill del SVG)',
+        'acts' => 'Q6: tarjeta «Siguiente mejor acción»; sus partes (.acts__l, .act…) llevan los estilos',
+        'lc__area' => 'Q6: área degradada del gráfico (relleno por atributo fill)',
+        'lc__area--ops' => 'Q6: gancho de la serie del área',
         'act--login' => 'etiqueta de filas de acceso en Actividad: la distingue el icono, no el estilo',
     ];
     $admin = Panel::user('admin');
@@ -64,6 +69,9 @@ return static function (array $ctx): void {
         $sheets = $m[1];
         if (str_contains($r['body'], 'src="/assets/ux.js')) {
             $sheets[] = 'ux';
+        }
+        if (str_contains($r['body'], 'data-live-v=')) {
+            $sheets[] = 'dashlive';   // dashboard.js la pide tras la primera pintura (hoja diferida)
         }
         if (str_contains($route, 'tab=reglas')) {
             $sheets[] = 'rules';   // el panel lateral del editor pide rules.css al abrirse

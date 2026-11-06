@@ -63,7 +63,7 @@
  t.addEventListener('keydown', function (e) { var i = tabs.indexOf(t), n = e.key === 'ArrowRight' ? i + 1 : e.key === 'ArrowLeft' ? i - 1 : -1; if (n >= 0 && tabs[n]) { e.preventDefault(); tabs[n].focus(); tabs[n].click(); } });
  });
  });
- $$('.lc').forEach(function (lc) {
+ $$('.lc:not([data-lc2])').forEach(function (lc) {
  var cfg; try { cfg = JSON.parse(lc.getAttribute('data-chart')); } catch (e) { return; }
  var plot = $('.lc__plot', lc), band = $('.lc__band', lc), tip = $('.lc__tip', lc), dots = $$('.lc__dot', lc), n = cfg.labels.length, cur = -1;
  function show(i) {
@@ -84,7 +84,7 @@
  });
  $$('[data-heat]').forEach(function (h) {
  var cap = $('[data-heat-cap]', h), def = cap.textContent;
- $$('rect', h).forEach(function (r) {
+ $$('rect,circle', h).forEach(function (r) {
  var set = function () { var n = r.getAttribute('data-n'); cap.textContent = r.getAttribute('data-d') + ' · ' + n + (n === '1' ? ' lead' : ' leads'); };
  r.addEventListener('pointerenter', set); r.addEventListener('pointerdown', set); r.addEventListener('pointerleave', function () { cap.textContent = def; });
  });

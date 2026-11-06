@@ -70,3 +70,4 @@
 .warm__i input:checked+span{background:var(--navy-2);color:var(--on-fill)}
 .warm__i input:focus-visible+span{outline:2px solid var(--focus);outline-offset:2px}
 .cfg-tabs{flex-wrap:wrap;overflow:visible}
+:root[data-theme="dark"] .cfg-unlock__i{color:var(--on-fill)}

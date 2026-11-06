@@ -1,28 +1,19 @@
-/* NorthStar Captación · panel (Q2a/Q2b). Base: paleta, shell, botones, campos, tarjetas, tablas y diálogos. Tema claro con la identidad de marca: navy #04101F/#0A1D33 + cian #06A6CC.
-   TODOS los colores viven en :root (paleta documentada en captacion/README.md §15). Las pantallas cargan además su hoja (dashboard, leads, lead, auth, kanban, tareas, config + cfg-<pestaña>, actividad). Sin estilos en línea (CSP). */
+/* NorthStar Captación · panel: base (paleta, shell, botones, campos, tarjetas, tablas). Paleta y contrastes en captacion/README.md §15; todos los colores viven en :root. Sin estilos en línea (CSP). */
 :root{
-  /* neutros con tinte azul (derivados del navy del sitio) */
   --bg:#F1F4F8;--surface:#FFFFFF;--sunk:#F6F8FB;--line:#E1E7EF;--line-2:#CBD5E1;--field:#7D8EA5;
   --ink:#0A1B2E;--ink-2:#3B4D63;--ink-3:#586A80;
-  /* marca */
   --navy:#04101F;--navy-2:#0A1D33;--navy-3:#12304F;--cyan:#06A6CC;--cyan-ink:#036E8A;--cyan-tint:#E2F4F9;--cyan-line:#A6DCEB;--on-navy:#FFFFFF;--on-navy-2:#C2D0E0;--on-fill:#FFFFFF;--pop:#0A1D33;--pop-2:#12304F;--pop-ink:#FFFFFF;--pop-ink-2:#C2D0E0;
-  /* estados */
   --ok:#17673C;--ok-bg:#E3F4EA;--ok-dot:#1F9D55;--bad:#B42318;--bad-bg:#FDECEA;--bad-dot:#D92D20;--warn:#8A4B0B;--warn-bg:#FEF1DC;--warn-dot:#E08A12;
-  /* temperatura (significado constante): caliente = único acento cálido; tibio = cian; frío = azul pizarra; descartado = gris */
   --hot:#9A3407;--hot-bg:#FDEBDD;--hot-dot:#EA580C;--warm:#045F78;--warm-bg:#DDF2F8;--warm-dot:#06A6CC;--cold:#394D7C;--cold-bg:#E6EBF6;--cold-dot:#6F86B8;--dq:#4E5F73;--dq-bg:#EAEEF3;--dq-dot:#94A3B5;
-  /* etapas del pipeline (punto del chip) */
   --st-new:#94A3B5;--st-contacted:#6F86B8;--st-qualified:#06A6CC;--st-booked:#0C86A6;--st-presented:#0A1D33;--st-closed:#1F9D55;--st-lost:#B8776F;
-  /* gráficos */
   --c-ops:#0A1D33;--c-drv:#0691B3;--seg-0:#0A1D33;--seg-1:#06A6CC;--seg-2:#6B7F99;--seg-3:#B3C1D4;--seg-4:#DAE3EE;--seg-e:#E7ECF3;
   --h0:#EDF1F6;--h1:#D2EDF5;--h2:#9AD9EA;--h3:#4CBBDB;--h4:#0A7E9E;
-  /* avatares (fondo / texto) */
   --av0:#E1F1F8;--av0i:#0B5D77;--av1:#E7EBF7;--av1i:#2E4377;--av2:#E3F3EF;--av2i:#12605A;--av3:#F6EDDF;--av3i:#76501A;--av4:#F5E7EB;--av4i:#7A3347;--av5:#E9EEF4;--av5i:#3F5168;--av6:#E5F2E8;--av6i:#24683B;--av7:#E0EDFA;--av7i:#1B5CA3;
   --urgent-bg:#FDEBDD;--shadow-pop:0 12px 32px rgba(4,16,31,.14),0 2px 6px rgba(4,16,31,.06);--scrim:rgba(4,16,31,.45);--focus:#036E8A;--focus-on-navy:#FFFFFF;color-scheme:light;
   --r-card:18px;--r-in:12px;--r-pill:999px;
   --f-sans:"Barlow","Barlow Fallback",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;--f-cond:"Barlow Condensed","Barlow Condensed Fallback","Arial Narrow",sans-serif;--f-mono:"JetBrains Mono","JetBrains Mono Fallback",ui-monospace,Menlo,Consolas,monospace;
 }
-/* Tema oscuro (Q5a): lienzo navy del sitio (#04101F / #0A1D33 / #0F2A47), nunca negro puro. Solo cambian valores: las hojas por pantalla usan las mismas variables. El cian #06A6CC sí es texto legible aquí.
-   Contrastes medidos en captacion/README.md §15. --navy-2 pasa a ser el relleno cian de los controles activos (con texto --on-fill) y --pop es la superficie de avisos y tooltips. */
+/* Tema oscuro: mismo juego de variables con el lienzo navy del sitio (README §15). --navy-2 es el relleno cian de los controles activos y --pop la superficie de avisos. */
 :root[data-theme="dark"]{
   --bg:#04101F;--surface:#0A1D33;--sunk:#0E2540;--line:#1A3350;--line-2:#2B4A6D;--field:#6683A5;
   --ink:#EEF3F8;--ink-2:#B9C8D8;--ink-3:#8FA3B8;
@@ -36,9 +27,6 @@
   --urgent-bg:#25191A;--shadow-pop:0 14px 36px rgba(0,0,0,.55),0 2px 6px rgba(0,0,0,.35);--scrim:rgba(2,8,16,.68);--focus:#6FD3EC;color-scheme:dark;
 }
 :root[data-theme="dark"] .nav-i.is-on{background:var(--surface);color:var(--cyan-ink);box-shadow:inset 3px 0 var(--cyan)}
-:root[data-theme="dark"] .auth__side{background:var(--surface);border:1px solid var(--line)}
-:root[data-theme="dark"] .auth__star{color:var(--sunk)}
-:root[data-theme="dark"] .cfg-unlock__i{color:var(--on-fill)}
 :root[data-theme="dark"] .brand__mark,:root[data-theme="dark"] .top__logo img{content:url(isotype-white.svg)}
 *,*::before,*::after{box-sizing:border-box}
 [hidden]{display:none!important}
@@ -134,14 +122,6 @@ kbd{font:500 11px/1 var(--f-mono);padding:4px 6px;border-radius:6px;border:1px s
 .dd__bar{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line)}
 .link{background:none;border:0;padding:6px 0;color:var(--cyan-ink);cursor:pointer;font-size:13px;font-weight:500}
 .link:hover{text-decoration:underline}
-.dlg{border:0;padding:0;border-radius:20px;background:var(--surface);color:var(--ink);box-shadow:var(--shadow-pop);width:min(520px,calc(100vw - 24px));max-height:calc(100vh - 24px);overflow:auto}
-.dlg::backdrop{background:var(--scrim)}
-.dlg form{padding:22px;display:flex;flex-direction:column;gap:14px}
-.dlg__h{display:flex;justify-content:space-between;align-items:center}
-.dlg__t{font:700 26px/1 var(--f-cond)}
-.dlg__m{color:var(--ink-2);display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.dlg__m.small{font-size:13px;color:var(--ink-3)}
-.dlg__a{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;padding:0 18px;border-radius:var(--r-pill);border:1px solid transparent;font-weight:600;font-size:14.5px;cursor:pointer;text-decoration:none!important;white-space:nowrap;transition:background .15s,border-color .15s,color .15s}
 .btn--sm{min-height:36px;padding:0 14px;font-size:13.5px}
 .btn--primary{background:var(--navy-2);color:var(--on-fill);padding-right:6px}
@@ -169,7 +149,6 @@ kbd{font:500 11px/1 var(--f-mono);padding:4px 6px;border-radius:6px;border:1px s
 .field input:focus,.field select:focus,.field textarea:focus,.notef textarea:focus,.nt__e textarea:focus,.inp:focus-within{border-color:var(--focus);box-shadow:0 0 0 3px var(--cyan-tint)}
 .inp{display:flex;align-items:center;gap:8px;padding-left:12px;background:var(--surface);border:1px solid var(--field);border-radius:var(--r-in);color:var(--ink-3)}
 .inp input{border:0;box-shadow:none!important;padding-left:0;background:none}
-.dlg__row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .check{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--ink-2);cursor:pointer}
 .check input{width:20px;height:20px;margin-top:1px;accent-color:var(--navy-2)}
 input[type=checkbox],input[type=radio]{accent-color:var(--navy-2)}
@@ -253,8 +232,6 @@ table.sr{display:block}
 .ptab.is-on .ptab__n{background:var(--navy-3);color:var(--on-fill)}
 .card--table{position:relative;overflow:visible}
 .card--table .tw{border-radius:var(--r-card) var(--r-card) 0 0}
-.bare{background:var(--surface)}
-.auth{min-height:100vh;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);padding:12px;gap:12px}
 .secret{font-size:17px;background:var(--sunk);border:1px dashed var(--line-2);border-radius:var(--r-in);padding:14px;word-break:break-word}
 .secret code{background:none;border:0;font-size:1em;letter-spacing:.06em}
 .codes{columns:2;padding-left:0;display:block}
@@ -308,10 +285,8 @@ html:not([data-theme-pref]) .thm__auto,[data-theme-pref=auto] .thm__auto,[data-t
   .search-btn{width:40px;padding:0;justify-content:center}
   .search-btn__t,.kbds{display:none}
   .main{padding:20px 16px 72px}
-  .auth{grid-template-columns:1fr}
 }
 @media (max-width:760px){
-  .dlg__row{grid-template-columns:1fr}
   body{font-size:15.5px}
   .clock{display:none}
   .page-head__a,.page-head__a form{width:100%}
@@ -329,7 +304,6 @@ html:not([data-theme-pref]) .thm__auto,[data-theme-pref=auto] .thm__auto,[data-t
   .card__h{padding:14px 16px 8px}
   .card__f{padding:12px 16px}
   .av--xl{width:52px;height:52px;font-size:18px}
-  .dlg{border-radius:18px}
   .card__f{justify-content:center}
   .codes{columns:1}
 }
