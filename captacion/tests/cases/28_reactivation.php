@@ -101,7 +101,7 @@ return static function (array $ctx): void {
     $tick();
     $m = array_slice($mails(), $n0);
     T::ok(count($m) === 1 && $m[0]['to'] === ['a@example.com'] && str_contains($raw($m[0]), 'Hola Ana') && str_contains($raw($m[0]), $address) && preg_match('/List-Unsubscribe: <http[^>]+\/u\/[A-Za-z0-9_-]+>/', $raw($m[0])) === 1 && str_contains($raw($m[0]), 'List-Unsubscribe-Post: List-Unsubscribe=One-Click'), 'editado el texto: sale el correo en espanol con direccion fisica y baja de un clic (cabeceras List-Unsubscribe)');
-    preg_match('/\d+\s?%|\$\s?\d|garant|24\/7/i', $raw($m[0]), $mm);
+    preg_match('/\d+\s?%|\$\s?\d|garant|24\/7/i', strip_tags($raw($m[0])), $mm);
     T::ok($mm === [], '  sin cifras, porcentajes ni garantias ' . json_encode($mm));
     T::ok((int) Db::value("SELECT COUNT(*) FROM messages WHERE lead_id = $a AND sequence_key = 'a11_reactivation' AND status IN ('sent','logged')") === 1 && (int) $enr($a)['step'] === 1 && $enr($a)['status'] === 'active', '  se anota en messages y la inscripcion pasa al mensaje 2');
     $due2 = (int) Clock::parse((string) $enr($a)['next_run_at']);

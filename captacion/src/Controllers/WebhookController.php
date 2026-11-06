@@ -249,7 +249,9 @@ final class WebhookController extends Responder
         if (!($res['ok'] ?? false)) {
             self::json(['ok' => false, 'error' => $res['error'] ?? 'error'], ($res['error'] ?? '') === 'lead_not_found' ? 404 : 422);
         }
-        Integrations::webhook('n8n', 'ok', (string) ($res['summary'] ?? 'duplicado'));
+        if (($e['event'] ?? '') !== 'error') {   // un evento «error» ya dejo su marca roja en la integracion
+            Integrations::webhook('n8n', 'ok', (string) ($res['summary'] ?? 'duplicado'));
+        }
         self::json(['ok' => true] + (isset($res['duplicate']) ? ['duplicate' => true] : []));
     }
 }

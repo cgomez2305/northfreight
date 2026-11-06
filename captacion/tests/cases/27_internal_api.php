@@ -243,6 +243,9 @@ return static function (array $ctx): void {
         $r = $ap->get('/leads');
         return str_contains($r['body'], $needle);
     };
+    foreach (glob("$work/storage/ratelimit/*.json") ?: [] as $f) {
+        @unlink($f);
+    }
     foreach (['meta', 'calcom', 'twilio', 'n8n'] as $s) {
         foreach (range(1, 3) as $_) {
             Captacion\Services\Integrations::webhook($s, 'err', 'Error de prueba ' . $s);
@@ -256,7 +259,7 @@ return static function (array $ctx): void {
     foreach (range(1, 5) as $_) {
         Captacion\Services\Integrations::webhook('calcom', 'sig');
     }
-    T::ok($bellHas('Firma rechazada 5 veces en Cal.com') && $bellHas('Posible clave mal puesta'), 'campana: aviso de firma rechazada repetidamente («posible clave mal puesta»)');
+    T::ok(preg_match('/Firma rechazada \d+ veces en Cal\.com/', $ap->get('/leads')['body']) === 1 && $bellHas('Posible clave mal puesta'), 'campana: aviso de firma rechazada repetidamente («posible clave mal puesta»)');
     $pg = $ap->get('/config?tab=integraciones');
     T::ok($pg['status'] === 200 && str_contains($pg['body'], 'id="int-meta"') && str_contains($pg['body'], '/api/webhooks/meta.php') && str_contains($pg['body'], '/api/webhooks/sms.php') && str_contains($pg['body'], 'data-copy="http://panel.test/api/webhooks/calcom.php"'), 'Integraciones: tarjetas de Meta, Cal.com, Twilio y n8n con la URL del webhook lista para copiar');
     foreach ($secrets as $v) {

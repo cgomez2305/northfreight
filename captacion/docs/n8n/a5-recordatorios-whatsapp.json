@@ -1,0 +1,345 @@
+{
+  "name": "NorthStar · A5 Recordatorios de cita por WhatsApp",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "NO PROBADO EN UNA INSTANCIA REAL DE N8N. Flujo de NorthStar Captación.\n\nA5: cada 5 minutos pregunta al CRM qué recordatorios de cita (24 h y 1 h antes) toca enviar por WhatsApp. El CRM solo los devuelve con consentimiento vigente, con cita reservada con tiempo suficiente y si \"appt_reminder\" está habilitado en Configuración > Canales externos. Plantillas ns_a5_reminder_24h_en/_es y ns_a5_reminder_1h_en/_es. Los recordatorios por correo los envía el CRM.",
+        "height": 260,
+        "width": 520
+      },
+      "id": "435ce969-3d25-7faf-be24-f439641ce62b",
+      "name": "Nota",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -200,
+        -260
+      ]
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 5
+            }
+          ]
+        }
+      },
+      "id": "0c03bd67-2259-3445-3038-9c006164c617",
+      "name": "Cada 5 minutos",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c1",
+              "name": "crm_base_url",
+              "value": "https://captacion.northstarfreightsolutions.us",
+              "type": "string"
+            },
+            {
+              "id": "c2",
+              "name": "wa_phone_number_id",
+              "value": "REEMPLAZAR_PHONE_NUMBER_ID",
+              "type": "string"
+            },
+            {
+              "id": "c3",
+              "name": "graph_version",
+              "value": "v21.0",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      },
+      "id": "1b5db65b-54a1-96f6-5e70-3c68630cd824",
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $('Config').first().json.crm_base_url }}/internal/reminders/due?limit=20",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "id": "8b00ccc4-45e4-5cdb-54e2-38c7b0ed9aab",
+      "name": "Pedir al CRM qué recordatorios tocan",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        440,
+        0
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REEMPLAZAR_CREDENCIAL_CRM",
+          "name": "Captacion CRM (Bearer)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "items",
+        "options": {}
+      },
+      "id": "3335f43e-50e1-28f9-4d84-f4c2e396b417",
+      "name": "Un item por lead",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        660,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/{{ $('Config').first().json.graph_version }}/{{ $('Config').first().json.wa_phone_number_id }}/messages",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ messaging_product: 'whatsapp', to: String($json.to).replace('+',''), type: 'template', template: { name: 'ns_a5_reminder_' + $('Un item por lead').item.json.which + '_' + $('Un item por lead').item.json.language, language: { code: $json.language === 'es' ? 'es' : 'en_US' }, components: [{ type: 'body', parameters: [{ type: 'text', text: $('Un item por lead').item.json.vars.nombre }, { type: 'text', text: $('Un item por lead').item.json.when_text }] }] } }) }}",
+        "options": {
+          "timeout": 20000,
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "d81d6ee0-c24e-2f3d-f621-086ce4ee33b2",
+      "name": "Enviar plantilla por WhatsApp",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        880,
+        -60
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REEMPLAZAR_CREDENCIAL_WHATSAPP",
+          "name": "WhatsApp Cloud API (Bearer)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "k1",
+              "leftValue": "={{ $json.messages && $json.messages[0] && $json.messages[0].id ? $json.messages[0].id : \"\" }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "b2ba5b6a-c804-cab7-35cf-5e9b5f621a53",
+      "name": "¿WhatsApp aceptó el mensaje?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1100,
+        -60
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config').first().json.crm_base_url }}/internal/leads/{{ $('Un item por lead').item.json.lead_id }}/events",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ event: 'reminder_sent', channel: 'whatsapp', appointment_id: $('Un item por lead').item.json.appointment_id, which: $('Un item por lead').item.json.which, message_id: $json.messages[0].id, event_id: 'rem-' + $('Un item por lead').item.json.appointment_id + '-' + $('Un item por lead').item.json.which }) }}",
+        "options": {
+          "timeout": 15000,
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "ac0c7e9b-2ce9-736d-26ce-bc0ca4bba495",
+      "name": "Avisar al CRM: enviado",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1320,
+        -140
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REEMPLAZAR_CREDENCIAL_CRM",
+          "name": "Captacion CRM (Bearer)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config').first().json.crm_base_url }}/internal/leads/{{ $('Un item por lead').item.json.lead_id }}/events",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ event: 'message_failed', channel: 'whatsapp', template: 'appt_reminder', error: JSON.stringify(($json.error && $json.error.message) || 'sin detalle').slice(0, 150), event_id: 'remf-' + $('Un item por lead').item.json.lead_id + '-' + $execution.id }) }}",
+        "options": {
+          "timeout": 15000,
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "0608d119-cff0-78ac-d563-20bf4c769b64",
+      "name": "Avisar al CRM: falló",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1320,
+        40
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REEMPLAZAR_CREDENCIAL_CRM",
+          "name": "Captacion CRM (Bearer)"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Cada 5 minutos": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config": {
+      "main": [
+        [
+          {
+            "node": "Pedir al CRM qué recordatorios tocan",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pedir al CRM qué recordatorios tocan": {
+      "main": [
+        [
+          {
+            "node": "Un item por lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Un item por lead": {
+      "main": [
+        [
+          {
+            "node": "Enviar plantilla por WhatsApp",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar plantilla por WhatsApp": {
+      "main": [
+        [
+          {
+            "node": "¿WhatsApp aceptó el mensaje?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿WhatsApp aceptó el mensaje?": {
+      "main": [
+        [
+          {
+            "node": "Avisar al CRM: enviado",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Avisar al CRM: falló",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "4d87e945-316b-8085-9344-4eeabab851c3",
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "note": "NO PROBADO en una instancia real de n8n"
+  },
+  "tags": [
+    {
+      "name": "northstar-captacion"
+    }
+  ]
+}

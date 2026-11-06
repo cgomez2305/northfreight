@@ -129,7 +129,7 @@ final class InternalController extends Responder
                     Webhook::finish($wid, $r['ok'] ? 'processed' : 'error', $r['ok'] ? $id : null, $r['ok'] ? ($r['summary'] ?? null) : ($r['error'] ?? 'error'));
                     return $r;
                 });
-                if ($res['ok'] ?? false) {
+                if (($res['ok'] ?? false) && ($body['event'] ?? '') !== 'error') {
                     Integrations::webhook('n8n', 'ok', (string) ($res['summary'] ?? 'duplicado'));
                 }
                 self::done($res);

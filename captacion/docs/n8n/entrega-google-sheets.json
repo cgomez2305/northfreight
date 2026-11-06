@@ -1,0 +1,278 @@
+{
+  "name": "NorthStar · Entrega de leads presentados a Google Sheets",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "NO PROBADO EN UNA INSTANCIA REAL DE N8N. Flujo de NorthStar Captación.\n\nRecibe el webhook firmado de Configuración > Entrega a NorthStar (esquema northstar.handoff.v1) y agrega una fila a la hoja de NorthStar. 1) Pega la URL de producción de este webhook en Configuración > Entrega a NorthStar y copia el secreto que muestra el CRM UNA vez. 2) En el nodo \"Config\" pega ese secreto en handoff_secret y el ID de la hoja en el nodo de Google Sheets. 3) El nodo \"Verificar firma\" necesita el módulo crypto: en n8n alojado por ti, NODE_FUNCTION_ALLOW_BUILTIN=crypto; en n8n Cloud confirma que se permite o sustituye ese nodo por una verificación equivalente. Sin firma válida responde 401 y NO escribe en la hoja.",
+        "height": 260,
+        "width": 520
+      },
+      "id": "ce87e8e3-4429-3888-1cbc-81181810e525",
+      "name": "Nota",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -200,
+        -330
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "northstar-handoff",
+        "responseMode": "responseNode",
+        "options": {
+          "rawBody": true
+        }
+      },
+      "id": "799a08b6-94ff-c3ce-b06f-f45f1685da3e",
+      "name": "Webhook del CRM",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "1ca8c8eb-135e-b692-89be-a4f42eb8242d"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "s1",
+              "name": "handoff_secret",
+              "value": "PEGAR_AQUI_EL_SECRETO_DE_ENTREGA",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "94528cd3-4488-c44b-3778-a828fa754200",
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const crypto = require('crypto');\nconst item = $input.first();\nconst secret = item.json.handoff_secret;\nconst h = item.json.headers || {};\nconst ts = String(h['x-ns-timestamp'] || '');\nconst sig = String(h['x-ns-signature'] || '');\nconst raw = item.binary && item.binary.data ? Buffer.from(item.binary.data.data, 'base64').toString('utf8') : '';\nconst expected = 'sha256=' + crypto.createHmac('sha256', secret).update(ts + '.' + raw).digest('hex');\nconst fresh = Math.abs(Date.now() / 1000 - Number(ts)) <= 300;\nconst a = Buffer.from(sig), b = Buffer.from(expected);\nconst valid = fresh && secret && !secret.startsWith('PEGAR') && a.length === b.length && crypto.timingSafeEqual(a, b);\nreturn [{ json: { valid: !!valid, body: item.json.body } }];"
+      },
+      "id": "b75c741d-19fb-37ca-ce20-9bc63da110cf",
+      "name": "Verificar firma",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        440,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "v1",
+              "leftValue": "={{ $json.valid }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "98a3d1bc-10e9-6a98-f32a-9b03d8ac7738",
+      "name": "¿Firma válida?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        660,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "resource": "sheet",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "REEMPLAZAR_ID_DE_LA_HOJA"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Leads"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Fecha de entrega": "={{ $json.body.sent_at }}",
+            "Lead ID": "={{ $json.body.lead.id }}",
+            "Nombre": "={{ $json.body.lead.name }}",
+            "Perfil": "={{ $json.body.lead.profile }}",
+            "Teléfono": "={{ $json.body.lead.phone }}",
+            "Correo": "={{ $json.body.lead.email }}",
+            "Estado": "={{ $json.body.lead.state }}",
+            "Equipo": "={{ ($json.body.lead.equipment || []).join(', ') }}",
+            "Camiones": "={{ $json.body.lead.truck_count }}",
+            "Años de experiencia": "={{ $json.body.lead.years_experience }}",
+            "USDOT": "={{ $json.body.lead.usdot }}",
+            "Puntuación": "={{ $json.body.lead.score }}",
+            "Temperatura": "={{ $json.body.lead.temperature }}",
+            "Banderas rojas": "={{ ($json.body.lead.red_flags || []).join(', ') }}",
+            "Fuente": "={{ $json.body.lead.attribution && $json.body.lead.attribution.source }}",
+            "Confirmar: firmó": "={{ $json.body.confirm_urls && $json.body.confirm_urls.signed }}",
+            "Confirmar: rechazado": "={{ $json.body.confirm_urls && $json.body.confirm_urls.rejected }}",
+            "Evento": "={{ $json.body.event }}"
+          },
+          "matchingColumns": [],
+          "schema": []
+        },
+        "options": {}
+      },
+      "id": "c2746336-8012-3927-31fa-38eb86737fce",
+      "name": "Agregar fila a Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.5,
+      "position": [
+        880,
+        -80
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REEMPLAZAR_CREDENCIAL_GOOGLE",
+          "name": "Google Sheets (NorthStar)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ ok: true }) }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "fc71e51f-493a-f9d3-f974-035231897e16",
+      "name": "Responder 200",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1100,
+        -80
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ ok: false, error: \"invalid_signature\" }) }}",
+        "options": {
+          "responseCode": 401
+        }
+      },
+      "id": "b080fcad-c9b4-da79-a0b8-d3dcd8c7ded8",
+      "name": "Responder 401",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        880,
+        100
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook del CRM": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config": {
+      "main": [
+        [
+          {
+            "node": "Verificar firma",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verificar firma": {
+      "main": [
+        [
+          {
+            "node": "¿Firma válida?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Firma válida?": {
+      "main": [
+        [
+          {
+            "node": "Agregar fila a Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Responder 401",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agregar fila a Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Responder 200",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "083f8154-6380-cf9f-7443-2eb5bb1c4a65",
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "note": "NO PROBADO en una instancia real de n8n"
+  },
+  "tags": [
+    {
+      "name": "northstar-captacion"
+    }
+  ]
+}

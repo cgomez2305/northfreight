@@ -1,0 +1,338 @@
+{
+  "name": "NorthStar · A7 Pausa las secuencias cuando el lead responde (entrada de WhatsApp)",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "NO PROBADO EN UNA INSTANCIA REAL DE N8N. Flujo de NorthStar Captación.\n\nA7: cada mensaje que escribe un lead por WhatsApp llega aquí (WhatsApp Trigger de n8n). Si el número ya es un lead, avisa al CRM (reply_received: guarda el mensaje, abre la ventana de 24 h, pausa las secuencias y avisa a Carlos por Telegram). Si es un número nuevo, crea el lead en /api/lead.php con el primer mensaje (ventana de 24 h, SIN consentimiento de marketing). Aquí se engancha después el bot de precalificación (A8, ver bot-whatsapp-spec.md).",
+        "height": 260,
+        "width": 520
+      },
+      "id": "7efadea2-bab6-ca07-b151-5472f31c81aa",
+      "name": "Nota",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -200,
+        -300
+      ]
+    },
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {}
+      },
+      "id": "1d7e9060-15d5-061b-224c-38a403f20d12",
+      "name": "WhatsApp: mensaje recibido",
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "REEMPLAZAR_CREDENCIAL_WA_TRIGGER",
+          "name": "WhatsApp Trigger (Meta)"
+        }
+      },
+      "webhookId": "71742c32-ecdc-e46f-c379-efde437b47cb"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c1",
+              "name": "crm_base_url",
+              "value": "https://captacion.northstarfreightsolutions.us",
+              "type": "string"
+            },
+            {
+              "id": "c2",
+              "name": "wa_phone_number_id",
+              "value": "REEMPLAZAR_PHONE_NUMBER_ID",
+              "type": "string"
+            },
+            {
+              "id": "c3",
+              "name": "graph_version",
+              "value": "v21.0",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      },
+      "id": "67c52cab-0b3a-f97a-49ca-644041ebe731",
+      "name": "Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        220,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e1",
+              "name": "from",
+              "value": "={{ '+' + $json.messages[0].from }}",
+              "type": "string"
+            },
+            {
+              "id": "e2",
+              "name": "text",
+              "value": "={{ ($json.messages[0].text && $json.messages[0].text.body) || '' }}",
+              "type": "string"
+            },
+            {
+              "id": "e3",
+              "name": "wamid",
+              "value": "={{ $json.messages[0].id }}",
+              "type": "string"
+            },
+            {
+              "id": "e4",
+              "name": "name",
+              "value": "={{ ($json.contacts && $json.contacts[0] && $json.contacts[0].profile && $json.contacts[0].profile.name) || 'WhatsApp' }}",
+              "type": "string"
+            },
+            {
+              "id": "e5",
+              "name": "sent_at",
+              "value": "={{ new Date(Number($json.messages[0].timestamp) * 1000).toISOString() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": false,
+        "options": {}
+      },
+      "id": "8fdc802f-0be9-0753-5912-060f5b0ad203",
+      "name": "Extraer el mensaje",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        440,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $('Config').first().json.crm_base_url }}/internal/leads/by-phone",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "phone",
+              "value": "={{ $('Extraer el mensaje').item.json.from }}"
+            }
+          ]
+        },
+        "options": {
+          "timeout": 15000
+        }
+      },
+      "id": "84cb5cc5-7e3b-fca1-16ad-a6bebe35f33b",
+      "name": "Buscar el lead por teléfono",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        660,
+        0
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REEMPLAZAR_CREDENCIAL_CRM",
+          "name": "Captacion CRM (Bearer)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose"
+          },
+          "conditions": [
+            {
+              "id": "x1",
+              "leftValue": "={{ $json.found }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "226de59d-fbbe-762d-478e-0562ad042e0e",
+      "name": "¿Ya es un lead?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        880,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config').first().json.crm_base_url }}/internal/leads/{{ $json.lead_id }}/events",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ event: 'reply_received', channel: 'whatsapp', text: $('Extraer el mensaje').item.json.text, message_id: $('Extraer el mensaje').item.json.wamid, at: $('Extraer el mensaje').item.json.sent_at, event_id: 'in-' + $('Extraer el mensaje').item.json.wamid }) }}",
+        "options": {
+          "timeout": 15000,
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "053fe11f-e53d-c034-ff1e-be3ff7338833",
+      "name": "Avisar al CRM: respondió",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1100,
+        -100
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REEMPLAZAR_CREDENCIAL_CRM",
+          "name": "Captacion CRM (Bearer)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Config').first().json.crm_base_url }}/api/lead.php",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ source: 'n8n_whatsapp', profile: 'owner_operator', name: $('Extraer el mensaje').item.json.name, phone: $('Extraer el mensaje').item.json.from, inbound: { channel: 'whatsapp', text: $('Extraer el mensaje').item.json.text, at: $('Extraer el mensaje').item.json.sent_at, message_id: $('Extraer el mensaje').item.json.wamid } }) }}",
+        "options": {
+          "timeout": 15000,
+          "response": {
+            "response": {
+              "neverError": true
+            }
+          }
+        }
+      },
+      "id": "38c0213b-8857-9a19-ef55-21eee8a66e26",
+      "name": "Crear el lead con su primer mensaje",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1100,
+        100
+      ],
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "REEMPLAZAR_CREDENCIAL_CRM",
+          "name": "Captacion CRM (Bearer)"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "WhatsApp: mensaje recibido": {
+      "main": [
+        [
+          {
+            "node": "Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Config": {
+      "main": [
+        [
+          {
+            "node": "Extraer el mensaje",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extraer el mensaje": {
+      "main": [
+        [
+          {
+            "node": "Buscar el lead por teléfono",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Buscar el lead por teléfono": {
+      "main": [
+        [
+          {
+            "node": "¿Ya es un lead?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Ya es un lead?": {
+      "main": [
+        [
+          {
+            "node": "Avisar al CRM: respondió",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Crear el lead con su primer mensaje",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "bca66845-6b99-8a8e-713e-d07155093bd8",
+  "meta": {
+    "templateCredsSetupCompleted": false,
+    "note": "NO PROBADO en una instancia real de n8n"
+  },
+  "tags": [
+    {
+      "name": "northstar-captacion"
+    }
+  ]
+}
