@@ -84,7 +84,7 @@ $ni = static function (string $href, string $icon, string $label, string $key, a
         <span class="sys__row"><i class="dot<?= !empty($sysOk) ? ' is-ok' : '' ?>"></i><span class="sys__t">Estado del sistema</span></span>
         <small>Cola, cron e integraciones</small>
       </a><?php endif; ?>
-      <button class="side__fold" type="button" data-side-toggle aria-pressed="<?= ($prefs['side'] ?? 'open') === 'collapsed' ? 'true' : 'false' ?>" data-tip="Contraer barra lateral"><?= Ui::icon('panel-left') ?><span class="nav-i__t">Contraer barra lateral</span></button>
+      <?php if (empty($isViewer)): ?><button class="side__fold" type="button" data-side-toggle aria-pressed="<?= ($prefs['side'] ?? 'open') === 'collapsed' ? 'true' : 'false' ?>" data-tip="Contraer barra lateral"><?= Ui::icon('panel-left') ?><span class="nav-i__t">Contraer barra lateral</span></button><?php endif; ?>
       <div class="dd" data-dd>
         <button class="user" type="button" aria-expanded="false" aria-haspopup="menu" aria-controls="dd-user">
           <?= Ui::avatar((string) $user['name'], 'md', 0) ?>

@@ -145,7 +145,7 @@ return static function (array $ctx): void {
     $csrf = $viewer->csrf;
     $getRoutes = ['/leads', "/leads/$lA", "/leads/$lB", '/leads?q=Zebulon', '/leads?t=hot&ct=none', '/pipeline', '/pipeline?pl=B', '/tareas', '/tareas?tab=overdue', '/config', '/config?tab=alertas', '/config?tab=costos', '/config?tab=integraciones', '/config?tab=horario', '/config?tab=copias',
         '/config?tab=entrega', '/config?tab=correo', '/config?tab=usuarios', '/actividad', '/actividad?q=Zebulon', '/reportes', '/reportes?r=90d', '/comunicaciones', '/comunicaciones/plantillas', '/comunicaciones/plantillas/1', '/comunicaciones/plantillas/new', '/comunicaciones/inscripciones',
-        '/comunicaciones/envios', '/comunicaciones/reactivacion', '/config?tab=canales', '/internal/ping', '/internal/sequences/due', '/api/webhooks/meta.php', '/api/webhooks/calcom.php', '/api/webhooks/sms.php', '/api/webhooks/n8n.php', '/ajax/search', '/ajax/notifications/read', '/ajax/pipeline/cards', '/ajax/pipeline/move', "/informes/$draftId", '/informes/generate', "/informes/$pubId/publish", "/informes/$pubId/actions", '/setup.php', '/api/lead.php', '/config/backups/download',
+        '/comunicaciones/envios', '/comunicaciones/reactivacion', '/config?tab=canales', '/internal/ping', '/internal/sequences/due', '/api/webhooks/meta.php', '/api/webhooks/calcom.php', '/api/webhooks/sms.php', '/api/webhooks/n8n.php', '/ajax/search', '/vistas/new', '/undo', '/ajax/notifications/read', '/ajax/pipeline/cards', '/ajax/pipeline/move', "/informes/$draftId", '/informes/generate', "/informes/$pubId/publish", "/informes/$pubId/actions", '/setup.php', '/api/lead.php', '/config/backups/download',
         '/leads/export', '/leads/bulk', '/reportes/export'];
     $bad = [];
     foreach ($getRoutes as $path) {
@@ -174,7 +174,7 @@ return static function (array $ctx): void {
         }
     }
     T::ok(!$badP, 'lector, ' . count($postRoutes) . ' rutas por POST con CSRF válido: todas rechazadas, sin CSV ni datos' . ($badP ? ': ' . implode('; ', $badP) : ''));
-    foreach (['/ajax/search' => ['q' => 'Zebulon'], '/ajax/notifications/read' => [], '/ajax/pipeline/move' => ['lead_id' => $lA, 'to' => 'contacted'], '/ajax/pipeline/cards' => ['stage' => 'new']] as $path => $body) {
+    foreach (['/ajax/search' => ['q' => 'Zebulon'], '/ajax/notifications/read' => [], '/ajax/pipeline/move' => ['lead_id' => $lA, 'to' => 'contacted'], '/ajax/pipeline/cards' => ['stage' => 'new'], '/ajax/pipeline/card' => ['lead_id' => $lA], '/ajax/peek' => ['id' => $lA], '/ajax/lead/act' => ['id' => $lA, 'act' => 'note', 'body' => 'x'], '/ajax/lead/create' => ['name' => 'X', 'phone' => '3055551234', 'profile' => 'owner_operator'], '/ajax/undo' => ['token' => 'x'], '/ajax/counters' => []] as $path => $body) {
         $r = $viewer->ajax($path, $body);
         T::ok($r['status'] === 403 && str_contains($r['body'], 'forbidden') && !str_contains($r['body'], 'Zebulon'), "lector: $path (JSON) responde 403 forbidden");
     }

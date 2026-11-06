@@ -67,7 +67,7 @@ return static function (array $ctx): void {
     T::eq(Kanban::counts('A', ['src' => 'meta'])['new'], 30, 'filtro fuente=meta: 30 en Nuevo');
     T::eq(Kanban::counts('A', ['q' => 'Zzzqqx'])['new'], 0, 'busqueda por texto sin coincidencia: 0 (no hay nadie con ese nombre)');
     T::ok(Kanban::counts('A', ['q' => 'Kan1'])['new'] >= 1, 'busqueda por texto (nombre): encuentra');
-    T::eq(array_keys(Kanban::filters(['t' => 'hot', 'src' => 'meta', 'q' => 'x', 'pf' => 'owner_operator', 'st' => 'new', 'page' => '3'])), ['t', 'src', 'q'], 'filtros del kanban: solo temperatura, fuente y texto (lo demas se descarta)');
+    T::eq(array_keys(Kanban::filters(['t' => 'hot', 'src' => 'meta', 'q' => 'x', 'pf' => 'owner_operator', 'st' => 'new', 'page' => '3'])), ['t', 'pf', 'src', 'q'], 'filtros del tablero (Q5a): los mismos de la bandeja (comparten vistas), salvo la etapa (son las columnas) y la paginacion');
     // tarea proxima y bandera roja
     Db::insert('tasks', ['title' => 'Llamar de nuevo', 'lead_id' => $contacted, 'due_at' => Clock::at($now + 3600), 'priority' => 2, 'created_at' => Clock::now()]);
     Db::insert('tasks', ['title' => 'Mas tarde', 'lead_id' => $contacted, 'due_at' => Clock::at($now + 86400), 'priority' => 2, 'created_at' => Clock::now()]);

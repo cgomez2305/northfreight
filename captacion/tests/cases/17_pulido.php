@@ -13,7 +13,7 @@ return static function (array $ctx): void {
     $size = static fn(string $f): int => (int) @filesize($assets . '/' . $f . '.css');
     // ------------------------------------------------------------------ Hojas por pantalla
     $screens = [
-        '/' => ['charts', 'dashboard'], '/leads' => ['leads'], '/pipeline' => ['kanban'], '/tareas' => ['tareas'], '/actividad' => ['config', 'actividad'],
+        '/' => ['charts', 'dashboard'], '/leads' => ['leads', 'views'], '/pipeline' => ['kanban', 'views'], '/tareas' => ['tareas'], '/actividad' => ['config', 'actividad'],
         '/config' => ['config', 'cfg-puntuacion'], '/config?tab=alertas' => ['config', 'cfg-alertas'], '/config?tab=costos' => ['config', 'cfg-costos'],
         '/config?tab=integraciones' => ['config', 'cfg-integraciones'], '/config?tab=horario' => ['config', 'cfg-horario'], '/config?tab=copias' => ['config', 'cfg-copias'],
         // Q3
@@ -54,7 +54,7 @@ return static function (array $ctx): void {
     T::eq([$r['status'], Infra::header($r, 'location')], [303, '/resultados'], 'lector: / lo lleva a /resultados');
     $r = $v->get('/resultados');
     T::ok($r['status'] === 200 && str_contains($r['body'], 'href="/resultados"') && str_contains($r['body'], 'href="/informes"') && !str_contains($r['body'], 'href="/pipeline"') && !str_contains($r['body'], 'href="/tareas"') && !str_contains($r['body'], 'href="/leads') && !str_contains($r['body'], 'href="/config"') && !str_contains($r['body'], 'href="/actividad"') && !str_contains($r['body'], 'data-search') && !str_contains($r['body'], 'data-notes'), 'lector: la barra lateral trae solo Resultados e Informes (sin Pipeline, Tareas, Leads, buscador ni campana)');
-    $crumbs = ['/pipeline' => 'Pipeline', '/tareas' => 'Tareas', '/actividad' => 'Actividad', '/config?tab=copias' => 'Copias de seguridad', '/config?tab=alertas' => 'Alertas', '/reportes' => 'Últimos 30 días', '/informes' => 'Informes', '/comunicaciones' => 'Plantillas', '/config?tab=entrega' => 'Entrega a NorthStar', '/config?tab=usuarios' => 'Usuarios', '/prospectos' => 'Prospectos', '/referidos' => 'Referidos', '/vacantes' => 'Vacantes', '/config?tab=prospectos' => 'Prospectos'];
+    $crumbs = ['/pipeline' => 'Tablero', '/tareas' => 'Tareas', '/actividad' => 'Actividad', '/config?tab=copias' => 'Copias de seguridad', '/config?tab=alertas' => 'Alertas', '/reportes' => 'Últimos 30 días', '/informes' => 'Informes', '/comunicaciones' => 'Plantillas', '/config?tab=entrega' => 'Entrega a NorthStar', '/config?tab=usuarios' => 'Usuarios', '/prospectos' => 'Prospectos', '/referidos' => 'Referidos', '/vacantes' => 'Vacantes', '/config?tab=prospectos' => 'Prospectos'];
     foreach ($crumbs as $route => $last) {
         $r = $s->get($route);
         T::ok(preg_match('#<li aria-current="page">' . preg_quote($last, '#') . '</li>#', $r['body']) === 1 && str_contains($r['body'], '<title>'), "migas de {$route}: termina en «{$last}»");
