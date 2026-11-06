@@ -74,6 +74,24 @@ final class PipelineController extends Responder
         self::json(['ok' => true, 'html' => self::renderCards($page['cards'], $canWrite), 'total' => $page['total'], 'next' => $page['next'], 'shown' => count($page['cards'])]);
     }
 
+    /** POST /ajax/pipeline/card {lead_id, qs}: la tarjeta actual de un lead (tras deshacer o un cambio hecho desde el vistazo) y los conteos de su pipeline. */
+    public static function card(): never
+    {
+        [$user, $b] = self::jsonPost();
+        if (RateLimiter::tooMany('pipeline_cards', 'u' . (int) $user['id'], 240, 60)) {
+            self::json(['ok' => false, 'error' => 'rate_limited'], 429, ['Retry-After: 15']);
+        }
+        RateLimiter::hit('pipeline_cards', 'u' . (int) $user['id'], 60);
+        $id = (int) ($b['lead_id'] ?? 0);
+        $lead = $id > 0 ? Lead::find($id) : null;
+        if ($lead === null) {
+            self::json(['ok' => false, 'error' => 'not_found'], 404);
+        }
+        parse_str(is_string($b['qs'] ?? null) ? mb_substr($b['qs'], 0, 600) : '', $q);
+        $card = Kanban::card($id);
+        self::json(['ok' => true, 'lead_id' => $id, 'to' => (string) $lead['stage'], 'pipeline' => (string) $lead['pipeline'], 'card' => $card !== null ? self::renderCards([$card], true) : '', 'counts' => Kanban::counts((string) $lead['pipeline'], Kanban::filters($q))]);
+    }
+
     public static function move(): never
     {
         [$user, $b] = self::jsonPost();

@@ -20,9 +20,11 @@ $filtered = count($f) > 0;
     <p class="sub">Una columna por etapa. Arrastra una tarjeta o usa «Mover a…».</p>
   </div>
   <div class="page-head__a">
-    <a class="btn btn--secondary" href="/leads<?= $e(Ui::qs(array_merge(['pf' => $pl === 'B' ? 'company_driver' : null], $f))) ?>"><?= Ui::icon('users') ?><span>Ver como lista</span></a>
+    <button class="btn btn--secondary" type="button" data-new-lead><?= Ui::icon('plus') ?><span>Nuevo lead</span></button>
   </div>
 </div>
+
+<?php $screen = 'pipeline'; $prefs = $prefs ?? []; require __DIR__ . '/_viewbar.php'; ?>
 
 <div class="ptabs" role="group" aria-label="Pipeline">
   <?php foreach ($labels as $k => $label): ?>
@@ -32,6 +34,8 @@ $filtered = count($f) > 0;
 
 <form class="kq" method="get" action="/pipeline" data-autosubmit>
   <?php if ($pl === 'B'): ?><input type="hidden" name="pl" value="B"><?php endif; ?>
+  <?php foreach (array_diff_key($f, ['t' => 1, 'src' => 1, 'q' => 1]) as $hk => $hv): ?><input type="hidden" name="<?= $e($hk) ?>" value="<?= $e($hv) ?>"><?php endforeach; ?>
+  <?php if (isset($activeView)): ?><input type="hidden" name="v" value="<?= $e($activeView['view']['id']) ?>"><?php endif; ?>
   <div class="seg seg--wrap kq__t" role="group" aria-label="Temperatura">
     <?php foreach ($tempTabs as $k => $label): ?>
       <a class="seg__i<?= ($f['t'] ?? '') === $k ? ' is-on' : '' ?>" href="/pipeline<?= $e($qsBase(['t' => $k === '' ? null : $k])) ?>"<?= ($f['t'] ?? '') === $k ? ' aria-current="true"' : '' ?>><?= $e($label) ?></a>
@@ -44,8 +48,22 @@ $filtered = count($f) > 0;
     </select></label>
   <label class="inp kq__q"><?= Ui::icon('search') ?><input type="search" name="q" value="<?= $e($f['q'] ?? '') ?>" placeholder="Buscar lead…" maxlength="100" aria-label="Buscar por nombre, teléfono, correo o USDOT"></label>
   <button class="btn btn--secondary btn--sm kq__go" type="submit">Filtrar</button>
-  <?php if ($filtered): ?><a class="btn btn--ghost btn--sm" href="/pipeline<?= $pl === 'B' ? '?pl=B' : '' ?>"><?= Ui::icon('x') ?>Quitar filtros</a><?php endif; ?>
+  <?php if ($filtered): ?><a class="btn btn--ghost btn--sm" href="/pipeline<?= $pl === 'B' ? '?pl=B' : '' ?>"><?= Ui::icon('x') ?>Limpiar</a><?php endif; ?>
 </form>
+<?php
+$chipLabels = [
+    't' => static fn($v) => 'Temperatura: ' . Catalog::label(Catalog::TEMPS, $v), 'pf' => static fn($v) => 'Perfil: ' . Catalog::label(Catalog::PROFILES, $v), 'src' => static fn($v) => 'Fuente: ' . Catalog::source($v),
+    'eq' => static fn($v) => 'Equipo: ' . Catalog::label(Catalog::EQUIPMENT, $v), 'us' => static fn($v) => 'Estado: ' . $v, 'lg' => static fn($v) => 'Idioma: ' . Catalog::label(Catalog::LANGS, $v),
+    'from' => static fn($v) => 'Desde: ' . $v, 'to' => static fn($v) => 'Hasta: ' . $v, 'q' => static fn($v) => 'Texto: «' . $v . '»', 'ct' => static fn() => 'Sin contactar', 'fl' => static fn() => 'FMCSA pendiente',
+    'nt' => static fn() => 'Sin tarea abierta', 'op' => static fn() => 'Solo abiertos', 'hs' => static fn() => 'Presentados sin respuesta',
+];
+if ($f): ?>
+<ul class="chips" aria-label="Filtros activos">
+  <?php foreach ($f as $k => $v): ?>
+    <li><a class="fchip" href="/pipeline<?= $e(Ui::qs(array_merge(['pl' => $pl === 'A' ? null : $pl], array_diff_key($f, [$k => 1])))) ?>" aria-label="Quitar filtro <?= $e($chipLabels[$k]($v)) ?>"><?= $e($chipLabels[$k]($v)) ?><?= Ui::icon('x') ?></a></li>
+  <?php endforeach; ?>
+</ul>
+<?php endif; ?>
 
 <?php if ($boardTotal === 0 && !$filtered && $totals[$pl] === 0): ?>
   <section class="card empty empty--lg">
@@ -55,7 +73,7 @@ $filtered = count($f) > 0;
     <a class="btn btn--secondary" href="/leads"><?= Ui::icon('users') ?>Ir a la bandeja</a>
   </section>
 <?php else: ?>
-<div class="kb" data-board data-pl="<?= $e($pl) ?>" data-qs="<?= $e(http_build_query($f)) ?>" data-stages="<?= $e(json_encode($stages, JSON_UNESCAPED_UNICODE)) ?>" data-write="<?= $canWrite ? '1' : '0' ?>" data-closed="<?= $e(json_encode(array_values(array_intersect(['signed', 'hired'], array_keys($stages))))) ?>">
+<div class="kb<?= ($density ?? 'comfortable') === 'compact' ? ' kb--compact' : '' ?>" data-board data-pl="<?= $e($pl) ?>" data-qs="<?= $e(http_build_query($f)) ?>" data-stages="<?= $e(json_encode($stages, JSON_UNESCAPED_UNICODE)) ?>" data-write="<?= $canWrite ? '1' : '0' ?>" data-closed="<?= $e(json_encode(array_values(array_intersect(['signed', 'hired'], array_keys($stages))))) ?>">
   <?php if ($boardTotal === 0): ?><p class="flash flash--warn" role="status"><?= Ui::icon('info') ?>Ningún lead de este pipeline coincide con los filtros.</p><?php endif; ?>
   <nav class="kb__chips" aria-label="Ir a una etapa">
     <?php foreach ($stages as $st => $label): ?>
@@ -70,7 +88,8 @@ $filtered = count($f) > 0;
             <?php if ($isLost): ?>
               <button class="kcol__tog" type="button" data-tog aria-expanded="false" aria-controls="kl-<?= $e($st) ?>"><i class="dot st-<?= $e($st) ?>"></i><span class="kcol__t" id="kh-<?= $e($st) ?>"><?= $e($label) ?></span><span class="kcol__n" data-count><?= $e($counts[$st]) ?></span><?= Ui::icon('chevron-right') ?></button>
             <?php else: ?>
-              <h2 class="kcol__t" id="kh-<?= $e($st) ?>"><i class="dot st-<?= $e($st) ?>"></i><?= $e($label) ?></h2><span class="kcol__n" data-count><?= $e($counts[$st]) ?></span>
+              <h2 class="kcol__t" id="kh-<?= $e($st) ?>"><?= Ui::stageIcon($st) ?><?= $e($label) ?></h2><span class="kcol__n" data-count><?= $e($counts[$st]) ?></span>
+              <?php if ($canWrite && $st === 'new'): ?><button class="icon-btn icon-btn--sm kcol__add" type="button" data-new-lead data-profile="<?= $pl === 'B' ? 'company_driver' : '' ?>" aria-label="Crear un lead nuevo"><?= Ui::icon('plus') ?></button><?php endif; ?>
             <?php endif; ?>
           </header>
           <div class="kcol__b"<?= $isLost ? ' hidden' : '' ?> id="kl-<?= $e($st) ?>">
@@ -87,15 +106,5 @@ $filtered = count($f) > 0;
 
 <div class="kmenu" role="menu" data-menu hidden aria-label="Mover a…"></div>
 
-<dialog class="dlg" id="kb-dlg" aria-labelledby="kb-dlg-t">
-  <form method="dialog" data-kb-form>
-    <div class="dlg__h"><h2 class="dlg__t" id="kb-dlg-t">Mover lead</h2><button class="icon-btn icon-btn--sm" type="button" data-close aria-label="Cerrar"><?= Ui::icon('x') ?></button></div>
-    <p class="dlg__m" data-kb-msg></p>
-    <label class="field" data-kb-reason hidden><span>Motivo</span>
-      <select name="reason"><option value="">Elige un motivo…</option><?php foreach (Catalog::LOSS_REASONS as $k => $l): ?><option value="<?= $e($k) ?>"><?= $e($l) ?></option><?php endforeach; ?></select></label>
-    <label class="field" data-kb-note hidden><span>Nota <small data-kb-note-hint>(opcional)</small></span><textarea name="note" maxlength="500" rows="3"></textarea></label>
-    <label class="check" data-kb-override hidden><input type="checkbox" name="override" value="1"><span>Sí, quiero saltarme el orden de las etapas.</span></label>
-    <div class="dlg__a"><button class="btn btn--ghost" type="button" data-close>Cancelar</button><button class="btn btn--primary" type="submit" value="go"><span class="btn__t">Mover</span><span class="btn__cell"><?= Ui::icon('arrow-up-right') ?></span></button></div>
-  </form>
-</dialog>
+<?php require __DIR__ . '/_peekshell.php'; ?>
 <?php endif; ?>

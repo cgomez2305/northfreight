@@ -95,6 +95,8 @@ switch (true) {
         PipelineController::index();
     case $path === '/ajax/pipeline/cards':
         PipelineController::cards();
+    case $path === '/ajax/pipeline/card':
+        PipelineController::card();
     case $path === '/ajax/pipeline/move':
         PipelineController::move();
     case $path === '/tareas':

@@ -34,7 +34,7 @@ $openTasks = array_filter($tasks, static fn($t) => $t['done_at'] === null);
 $doneTasks = array_filter($tasks, static fn($t) => $t['done_at'] !== null);
 $loc = trim(($lead['city'] ? $lead['city'] . ', ' : '') . ($lead['state'] ?? ''), ', ');
 ?>
-<article class="lead" aria-labelledby="lead-name">
+<article class="lead" aria-labelledby="lead-name" data-lead="<?= $e($id) ?>" data-stage="<?= $e($lead['stage']) ?>" data-name="<?= $e($name) ?>" data-stages="<?= $e(json_encode($stages, JSON_UNESCAPED_UNICODE)) ?>">
 <header class="card lead__head">
   <div class="lead__id">
     <?= Ui::avatar($name, 'xl') ?>

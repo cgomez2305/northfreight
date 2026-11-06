@@ -79,7 +79,8 @@ final class UxController extends Responder
             'lead' => $lead, 'tasks' => $tasks, 'timeline' => array_slice(Timeline::build($lead, $events, [], [], $users), 0, 5), 'stages' => Catalog::STAGES[(string) $lead['pipeline']] ?? Catalog::STAGES['A'],
             'openTasks' => (int) Db::value('SELECT COUNT(*) FROM tasks WHERE lead_id = ? AND deleted_at IS NULL AND done_at IS NULL', [$id]), 'now' => Clock::time(),
         ], false);
-        self::json(['ok' => true, 'id' => $id, 'name' => Fmt::name($lead), 'code' => Fmt::code($id), 'html' => $html]);
+        self::json(['ok' => true, 'id' => $id, 'name' => Fmt::name($lead), 'code' => Fmt::code($id), 'stage' => (string) $lead['stage'], 'stages' => Catalog::STAGES[(string) $lead['pipeline']] ?? Catalog::STAGES['A'],
+            'stage_chip' => \Captacion\Ui::stage((string) $lead['stage'], (string) $lead['pipeline']), 'html' => $html]);
     }
 
     /** POST /ajax/lead/act {id, act, ...}: nota, tarea, tarea hecha, llamada, respondio. Mismas funciones (y validaciones) que la ficha. */

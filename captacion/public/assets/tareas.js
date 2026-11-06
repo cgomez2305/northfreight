@@ -63,3 +63,6 @@
   });
  });
 })();
+
+/* Q5a: «Nueva tarea» desde la paleta de comandos (/tareas?new=1) */
+(function () { var d = document.querySelector("#task-new"); if (d && d.showModal && /[?&]new=1(&|$)/.test(location.search)) { d.showModal(); var f = d.querySelector("input:not([type=hidden]),textarea"); if (f) f.focus(); } })();

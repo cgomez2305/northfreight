@@ -7,6 +7,7 @@ namespace Captacion\Controllers;
 
 use Captacion\Services\GlobalSearch;
 use Captacion\Services\Notifications;
+use Captacion\Services\Prefs;
 use Captacion\Services\RateLimiter;
 
 final class AjaxController extends Responder
@@ -28,7 +29,7 @@ final class AjaxController extends Responder
         }
         RateLimiter::hit('panel_search', $key, 60);
         $q = is_string($body['q'] ?? null) ? $body['q'] : '';
-        self::json(['ok' => true] + GlobalSearch::run($q));
+        self::json(['ok' => true] + GlobalSearch::run($q, trim($q) === '' ? Prefs::recent((int) $user['id']) : []));
     }
 
     public static function notificationsRead(): never

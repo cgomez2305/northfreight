@@ -12,7 +12,7 @@ $nFilters = count(array_diff_key($f, ['t' => 1]));
 $chipLabels = [
     'pf' => static fn($v) => 'Perfil: ' . Catalog::label(Catalog::PROFILES, $v), 'src' => static fn($v) => 'Fuente: ' . Catalog::source($v), 'st' => static fn($v) => 'Etapa: ' . Catalog::stageAny($v),
     'eq' => static fn($v) => 'Equipo: ' . Catalog::label(Catalog::EQUIPMENT, $v), 'us' => static fn($v) => 'Estado: ' . $v, 'lg' => static fn($v) => 'Idioma: ' . Catalog::label(Catalog::LANGS, $v),
-    'from' => static fn($v) => 'Desde: ' . $v, 'to' => static fn($v) => 'Hasta: ' . $v, 'q' => static fn($v) => 'Texto: «' . $v . '»', 'ct' => static fn() => 'Sin contactar', 'fl' => static fn() => 'FMCSA pendiente',
+    'from' => static fn($v) => 'Desde: ' . $v, 'to' => static fn($v) => 'Hasta: ' . $v, 'q' => static fn($v) => 'Texto: «' . $v . '»', 'ct' => static fn() => 'Sin contactar', 'fl' => static fn() => 'FMCSA pendiente', 'nt' => static fn() => 'Sin tarea abierta', 'op' => static fn() => 'Solo abiertos', 'hs' => static fn() => 'Presentados sin respuesta',
 ];
 $sortLink = static function (string $key, string $label) use ($paging, $base, $e): string {
     $on = $paging['sort'] === $key;
@@ -30,6 +30,7 @@ $isEmptyDb = $grandTotal === 0;
   </div>
   <?php if (!$isEmptyDb): ?>
   <div class="page-head__a">
+    <button class="btn btn--secondary" type="button" data-new-lead><?= Ui::icon('plus') ?>Nuevo lead</button>
     <button class="btn btn--secondary filters-toggle" type="button" data-toggle="#filters" aria-expanded="<?= $nFilters > 0 ? 'true' : 'false' ?>" aria-controls="filters"><?= Ui::icon('filter') ?>Filtros<?= $nFilters > 0 ? ' <b class="badge">' . $e($nFilters) . '</b>' : '' ?></button>
     <form method="post" action="/leads/export">
       <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="scope" value="filters"><input type="hidden" name="qs" value="<?= $e(ltrim($qsAll(), '?')) ?>">
@@ -52,6 +53,8 @@ $isEmptyDb = $grandTotal === 0;
 </section>
 <?php else: ?>
 
+<?php $screen = 'leads'; require __DIR__ . '/_viewbar.php'; ?>
+
 <nav class="ptabs" aria-label="Temperatura">
   <?php foreach ($tabs as $k => $label): $on = ($f['t'] ?? '') === $k; $n = $k === '' ? $counts['all'] : $counts[$k]; ?>
     <a class="ptab<?= $on ? ' is-on' : '' ?><?= $k !== '' ? ' ptab--' . ($k === 'disqualified' ? 'dq' : $k) : '' ?>" href="/leads<?= $e(Ui::qs(array_merge(array_diff_key($base, ['t' => 1]), $sortBase, $k !== '' ? ['t' => $k] : []))) ?>"<?= $on ? ' aria-current="true"' : '' ?>><?= $k !== '' ? '<i class="dot"></i>' : '' ?><?= $e($label) ?><span class="ptab__n"><?= $e(Fmt::num($n)) ?></span></a>
@@ -60,6 +63,7 @@ $isEmptyDb = $grandTotal === 0;
 
 <form class="filters<?= $nFilters > 0 ? ' is-open' : '' ?>" id="filters" method="get" action="/leads" aria-label="Filtros">
   <?php if (isset($f['t'])): ?><input type="hidden" name="t" value="<?= $e($f['t']) ?>"><?php endif; ?>
+  <?php foreach (['nt', 'op', 'hs', 'fl'] as $hk): if (isset($f[$hk])): ?><input type="hidden" name="<?= $e($hk) ?>" value="<?= $e($f[$hk]) ?>"><?php endif; endforeach; ?>
   <?php foreach (['sort', 'dir', 'per'] as $k): if ($sortBase[$k] !== null): ?><input type="hidden" name="<?= $e($k) ?>" value="<?= $e($sortBase[$k]) ?>"><?php endif; endforeach; ?>
   <label class="field field--q"><span>Buscar</span><div class="inp"><?= Ui::icon('search') ?><input type="search" name="q" value="<?= $e($f['q'] ?? '') ?>" placeholder="Nombre, teléfono, correo o USDOT" maxlength="100"></div></label>
   <label class="field"><span>Perfil</span><select name="pf"><option value="">Todos</option><?php foreach (Catalog::PROFILES as $k => $l): ?><option value="<?= $e($k) ?>"<?= ($f['pf'] ?? '') === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
@@ -89,26 +93,28 @@ $isEmptyDb = $grandTotal === 0;
     <div class="empty"><svg class="empty__star" aria-hidden="true"><use href="#i-star"/></svg><h3>Ningún lead coincide con estos filtros</h3><p>Prueba quitando algún filtro o buscando por otro dato.</p><a class="btn btn--secondary" href="/leads">Quitar los filtros</a></div>
   <?php else: ?>
   <div class="tw">
-    <table class="tbl tbl--leads">
+    <table class="tbl tbl--leads" data-hide="<?= $e(implode(' ', array_values(array_diff(array_keys(\Captacion\Services\Prefs::COLUMNS), $cols)))) ?>" data-leads-table>
       <caption class="sr">Leads (<?= $e($list['total']) ?>), ordenados por <?= $e(['created' => 'fecha de llegada', 'score' => 'puntuación', 'name' => 'nombre', 'stage' => 'etapa'][$paging['sort']]) ?></caption>
       <thead><tr>
         <th scope="col" class="c-chk"><input type="checkbox" data-all aria-label="Seleccionar todos los de esta página"></th>
-        <th scope="col"><?= $sortLink('name', 'Lead') ?></th><th scope="col" class="c-prof">Perfil</th><th scope="col" class="c-st">Est.</th><th scope="col" class="c-eq">Equipo</th>
-        <th scope="col" class="c-n"><?= $sortLink('score', 'Pts') ?></th><th scope="col">Temp.</th><th scope="col" class="c-stage"><?= $sortLink('stage', 'Etapa') ?></th><th scope="col" class="c-src">Fuente</th><th scope="col" class="c-when"><?= $sortLink('created', 'Recibido') ?></th><th scope="col" class="c-act"><span class="sr">Llamar</span></th>
+        <th scope="col"><?= $sortLink('name', 'Lead') ?></th><th scope="col" class="c-prof k-prof">Perfil</th><th scope="col" class="c-st k-st">Est.</th><th scope="col" class="c-eq k-eq">Equipo</th>
+        <th scope="col" class="c-n k-pts"><?= $sortLink('score', 'Pts') ?></th><th scope="col" class="k-temp">Temp.</th><th scope="col" class="c-stage k-stage"><?= $sortLink('stage', 'Etapa') ?></th><th scope="col" class="c-src k-src">Fuente</th><th scope="col" class="c-when k-when"><?= $sortLink('created', 'Recibido') ?></th><th scope="col" class="c-tk k-task">Próxima tarea</th><th scope="col" class="c-act"><span class="sr">Llamar</span></th>
       </tr></thead>
       <tbody>
       <?php foreach ($rows as $r): $name = Fmt::name($r); ?>
-        <tr<?= $r['temperature'] === 'hot' && $r['first_contact_at'] === null && $r['stage'] === 'new' ? ' class="is-urgent"' : '' ?>>
+        <tr data-peek="<?= $e($r['id']) ?>"<?= $r['temperature'] === 'hot' && $r['first_contact_at'] === null && $r['stage'] === 'new' ? ' class="is-urgent"' : '' ?>>
           <td class="c-chk"><input type="checkbox" name="ids[]" value="<?= $e($r['id']) ?>" aria-label="Seleccionar a <?= $e($name) ?>"></td>
-          <th scope="row" class="c-name"><a class="who" href="/leads/<?= $e($r['id']) ?>"><?= Ui::avatar($name, 'md') ?><span><b><?= $e($name) ?></b><small class="mono"><?= $e(Fmt::phone($r['phone_e164'])) ?></small></span></a></th>
-          <td class="c-prof" data-l="Perfil"><?= $e(Catalog::label(Catalog::PROFILES_SHORT, $r['profile'])) ?></td>
-          <td class="c-st mono" data-l="Estado"><?= $e($r['state'] ?? '—') ?></td>
-          <td class="c-eq" data-l="Equipo"><?= $e(Ui::equipment($r['equipment_types'], 2)) ?></td>
-          <td class="c-n" data-l="Puntos"><?= Ui::score((int) $r['score'], $r['temperature']) ?></td>
-          <td class="c-tmp"><?= Ui::temp($r['temperature']) ?></td>
-          <td class="c-stage"><?= Ui::stage($r['stage'], $r['pipeline']) ?></td>
-          <td class="c-src" data-l="Fuente"><?= $e(Catalog::source($r['source'])) ?></td>
-          <td class="c-when mono" data-l="Recibido" title="<?= $e(Fmt::dateTime($r['created_at'])) ?>"><?= $e(Fmt::ago($r['created_at'])) ?></td>
+          <th scope="row" class="c-name"><a class="who" href="/leads/<?= $e($r['id']) ?>"><?= Ui::avatar($name, 'md') ?><span><b><?= $e($name) ?></b><small class="mono"><?= $e(Fmt::code((int) $r['id'])) ?> · <?= $e(Fmt::phone($r['phone_e164'])) ?></small></span></a></th>
+          <td class="c-prof k-prof" data-l="Perfil"><?= $e(Catalog::label(Catalog::PROFILES_SHORT, $r['profile'])) ?></td>
+          <td class="c-st k-st mono" data-l="Estado"><?= $e($r['state'] ?? '—') ?></td>
+          <td class="c-eq k-eq" data-l="Equipo"><?= $e(Ui::equipment($r['equipment_types'], 2)) ?></td>
+          <td class="c-n k-pts" data-l="Puntos"><?= Ui::score((int) $r['score'], $r['temperature']) ?></td>
+          <td class="c-tmp k-temp"><?= Ui::temp($r['temperature']) ?></td>
+          <td class="c-stage k-stage"><?= Ui::stage($r['stage'], $r['pipeline']) ?></td>
+          <td class="c-src k-src" data-l="Fuente"><?= $e(Catalog::source($r['source'])) ?></td>
+          <td class="c-when k-when mono" data-l="Recibido" title="<?= $e(Fmt::dateTime($r['created_at'])) ?>"><?= $e(Fmt::ago($r['created_at'])) ?></td>
+          <?php $nt = $nextTasks[(int) $r['id']] ?? null; $ntLate = $nt !== null && $nt !== '' && (int) \Captacion\Clock::parse($nt) < \Captacion\Clock::time(); ?>
+          <td class="c-tk k-task mono<?= $ntLate ? ' late' : '' ?>" data-l="Próxima tarea"><?= $nt === null ? '<span class="muted">Sin tarea</span>' : ($nt === '' ? 'Sin fecha' : $e(Fmt::dateTime($nt, false))) ?></td>
           <td class="c-act"><?php if ($r['phone_e164']): ?><a class="icon-btn icon-btn--sm" href="tel:<?= $e($r['phone_e164']) ?>" aria-label="Llamar a <?= $e($name) ?>"><?= Ui::icon('phone') ?></a><?php endif; ?></td>
         </tr>
       <?php endforeach; ?>
@@ -136,3 +142,4 @@ $isEmptyDb = $grandTotal === 0;
   <?php endif; ?>
 </form>
 <?php endif; ?>
+<?php if (!$isEmptyDb) { require __DIR__ . '/_peekshell.php'; } ?>

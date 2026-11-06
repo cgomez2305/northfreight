@@ -9,7 +9,7 @@
  var PL = board.getAttribute('data-pl'), QS = board.getAttribute('data-qs') || '', WRITE = board.getAttribute('data-write') === '1';
  var STAGES = {}, CLOSED = [];
  try { STAGES = JSON.parse(board.getAttribute('data-stages')); CLOSED = JSON.parse(board.getAttribute('data-closed')); } catch (e) {}
- var live = $('[data-live]', board), scroller = $('[data-scroll]', board), menu = $('[data-menu]'), dlg = $('#kb-dlg');
+ var live = $('[data-live]', board), scroller = $('[data-scroll]', board), menu = $('[data-menu]');
  var cols = {};
  $$('.kcol', board).forEach(function (el) {
   var st = el.getAttribute('data-col'), list = $('[data-list]', el);
@@ -18,14 +18,7 @@
  });
  function total(st) { return parseInt(cols[st].el.getAttribute('data-total'), 10) || 0; }
  function say(t) { live.textContent = ''; setTimeout(function () { live.textContent = t; }, 40); }
- var toastEl = null, toastT = 0;
- function toast(msg, bad) {
-  if (toastEl) toastEl.remove(); clearTimeout(toastT);
-  toastEl = D.createElement('div'); toastEl.className = 'ktoast' + (bad ? ' ktoast--bad' : ''); toastEl.setAttribute('role', bad ? 'alert' : 'status');
-  var t = D.createElement('span'); t.textContent = msg; var b = D.createElement('button'); b.type = 'button'; b.setAttribute('aria-label', 'Cerrar aviso'); b.textContent = '×';
-  b.addEventListener('click', function () { if (toastEl) toastEl.remove(); toastEl = null; }); toastEl.appendChild(t); toastEl.appendChild(b); D.body.appendChild(toastEl);
-  toastT = setTimeout(function () { if (toastEl) toastEl.remove(); toastEl = null; }, bad ? 9000 : 4500);
- }
+ function toast(msg, bad, undo) { if (window.NS) NS.toast(msg, { bad: !!bad, undo: undo || null }); }
  function api(path, body) {
   return fetch(path, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': CSRF }, body: JSON.stringify(body) })
    .then(function (r) { return r.json().then(function (j) { j.status = r.status; return j; }, function () { return { ok: false, status: r.status, msg: 'Respuesta no válida del servidor.' }; }); });
@@ -82,7 +75,7 @@
     var fresh = frag(j.card).firstElementChild;
     if (fresh && cols[to].loaded) { card.replaceWith(fresh); fresh.classList.add('is-just-moved'); setTimeout(function () { fresh.classList.remove('is-just-moved'); }, 1800); var b = $('[data-move]', fresh); if (b && D.activeElement === D.body) b.focus(); } else { card.remove(); }
     if (j.counts) setTotals(j.counts);
-    toast(name + ': ' + j.msg); say(name + ' movido a ' + (STAGES[to] || to) + '.');
+    toast(name + ': ' + j.msg, false, j.undo); say(name + ' movido a ' + (STAGES[to] || to) + '.'); if (window.NS) NS.counters();
     return;
    }
    restore(card, snap);
@@ -91,32 +84,22 @@
   }, function () { restore(card, snap); toast('Sin conexión con el servidor. El lead no se movió.', true); });
  }
 
- /* ---- Diálogo de datos que pide el servidor ---- */
+ /* ---- Datos que pide el servidor (motivo, nota, salto de orden): diálogo compartido de ux.js ---- */
  function ask(card, to, needs, msg, prev) {
-  if (!dlg || !dlg.showModal) { toast(msg, true); return; }
-  prev = prev || {}; ctx = { card: card, to: to };
-  var f = $('[data-kb-form]', dlg);
-  $('.btn__t', dlg).textContent = to === 'lost' ? 'Marcar como perdido' : 'Mover';
-  $('#kb-dlg-t').textContent = to === 'lost' ? 'Marcar como «' + STAGES.lost + '»' : 'Mover a «' + (STAGES[to] || to) + '»';
-  $('[data-kb-msg]', dlg).textContent = card.getAttribute('data-name') + ': ' + msg;
-  var needReason = needs === 'reason' || needs === 'note' || to === 'lost', needOverride = needs === 'override' || !!prev.override;
-  $('[data-kb-reason]', dlg).hidden = !needReason; f.elements.reason.required = needReason; f.elements.reason.value = prev.reason || '';
-  $('[data-kb-note]', dlg).hidden = !(needReason || needs === 'note'); f.elements.note.value = prev.note || '';
-  $('[data-kb-note-hint]', dlg).textContent = needs === 'note' ? '(obligatoria con «Otro»)' : '(opcional)';
-  $('[data-kb-override]', dlg).hidden = !needOverride; f.elements.override.required = needOverride; f.elements.override.checked = false;
-  dlg.showModal();
-  var first = needReason ? f.elements.reason : needOverride ? f.elements.override : f.elements.note; if (first) first.focus();
+  NS.ask({ name: card.getAttribute('data-name'), to: to, needs: needs, msg: msg, prev: prev || {}, title: to === 'lost' ? 'Marcar como «' + STAGES.lost + '»' : 'Mover a «' + (STAGES[to] || to) + '»' }).then(function (extra) { if (extra) move(card, to, extra); });
  }
- if (dlg) {
-  var kf = $('[data-kb-form]', dlg);
-  kf.addEventListener('submit', function (e) {
-   e.preventDefault(); if (!ctx) { dlg.close(); return; }
-   var c = ctx, o = { reason: kf.elements.reason.value, note: kf.elements.note.value.trim(), override: kf.elements.override.checked };
-   if (o.reason === 'other' && o.note.length < 3) { kf.elements.note.focus(); $('[data-kb-msg]', dlg).textContent = 'Con el motivo «Otro» escribe una nota que lo explique.'; return; }
-   ctx = null; dlg.close(); move(c.card, c.to, o);
-  });
-  dlg.addEventListener('close', function () { ctx = null; });
+
+ /* ---- Cambios hechos fuera del tablero (vistazo, paleta, deshacer): se refleja la tarjeta ---- */
+ function applyCard(j) {
+  var old = $('.kcard[data-id="' + j.lead_id + '"]', board); if (old) old.remove();
+  var fresh = j.card ? frag(j.card).firstElementChild : null;
+  if (fresh && cols[j.to] && cols[j.to].loaded && j.pipeline === PL) place(fresh, j.to);
+  if (j.counts) setTotals(j.counts);
  }
+ function refreshCard(id) { api('/ajax/pipeline/card', { lead_id: id, qs: QS }).then(function (j) { if (j.ok) applyCard(j); }); }
+ D.addEventListener('ns:moved', function (e) { var r = e.detail.res || {}; if (r.card !== undefined && $('.kcard[data-id="' + e.detail.id + '"]', board) && r.to) { applyCard({ lead_id: e.detail.id, to: r.to, pipeline: PL, card: r.card, counts: r.counts }); } });
+ D.addEventListener('ns:undone', function (e) { (e.detail.lead_ids || []).forEach(refreshCard); });
+ D.addEventListener('ns:acted', function (e) { if (e.detail.act === 'task_done') refreshCard(e.detail.id); });
 
  /* ---- Menú «Mover a…» ---- */
  var menuFor = null, menuBtn = null;
