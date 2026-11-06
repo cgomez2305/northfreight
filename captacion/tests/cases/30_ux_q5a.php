@@ -211,7 +211,7 @@ return static function (array $ctx): void {
     T::ok($r['status'] === 303 && $vv !== null && $vv['name'] === 'Calientes de TX' && json_decode((string) $vv['filters'], true) === ['t' => 'hot', 'us' => 'TX'] && $vv['sort'] === 'score' && str_contains(Infra::header($r, 'location'), 'v=' . $vv['id']), 'vistas (HTTP): guardar desde los filtros actuales y abrirla');
     $vvid = (int) $vv['id'];
     $pg = $s->get('/leads?t=hot&us=TX&v=' . $vvid);
-    T::ok(str_contains($pg['body'], 'Calientes de TX') && str_contains($pg['body'], 'vmenu') && str_contains($pg['body'], 'Mis vistas') === false || str_contains($pg['body'], 'MIS VISTAS'), 'la barra de vistas lista la vista guardada');
+    T::ok(str_contains($pg['body'], 'Calientes de TX') && str_contains($pg['body'], 'class="dd__panel vmenu"') && str_contains($pg['body'], 'MIS VISTAS') && str_contains($pg['body'], 'data-view-rename="' . $vvid . '"'), 'la barra de vistas lista la vista guardada (con renombrar, fijar y borrar)');
     T::ok(preg_match('/<a class="vtab is-on" href="[^"]*"[^>]*aria-current="page"><svg[^>]*><use href="#i-list"\/><\/svg>Lista<\/a>/', $pg['body']) === 1 && str_contains($pg['body'], 'href="/pipeline?t=hot&amp;us=TX&amp;v=' . $vvid . '"'), 'pestañas Lista / Tablero: comparten los mismos filtros (la del tablero conserva t, us y v)');
     T::ok(str_contains($pg['body'], 'data-view-count="' . $vvid . '"') === false, 'una vista sin fijar no sale en la barra lateral');
     T::eq($post($s, '/vistas/' . $vvid . '/pin', ['qs' => '', 'screen' => 'leads', 'back' => '/leads'])['status'], 303, 'fijar la vista (formulario)');
@@ -372,7 +372,7 @@ return static function (array $ctx): void {
     preg_match('/id="search"[^>]*data-cmds="([^"]*)"/', $page['body'], $cm);
     $cj = json_decode(html_entity_decode($cm[1] ?? '{}', ENT_QUOTES), true) ?: [];
     T::ok(in_array('Configuración', array_column($cj['screens'] ?? [], 0), true) && count($cj['views'] ?? []) >= 5 && in_array('Nuevo lead', array_column($cj['actions'] ?? [], 1), true) && str_contains($page['body'], 'id="keys"') && str_contains($page['body'], 'id="mv-dlg"') && str_contains($page['body'], 'id="qc-dlg"') && str_contains($page['body'], 'id="toasts"'), 'paleta: el administrador recibe el catálogo en la página, y la hoja de atajos, el diálogo de mover, el de alta y el contenedor de avisos');
-    T::ok(str_contains($page['body'], 'data-keys') && str_contains($page['body'], '<kbd>g</kbd> <kbd>d</kbd>') && str_contains($page['body'], 'Registrar llamada') === false || str_contains($page['body'], 'Atajos de teclado'), 'hoja de atajos: g d / g l / g p / g t, j / k, Enter, n, c, m, Esc y ?');
+    T::ok(str_contains($page['body'], 'data-keys') && str_contains($page['body'], '<kbd>g</kbd> <kbd>d</kbd>') && str_contains($page['body'], '<kbd>j</kbd> <kbd>/</kbd> <kbd>k</kbd>') && str_contains($page['body'], 'CON UN LEAD ABIERTO'), 'hoja de atajos: g d / g l / g p / g t, j / k, Enter, n, c, m, Esc y ?');
     $rs = $s->json($s->ajax('/ajax/search', ['q' => '']));
     T::ok(($rs['ok'] ?? false) && count($rs['items']) >= 1 && count($rs['items']) <= 5, 'búsqueda vacía: devuelve los leads recientes del usuario (máximo 5)');
     T::eq($o->json($o->ajax('/ajax/search', ['q' => '']))['items'] ?? null, [], '  y el otro usuario no ve los míos (sus recientes están vacíos)');
