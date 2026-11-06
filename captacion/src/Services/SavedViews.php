@@ -22,6 +22,7 @@ final class SavedViews
         'no_task'        => ['name' => 'Sin tarea', 'icon' => 'list-check', 'pin' => false],
         'discarded'      => ['name' => 'Descartados', 'icon' => 'flag', 'pin' => true],
         'presented_wait' => ['name' => 'Presentados sin respuesta', 'icon' => 'send', 'pin' => false],
+        'review'         => ['name' => 'Por revisar', 'icon' => 'eye', 'pin' => false],   // Q5b: cola de revision de las reglas
     ];
     /** Claves de la URL que forman una vista (los filtros de LeadQuery). */
     private const FILTER_KEYS = ['t', 'pf', 'src', 'st', 'eq', 'us', 'lg', 'from', 'to', 'q', 'ct', 'fl', 'nt', 'op', 'hs'];
@@ -35,6 +36,7 @@ final class SavedViews
             'no_task'        => ['nt' => '1', 'op' => '1'],
             'discarded'      => ['t' => 'disqualified'],
             'presented_wait' => ['hs' => 'wait'],
+            'review'         => ['fl' => 'review_queue'],
             default          => [],
         };
     }

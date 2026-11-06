@@ -11,9 +11,9 @@
 .rp__title{flex:1;min-width:0}
 .rp__h{font:700 26px/1.05 var(--f-cond);overflow-wrap:anywhere;outline:0}
 .rp__sub{color:var(--ink-3);font-size:13px;margin-top:2px}
-.rp__body{flex:1;min-height:0;overflow:auto;display:grid;grid-template-columns:minmax(0,1fr) 380px;align-items:start;overscroll-behavior:contain}
-.rp__main{display:flex;flex-direction:column;gap:14px;padding:18px 20px 28px;min-width:0}
-.rp__side{display:flex;flex-direction:column;gap:14px;padding:18px 20px 28px 0;min-width:0;position:sticky;top:0}
+.rp__body{flex:1;min-height:0;overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr) 380px;align-items:stretch}
+.rp__main{display:flex;flex-direction:column;gap:14px;padding:18px 20px 28px;min-width:0;min-height:0;overflow:auto;overscroll-behavior:contain}
+.rp__side{display:flex;flex-direction:column;gap:14px;padding:18px 20px 28px 0;min-width:0;min-height:0;overflow:auto;overscroll-behavior:contain}
 .rp__meta{display:grid;grid-template-columns:1fr 1.4fr;gap:12px}
 .rp__kind{display:flex;gap:8px;align-items:flex-start;color:var(--ink-2);font-size:13.5px}
 .rp__kind .ic{flex:none;margin-top:3px;color:var(--cyan-ink)}
@@ -39,7 +39,7 @@
 .rule__grip:active{cursor:grabbing}
 .rule__n{flex:none;min-width:28px;height:28px;border-radius:50%;background:var(--navy-2);color:var(--on-fill);display:grid;place-items:center;font:700 13px var(--f-mono)}
 .rule__n::before{content:counter(rule)}
-.rule__name{flex:1 1 200px;min-width:0}
+.rule__name{flex:1 1 300px;min-width:0}
 .rule__name input{width:100%;min-height:40px;padding:6px 10px;background:transparent;border:1px solid transparent;border-radius:var(--r-in);font:700 20px/1.1 var(--f-cond);outline:0}
 .rule__name input:hover{border-color:var(--line-2)}
 .rule__name input:focus{border-color:var(--focus);background:var(--surface);box-shadow:0 0 0 3px var(--cyan-tint)}
@@ -57,8 +57,9 @@
 .rb{display:flex;flex-direction:column;gap:8px}
 .rb__mode{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2);align-self:flex-start}
 .rb__mode select{min-height:34px;padding:0 8px;background:var(--surface);border:1px solid var(--field);border-radius:10px}
-.rb__items,.rg__items{display:flex;flex-direction:column;gap:8px}
-.rb__items>*+*::before,.rg__items>*+*::before{content:"Y";display:block;margin:-2px 0 6px;font:600 10.5px var(--f-mono);letter-spacing:.1em;color:var(--ink-3)}
+.rb__items,.rg__items{display:flex;flex-direction:column;gap:20px}
+.rb__items>*+*,.rg__items>*+*{position:relative}
+.rb__items>*+*::before,.rg__items>*+*::before{content:"Y";position:absolute;left:2px;top:-17px;font:600 10.5px var(--f-mono);letter-spacing:.1em;color:var(--ink-3)}
 .rb[data-mode="any"]>.rb__items>*+*::before,.rg[data-mode="any"]>.rg__items>*+*::before{content:"O"}
 .rb__acts{display:flex;gap:6px 16px;flex-wrap:wrap}
 .rc{display:grid;grid-template-columns:minmax(120px,1fr) minmax(120px,.9fr) minmax(150px,1.7fr) 32px;gap:8px;align-items:center;min-width:0}
@@ -80,7 +81,7 @@
 .rg__h{display:flex;justify-content:space-between;align-items:center;gap:8px}
 /* acciones */
 .ra__list{display:flex;flex-direction:column;gap:8px}
-.ra{display:grid;grid-template-columns:minmax(150px,.7fr) minmax(0,2fr) 32px;gap:8px 10px;align-items:start}
+.ra{display:grid;grid-template-columns:minmax(210px,.8fr) minmax(0,2fr) 32px;gap:8px 10px;align-items:start}
 .ra__p{display:flex;gap:8px 12px;flex-wrap:wrap;align-items:flex-end;min-width:0}
 .ra__f{display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:var(--ink-3);min-width:120px;flex:1 1 140px}
 .ra__f--wide{flex:3 1 260px}
@@ -159,6 +160,7 @@
 /* sin JS: el editor va en linea debajo de la lista */
 html:not(.js) .rp{position:static;width:auto;transform:none;box-shadow:none;border:1px solid var(--line);border-radius:var(--r-card);margin-top:14px}
 html:not(.js) .rp__body{overflow:visible}
+html:not(.js) .rp__main,html:not(.js) .rp__side{overflow:visible}
 html:not(.js) .rp__foot{position:sticky;bottom:0}
 html:not(.js) .rpscrim,html:not(.js) [data-rp-close]{display:none}
 /* hoja inferior */
@@ -167,8 +169,9 @@ html:not(.js) .rpscrim,html:not(.js) [data-rp-close]{display:none}
   .rp.is-open{transform:none}
   .rp__head{position:relative;padding-top:20px}
   .rp__head::before{content:"";position:absolute;left:50%;top:7px;width:38px;height:4px;margin-left:-19px;border-radius:2px;background:var(--line-2)}
-  .rp__body{grid-template-columns:1fr}
-  .rp__side{position:static;padding:0 20px 24px}
+  .rp__body{grid-template-columns:1fr;overflow:auto;overscroll-behavior:contain;align-items:start}
+  .rp__main,.rp__side{overflow:visible}
+  .rp__side{padding:0 20px 24px}
   html:not(.js) .rp{height:auto;border-radius:var(--r-card)}
 }
 @media (min-width:1025px){.rpscrim{display:none}}

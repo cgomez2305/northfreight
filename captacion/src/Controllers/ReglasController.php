@@ -30,7 +30,7 @@ use Captacion\View;
 
 final class ReglasController extends Responder
 {
-    public const PREVIEW_LIMIT = 40;   // vistas previas por minuto y usuario
+    public const PREVIEW_LIMIT = 90;   // vistas previas por minuto y usuario
     public const SIM_LIMIT = 8;        // simulaciones por hora y usuario
     public const ROW_LIMIT = 300;      // filas y paneles por minuto y usuario
     public const JSON_MAX = 200000;
@@ -234,7 +234,7 @@ final class ReglasController extends Responder
         self::redirect(self::listUrl());
     }
 
-    private static function page(array $user, int $setId, array $over, int $status = 200): never
+    private static function render(array $user, int $setId, array $over, int $status = 200): never
     {
         ConfigController::index($user, ['editor' => self::editorVars($setId, $over)], $status, 'reglas');
     }
@@ -257,18 +257,18 @@ final class ReglasController extends Responder
         $name = explode(':', $op, 2)[0];
 
         if (!$publish && in_array($name, self::STRUCT_OPS, true)) {
-            self::page($user, $sid, ['rules' => RuleForm::apply($raw, $kind, $op)] + $keep);
+            self::render($user, $sid, ['rules' => RuleForm::apply($raw, $kind, $op)] + $keep);
         }
         if (!$publish && $op === 'preview') {
             if ($errors) {
-                self::page($user, $sid, ['rules' => $raw, 'errors' => $errors, 'impactErr' => 'Corrige los campos marcados para calcular el impacto.'] + $keep, 422);
+                self::render($user, $sid, ['rules' => $raw, 'errors' => $errors, 'impactErr' => 'Corrige los campos marcados para calcular el impacto.'] + $keep, 422);
             }
             $sc = self::scopeIn($keep['impactScope'], null, null, false);
-            self::page($user, $sid, ['rules' => $raw, 'impact' => RuleSim::preview(self::target($set, $v['rules']), $sc['scope'])] + $keep);
+            self::render($user, $sid, ['rules' => $raw, 'impact' => RuleSim::preview(self::target($set, $v['rules']), $sc['scope'])] + $keep);
         }
         if ($errors) {
             self::flash(false, 'Hay ' . count($errors) . ' campo' . (count($errors) === 1 ? '' : 's') . ' por corregir. No se guardó nada.');
-            self::page($user, $sid, ['rules' => $raw, 'errors' => $errors] + $keep, 422);
+            self::render($user, $sid, ['rules' => $raw, 'errors' => $errors] + $keep, 422);
         }
         if ($meta['name'] !== (string) $set['name'] || $meta['description'] !== (string) $set['description']) {
             RuleSets::updateMeta($sid, $meta['name'], $meta['description'], $uid);
@@ -281,7 +281,7 @@ final class ReglasController extends Responder
         if (!$publish && $op === 'simulate') {
             $sc = self::scopeIn($keep['simScope'], $_POST['sim_from'] ?? '', $_POST['sim_to'] ?? '', true);
             if (!$sc['ok']) {
-                self::page($user, $sid, ['rules' => $raw, 'impactErr' => $sc['error']] + $keep, 422);
+                self::render($user, $sid, ['rules' => $raw, 'impactErr' => $sc['error']] + $keep, 422);
             }
             self::limit('rules_sim', $user, self::SIM_LIMIT, 3600, false);
             $s = RuleSim::start($sid, (int) $r['version_id'], $v['rules'], $sc['scope'], $uid);

@@ -62,8 +62,8 @@ final class LeadQuery
         if ($s('hs') === 'wait') {
             $f['hs'] = 'wait';   // Q5a: presentados a NorthStar que aun no responden
         }
-        if ($s('fl') === 'fmcsa_pending') {
-            $f['fl'] = 'fmcsa_pending';
+        if ($s('fl') === 'fmcsa_pending' || $s('fl') === 'review_queue' || preg_match('/^tag:[a-z0-9][a-z0-9-]{0,23}$/', $s('fl')) === 1) {
+            $f['fl'] = $s('fl');   // fmcsa_pending, review_queue (cola de revision de las reglas, Q5b) o tag:etiqueta
         }
         return $f;
     }
@@ -145,7 +145,7 @@ final class LeadQuery
         }
         if (isset($f['fl'])) {
             $w[] = 'l.flags LIKE ?';
-            $p[] = '%"fmcsa_pending"%';
+            $p[] = '%"' . $f['fl'] . '"%';
         }
         if (isset($f['ct'])) {
             $w[] = "l.first_contact_at IS NULL AND l.stage = 'new'";

@@ -12,7 +12,7 @@ $nFilters = count(array_diff_key($f, ['t' => 1]));
 $chipLabels = [
     'pf' => static fn($v) => 'Perfil: ' . Catalog::label(Catalog::PROFILES, $v), 'src' => static fn($v) => 'Fuente: ' . Catalog::source($v), 'st' => static fn($v) => 'Etapa: ' . Catalog::stageAny($v),
     'eq' => static fn($v) => 'Equipo: ' . Catalog::label(Catalog::EQUIPMENT, $v), 'us' => static fn($v) => 'Estado: ' . $v, 'lg' => static fn($v) => 'Idioma: ' . Catalog::label(Catalog::LANGS, $v),
-    'from' => static fn($v) => 'Desde: ' . $v, 'to' => static fn($v) => 'Hasta: ' . $v, 'q' => static fn($v) => 'Texto: «' . $v . '»', 'ct' => static fn() => 'Sin contactar', 'fl' => static fn() => 'FMCSA pendiente', 'nt' => static fn() => 'Sin tarea abierta', 'op' => static fn() => 'Solo abiertos', 'hs' => static fn() => 'Presentados sin respuesta',
+    'from' => static fn($v) => 'Desde: ' . $v, 'to' => static fn($v) => 'Hasta: ' . $v, 'q' => static fn($v) => 'Texto: «' . $v . '»', 'ct' => static fn() => 'Sin contactar', 'fl' => static fn($v) => $v === 'review_queue' ? 'Por revisar' : (str_starts_with((string) $v, 'tag:') ? 'Etiqueta: ' . substr((string) $v, 4) : 'FMCSA pendiente'), 'nt' => static fn() => 'Sin tarea abierta', 'op' => static fn() => 'Solo abiertos', 'hs' => static fn() => 'Presentados sin respuesta',
 ];
 $sortLink = static function (string $key, string $label) use ($paging, $base, $e): string {
     $on = $paging['sort'] === $key;

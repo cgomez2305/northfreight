@@ -118,6 +118,20 @@ final class RulePhrase
         }
     }
 
+    /** Efecto de una regla ya aplicada a un lead, en pocas palabras (desglose de la ficha y del vistazo). @param array $e efecto de score_breakdown.rules[].effects[] */
+    public static function effect(array $e): string
+    {
+        return match ($e['type'] ?? '') {
+            'add_points'      => ((int) ($e['points'] ?? 0) >= 0 ? '+' : '−') . abs((int) ($e['points'] ?? 0)) . (!empty($e['capped']) ? ' (con tope)' : ''),
+            'min_temperature' => 'temperatura mínima ' . (($e['level'] ?? '') === 'hot' ? 'Caliente' : 'Tibio'),
+            'telegram_alert'  => 'alerta por Telegram',
+            'create_task'     => 'tarea: ' . (string) ($e['title'] ?? ''),
+            'tag'             => 'etiqueta «' . (string) ($e['tag'] ?? '') . '»',
+            'review_queue'    => 'a la cola de revisión',
+            default           => '',
+        };
+    }
+
     public static function then(array $rule): string
     {
         $parts = array_map([self::class, 'action'], (array) ($rule['then'] ?? []));

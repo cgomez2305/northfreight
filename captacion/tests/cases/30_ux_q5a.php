@@ -68,7 +68,7 @@ return static function (array $ctx): void {
 
     // ------------------------------------------------------------------ Vistas guardadas (servicio)
     $sys = array_column(SavedViews::system(), 'id');
-    T::eq($sys, ['sys-hot_pending', 'sys-today', 'sys-no_task', 'sys-discarded', 'sys-presented_wait'], 'vistas del sistema: Calientes pendientes, Llegaron hoy, Sin tarea, Descartados y Presentados sin respuesta');
+    T::eq($sys, ['sys-hot_pending', 'sys-today', 'sys-no_task', 'sys-discarded', 'sys-presented_wait', 'sys-review'], 'vistas del sistema: Calientes pendientes, Llegaron hoy, Sin tarea, Descartados, Presentados sin respuesta y (Q5b) Por revisar');
     $r = SavedViews::create($uid, 'Owner-operators de TX', ['pf' => 'owner_operator', 'us' => 'tx', 'zz' => 'basura', 'q' => 'zzzqq'], 'score', 'asc', null);
     T::ok($r['ok'] && is_int($r['id']), 'vistas: guardar filtros y orden con un nombre');
     $vid = (int) $r['id'];

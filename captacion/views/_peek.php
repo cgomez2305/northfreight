@@ -77,6 +77,17 @@ $lost = $lead['stage'] === 'lost';
     <?php endif; ?>
   </section>
 
+  <?php $pkRules = is_array($lead['score_breakdown'] ?? null) ? (array) ($lead['score_breakdown']['rules'] ?? []) : []; if ($pkRules): ?>
+  <section class="pk__sec" aria-label="Reglas que influyeron">
+    <h3 class="label">REGLAS QUE INFLUYERON</h3>
+    <ul class="pk__rules">
+      <?php foreach ($pkRules as $ru): $fx = array_values(array_filter(array_map([\Captacion\Services\RulePhrase::class, 'effect'], (array) ($ru['effects'] ?? [])))); ?>
+        <li><span><?= $e($ru['name'] ?? 'Regla') ?><small><?= $e($ru['set'] ?? '') ?></small></span><b class="mono"><?= $e(implode(' · ', $fx)) ?></b></li>
+      <?php endforeach; ?>
+    </ul>
+  </section>
+  <?php endif; ?>
+
   <section class="pk__sec" aria-label="Próximas tareas">
     <h3 class="label">PRÓXIMAS TAREAS <span class="muted">(<?= $e($openTasks) ?>)</span></h3>
     <?php if (!$tasks): ?><p class="muted">Sin tareas abiertas. Agenda el siguiente paso abajo.</p><?php endif; ?>

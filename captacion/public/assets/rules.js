@@ -6,7 +6,7 @@
  var D = document, W = window, NS = W.NS, rp = D.querySelector('#rp');
  if (!NS || !NS.api || !rp) return;
  var $ = function (s, r) { return (r || D).querySelector(s); }, $$ = function (s, r) { return Array.prototype.slice.call((r || D).querySelectorAll(s)); };
- var body = $('[data-rp-body]', rp), scrim = $('[data-rp-scrim]'), cssV = rp.getAttribute('data-css-v'), cssP = null, origin = null, dirty = false, setId = 0, req = 0, pvTimer = 0, pvReq = 0, simTimer = 0;
+ var body = $('[data-rp-body]', rp), scrim = $('[data-rp-scrim]'), cssV = rp.getAttribute('data-css-v'), cssP = null, origin = null, dirty = false, setId = 0, req = 0, pvTimer = 0, ivTimer = 0, pvReq = 0, simTimer = 0;
  var sheet = function () { return W.matchMedia('(max-width:1024px)').matches; };
  function ready() { return cssP || (cssP = NS.css('rules', cssV)); }
  if (W.requestIdleCallback) W.requestIdleCallback(ready); else setTimeout(ready, 1500);
@@ -72,7 +72,7 @@
   var n = max + 1, used = D.body.innerHTML; while (used.indexOf('[' + prefix + n + ']') >= 0) n++; return prefix + n;
  }
  function ruleKeyOf(el) { return el.closest('[data-rule]').getAttribute('data-key'); }
- function touched() { dirty = true; schedule(false); }
+ function touched(from) { dirty = true; var r = from && from.closest ? from.closest('[data-fresh]') : null; if (r) r.removeAttribute('data-fresh'); schedule(false); }
 
  /* ---------- Acciones del editor (delegadas: el contenido llega por fetch) ---------- */
  rp.addEventListener('click', function (e) {
@@ -95,7 +95,7 @@
   var r = btn.closest('[data-rule]');
   if (kind === 'rule') {
    var list = $('[data-rules]', rp), key = nextKey(list, 'n'); btn.disabled = true;
-   row('rule', 'rules[' + key + ']').then(function (el) { btn.disabled = false; if (!el) return; list.appendChild(el); emptyState(); el.scrollIntoView({ behavior: 'smooth', block: 'center' }); var i = $('.rule__name input', el); if (i) i.focus(); touched(); });
+   row('rule', 'rules[' + key + ']').then(function (el) { btn.disabled = false; if (!el) return; el.setAttribute('data-fresh', '1'); list.appendChild(el); emptyState(); el.scrollIntoView({ behavior: 'smooth', block: 'center' }); var i = $('.rule__name input', el); if (i) i.focus(); touched(); });
    return;
   }
   if (kind === 'cond' || kind === 'group') {
@@ -168,26 +168,32 @@
   if (t.matches('[data-impact-scope]')) { schedule(true); return; }
   if (t.matches('[data-sim-scope]')) { var rg = $('[data-sim-range]', rp); if (rg) rg.hidden = t.value !== 'range'; return; }
   if (t.name && /^(impact_scope|sim_scope|sim_from|sim_to)$/.test(t.name)) return;
-  touched();
+  touched(t);
  });
- rp.addEventListener('input', function (e) { var t = e.target; if (!t || !t.name || /^(impact_scope|sim_scope|sim_from|sim_to|password|code)$/.test(t.name) || t.closest('.rp__ulf')) return; touched(); });
+ rp.addEventListener('input', function (e) { var t = e.target; if (!t || !t.name || /^(impact_scope|sim_scope|sim_from|sim_to|password|code)$/.test(t.name) || t.closest('.rp__ulf')) return; touched(t); });
 
  /* ---------- Validación en vivo, frases e impacto ---------- */
  function qs() { var f = form(); if (!f) return ''; return new URLSearchParams(new FormData(f)).toString(); }
+ function nameOf(p) { var a = p.split('.'); return a[0] + a.slice(1).map(function (x) { return '[' + x + ']'; }).join(''); }
  function showErrors(map) {
   $$('.rp-err', rp).forEach(function (s) { s.hidden = true; s.textContent = ''; });
   $$('[aria-invalid=true]', rp).forEach(function (x) { x.removeAttribute('aria-invalid'); }); $$('.rule.has-err', rp).forEach(function (x) { x.classList.remove('has-err'); });
   Object.keys(map || {}).forEach(function (p) {
-   var s = $('[data-err="' + p + '"]', rp); if (s) { s.textContent = map[p]; s.hidden = false; var c = s.parentNode && $('[aria-invalid]', s.parentNode); }
-   var m = p.match(/^rules\.([A-Za-z0-9_]+)\./); if (m) { var ru = $('[data-key="' + m[1] + '"]', rp); if (ru) ru.classList.add('has-err'); }
+   var m = p.match(/^rules\.([A-Za-z0-9_]+)(\.|$)/), ru = m ? $('[data-key="' + m[1] + '"]', rp) : null;
+   if (ru && ru.hasAttribute('data-fresh')) return;   // una regla recién añadida no se marca hasta que la toquen
+   var s = $('[data-err="' + p + '"]', rp); if (s) { s.textContent = map[p]; s.hidden = false; }
+   $$('[name^="' + nameOf(p) + '"]', rp).forEach(function (x) { x.setAttribute('aria-invalid', 'true'); });
+   if (ru) ru.classList.add('has-err');
   });
  }
- function schedule(now) { clearTimeout(pvTimer); pvTimer = setTimeout(preview, now ? 0 : 550); }
- function preview() {
+ /* validación y frases enseguida (400 ms); el impacto, que cuesta más, cuando se deja de escribir (1,6 s) */
+ function schedule(now) { clearTimeout(pvTimer); clearTimeout(ivTimer); if (now) { preview(true); return; } pvTimer = setTimeout(function () { preview(false); }, 400); ivTimer = setTimeout(function () { preview(true); }, 1600); }
+ function preview(impact) {
   var f = form(); if (!f) return; var my = ++pvReq, sc = $('[data-impact-scope]', rp), out = $('[data-impact]', rp);
-  if (out) out.setAttribute('aria-busy', 'true');
-  NS.api('/ajax/rules/preview', { set: setId, form: qs(), impact: true, scope: sc ? sc.value : 'last:500' }).then(function (j) {
-   if (my !== pvReq) return; if (out) out.removeAttribute('aria-busy');
+  if (impact && out) out.setAttribute('aria-busy', 'true');
+  NS.api('/ajax/rules/preview', { set: setId, form: qs(), impact: !!impact, scope: sc ? sc.value : 'last:500' }).then(function (j) {
+   if (impact && out) out.removeAttribute('aria-busy');
+   if (!impact && my !== pvReq) return;
    if (!j.ok) { if (out && j.status === 429) { out.textContent = 'Demasiadas vistas previas seguidas. Espera un momento.'; } return; }
    showErrors(j.errors); Object.keys(j.phrases || {}).forEach(function (k) { var ru = $('[data-key="' + k + '"] [data-phrase]', rp); if (!ru) return; var p = j.phrases[k]; ru.textContent = ''; ru.appendChild(D.createTextNode(p.when + '. ')); var b = NS.el('b', null, p.then + '.'); ru.appendChild(b); if (p.except) ru.appendChild(D.createTextNode(' ' + p.except + '.')); });
    if (j.html && out) { var t = D.createElement('template'); t.innerHTML = j.html; out.textContent = ''; out.appendChild(t.content); }

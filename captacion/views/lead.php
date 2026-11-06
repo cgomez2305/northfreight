@@ -175,7 +175,17 @@ $loc = trim(($lead['city'] ? $lead['city'] . ', ' : '') . ($lead['state'] ?? '')
               <svg class="scorel__b" viewBox="0 0 100 4" preserveAspectRatio="none" aria-hidden="true"><rect class="scorel__bg" width="100" height="4" rx="2"/><?php if ($pts > 0): ?><rect class="scorel__fg" width="<?= $e(max(4, round($pts / $maxPts * 100))) ?>" height="4" rx="2"/><?php endif; ?></svg></li>
           <?php endforeach; ?>
         </ul>
+        <?php if (!empty($bd['rules'])): ?>
+        <h3 class="label scorel__rh">REGLAS QUE INFLUYERON</h3>
+        <ul class="scorel">
+          <?php foreach ((array) $bd['rules'] as $ru): $fx = array_values(array_filter(array_map([\Captacion\Services\RulePhrase::class, 'effect'], (array) ($ru['effects'] ?? [])))); ?>
+            <li class="is-on"><span class="scorel__t"><?= $e($ru['name'] ?? 'Regla') ?><small><?= $e($ru['set'] ?? '') ?></small></span><b class="mono"><?= $e(implode(' · ', $fx)) ?></b></li>
+          <?php endforeach; ?>
+        </ul>
+        <p class="scorel__sum">Base del documento <b><?= $e($bd['score_base'] ?? $lead['score']) ?></b> · ajuste de las reglas <b><?= $e(((int) ($bd['rules_adjust'] ?? 0) >= 0 ? '+' : '−') . abs((int) ($bd['rules_adjust'] ?? 0))) ?></b> · Total <b><?= $e($lead['score']) ?></b>. Caliente desde 70, tibio desde 40.</p>
+        <?php else: ?>
         <p class="scorel__sum">Total <b><?= $e($bd['raw_total'] ?? $lead['score']) ?></b><?= !empty($bd['capped']) ? ' · limitado a 100' : '' ?> · Caliente desde 70, tibio desde 40.</p>
+        <?php endif; ?>
         <?php endif; ?>
       </div>
     </section>

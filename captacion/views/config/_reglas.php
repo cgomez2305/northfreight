@@ -34,6 +34,7 @@ $chipOf = ['published' => ['ok', 'Publicada'], 'published_draft' => ['warm', 'Pu
 $tl = ['hot' => 'Calientes', 'warm' => 'Tibios', 'cold' => 'Fríos', 'disqualified' => 'Descartados'];
 $run = $recalc !== null && ($recalc['status'] ?? '') === 'running';
 ?>
+<?php if ($sets): ?>
 <section class="card rl-recalc" id="aplicar" aria-labelledby="rl-rc-t">
   <div class="rl-recalc__t">
     <h2 class="label" id="rl-rc-t">APLICAR A LEADS EXISTENTES</h2>
@@ -54,6 +55,7 @@ $run = $recalc !== null && ($recalc['status'] ?? '') === 'running';
     <button class="btn btn--secondary btn--sm" type="submit"<?= $locked || $run ? ' disabled' : '' ?>><?= Ui::icon('refresh') ?><?= $run ? 'Recálculo en marcha…' : 'Aplicar a leads existentes' ?></button>
   </form>
 </section>
+<?php endif; ?>
 
 <div class="rl-bar">
   <h2 class="cfg-h3 rl-bar__t">Conjuntos de reglas <span class="rl-bar__n"><?= $e(count($sets)) ?></span></h2>
