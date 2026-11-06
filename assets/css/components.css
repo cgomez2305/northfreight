@@ -131,6 +131,8 @@ a.btn--primary:is(:hover, :focus-visible)::after, a.btn--navy:is(:hover, :focus-
 .mega:has(.mega__in--services) { width: min(100%, 940px); }
 .mega__in--services { grid-template-columns: minmax(0, 1fr) minmax(0, 380px); gap: 40px; }
 .mega__in--resources { grid-template-columns: 1fr 1fr 1fr 1.1fr; gap: 24px; }
+.mega:has(.mega__in--lite) { width: min(100%, 640px); }
+.mega__in--lite { grid-template-columns: 1fr 1fr; }
 .mega__col { display: flex; flex-direction: column; gap: 6px; }
 .mega__label { color: var(--cyan); padding: 0 12px 8px; }
 .mega__label--gap { padding-top: 18px; }

@@ -9,9 +9,11 @@ if (!cfg('show_resources')) {
 }
 $m = ns_menu();
 $cols = [['Free tools', $m['tools']], ['Templates', $m['templates']], ['Learn', $m['learn']]];
+// Fase S: sin plantillas aprobadas (producción) quedan 2 columnas y sin tarjeta del BOL: panel estrecho (.mega__in--lite) para no dejar medio panel vacío.
+$lite = !route_is_live('/resources/bol-template/') && count(array_filter($cols, static fn(array $c): bool => (bool) $c[1])) < 3;
 ?>
 <div id="mega-resources" class="mega" data-mega="resources" aria-label="Resources" hidden>
-  <div class="mega__in mega__in--resources">
+  <div class="mega__in mega__in--resources<?= $lite ? ' mega__in--lite' : '' ?>">
     <?php foreach ($cols as [$label, $items]): if (!$items) { continue; } ?>
     <div class="mega__col">
       <span class="mega__label t-meta"><?= e($label) ?></span>
