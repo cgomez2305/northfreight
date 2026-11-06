@@ -70,7 +70,7 @@ return static function (array $ctx): void {
     T::throws(static fn() => $q2b->exec("INSERT INTO webhook_events (source, event_key) VALUES ('meta', 'k1')"), '  010: el mismo evento dos veces no entra (UNIQUE source + event_key)', 'Duplicate');
     $rootPdo->exec('DROP DATABASE cap_mig_q2b');
 
-    // Q5b: la 012 se aplica SOBRE la base de Q5a (001 a 011) con datos reales, sin tocarlos, y es idempotente
+    // Q5b: la 012 se aplica SOBRE la base de Q5a (001 a 011) con datos reales, sin tocarlos (el migrador no la repite)
     $rootPdo->exec('DROP DATABASE IF EXISTS cap_mig_q5a');
     $rootPdo->exec('CREATE DATABASE cap_mig_q5a CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
     $q5a = new PDO('mysql:host=127.0.0.1;port=' . $ctx['dbPort'] . ';dbname=cap_mig_q5a;charset=utf8mb4', 'root', '', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
@@ -117,7 +117,7 @@ return static function (array $ctx): void {
     T::eq((int) $q5a->query('SELECT COUNT(*) FROM rule_simulation_rows')->fetchColumn(), 0, '  esquema: borrar una simulación borra sus filas (ON DELETE CASCADE)');
     $rootPdo->exec('DROP DATABASE cap_mig_q5a');
 
-    // Q5c: la 013 se aplica SOBRE la base de Q5b (001 a 012) con datos reales, sin tocarlos, y es idempotente
+    // Q5c: la 013 se aplica SOBRE la base de Q5b (001 a 012) con datos reales, sin tocarlos (el migrador no la repite)
     $rootPdo->exec('DROP DATABASE IF EXISTS cap_mig_q5b');
     $rootPdo->exec('CREATE DATABASE cap_mig_q5b CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
     $q5b = new PDO('mysql:host=127.0.0.1;port=' . $ctx['dbPort'] . ';dbname=cap_mig_q5b;charset=utf8mb4', 'root', '', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
@@ -142,11 +142,6 @@ return static function (array $ctx): void {
     T::eq(Migrator::run($q5b, $dir), [], '  repetirla no hace nada');
     $q5bIdx = static fn(string $t): array => $q5b->query("SELECT DISTINCT INDEX_NAME FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = 'cap_mig_q5b' AND TABLE_NAME = '$t'")->fetchAll(PDO::FETCH_COLUMN);
     T::ok(in_array('idx_events_created', $q5bIdx('lead_events'), true) && in_array('idx_tasks_due_range', $q5bIdx('tasks'), true) && in_array('idx_jobs_type_run', $q5bIdx('jobs'), true), '  índices nuevos: cronología (created_at, id), tareas por vencimiento y jobs por tipo');
-    $sql013 = (string) file_get_contents("$dir/013_lead_modes.sql");
-    foreach (array_filter(array_map('trim', preg_split('/;\s*\n/', (string) preg_replace('/^\s*--.*$/m', '', $sql013)) ?: [])) as $stmt) {
-        $q5b->exec($stmt);
-    }
-    T::eq([count(array_keys($q5bIdx('lead_events'), 'idx_events_created')), (int) $q5b->query("SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = 'cap_mig_q5b' AND TABLE_NAME = 'saved_views' AND COLUMN_NAME = 'mode'")->fetchColumn()], [1, 1], '  013 ejecutada de nuevo a mano: ni índices ni columna duplicados (IF NOT EXISTS)');
     $rootPdo->exec('DROP DATABASE cap_mig_q5b');
 
     $tables = $pdo->query('SHOW TABLES')->fetchAll(PDO::FETCH_COLUMN);

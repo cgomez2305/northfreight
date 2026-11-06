@@ -68,7 +68,7 @@ MySQL 8 y MariaDB 10.11 (`utf8mb4`, `utf8mb4_unicode_ci`, InnoDB, borrados lógi
 
 | `011_ux_prefs_views.sql` | Q5a: `user_prefs` (tema, barra lateral, densidad, columnas de la lista y leads recientes de la paleta, una fila por usuario y clave) y `saved_views` (vistas guardadas por usuario: filtros en JSON, orden, pipeline, fijada, borrado lógico). `CREATE TABLE IF NOT EXISTS`, idempotente; probada desde cero y sobre la base de Q2b. |
 | `012_rules.sql` | Q5b: `rule_sets` (conjuntos por tipo: puntuación, alertas, tareas y etiquetas), `rule_versions` (versiones con JSON validado; UNA publicada y UN borrador por conjunto garantizados por `pub_slot` y `draft_slot`), `rule_applications` (qué regla influyó en cada lead, con `dedupe_key` único para alertas, tareas y etiquetas), `rule_simulations` y `rule_simulation_rows` (resultado de las simulaciones). `CREATE TABLE IF NOT EXISTS`, idempotente; probada desde cero y sobre la base de Q5a con datos. En el servidor: `php captacion/bin/migrate.php`. |
-| `013_lead_modes.sql` | Q5c: `saved_views.mode` (la vista recuerda el modo en que se guardó; NULL = la pantalla actual) y cuatro índices: `lead_events (created_at, id)` (cronología con cursor), `tasks (deleted_at, due_at)` y `jobs (type, status, run_at)` (calendario por rango). Idempotente con `ADD COLUMN/KEY IF NOT EXISTS` (**MariaDB 10.1 o superior**, que es lo que corre en Hostinger; MySQL 8 no acepta esa sintaxis). |
+| `013_lead_modes.sql` | Q5c: `saved_views.mode` (la vista recuerda el modo en que se guardó; NULL = la pantalla actual) y cuatro índices: `lead_events (created_at, id)` (cronología con cursor), `tasks (deleted_at, due_at)` y `jobs (type, status, run_at)` (calendario por rango). SQL estándar (MariaDB y MySQL 8); el migrador registra la versión y no la repite. |
 
 Columnas añadidas a `leads` respecto al documento (necesarias para esta fase): `site_lead_id` (UNIQUE, id `ld_…` del sitio: idempotencia), `phone_raw`, `authority_status`, `endorsements`, `contact_pref`, `best_time`, `job_slug`, `disqualified_reason`, `lost_at`, `attempt`, `updated_at`. `jobs` añade `dedupe_key` (UNIQUE), `started_at`, `finished_at`.
 
@@ -849,4 +849,3 @@ Se partió `views.css` (ahora 2,9 KB) en `filtros.css` (1,3 KB: el formulario de
 - El primer contacto pendiente se pinta el día de llegada del lead (no hay un SLA propio que lo mueva) y desaparece al contactarlo.
 - Las entregas programadas casi siempre son inmediatas (el cron las toma en un minuto): solo se ven en el calendario mientras esperan o si reintentan.
 - Una tarea sin lead abre `/tareas` en su semana (no hay diálogo de edición en el calendario).
-- `ADD … IF NOT EXISTS` de la migración 013 requiere MariaDB.
