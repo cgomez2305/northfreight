@@ -5,8 +5,8 @@
  var D = document, W = window, NS = W.NS, pk = D.querySelector('#peek');
  if (!NS || !NS.api || !pk) return;
  var $ = function (s, r) { return (r || D).querySelector(s); }, $$ = function (s, r) { return Array.prototype.slice.call((r || D).querySelectorAll(s)); };
- var cssV = pk.getAttribute('data-css-v'), cssP = null;
- function ready() { return cssP || (cssP = NS.css('peek', cssV)); }
+ var cssV = pk.getAttribute('data-css-v'), cssE = pk.getAttribute('data-css-e'), cssP = null;
+ function ready() { return cssP || (cssP = Promise.all([NS.css('peek', cssV), D.querySelector('link[href*="/assets/etiquetas.css"]') ? Promise.resolve() : NS.css('etiquetas', cssE)])); }
  if (W.requestIdleCallback) W.requestIdleCallback(ready); else setTimeout(ready, 1200);
  var body = $('[data-pk-body]', pk), scrim = $('[data-pk-scrim]'), cur = 0, req = 0, sel = null, origin = null;
  var sheet = function () { return W.matchMedia('(max-width:1024px)').matches; };

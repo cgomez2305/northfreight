@@ -43,7 +43,7 @@ final class LeadsController extends Responder
         $uid = (int) $user['id'];
         $cur = $f;   // para detectar si una vista guardada fue modificada (solo cuentan los filtros)
         self::page('leads', $user, 'leads', [['Leads', null], ['Lista', null]], [
-            'title' => 'Leads', 'css' => ['leads', 'views'], 'js' => ['peek', 'views'], 'f' => $f, 'paging' => $paging, 'list' => $list, 'counts' => $counts, 'facets' => LeadQuery::facets(), 'grandTotal' => $total,
+            'title' => 'Leads', 'css' => ['leads', 'views', 'filtros'], 'js' => ['peek', 'views'], 'f' => $f, 'paging' => $paging, 'list' => $list, 'counts' => $counts, 'facets' => LeadQuery::facets(), 'grandTotal' => $total,
             'activeView' => SavedViews::active($uid, $_GET, $cur), 'sysViews' => SavedViews::system(), 'myViews' => SavedViews::mine($uid), 'cols' => Prefs::columns($uid), 'peekId' => (int) ($_GET['peek'] ?? 0),
             'nextTasks' => self::nextTasks($list['rows']),
         ]);

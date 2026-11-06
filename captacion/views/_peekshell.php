@@ -1,6 +1,6 @@
 <?php use Captacion\Ui; ?>
 <div class="pkscrim" data-pk-scrim hidden></div>
-<aside class="peek" id="peek" role="dialog" aria-modal="false" aria-labelledby="pk-title" aria-label="Vistazo rápido del lead" tabindex="-1" hidden data-peek-id="<?= $e((int) ($peekId ?? 0)) ?>" data-css-v="<?= $e((string) (@filemtime(CAPTACION_ROOT . '/public/assets/peek.css') ?: 1)) ?>">
+<aside class="peek" id="peek" role="dialog" aria-modal="false" aria-labelledby="pk-title" aria-label="Vistazo rápido del lead" tabindex="-1" hidden data-peek-id="<?= $e((int) ($peekId ?? 0)) ?>" data-css-e="<?= $e((string) (@filemtime(CAPTACION_ROOT . '/public/assets/etiquetas.css') ?: 1)) ?>" data-css-v="<?= $e((string) (@filemtime(CAPTACION_ROOT . '/public/assets/peek.css') ?: 1)) ?>">
   <div class="peek__bar">
     <span class="label">VISTAZO RÁPIDO</span>
     <div class="peek__nav">

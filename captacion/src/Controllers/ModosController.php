@@ -64,7 +64,7 @@ final class ModosController extends Responder
         $paging = LeadTable::paging($_GET);
         $list = LeadTable::list($f, $paging);
         self::page('tabla', $user, 'leads', [['Leads', '/leads'], ['Tabla', null]], self::common($user, $f) + [
-            'title' => 'Tabla de leads', 'css' => ['leads', 'views', 'tabla'], 'js' => ['peek', 'views'], 'paging' => $paging, 'list' => $list, 'counts' => LeadQuery::tempCounts($f),
+            'title' => 'Tabla de leads', 'css' => ['leads', 'views', 'filtros', 'tabla'], 'js' => ['peek', 'views'], 'paging' => $paging, 'list' => $list, 'counts' => LeadQuery::tempCounts($f),
             'tcols' => Prefs::tableColumns($uid), 'nextTasks' => LeadTable::nextTasks($list['rows']),
         ]);
     }
@@ -155,7 +155,7 @@ final class ModosController extends Responder
             $sel = $cal['days'][0]['ymd'];
         }
         self::page('calendario', $user, 'leads', [['Leads', '/leads'], ['Calendario', null]], self::common($user, $f) + [
-            'title' => 'Calendario', 'css' => ['views', 'calendario'], 'js' => ['peek', 'views', 'calendario'], 'cal' => $cal, 'calError' => $error, 'mode' => $mode, 'anchor' => $anchor, 'sel' => $sel, 'types' => $types,
+            'title' => 'Calendario', 'css' => ['views', 'filtros', 'calendario'], 'js' => ['peek', 'views', 'calendario'], 'cal' => $cal, 'calError' => $error, 'mode' => $mode, 'anchor' => $anchor, 'sel' => $sel, 'types' => $types,
             'allTypes' => count($types) === count(LeadCalendar::TYPES), 'explicitAnchor' => isset($_GET['d']) && LeadCalendar::ymd($_GET['d']) !== null, 'newDay' => LeadCalendar::ymd($_GET['nueva'] ?? null), 'now' => $now,
             'prios' => \Captacion\Services\Catalog::PRIORITIES, 'startTime' => \Captacion\Services\Display::hours()['start'],
         ]);
@@ -224,7 +224,7 @@ final class ModosController extends Responder
         }
         $leadRow = $ld !== null ? Db::one('SELECT id, first_name, last_name FROM leads WHERE id = ? AND deleted_at IS NULL', [$ld]) : null;
         self::page('cronologia', $user, 'leads', [['Leads', '/leads'], ['Cronología', null]], self::common($user, $f) + [
-            'title' => 'Cronología', 'css' => ['views', 'cronologia'], 'js' => ['peek', 'views', 'cronologia'], 'feed' => $feed, 'feedError' => $error, 'types' => $types, 'allTypes' => count($types) === count(LeadFeed::TYPES),
+            'title' => 'Cronología', 'css' => ['views', 'filtros', 'cronologia'], 'js' => ['peek', 'views', 'cronologia'], 'feed' => $feed, 'feedError' => $error, 'types' => $types, 'allTypes' => count($types) === count(LeadFeed::TYPES),
             'ld' => $ld, 'ldName' => $leadRow !== null ? \Captacion\Services\Fmt::name($leadRow) . ' · ' . Fmt::code((int) $leadRow['id']) : null, 'cursor' => $cur, 'render' => static fn(array $days): string => View::render('_feed', ['days' => $days], false),
         ]);
     }

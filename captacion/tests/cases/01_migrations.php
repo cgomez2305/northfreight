@@ -48,7 +48,7 @@ return static function (array $ctx): void {
     $q2b->exec("INSERT INTO referrals (referral_code_id, lead_id) VALUES (1, 1)");
     $q2b->exec("INSERT INTO job_postings (title, slug, valid_through, is_active) VALUES ('Driver viejo', 'driver-viejo', '2027-01-01', 1)");
     $newOnes = Migrator::run($q2b, $dir);
-    T::eq($newOnes, ['006_handoff', '007_viewer_reports', '008_comms', '009_prospects_referrals_jobs', '010_channels', '011_ux_prefs_views', '012_rules'], 'sobre la base de Q2b se aplican solo 006 a 012');
+    T::eq($newOnes, ['006_handoff', '007_viewer_reports', '008_comms', '009_prospects_referrals_jobs', '010_channels', '011_ux_prefs_views', '012_rules', '013_lead_modes'], 'sobre la base de Q2b se aplican solo 006 a 013');
     T::eq([$q2b->query('SELECT status FROM referrals WHERE id = 1')->fetchColumn(), $q2b->query("SELECT status FROM job_postings WHERE slug = 'driver-viejo'")->fetchColumn(), (int) $q2b->query('SELECT attempts FROM prospects_fmcsa')->fetchColumn(), $q2b->query('SELECT source FROM prospects_fmcsa')->fetchColumn()],
         ['referred', 'active', 1, 'socrata'], '  009 conserva las filas previas (el referido pasa de «new» a «referred», la vacante activa queda «active»)');
     T::eq([(int) $q2b->query('SELECT COUNT(*) FROM leads')->fetchColumn(), (int) $q2b->query('SELECT COUNT(*) FROM sequence_enrollments')->fetchColumn(), (int) $q2b->query('SELECT COUNT(*) FROM messages')->fetchColumn(), (int) $q2b->query('SELECT COUNT(*) FROM users')->fetchColumn()], [1, 1, 1, 1], '  y los datos existentes siguen ahi');
@@ -87,7 +87,7 @@ return static function (array $ctx): void {
     $q5a->exec("INSERT INTO leads (profile, first_name, last_name, source, stage, temperature, score) VALUES ('owner_operator', 'Real', 'Lead', 'web_careers', 'new', 'warm', 55)");
     $q5a->exec("INSERT INTO saved_views (user_id, name, filters) VALUES (1, 'Mi vista', '{\"t\":\"hot\"}')");
     $q5a->exec("INSERT INTO user_prefs (user_id, pkey, pvalue) VALUES (1, 'theme', 'dark')");
-    T::eq(Migrator::run($q5a, $dir), ['012_rules'], '  sobre ella se aplica solo 012_rules');
+    T::eq(Migrator::run($q5a, $dir), ['012_rules', '013_lead_modes'], '  sobre ella se aplican solo 012_rules y 013_lead_modes');
     T::eq([(int) $q5a->query('SELECT COUNT(*) FROM leads')->fetchColumn(), (int) $q5a->query('SELECT COUNT(*) FROM saved_views')->fetchColumn(), (int) $q5a->query('SELECT COUNT(*) FROM user_prefs')->fetchColumn(), $q5a->query('SELECT score FROM leads')->fetchColumn()], [1, 1, 1, 55], '  los datos de Q5a siguen ahi, sin cambios');
     T::eq(Migrator::run($q5a, $dir), [], '  repetirla no hace nada');
     $q5aTables = $q5a->query('SHOW TABLES')->fetchAll(PDO::FETCH_COLUMN);
@@ -116,6 +116,38 @@ return static function (array $ctx): void {
     $q5a->exec('DELETE FROM rule_simulations WHERE id = 1');
     T::eq((int) $q5a->query('SELECT COUNT(*) FROM rule_simulation_rows')->fetchColumn(), 0, '  esquema: borrar una simulación borra sus filas (ON DELETE CASCADE)');
     $rootPdo->exec('DROP DATABASE cap_mig_q5a');
+
+    // Q5c: la 013 se aplica SOBRE la base de Q5b (001 a 012) con datos reales, sin tocarlos, y es idempotente
+    $rootPdo->exec('DROP DATABASE IF EXISTS cap_mig_q5b');
+    $rootPdo->exec('CREATE DATABASE cap_mig_q5b CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci');
+    $q5b = new PDO('mysql:host=127.0.0.1;port=' . $ctx['dbPort'] . ';dbname=cap_mig_q5b;charset=utf8mb4', 'root', '', [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
+    $tmp5b = $ctx['work'] . '/mig-q5b';
+    @mkdir($tmp5b, 0777, true);
+    foreach (glob($tmp5b . '/*.sql') ?: [] as $f) {
+        unlink($f);
+    }
+    foreach (array_filter($files, static fn($f) => (int) substr($f, 0, 3) <= 12) as $f) {
+        copy("$dir/$f.sql", "$tmp5b/$f.sql");
+    }
+    T::eq(count(Migrator::run($q5b, $tmp5b)), 12, 'base de Q5b: se aplican 001 a 012');
+    $q5b->exec("INSERT INTO users (name, email, password_hash, role) VALUES ('Carlos', 'c@example.com', 'x', 'admin')");
+    $q5b->exec("INSERT INTO leads (profile, first_name, last_name, source, stage, temperature, score) VALUES ('owner_operator', 'Real', 'Lead', 'web_careers', 'new', 'warm', 55)");
+    $q5b->exec("INSERT INTO saved_views (user_id, name, filters, sort, dir) VALUES (1, 'Mi vista', '{\"t\":\"hot\"}', 'score', 'asc')");
+    $q5b->exec("INSERT INTO tasks (title, lead_id, due_at) VALUES ('Llamar', 1, '2026-11-10 14:00:00')");
+    $q5b->exec("INSERT INTO lead_events (lead_id, type, payload) VALUES (1, 'created', '{}')");
+    $q5b->exec("INSERT INTO jobs (type, payload, run_at) VALUES ('handoff_deliver', '{}', '2026-11-10 14:00:00')");
+    T::eq(Migrator::run($q5b, $dir), ['013_lead_modes'], 'sobre la base de Q5b se aplica solo 013_lead_modes');
+    T::eq([(int) $q5b->query('SELECT COUNT(*) FROM leads')->fetchColumn(), (int) $q5b->query('SELECT COUNT(*) FROM tasks')->fetchColumn(), (int) $q5b->query('SELECT COUNT(*) FROM lead_events')->fetchColumn(), (int) $q5b->query('SELECT COUNT(*) FROM jobs')->fetchColumn(), $q5b->query('SELECT sort FROM saved_views')->fetchColumn(), $q5b->query('SELECT mode FROM saved_views')->fetchColumn()],
+        [1, 1, 1, 1, 'score', null], '  los datos previos siguen y la vista guardada antigua queda «sin modo» (se abre en la pantalla actual)');
+    T::eq(Migrator::run($q5b, $dir), [], '  repetirla no hace nada');
+    $q5bIdx = static fn(string $t): array => $q5b->query("SELECT DISTINCT INDEX_NAME FROM information_schema.STATISTICS WHERE TABLE_SCHEMA = 'cap_mig_q5b' AND TABLE_NAME = '$t'")->fetchAll(PDO::FETCH_COLUMN);
+    T::ok(in_array('idx_events_created', $q5bIdx('lead_events'), true) && in_array('idx_tasks_due_range', $q5bIdx('tasks'), true) && in_array('idx_jobs_type_run', $q5bIdx('jobs'), true), '  índices nuevos: cronología (created_at, id), tareas por vencimiento y jobs por tipo');
+    $sql013 = (string) file_get_contents("$dir/013_lead_modes.sql");
+    foreach (array_filter(array_map('trim', preg_split('/;\s*\n/', (string) preg_replace('/^\s*--.*$/m', '', $sql013)) ?: [])) as $stmt) {
+        $q5b->exec($stmt);
+    }
+    T::eq([count(array_keys($q5bIdx('lead_events'), 'idx_events_created')), (int) $q5b->query("SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = 'cap_mig_q5b' AND TABLE_NAME = 'saved_views' AND COLUMN_NAME = 'mode'")->fetchColumn()], [1, 1], '  013 ejecutada de nuevo a mano: ni índices ni columna duplicados (IF NOT EXISTS)');
+    $rootPdo->exec('DROP DATABASE cap_mig_q5b');
 
     $tables = $pdo->query('SHOW TABLES')->fetchAll(PDO::FETCH_COLUMN);
     foreach (['prospect_calls', 'dnc_numbers', 'users', 'leads', 'lead_events', 'consents', 'prospects_fmcsa', 'tasks', 'appointments', 'messages', 'sequence_enrollments', 'referral_codes', 'referrals', 'job_postings', 'channel_costs', 'settings', 'jobs', 'activity_log', 'recovery_codes', 'login_attempts', 'schema_migrations', 'handoffs', 'handoff_deliveries', 'user_invites', 'reports', 'email_templates', 'backups', 'lead_notes'] as $t) {

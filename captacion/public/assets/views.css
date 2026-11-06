@@ -17,32 +17,6 @@
 [data-hide~=prof] .k-prof,[data-hide~=st] .k-st,[data-hide~=eq] .k-eq,[data-hide~=pts] .k-pts,[data-hide~=temp] .k-temp,[data-hide~=stage] .k-stage,[data-hide~=src] .k-src,[data-hide~=when] .k-when,[data-hide~=task] .k-task{display:none}
 html[data-density=compact] .tbl--leads td,html[data-density=compact] .tbl--leads th{padding-top:6px;padding-bottom:6px}
 html[data-density=compact] .tbl--leads .av{width:28px;height:28px;font-size:11px}
-/* etiquetas, puntuación y avance (también en el tablero) */
-.tag{display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 8px;border-radius:var(--r-pill);font:500 11.5px var(--f-sans);background:var(--sunk);color:var(--ink-2);border:1px solid var(--line);white-space:nowrap}
-.tag i{width:6px;height:6px;border-radius:50%;background:var(--ink-3)}
-.tag .ic{width:12px;height:12px}
-.tag--p-owner_operator i{background:var(--st-qualified)}
-.tag--p-small_carrier i{background:var(--st-contacted)}
-.tag--p-company_driver i{background:var(--hot-dot)}
-.tag--e-0 i{background:var(--seg-0)}
-.tag--e-1 i{background:var(--st-closed)}
-.tag--e-2 i{background:var(--warn-dot)}
-.tag--e-3 i{background:var(--cold-dot)}
-.tag--e-4 i{background:var(--st-lost)}
-.tag--bad{background:var(--bad-bg);color:var(--bad);border-color:transparent}
-.sbar{display:inline-flex;align-items:flex-end;gap:2px;height:14px}
-.sbar i{width:4px;border-radius:1px;background:var(--line-2)}
-.sbar i:nth-child(1){height:5px}
-.sbar i:nth-child(2){height:8px}
-.sbar i:nth-child(3){height:11px}
-.sbar i:nth-child(4){height:14px}
-.sbar--hot .on{background:var(--hot-dot)}
-.sbar--warm .on{background:var(--warm-dot)}
-.sbar--cold .on{background:var(--cold-dot)}
-.sbar--dq .on{background:var(--dq-dot)}
-.prog{display:inline-flex;gap:2px;flex:1;max-width:84px}
-.prog b{height:3px;flex:1;border-radius:2px;background:var(--line-2)}
-.prog b.on{background:var(--cyan)}
 .dot--ok{background:var(--ok-dot)}
 .dot--info{background:var(--cyan)}
 @media (max-width:1024px){
@@ -64,32 +38,3 @@ html[data-density=compact] .tbl--leads .av{width:28px;height:28px;font-size:11px
 .tchip:not(.is-on){opacity:.7}
 .tchip .ic{width:15px;height:15px}
 .tchip b{font:600 11px var(--f-mono)}
-/* filtros (formulario compartido por la Lista, la Tabla, el Calendario y la Cronología) */
-.filters{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px 14px;padding:16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);align-items:end}
-@media (max-width:1180px){
-  .filters{grid-template-columns:repeat(3,minmax(0,1fr))}
-}
-@media (max-width:760px){
-  .filters{grid-template-columns:1fr 1fr}
-}
-@media (max-width:760px){
-  .js .filters:not(.is-open){display:none}
-}
-.field--q{grid-column:span 2}
-.filters .check--f{grid-column:span 1}
-.filters__a{grid-column:span 1}
-.filters__a{display:flex;gap:8px;align-items:center}
-.check--f{align-self:center;min-height:44px;align-items:center}
-.filters-toggle{display:none}
-@media (max-width:1180px){
-  .filters .check--f,.filters__a{grid-column:span 1}
-}
-@media (max-width:760px){
-  .field--q{grid-column:1/-1}
-  .filters-toggle{display:inline-flex}
-  .filters__a{grid-column:1/-1}
-  .filters__a .btn{flex:1}
-}
-/* calendario y cronología: los filtros van plegados (con JS) hasta que se pide el botón «Filtros» o hay alguno activo */
-.filters-toggle--on{display:inline-flex}
-.js .filters--fold:not(.is-open){display:none}

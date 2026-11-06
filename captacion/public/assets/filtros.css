@@ -1,0 +1,29 @@
+/* NorthStar Captación · formulario de filtros compartido por la Lista, la Tabla, el Calendario y la Cronología (Q5c). Sin estilos en línea (CSP). */
+.filters{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px 14px;padding:16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);align-items:end}
+@media (max-width:1180px){
+  .filters{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (max-width:760px){
+  .filters{grid-template-columns:1fr 1fr}
+}
+@media (max-width:760px){
+  .js .filters:not(.is-open){display:none}
+}
+.field--q{grid-column:span 2}
+.filters .check--f{grid-column:span 1}
+.filters__a{grid-column:span 1}
+.filters__a{display:flex;gap:8px;align-items:center}
+.check--f{align-self:center;min-height:44px;align-items:center}
+.filters-toggle{display:none}
+@media (max-width:1180px){
+  .filters .check--f,.filters__a{grid-column:span 1}
+}
+@media (max-width:760px){
+  .field--q{grid-column:1/-1}
+  .filters-toggle{display:inline-flex}
+  .filters__a{grid-column:1/-1}
+  .filters__a .btn{flex:1}
+}
+/* calendario y cronología: los filtros van plegados (con JS) hasta que se pide el botón «Filtros» o hay alguno activo */
+.filters-toggle--on{display:inline-flex}
+.js .filters--fold:not(.is-open){display:none}
