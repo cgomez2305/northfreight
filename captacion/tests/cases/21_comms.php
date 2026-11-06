@@ -287,7 +287,7 @@ return static function (array $ctx): void {
     $r1 = $warm(['email' => 'r1@example.com', 'first_name' => 'Resp']);
     Sequences::enrollWarm($r1);
     $ficha = $panel->get('/leads/' . $r1);
-    T::ok(str_contains($ficha['body'], 'SECUENCIAS DE CORREO') && str_contains($ficha['body'], 'El lead respondió') && str_contains($ficha['body'], 'Pausar'), 'la ficha muestra las secuencias del lead con Pausar y «El lead respondió»');
+    T::ok(str_contains($ficha['body'], 'Secuencias de correo') && str_contains($ficha['body'], 'El lead respondió') && str_contains($ficha['body'], 'Pausar'), 'la ficha muestra las secuencias del lead con Pausar y «El lead respondió»');
     $csrf = $panel->csrfOf($ficha['body']);
     $x = $panel->post('/leads/' . $r1 . '/responded', ['_csrf' => $csrf]);
     T::ok($x['status'] === 303 && $enr($r1)['status'] === 'paused' && $enr($r1)['paused_reason'] === 'responded', 'botón «El lead respondió»: pausa la secuencia');
@@ -387,7 +387,7 @@ return static function (array $ctx): void {
     $tid = (int) Db::value("SELECT id FROM email_templates WHERE tkey = 'a6_d1' AND lang = 'en'");
     Db::run("UPDATE email_templates SET body = REPLACE(body, 'Un owner-operator nos pidió ayuda con una ruta de ida y vuelta y la cuadramos juntos.', '[[CONFIRMAR: caso real]]') WHERE id = ?", [$tid]);
     $ed = $panel->get("/comunicaciones/plantillas/$tid");
-    T::ok($ed['status'] === 200 && str_contains($ed['body'], 'No se enviará') && str_contains($ed['body'], '<mark class="mk">[[CONFIRMAR: caso real]]</mark>') && str_contains($ed['body'], 'VISTA PREVIA') && str_contains($ed['body'], 'ENVIAR PRUEBA'), 'editor: vista previa con el marcador resaltado y aviso «No se enviará»');
+    T::ok($ed['status'] === 200 && str_contains($ed['body'], 'No se enviará') && str_contains($ed['body'], '<mark class="mk">[[CONFIRMAR: caso real]]</mark>') && str_contains($ed['body'], 'Vista previa') && str_contains($ed['body'], 'Enviar prueba'), 'editor: vista previa con el marcador resaltado y aviso «No se enviará»');
     $x = $panel->post("/comunicaciones/plantillas/$tid/save", ['_csrf' => $csrf, 'name' => 'A6 · Día 1 · Caso real', 'subject' => 'Nuevo asunto', 'body' => "Hola {nombre},\n\nTexto real de la plantilla, sin marcadores.\n\nGracias.", 'active' => '1']);
     T::ok($x['status'] === 303 && Db::value('SELECT subject FROM email_templates WHERE id = ?', [$tid]) === 'Nuevo asunto' && !str_contains((string) Db::value('SELECT body FROM email_templates WHERE id = ?', [$tid]), '[['), 'guardar la plantilla desde el editor');
     $x = $panel->post("/comunicaciones/plantillas/$tid/save", ['_csrf' => $csrf, 'name' => 'x', 'subject' => '', 'body' => 'corto']);
@@ -414,7 +414,7 @@ return static function (array $ctx): void {
     $x = $panel->post("/comunicaciones/plantillas/$tid/restore", ['_csrf' => $csrf]);
     T::ok(str_contains((string) Db::value('SELECT body FROM email_templates WHERE id = ?', [$tid]), '[[CONFIRMAR'), 'restaurar el texto de fábrica (vuelve el marcador)');
     $en = $panel->get('/comunicaciones/inscripciones');
-    T::ok($en['status'] === 200 && str_contains($en['body'], 'Pantalla Uno') && str_contains($en['body'], 'Día 1 · Caso real') && str_contains($en['body'], 'Pausar') && str_contains($en['body'], 'TOPES DE ENVÍO') && str_contains($en['body'], 'Se omite: no hay fuente real de tarifas'), 'Inscripciones: quién está en qué paso, acciones, topes y la nota del día 7 omitido');
+    T::ok($en['status'] === 200 && str_contains($en['body'], 'Pantalla Uno') && str_contains($en['body'], 'Día 1 · Caso real') && str_contains($en['body'], 'Pausar') && str_contains($en['body'], 'Topes de envío') && str_contains($en['body'], 'Se omite: no hay fuente real de tarifas'), 'Inscripciones: quién está en qué paso, acciones, topes y la nota del día 7 omitido');
     T::ok(str_contains($panel->get('/comunicaciones/inscripciones?st=paused')['body'], 'Nadie está inscrito con ese filtro'), '  el filtro por estado funciona (vacío con mensaje)');
     T::eq($panel->get('/comunicaciones/inventada')['status'], 404, 'pestaña inexistente: 404');
     T::eq($panel->get('/comunicaciones/plantillas/99999')['status'], 404, 'plantilla inexistente: 404');

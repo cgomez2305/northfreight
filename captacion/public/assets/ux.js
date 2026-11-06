@@ -233,7 +233,7 @@
    var gh = el('li', 'srch__g', g); gh.setAttribute('role', 'presentation'); sl.appendChild(gh);
    its.forEach(function (it) {
     var li = el('li'), d = el('div', 'res'); d.id = 'res-' + idx; d.setAttribute('role', 'option'); d.setAttribute('aria-selected', 'false'); d.setAttribute('data-i', idx);
-    if (it.lead) { var r = it.lead, av = el('span', 'av av-' + r.av, r.initials); av.setAttribute('aria-hidden', 'true'); d.appendChild(av); } else { var ic = el('span', 'res__ic'); ic.appendChild(icon(it.ic)); d.appendChild(ic); }
+    if (it.lead) { var r = it.lead, av = el('span', 'av', r.initials); av.setAttribute('aria-hidden', 'true'); d.appendChild(av); } else { var ic = el('span', 'res__ic'); ic.appendChild(icon(it.ic)); d.appendChild(ic); }
     var t = el('span', 'res__t'); t.appendChild(el('b', null, it.t)); if (it.s) t.appendChild(el('small', null, it.s)); d.appendChild(t);
     if (it.lead) { var c = el('span', 'chip chip--' + (it.lead.temp === 'disqualified' ? 'dq' : it.lead.temp)); c.appendChild(el('i', 'dot')); c.appendChild(D.createTextNode(it.lead.temp_label)); d.appendChild(c); }
     li.appendChild(d); sl.appendChild(li); rows.push(it); idx++;

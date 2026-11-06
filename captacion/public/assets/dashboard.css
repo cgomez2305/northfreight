@@ -58,7 +58,7 @@ a.pg__n:hover{background:var(--sunk)}
 .srclist{display:flex;flex-direction:column}
 .srclist li{display:flex;align-items:center;gap:10px;min-height:40px;border-bottom:1px solid var(--line);font-size:var(--fs-md)}
 .srclist li:last-child{border:0}
-.srclist .hb{flex:none;width:56px;height:4px;display:block}
+.srclist .hb{display:none}
 .sq{width:8px;height:8px;border-radius:2px;flex:none}
 .srclist__n{flex:1 1 90px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .srclist a{color:var(--ink)}

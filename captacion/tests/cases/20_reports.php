@@ -166,7 +166,7 @@ return static function (array $ctx): void {
     $panel = Panel::start($ctx, 'panel20', ['SMTP_HOST' => '127.0.0.1', 'SMTP_PORT' => (string) $smtpPort, 'SMTP_USER' => 'crm@example.com', 'SMTP_PASS' => 'pw-smtp-prueba', 'SMTP_SECURE' => 'none']);
     T::ok($panel->login($adm['email']), 'login del administrador');
     $pg = $panel->get('/reportes?r=lastmonth');
-    T::ok($pg['status'] === 200 && str_contains($pg['body'], 'EMBUDO') && str_contains($pg['body'], 'Sitio · Careers') && str_contains($pg['body'], 'Meta Ads') && str_contains($pg['body'], '$100.00') && str_contains($pg['body'], '$300'), '/reportes?r=lastmonth: embudo, canales y costos de Meta (CPL $100 y costo por firmado $300)');
+    T::ok($pg['status'] === 200 && str_contains($pg['body'], 'Embudo') && str_contains($pg['body'], 'Sitio · Careers') && str_contains($pg['body'], 'Meta Ads') && str_contains($pg['body'], '$100.00') && str_contains($pg['body'], '$300'), '/reportes?r=lastmonth: embudo, canales y costos de Meta (CPL $100 y costo por firmado $300)');
     T::ok(!preg_match('/\sstyle="/i', $pg['body']) && !preg_match('/\son\w+="/i', $pg['body']) && preg_match('/<script(?![^>]*\bnonce=")/i', $pg['body']) === 0 && str_contains($pg['body'], '/assets/reportes.css'), '  sin estilos ni handlers en línea, scripts con nonce');
     T::ok(str_contains($panel->get('/reportes')['body'], 'Sin costos cargados') || str_contains($panel->get('/reportes')['body'], 'ningún mes completo'), '/reportes (30 días): explica por qué no hay costos');
     $bad = $panel->get('/reportes?from=2026-10-09&to=2026-10-01');
@@ -206,7 +206,7 @@ return static function (array $ctx): void {
     T::eq($snap2['cur']['funnel'], $snap['cur']['funnel'], 'es una instantánea: cambiar un lead después no altera el informe');
     // pagina
     $one = $panel->get('/informes/' . $rep['id']);
-    T::ok($one['status'] === 200 && str_contains($one['body'], 'BORRADOR') && str_contains($one['body'], 'name="action[]"') && str_contains($one['body'], 'TENDENCIA FRENTE AL MES ANTERIOR') && str_contains($one['body'], 'data-print') && str_contains($one['body'], 'rep-print-h'), 'vista del informe (admin, borrador): acciones editables, tendencia vs mes anterior y botón de imprimir');
+    T::ok($one['status'] === 200 && str_contains($one['body'], 'BORRADOR') && str_contains($one['body'], 'name="action[]"') && str_contains($one['body'], 'Tendencia frente al mes anterior') && str_contains($one['body'], 'data-print') && str_contains($one['body'], 'rep-print-h'), 'vista del informe (admin, borrador): acciones editables, tendencia vs mes anterior y botón de imprimir');
     $css = (string) file_get_contents($ctx['root'] . '/public/assets/reportes.css');
     T::ok(str_contains($css, '@media print') && str_contains($css, '@page') && str_contains($css, '.side,.top,.tabbar'), 'hoja de impresión: oculta barra lateral y superior, define la página A4');
     $r = $panel->post('/informes/' . $rep['id'] . '/actions', ['_csrf' => $panel->csrf, 'action' => ['Primera acción editada', 'Segunda <b>editada</b>', '', 'sobra']]);
@@ -237,7 +237,7 @@ return static function (array $ctx): void {
     $panel->post('/informes/generate', ['_csrf' => $panel->csrf, 'period' => Fmt::et($now - 70 * 86400)->format('Y-m')]);
     T::eq((int) Db::value("SELECT COUNT(*) FROM reports WHERE kind = 'monthly'"), 2, '«Generar ahora» para un mes pasado crea su borrador');
     $lst = $panel->get('/informes');
-    T::ok(str_contains($lst['body'], 'Borrador') && str_contains($lst['body'], 'Publicado') && str_contains($lst['body'], 'GENERAR UN INFORME'), 'lista de informes (admin): publicados y borradores');
+    T::ok(str_contains($lst['body'], 'Borrador') && str_contains($lst['body'], 'Publicado') && str_contains($lst['body'], 'Generar un informe'), 'lista de informes (admin): publicados y borradores');
 
     // ------------------------------------------------------------------ Crons: resumen semanal (A13) e informe mensual (A14), con zona horaria ET
     $et = static function (string $local): int {

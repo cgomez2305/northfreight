@@ -304,7 +304,7 @@ return static function (array $ctx): void {
 
     // ------------------------------------------------------------------ Pantalla de configuracion
     $cfg = $panel->get('/config?tab=entrega');
-    T::ok($cfg['status'] === 200 && !str_contains($cfg['body'], $secret) && str_contains($cfg['body'], 'configurado') && str_contains($cfg['body'], 'Enviar prueba') && str_contains($cfg['body'], 'ÚLTIMAS ENTREGAS'), 'la pantalla de entrega muestra estado y prueba, nunca el secreto');
+    T::ok($cfg['status'] === 200 && !str_contains($cfg['body'], $secret) && str_contains($cfg['body'], 'configurado') && str_contains($cfg['body'], 'Enviar prueba') && str_contains($cfg['body'], 'Últimas entregas'), 'la pantalla de entrega muestra estado y prueba, nunca el secreto');
     $r = $panel->post('/config/handoff/save', ['_csrf' => $panel->csrf, 'email' => 'otro@northstar.test', 'webhook_url' => "http://127.0.0.1:$hookPort/hook", 'webhook_on' => '1', 'secret_mode' => 'generate']);
     Settings::clear();
     $after = $panel->get('/config?tab=entrega');

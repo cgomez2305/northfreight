@@ -112,7 +112,7 @@ return static function (array $ctx): void {
     T::ok($s->login($admin['email']), 'login del administrador');
     $r = $s->get('/?p=week');
     $b = $r['body'];
-    T::ok($r['status'] === 200 && str_contains($b, 'data-live="headline"') && str_contains($b, 'En los últimos 7 días llegaron') && str_contains($b, 'SIGUIENTE MEJOR ACCIÓN') && str_contains($b, 'Contacta a los calientes'), 'HTML del servidor: subtítulo, KPI y acciones ya vienen escritos (sin JS no falta nada)');
+    T::ok($r['status'] === 200 && str_contains($b, 'data-live="headline"') && str_contains($b, 'En los últimos 7 días llegaron') && str_contains($b, 'Siguiente mejor acción') && str_contains($b, 'Contacta a los calientes'), 'HTML del servidor: subtítulo, KPI y acciones ya vienen escritos (sin JS no falta nada)');
     T::ok(preg_match('/<p class="kpi__v" data-count="3"[^>]*><span class="sr">3<\/span><span class="kpi__n" aria-hidden="true">3<\/span><\/p>/', $b) === 1, '  el número protagonista: texto accesible final en .sr y lo pintado en aria-hidden (el conteo no cambia lo que lee el lector)');
     T::ok(str_contains($b, 'role="img" aria-label="Impacto '), '  el medidor de rayas lleva su texto accesible');
     T::ok(!preg_match('/\sstyle="/i', $b) && !preg_match('/\son[a-z]+="/i', $b), '  sin estilos ni handlers en línea');

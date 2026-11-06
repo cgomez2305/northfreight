@@ -489,7 +489,7 @@ return static function (array $ctx): void {
     $good = $form;
     $good['owner']['cdl_standard'] = '22';
     $r = $short->post('/config/scoring/preview', $good);
-    T::ok($r['status'] === 200 && str_contains($r['body'], 'VISTA PREVIA') && Scoring::settings()['scoring.owner']['cdl_standard'] === 20, 'vista previa por HTTP: muestra el efecto y no guarda');
+    T::ok($r['status'] === 200 && str_contains($r['body'], 'Vista previa') && Scoring::settings()['scoring.owner']['cdl_standard'] === 20, 'vista previa por HTTP: muestra el efecto y no guarda');
     $r = $short->post('/config/scoring', $good);
     Settings::clear();
     T::ok($r['status'] === 303 && Scoring::settings()['scoring.owner']['cdl_standard'] === 22, 'guardar puntuacion por HTTP');

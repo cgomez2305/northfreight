@@ -148,12 +148,12 @@ return static function (array $ctx): void {
     T::ok($r['status'] === 200 && str_contains($b, 'llegaron <b>7 leads</b>') && str_contains($b, 'data-rs') && str_contains($b, 'data-live-v="') && str_contains($b, 'class="kpi"') && str_contains($b, 'role="img" aria-label="Calificados:') && str_contains($b, 'data-lc2'),
         'con datos: subtítulo, tarjetas con medidor de rayas con texto accesible y gráfico anotado');
     T::ok(preg_match('/<p class="kpi__v" data-count="7"[^>]*><span class="sr">7<\/span><span class="kpi__n" aria-hidden="true">7<\/span><\/p>/', $b) === 1, '  número protagonista: el texto accesible final va en .sr (el conteo no lo cambia)');
-    T::ok(str_contains($b, 'RECIBIDOS') && str_contains($b, 'EMBUDO') && str_contains($b, '<table class="sr">') && str_contains($b, 'COSTO POR FIRMADO POR CANAL') && str_contains($b, 'MOTIVOS DE PÉRDIDA'), '  HTML completo sin JS: tarjetas, embudo, tabla accesible del gráfico, canales y pérdidas');
+    T::ok(str_contains($b, 'RECIBIDOS') && str_contains($b, 'Embudo') && str_contains($b, '<table class="sr">') && str_contains($b, 'Costo por firmado por canal') && str_contains($b, 'Motivos de pérdida'), '  HTML completo sin JS: tarjetas, embudo, tabla accesible del gráfico, canales y pérdidas');
     $pii = ['Zebulon', 'Quixote', '98765', '+1305555', 'q6i-'];
     $hits = array_filter($pii, static fn($p) => str_contains($b, $p));
     T::ok(!$hits, 'el lector: NINGUNA cadena personal en el HTML (nombres, teléfonos, correos, USDOT)' . ($hits ? ' · aparece: ' . implode(', ', $hits) : ''));
     T::ok(preg_match('#/leads/\d+#', $b) !== 1 && !str_contains($b, 'data-peek') && !str_contains($b, 'id="peek"') && !str_contains($b, 'wa.me') && !str_contains($b, 'mailto:') && !str_contains($b, 'tel:'), '  sin enlaces a leads, vistazo, WhatsApp, correo ni teléfono');
-    T::ok(!str_contains($b, 'SIGUIENTE MEJOR ACCIÓN') && !str_contains($b, 'data-dash') && !str_contains($b, '/ajax/dashboard') && !str_contains($b, 'data-live="actions"') && !str_contains($b, 'CALIENTES SIN CONTACTAR') && !str_contains($b, 'PRIMERA RESPUESTA'), '  sin «siguiente mejor acción», sin KPI de administrador y sin el marcado del refresco');
+    T::ok(!str_contains($b, 'Siguiente mejor acción') && !str_contains($b, 'data-dash') && !str_contains($b, '/ajax/dashboard') && !str_contains($b, 'data-live="actions"') && !str_contains($b, 'CALIENTES SIN CONTACTAR') && !str_contains($b, 'PRIMERA RESPUESTA'), '  sin «siguiente mejor acción», sin KPI de administrador y sin el marcado del refresco');
     preg_match_all('/data-chart="([^"]*)"/', $b, $cm);
     $okJson = count($cm[1]) === 1;
     foreach ($cm[1] as $raw) {

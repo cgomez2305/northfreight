@@ -32,7 +32,7 @@ final class ReportesController extends Responder
         $cur = Reports::compute($r['from'], $r['to']);
         $prev = Reports::compute($r['prev_from'], $r['prev_to']);
         self::page('reportes', $user, 'reportes', [['Reportes', null], [$r['label'], null]], [
-            'title' => 'Reportes', 'css' => ['charts', 'reportes'], 'range' => $r, 'm' => $cur, 'p' => $prev, 'presets' => Reports::PRESETS, 'tables' => Reports::TABLES,
+            'title' => 'Reportes', 'css' => ['charts', 'viz', 'reportes'], 'range' => $r, 'm' => $cur, 'p' => $prev, 'presets' => Reports::PRESETS, 'tables' => Reports::TABLES,
         ]);
     }
 

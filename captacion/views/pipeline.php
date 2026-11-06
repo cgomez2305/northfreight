@@ -20,7 +20,7 @@ $filtered = count($f) > 0;
     <p class="sub">Una columna por etapa. Arrastra una tarjeta o usa «Mover a…».</p>
   </div>
   <div class="page-head__a">
-    <button class="btn btn--primary" type="button" data-new-lead><span>Nuevo lead</span></button>
+    <button class="btn btn--primary" type="button" data-new-lead><?= Ui::icon('plus') ?><span>Nuevo lead</span></button>
   </div>
 </div>
 

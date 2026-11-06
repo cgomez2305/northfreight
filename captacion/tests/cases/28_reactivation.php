@@ -168,7 +168,7 @@ return static function (array $ctx): void {
     $panel = Panel::start($ctx, 'react28');
     T::ok($panel->login($admin['email']), 'login administrador');
     $pg = $panel->get('/comunicaciones/reactivacion');
-    T::ok($pg['status'] === 200 && str_contains($pg['body'], 'QUIÉN ENTRA') && str_contains($pg['body'], 'INTERRUPTOR') && str_contains($pg['body'], 'Lista') && str_contains($pg['body'], 'Teléfono en «No llamar más»'), 'pagina /comunicaciones/reactivacion: interruptor, elegibles, exclusiones y plantillas');
+    T::ok($pg['status'] === 200 && str_contains($pg['body'], 'Quién entra') && str_contains($pg['body'], 'Interruptor') && str_contains($pg['body'], 'Lista') && str_contains($pg['body'], 'Teléfono en «No llamar más»'), 'pagina /comunicaciones/reactivacion: interruptor, elegibles, exclusiones y plantillas');
     T::ok(str_contains($pg['body'], 'href="/comunicaciones/reactivacion"') || str_contains($pg['body'], '/comunicaciones/reactivacion'), '  y la pestana «Reactivación» esta en Comunicaciones');
     $before = Sequences::reactivationConfig();
     $r = $panel->post('/comunicaciones/reactivacion', ['_csrf' => $panel->csrf, 'enabled' => '1', 'min_days' => '45']);

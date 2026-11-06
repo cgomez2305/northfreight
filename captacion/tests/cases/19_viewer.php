@@ -126,7 +126,7 @@ return static function (array $ctx): void {
     T::ok(!str_contains($res['body'], '/reportes/export') && !str_contains($res['body'], 'CSV') && !str_contains($res['body'], '/leads/export'), 'el lector no tiene exportaciones');
     $inf = $viewer->get('/informes');
     $leakCheck($inf['body'], '/informes');
-    T::ok($inf['status'] === 200 && str_contains($inf['body'], 'href="/informes/' . $pubId . '"') && !str_contains($inf['body'], 'href="/informes/' . $draftId . '"') && !str_contains($inf['body'], 'RESÚMENES SEMANALES') && !str_contains($inf['body'], 'GENERAR UN INFORME'), '/informes: solo los publicados, sin borradores, sin resúmenes semanales ni generar');
+    T::ok($inf['status'] === 200 && str_contains($inf['body'], 'href="/informes/' . $pubId . '"') && !str_contains($inf['body'], 'href="/informes/' . $draftId . '"') && !str_contains($inf['body'], 'RESÚMENES SEMANALES') && !str_contains($inf['body'], 'Generar un informe'), '/informes: solo los publicados, sin borradores, sin resúmenes semanales ni generar');
     $one = $viewer->get('/informes/' . $pubId);
     $leakCheck($one['body'], '/informes/{publicado}');
     T::ok($one['status'] === 200 && str_contains($one['body'], 'Reforzar la captación de Meta') && !str_contains($one['body'], 'name="action[]"') && !str_contains($one['body'], '/publish'), 'informe publicado: lo ve con sus tres acciones, sin controles de edición');

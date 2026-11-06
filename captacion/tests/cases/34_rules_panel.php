@@ -102,7 +102,7 @@ return static function (array $ctx): void {
     T::ok($nSets() === 1 && str_contains($s->get('/config?tab=reglas')['body'], 'Ponle un nombre'), '  un nombre vacío da un mensaje claro');
     $page = $s->get("/config?tab=reglas&set=$sid");
     T::ok($page['status'] === 200 && str_contains($page['body'], 'data-rp-form') && str_contains($page['body'], 'rules.css') && str_contains($page['body'], 'Mis puntos') && str_contains($page['body'], 'rp-nojs'), 'editor: abierto con ?set=ID va en la propia página (sin JS queda en línea) con su hoja');
-    T::ok(str_contains($page['body'], 'Este conjunto todavía no tiene reglas') && str_contains($page['body'], 'Publicar v1') && str_contains($page['body'], 'disabled title="Confirma tu identidad para publicar"') && str_contains($page['body'], 'CONFIRMA TU IDENTIDAD PARA PUBLICAR'), '  vacío, con «Publicar» bloqueado y su formulario de confirmación dentro del editor');
+    T::ok(str_contains($page['body'], 'Este conjunto todavía no tiene reglas') && str_contains($page['body'], 'Publicar v1') && str_contains($page['body'], 'disabled title="Confirma tu identidad para publicar"') && str_contains($page['body'], 'Confirma tu identidad para publicar'), '  vacío, con «Publicar» bloqueado y su formulario de confirmación dentro del editor');
     // Estructurales sin JS
     $form = static fn(array $rules, array $o = []): array => $o + ['set' => (string) $sid, 'name' => 'Mis puntos', 'description' => '', 'note' => '', 'rules' => $rules];
     $ops = static function (array $rules, string $op) use ($s, $post, $form): array {
@@ -110,7 +110,7 @@ return static function (array $ctx): void {
     };
     $r = $ops([], 'add_rule');
     preg_match_all('/data-rule data-key="([^"]+)"/', $r['body'], $mm);
-    T::ok($r['status'] === 200 && count($mm[1]) === 1 && str_contains($r['body'], 'Añadir condición') && str_contains($r['body'], 'ENTONCES') && str_contains($r['body'], 'EXCEPTO') && Db::value('SELECT COUNT(*) FROM rule_versions') == 0, 'sin JS: «Añadir regla» recarga con una regla nueva y NO guarda nada');
+    T::ok($r['status'] === 200 && count($mm[1]) === 1 && str_contains($r['body'], 'Añadir condición') && str_contains($r['body'], 'Entonces') && str_contains($r['body'], 'Excepto') && Db::value('SELECT COUNT(*) FROM rule_versions') == 0, 'sin JS: «Añadir regla» recarga con una regla nueva y NO guarda nada');
     $k1 = $mm[1][0];
     // Guardar con errores: 422 con el mensaje junto al campo
     $r = $post($s, '/config/rules/save', $form([$k1 => ['id' => '', 'name' => '', 'enabled' => '1', 'when' => ['mode' => 'all', 'items' => ['c1' => ['field' => 'profile', 'op' => 'is', 'value' => '']]], 'then' => ['a1' => ['type' => 'add_points', 'points' => '99']]]]) + ['op' => 'save']);
@@ -216,12 +216,12 @@ return static function (array $ctx): void {
     T::ok(str_contains($page['body'], 'Último recálculo terminado') && str_contains($page['body'], 'Recuento antes y después') && str_contains($page['body'], 'Calientes'), '  la pestaña muestra el resultado del recálculo');
     // Ficha y vistazo con las reglas que influyeron
     $fich = $s->get("/leads/$ld");
-    T::ok(str_contains($fich['body'], 'REGLAS QUE INFLUYERON') && str_contains($fich['body'], 'Texas suma') && str_contains($fich['body'], '+10') && str_contains($fich['body'], 'Base del documento'), 'ficha: el desglose muestra las reglas que influyeron, su efecto y la base del documento');
+    T::ok(str_contains($fich['body'], 'Reglas que influyeron') && str_contains($fich['body'], 'Texas suma') && str_contains($fich['body'], '+10') && str_contains($fich['body'], 'Base del documento'), 'ficha: el desglose muestra las reglas que influyeron, su efecto y la base del documento');
     $pk = $s->ajax('/ajax/peek', ['id' => $ld]);
-    T::ok(str_contains($pk['body'], 'REGLAS QUE INFLUYERON') && str_contains($pk['body'], 'Texas suma'), 'vistazo: también');
+    T::ok(str_contains($pk['body'], 'Reglas que influyeron') && str_contains($pk['body'], 'Texas suma'), 'vistazo: también');
     $plain = Fx::lead(['state' => 'GA', 'first_name' => 'Sinreglas']);
     LeadIngest::rescore($plain);
-    T::ok(!str_contains($s->get("/leads/$plain")['body'], 'REGLAS QUE INFLUYERON'), '  y un lead al que no actúan reglas no muestra la sección');
+    T::ok(!str_contains($s->get("/leads/$plain")['body'], 'Reglas que influyeron'), '  y un lead al que no actúan reglas no muestra la sección');
     // Por revisar
     $rv = Fx::lead(['first_name' => 'Revisa']);
     Db::update('leads', $rv, ['flags' => ['review_queue', 'tag:revisar-fmcsa']]);
@@ -263,7 +263,7 @@ return static function (array $ctx): void {
     // Vista previa
     $qs = http_build_query($form($good2));
     $pv = $s->json($s->ajax('/ajax/rules/preview', ['set' => $sid, 'form' => $qs, 'impact' => true, 'scope' => 'last:100']));
-    T::ok(($pv['ok'] ?? false) && $pv['valid'] === true && str_contains($pv['phrases']['r_tx']['when'], 'el estado está en TX, FL') && str_contains($pv['html'], 'leads cambiarían') && str_contains($pv['html'], 'MUESTRAS') && str_contains($pv['html'], '<svg'), 'JSON preview: frases, validación e impacto con muestras y mini-gráfico SVG');
+    T::ok(($pv['ok'] ?? false) && $pv['valid'] === true && str_contains($pv['phrases']['r_tx']['when'], 'el estado está en TX, FL') && str_contains($pv['html'], 'leads cambiarían') && str_contains($pv['html'], 'Muestras') && str_contains($pv['html'], '<svg'), 'JSON preview: frases, validación e impacto con muestras y mini-gráfico SVG');
     $bad = $good2;
     $bad['r_tx']['when']['items']['c1']['value'] = 'ZZ';
     $pv = $s->json($s->ajax('/ajax/rules/preview', ['set' => $sid, 'form' => http_build_query($form($bad)), 'impact' => true]));

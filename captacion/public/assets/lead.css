@@ -113,7 +113,9 @@
   .lead__head{padding:16px;position:relative}
   .lead__id{gap:12px;align-items:flex-start}
   .lead__who>.label{margin-right:76px}
-  .lead__score{position:absolute;top:44px;right:14px}
+  .lead__score{position:absolute;top:14px;right:14px}
+  .lead__n{padding-right:68px}
+  .lead__id .av--xl{display:none}
   .ring{width:60px;height:60px}
   .ring svg{width:60px;height:60px}
   .ring b{font-size:16px}

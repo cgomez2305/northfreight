@@ -34,13 +34,13 @@ final class Ui
 
     public static function avatar(string $name, string $size = '', ?int $variant = null): string
     {
-        return '<span class="av av-' . ($variant ?? Fmt::avatar($name)) . ($size !== '' ? ' av--' . self::e($size) : '') . '" aria-hidden="true">' . self::e(Fmt::initials($name)) . '</span>';
+        return '<span class="av' . ($size !== '' ? ' av--' . self::e($size) : '') . '" aria-hidden="true">' . self::e(Fmt::initials($name)) . '</span>';
     }
 
     public static function score(int $score, string $temp): string
     {
         $cls = $temp === 'disqualified' ? 'dq' : $temp;
-        return '<span class="score score--' . self::e($cls) . '" title="Puntuación ' . $score . ' de 100">' . $score . '</span>';
+        return '<span class="score' . ($cls === 'dq' ? ' score--dq' : '') . '" title="Puntuación ' . $score . ' de 100">' . $score . '</span>';
     }
 
     /** @param array{text:string,dir:string,good:?bool} $d */

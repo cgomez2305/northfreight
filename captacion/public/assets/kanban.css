@@ -116,3 +116,4 @@
 @media (min-width:761px){.kc__mv{border-color:transparent;background:none;color:var(--ink-3)}.kc__mv:hover{background:var(--sunk);border-color:transparent}}
 .kq__q{min-height:40px}
 .kq__q input{min-height:38px}
+@media (max-width:760px){.kcol__add{width:44px;height:44px;margin:-8px -6px -8px 0}}

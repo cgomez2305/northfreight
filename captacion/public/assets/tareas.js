@@ -18,7 +18,7 @@
    list.textContent = ''; idx = -1;
    j.items.forEach(function (r) {
     var li = D.createElement('li'), b = D.createElement('button'); b.type = 'button'; b.className = 'lp__o'; b.setAttribute('role', 'option'); b.setAttribute('aria-selected', 'false');
-    var av = D.createElement('span'); av.className = 'av av--sm av-' + r.av; av.textContent = r.initials; av.setAttribute('aria-hidden', 'true');
+    var av = D.createElement('span'); av.className = 'av av--sm'; av.textContent = r.initials; av.setAttribute('aria-hidden', 'true');
     var t = D.createElement('span'), n = D.createElement('b'), s = D.createElement('small'); n.textContent = r.name; s.textContent = [r.profile, r.state, r.phone !== '—' ? r.phone : '', r.stage].filter(Boolean).join(' · ');
     t.appendChild(n); t.appendChild(s); b.appendChild(av); b.appendChild(t);
     b.addEventListener('click', function () { setLead(r.id, r.name); });
