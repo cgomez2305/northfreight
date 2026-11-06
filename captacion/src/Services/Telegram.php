@@ -90,6 +90,16 @@ final class Telegram
         return implode("\n", $lines);
     }
 
+    /** Alerta de una regla (Q5b): nombre de la regla, el texto ya con las variables de la lista blanca resueltas (escapado) y el enlace al lead. Sin telefono ni correo. */
+    public static function ruleText(array $lead, string $ruleName, string $text): string
+    {
+        return implode("\n", [
+            '<b>Regla: ' . self::e(mb_substr($ruleName, 0, 80)) . '</b>',
+            self::e(mb_substr($text, 0, 400)),
+            'Panel: <a href="' . self::e(Url::lead((int) ($lead['id'] ?? 0))) . '">abrir lead #' . (int) ($lead['id'] ?? 0) . '</a>',
+        ]);
+    }
+
     /** Avisos cortos (Q4b): el lead respondio, el bot termino, un handoff esta listo. Sin datos que no hagan falta; el texto del lead va recortado y escapado. */
     public static function noticeText(array $lead, string $kind, string $channel = '', string $snippet = ''): string
     {

@@ -59,13 +59,13 @@ final class T
     {
         $pdo = Db::pdo();
         $pdo->exec('SET FOREIGN_KEY_CHECKS = 0');
-        foreach (['lead_events', 'consents', 'leads', 'jobs', 'activity_log', 'login_attempts', 'recovery_codes', 'lead_notes', 'notification_reads', 'tasks', 'appointments', 'messages', 'sequence_enrollments', 'referrals', 'referral_codes', 'prospect_calls', 'dnc_numbers', 'prospects_fmcsa', 'job_postings', 'backups', 'handoff_deliveries', 'handoffs', 'user_invites', 'reports', 'webhook_events', 'user_prefs', 'saved_views'] as $t) {
+        foreach (['lead_events', 'consents', 'leads', 'jobs', 'activity_log', 'login_attempts', 'recovery_codes', 'lead_notes', 'notification_reads', 'tasks', 'appointments', 'messages', 'sequence_enrollments', 'referrals', 'referral_codes', 'prospect_calls', 'dnc_numbers', 'prospects_fmcsa', 'job_postings', 'backups', 'handoff_deliveries', 'handoffs', 'user_invites', 'reports', 'webhook_events', 'user_prefs', 'saved_views', 'rule_simulation_rows', 'rule_simulations', 'rule_applications', 'rule_versions', 'rule_sets'] as $t) {
             $pdo->exec("TRUNCATE TABLE `$t`");
         }
         if ($withUsers) {
             $pdo->exec('TRUNCATE TABLE users');
         }
-        $pdo->exec("DELETE FROM settings WHERE `key` LIKE 'cron.%' OR `key` LIKE 'prospects.%' OR `key` LIKE 'referrals.%' OR `key` LIKE 'jobs.%'");
+        $pdo->exec("DELETE FROM settings WHERE `key` LIKE 'cron.%' OR `key` LIKE 'prospects.%' OR `key` LIKE 'referrals.%' OR `key` LIKE 'jobs.%' OR `key` LIKE 'rules.%'");
         $pdo->exec('SET FOREIGN_KEY_CHECKS = 1');
         \Captacion\Services\Settings::clear();
         \Captacion\Clock::travel(0);

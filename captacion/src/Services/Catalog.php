@@ -56,7 +56,7 @@ final class Catalog
     public const FLAGS = [
         'cdl_unsure' => 'CDL sin confirmar', 'below_min_experience' => 'Experiencia bajo el mínimo', 'fmcsa_pending' => 'FMCSA pendiente', 'usdot_not_found' => 'USDOT no encontrado',
         'phone_invalid' => 'Teléfono inválido', 'intl_phone' => 'Teléfono internacional', 'stop' => 'STOP (sin contacto)', 'stop_sms' => 'STOP (SMS)', 'stop_call' => 'STOP (llamada)', 'stop_email' => 'STOP (correo)',
-        'red:authority_inactive' => 'Autoridad inactiva', 'red:no_insurance' => 'Sin seguro registrado',
+        'red:authority_inactive' => 'Autoridad inactiva', 'red:no_insurance' => 'Sin seguro registrado', 'review_queue' => 'Por revisar',
     ];
 
     public const EVENT_LABELS = [
@@ -73,7 +73,7 @@ final class Catalog
         'reminder_skipped' => 'Recordatorio de cita omitido', 'inbound_message' => 'Mensaje recibido', 'lead_replied' => 'El lead respondió', 'consent_restored' => 'Consentimiento de SMS restablecido',
         'message_sent' => 'Mensaje enviado (n8n)', 'message_failed' => 'Falló un mensaje (n8n)', 'sequence_message_sent' => 'Paso de secuencia enviado por WhatsApp', 'bot_finished' => 'El bot de WhatsApp terminó',
         'handoff_ready' => 'Listo para hablar con Carlos', 'automation_error' => 'Error de una automatización', 'lead_updated' => 'Datos actualizados por una automatización', 'meta_fields_unmapped' => 'Campos de Meta sin mapear',
-        'prospect_converted' => 'Convertido desde un prospecto FMCSA', 'referral_linked' => 'Llegó por un código de referido', 'referral_signed' => 'Su referido firmó',
+        'rule_alert_skipped' => 'Alerta de regla omitida (tope por hora)', 'prospect_converted' => 'Convertido desde un prospecto FMCSA', 'referral_linked' => 'Llegó por un código de referido', 'referral_signed' => 'Su referido firmó',
     ];
 
     /** Grupo de filtro de la linea de tiempo de cada tipo de evento. */
@@ -120,6 +120,9 @@ final class Catalog
     {
         if ($key === null || $key === '') {
             return $fallback;
+        }
+        if ($map === self::FLAGS && str_starts_with($key, 'tag:')) {
+            return 'Etiqueta: ' . substr($key, 4);   // etiquetas que ponen las reglas (Q5b)
         }
         return $map[$key] ?? ucfirst(str_replace(['_', '-'], ' ', $key));
     }

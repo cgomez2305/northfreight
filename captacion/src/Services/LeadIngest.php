@@ -149,10 +149,12 @@ final class LeadIngest
             $mflags = Flags::add($mflags, 'fmcsa_pending');
         }
         $mflags = Flags::add($mflags, ...array_values(array_diff($flags, ['phone_invalid'])));
-        $scored = Scoring::score($merged);
         $mflags = Flags::derive($mflags, $merged);
+        $scored = RuleRunner::score(['flags' => $mflags] + $merged);   // puntuacion base del documento + reglas PUBLICADAS (sin reglas, identica a Scoring::score)
+        $mflags = RuleEffects::flags($mflags, $scored['effects'] ?? null);
         $updates += ['score' => $scored['score'], 'temperature' => $scored['temperature'], 'score_breakdown' => $scored['breakdown'], 'disqualified_reason' => $scored['disqualified_reason'], 'flags' => $mflags];
         Db::update('leads', $leadId, $updates);
+        RuleEffects::persist($leadId, array_merge($merged, ['flags' => $mflags]), $scored, is_array($existing['score_breakdown'] ?? null) ? $existing['score_breakdown'] : null, (int) $attempt, !$quiet);
         if (isset($updates['referral_code'])) {
             Referrals::attach($leadId, $updates['referral_code']);
         }
@@ -197,8 +199,9 @@ final class LeadIngest
             $flags[] = 'fmcsa_pending';
         }
         $lead['source'] = $source;
-        $scored = Scoring::score($lead);
         $flags = Flags::derive($flags, $lead);
+        $scored = RuleRunner::score($lead + ['flags' => $flags, 'stage' => 'new']);   // base del documento + reglas publicadas (sin reglas, identica a Scoring::score)
+        $flags = RuleEffects::flags($flags, $scored['effects'] ?? null);
 
         $row = $lead;
         unset($row['consent']);
@@ -212,6 +215,7 @@ final class LeadIngest
         if ($lead['referral_code'] !== null) {
             Referrals::attach($leadId, $lead['referral_code']);
         }
+        RuleEffects::persist($leadId, $row + ['id' => $leadId], $scored, null, 1, !$quiet);
 
         self::event($leadId, 'created', [
             'source' => $source, 'site_lead_id' => $lead['site_lead_id'], 'landing_page' => $lead['landing_page'], 'utm' => $lead['utm'],
@@ -285,10 +289,12 @@ final class LeadIngest
             if ($lead === null) {
                 return null;
             }
-            $scored = Scoring::score($lead);
             $flags = Flags::derive($lead['flags'], $lead);
+            $scored = RuleRunner::score(['flags' => $flags] + $lead);   // base del documento + reglas publicadas (sin reglas, identica a Scoring::score)
+            $flags = RuleEffects::flags($flags, $scored['effects'] ?? null);
             $changed = (int) $lead['score'] !== $scored['score'] || $lead['temperature'] !== $scored['temperature'];
             Db::update('leads', $leadId, ['score' => $scored['score'], 'temperature' => $scored['temperature'], 'score_breakdown' => $scored['breakdown'], 'disqualified_reason' => $scored['disqualified_reason'], 'flags' => $flags]);
+            RuleEffects::persist($leadId, array_merge($lead, ['flags' => $flags]), $scored, is_array($lead['score_breakdown'] ?? null) ? $lead['score_breakdown'] : null, (int) $lead['attempt'], $enqueue);
             if ($changed) {
                 self::event($leadId, 'scored', ['score' => $scored['score'], 'previous' => (int) $lead['score'], 'temperature' => $scored['temperature'], 'reason' => $reason]);
                 if ($scored['temperature'] === 'disqualified') {

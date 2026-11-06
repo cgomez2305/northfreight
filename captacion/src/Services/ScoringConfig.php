@@ -224,7 +224,7 @@ final class ScoringConfig
             foreach ($rows as $r) {
                 $last = (int) $r['id'];
                 $lead = Lead::hydrate($r);
-                $new = Scoring::score($lead, $settings);
+                $new = RuleRunner::score($lead, $settings);   // base con los pesos del formulario + reglas publicadas (sin reglas, igual que antes)
                 $total++;
                 $before[$lead['temperature']] = ($before[$lead['temperature']] ?? 0) + 1;
                 $after[$new['temperature']]++;

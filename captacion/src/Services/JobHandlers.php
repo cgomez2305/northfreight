@@ -35,6 +35,8 @@ final class JobHandlers
             'meta_fetch_lead'         => [MetaLeads::class, 'jobFetch'],
             'appointment_reminder'    => [Appointments::class, 'jobReminder'],
             'telegram_notice'         => [self::class, 'telegramNotice'],
+            'rule_alert'              => [RuleEffects::class, 'jobAlert'],
+            'rule_simulate'           => [RuleSim::class, 'jobStep'],
         ];
     }
 

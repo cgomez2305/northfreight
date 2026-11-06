@@ -69,9 +69,9 @@ final class Timeline
                 break;
             case 'alert_sent':
                 $icon = 'bell';
-                $kinds = ['hot' => 'Alerta de lead caliente', 'followup' => 'Segunda alerta (sin contacto en 15 min)', 'signed_reentry' => 'Alerta: lead firmado volvió a escribir'];
+                $kinds = ['hot' => 'Alerta de lead caliente', 'followup' => 'Segunda alerta (sin contacto en 15 min)', 'signed_reentry' => 'Alerta: lead firmado volvió a escribir', 'rule' => 'Alerta de una regla'];
                 $title = $kinds[$p['kind'] ?? 'hot'] ?? 'Alerta enviada';
-                $detail = 'Por ' . ucfirst((string) ($p['channel'] ?? 'telegram')) . '.';
+                $detail = 'Por ' . ucfirst((string) ($p['channel'] ?? 'telegram')) . '.' . (($p['kind'] ?? '') === 'rule' && !empty($p['rule']) ? ' Regla: ' . mb_substr((string) $p['rule'], 0, 80) . '.' : '');
                 break;
             case 'a3_cancelled':
                 $icon = 'bell';
