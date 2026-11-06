@@ -39,7 +39,11 @@ ns_default('BRAND', 'NorthStar Freight Solutions');
 ns_default('BRAND_SHORT', 'NorthStar');
 ns_default('PHONE', '+1 863-651-3322');          // visible como texto
 ns_default('TEL', '+18636513322');                // para href="tel:"
+// Correo visible y de contacto. Se imprime en footer, CTA final, /contact/, legales y pop-up móvil, y llega a JSON-LD y llms.txt: cambiarlo AQUÍ (o con define() en config.local.php)
+// basta para pasar al correo con dominio propio. Literal aparte: la meta de /contact/ en app/routes.php (no se toca sin decisión de SEO).
 ns_default('EMAIL', 'nfreightsolutionsllc@gmail.com');
+// Remitente (From) de los correos del sitio. Vacío = el buzón SMTP_USER. Con SMTP de Hostinger debe ser el propio buzón autenticado.
+ns_default('MAIL_FROM', '');
 ns_default('WA_BASE', 'https://wa.me/18636513322');
 // PENDIENTE (cliente): dominio definitivo. Sin "https://" ni barra final.
 // Elegir UNO (con o sin www) y reflejarlo en .htaccess.
@@ -47,10 +51,10 @@ ns_default('DOMAIN', 'northstarfreight.example');
 
 // --- Entidad / SEO (todas OPCIONALES: vacías hasta que el cliente las confirme) -----------------------------------
 // Solo se emiten en JSON-LD (Organization) y en el footer cuando están definidas. Ver app/config.local.example.php.
-ns_default('LEGAL_NAME', '');      // nombre legal completo (p. ej. el de la LLC)
-ns_default('ADDRESS', []);         // ['street'=>'', 'city'=>'', 'region'=>'', 'postal'=>'', 'country'=>'US']
+ns_default('LEGAL_NAME', 'NorthStar Freight Solutions LLC');   // nombre legal (confirmado por el cliente, fase S). Llega a JSON-LD legalName. No es secreto.
+ns_default('ADDRESS', []);         // OMITIDA a propósito (decisión del cliente, fase S: no se publica dirección). ['street'=>'', 'city'=>'', 'region'=>'', 'postal'=>'', 'country'=>'US']
 ns_default('SAME_AS', []);         // URLs de perfiles oficiales (LinkedIn, Facebook, YouTube…)
-ns_default('FOUNDING_DATE', '');   // 'YYYY' o 'YYYY-MM-DD'
+ns_default('FOUNDING_DATE', '');   // PENDIENTE (fecha exacta). 'YYYY' o 'YYYY-MM-DD'. Solo se sabe que opera desde el 1 de junio de 2026: no se publica sin confirmar.
 // robots.txt de producción: bots de ENTRENAMIENTO de IA (GPTBot, ClaudeBot, Google-Extended, Applebot-Extended, CCBot).
 // 'allow' (defecto) | 'block'. Los bots de búsqueda/respuesta de IA (OAI-SearchBot, PerplexityBot…) siempre quedan permitidos.
 ns_default('AI_TRAINING_BOTS', 'allow');
@@ -97,7 +101,18 @@ ns_default('SHOW_RESOURCES', true);         // Resources y Blog en nav/footer (a
 // Chip "On shift · ET hh:mm" de la isla de acciones del header. Afirma que el desk trabaja AHORA, así que solo se muestra en producción si config.local.php lo activa
 // de forma explícita con SHOW_ON_SHIFT_PRODUCTION = true (tras confirmar el horario con el cliente). En staging se ve para revisar el diseño.
 ns_default('SHOW_ON_SHIFT_PRODUCTION', false);
-ns_default('SHOW_ON_SHIFT', true);
+ns_default('SHOW_ON_SHIFT', false);   // fase S: retirado en TODOS los entornos (el cliente anuncia cobertura 24/7 como texto, ver COVERAGE_TEXT). El mecanismo sigue disponible.
+
+// Cobertura del desk (fase S, decisión del cliente: 24/7). UN solo sitio para cambiarla o vaciarla: con '' desaparece de todas las páginas.
+// Aparece solo donde había un hueco natural: la línea de horario de /contact/ (rótulo "Desk hours") y el cierre de /our-desk/. Sin promesas de tiempo de respuesta.
+// Sin openingHours en JSON-LD a propósito. PENDIENTE de validar por Carlos con el cliente.
+ns_default('COVERAGE_TEXT', 'Dispatch desk coverage: 24/7');
+// Idiomas de atención (fase S: el equipo atiende en inglés y español). '' = no se muestra. Aparece en /contact/ y en el cierre de /our-desk/.
+ns_default('LANGUAGES_TEXT', 'English and Spanish');
+// Descargables (BOL y agreement): el cliente pidió NO ofrecerlos hasta que estén aprobados. false (defecto) = en ENV=production las rutas /resources/bol-template/ y
+// /resources/dispatcher-carrier-agreement/ dan 404 y desaparecen de sitemap, llms, menús, listados, footer y enlaces; en staging se ven para revisar. true = se publican
+// (siempre que además existan los archivos de assets/downloads/ que declara cada ruta en needs_files).
+ns_default('DOWNLOADS_APPROVED', false);
 // URL del video del equipo (YouTube, Vimeo o .mp4). Vacía = no hay video: en producción se omiten la fachada, el play, la duración y los capítulos (en staging se ven para revisar el diseño).
 ns_default('DESK_VIDEO_URL', '');
 ns_default('SHOW_EQUIPMENT_CHIPS', false);  // chips "By equipment" del mega menú
@@ -148,6 +163,9 @@ function cfg(?string $key = null): mixed
             'hero_headline'        => HERO_HEADLINES[HERO_VARIANT] ?? HERO_HEADLINES['B'],
             'show_resources'       => (bool) SHOW_RESOURCES,
             'show_on_shift'        => (bool) SHOW_ON_SHIFT && (ENV !== 'production' || (bool) SHOW_ON_SHIFT_PRODUCTION),   // en producción solo con SHOW_ON_SHIFT_PRODUCTION = true
+            'coverage_text'        => trim((string) COVERAGE_TEXT),
+            'languages_text'       => trim((string) LANGUAGES_TEXT),
+            'downloads_approved'   => (bool) DOWNLOADS_APPROVED,
             'show_equipment_chips' => (bool) SHOW_EQUIPMENT_CHIPS,
             'wa_messages'          => WA_MESSAGES,
         ];

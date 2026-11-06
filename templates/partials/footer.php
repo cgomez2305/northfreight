@@ -1,6 +1,6 @@
 <?php
 /**
- * Footer: logo + descripción · Services · Company · Talk to the desk; fila inferior © año, MC#/USDOT (ph), Privacy, Terms.
+ * Footer: logo + descripción · Services · Company · Talk to the desk; fila inferior © año, Privacy, Terms (sin MC#/USDOT: NorthStar no los tiene, fase S).
  * WhatsApp, teléfono y correo siempre visibles como texto, con icono (bloque de contacto). "Back to top" apunta a #site-header (la cabecera).
  * Ancla #footer-nav (alternativa sin JS al menú móvil). Debajo de la fila legal, el wordmark gigante "NORTHSTAR" recortado por abajo (.footer__mark, decorativo).
  * Dirección (NAP) opcional: solo si ADDRESS está definida (org_address()).
@@ -20,7 +20,6 @@ if (cfg('show_resources')) {
     }
 }
 $email = (string) cfg('email');
-$legalId = ph('MC# pending · USDOT pending');
 $addr = org_address();   // NAP: solo se imprime si ADDRESS está definida en config.local.php
 ?>
 <footer class="footer" id="footer-nav">
@@ -65,9 +64,8 @@ $addr = org_address();   // NAP: solo se imprime si ADDRESS está definida en co
     </div>
   </div>
   <div class="footer__bar">
-    <span>© <?= date('Y') ?> <?= e(cfg('brand')) ?> LLC</span>
+    <span>© <?= date('Y') ?> <?= e((string) (cfg('legal_name') ?: cfg('brand') . ' LLC')) ?></span>
     <span class="footer__legal">
-      <?php if ($legalId !== ''): ?><span><?= $legalId ?></span><?php endif; ?>
       <?php if (route_is_live('/privacy-policy/')): ?><a class="foot__link" href="<?= e(url('/privacy-policy/')) ?>">Privacy</a><?php endif; ?>
       <?php if (route_is_live('/terms/')): ?><a class="foot__link" href="<?= e(url('/terms/')) ?>">Terms</a><?php endif; ?>
       <a class="foot__top" href="#site-header">Back to top <span class="arrow" aria-hidden="true">→</span></a>

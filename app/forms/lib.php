@@ -467,7 +467,8 @@ function ns_send_mail(string $subject, string $body, ?array $replyTo = null): bo
         $m->CharSet = 'UTF-8';
         $m->Encoding = '8bit';
         $m->SMTPDebug = 0;
-        $from = filter_var((string) SMTP_USER, FILTER_VALIDATE_EMAIL) ? (string) SMTP_USER : ns_mail_to();
+        $mailFrom = defined('MAIL_FROM') ? trim((string) MAIL_FROM) : '';
+        $from = filter_var($mailFrom, FILTER_VALIDATE_EMAIL) ? $mailFrom : (filter_var((string) SMTP_USER, FILTER_VALIDATE_EMAIL) ? (string) SMTP_USER : ns_mail_to());
         $m->setFrom($from, 'NorthStar website');
         $m->addAddress(ns_mail_to());
         if ($replyTo !== null && filter_var($replyTo[0] ?? '', FILTER_VALIDATE_EMAIL)) {

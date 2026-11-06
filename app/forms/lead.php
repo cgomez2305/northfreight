@@ -249,8 +249,9 @@ function ns_lead_mail_body(array $l, array $opt): string
     }
 
     // --- Elegibilidad interna: nunca se muestra ni rechaza en pantalla ---
-    $minYears = defined('LEAD_MIN_YEARS') ? (int) LEAD_MIN_YEARS : 1;
-    $qualified = $old['cdl_standard'] === 'yes' && in_array($old['english'], ['yes', 'basic'], true) && (int) $yearsRaw >= $minYears;
+    // LEAD_MIN_YEARS = 0 (defecto desde la fase S): los años de experiencia NO cuentan como criterio hasta que el cliente apruebe el requisito.
+    $minYears = defined('LEAD_MIN_YEARS') ? max(0, (int) LEAD_MIN_YEARS) : 0;
+    $qualified = $old['cdl_standard'] === 'yes' && in_array($old['english'], ['yes', 'basic'], true) && ($minYears === 0 || (int) $yearsRaw >= $minYears);
 
     $consentGiven = $old['consent'] === '1';
     $now = gmdate('c');
