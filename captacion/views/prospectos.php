@@ -42,7 +42,7 @@ $cronAt = is_array($cron) ? ($cron['at'] ?? null) : null;
     <button class="btn btn--secondary filters-toggle" type="button" data-toggle="#filters" aria-expanded="<?= $nFilters > 0 ? 'true' : 'false' ?>" aria-controls="filters"><?= Ui::icon('filter') ?>Filtros<?= $nFilters > 0 ? ' <b class="badge">' . $e($nFilters) . '</b>' : '' ?></button>
     <form method="post" action="/prospectos/export">
       <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="qs" value="<?= $e(ltrim(Ui::qs($qsBase), '?')) ?>">
-      <button class="btn btn--primary" type="submit"><span class="btn__t">Exportar CSV</span><span class="btn__cell"><?= Ui::icon('download') ?></span></button>
+      <button class="btn btn--primary" type="submit"><span class="btn__t">Exportar CSV</span></button>
     </form>
   </div>
   <?php endif; ?>
@@ -150,7 +150,7 @@ $cronAt = is_array($cron) ? ($cron['at'] ?? null) : null;
         <?php elseif ($r['phone'] === null): ?>
           <span class="btn btn--primary is-off" aria-disabled="true"><span class="btn__t">Llamar</span></span><span class="pc__local pc__local--off">Sin teléfono en FMCSA</span>
         <?php elseif ($tz['allowed']): ?>
-          <a class="btn btn--primary" href="tel:<?= $e($r['phone']) ?>" aria-label="Llamar a <?= $e($name) ?>, <?= $e(Fmt::phone($r['phone'])) ?>"><span class="btn__t">Llamar</span><span class="btn__cell"><?= Ui::icon('phone') ?></span></a>
+          <a class="btn btn--primary" href="tel:<?= $e($r['phone']) ?>" aria-label="Llamar a <?= $e($name) ?>, <?= $e(Fmt::phone($r['phone'])) ?>"><span class="btn__t">Llamar</span></a>
           <span class="pc__num mono"><?= $e(Fmt::phone($r['phone'])) ?></span>
           <span class="pc__local">Allá son las <?= $e($tz['local_hm']) ?> <?= $e($tz['zone_label']) ?><?= $tz['multi'] ? ' · dos zonas horarias' : '' ?></span>
         <?php else: ?>

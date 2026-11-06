@@ -8,8 +8,7 @@
 .tbl--tabla .c-name{position:sticky;left:44px;z-index:3;min-width:210px;max-width:260px;background:var(--surface);box-shadow:1px 0 0 var(--line)}
 .tbl--tabla thead .c-chk,.tbl--tabla thead .c-name{background:var(--sunk);z-index:4}
 .tbl--tabla tbody tr:hover>.c-chk,.tbl--tabla tbody tr:hover>.c-name{background:var(--sunk)}
-.tbl--tabla tr.is-cur>.c-chk,.tbl--tabla tr.is-cur>.c-name,.tbl--tabla tr.is-open>.c-chk,.tbl--tabla tr.is-open>.c-name{background:var(--cyan-tint)}
-.tbl--tabla .is-urgent>.c-chk,.tbl--tabla .is-urgent>.c-name{background:var(--urgent-bg)}
+.tbl--tabla tr.is-cur>.c-chk,.tbl--tabla tr.is-cur>.c-name,.tbl--tabla tr.is-open>.c-chk,.tbl--tabla tr.is-open>.c-name{background:var(--accent-tint)}
 .tbl--tabla .who b{overflow:hidden;text-overflow:ellipsis;max-width:170px}
 .tbl--tabla .tc--n{text-align:right}
 .tbl--tabla .tc--n .sort{justify-content:flex-end}

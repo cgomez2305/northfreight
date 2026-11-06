@@ -7,7 +7,7 @@ for ($i = 0; $i < 3; $i++) {   // tres filas vacias para añadir preguntas
     $rows[] = ['from' => '', 'to' => ''];
 }
 $chan = ['call' => 'Llamada', 'sms' => 'SMS', 'email' => 'Correo', 'whatsapp' => 'WhatsApp'];
-$btn = static fn(string $t): string => '<button class="btn btn--primary" type="submit"><span class="btn__t">' . $t . '</span><span class="btn__cell">' . Ui::icon('check') . '</span></button>';
+$btn = static fn(string $t): string => '<button class="btn btn--primary" type="submit"><span class="btn__t">' . $t . '</span></button>';
 ?>
 <p class="cfg-intro">Ajustes de los canales que entran por webhook. Las llaves y contraseñas NO se editan aquí: viven en <code>config/.env</code> (estado y botón «Probar» en la pestaña Integraciones).</p>
 
@@ -15,10 +15,10 @@ $btn = static fn(string $t): string => '<button class="btn btn--primary" type="s
   <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>">
   <fieldset class="cfg-fs"<?= $locked ? ' disabled' : '' ?>>
     <section class="card cfg-card" aria-labelledby="mt-t">
-      <header class="card__h"><h2 class="label" id="mt-t">META LEAD ADS · MAPEO DE CAMPOS</h2></header>
+      <header class="card__h"><h2 class="label" id="mt-t">Meta lead ads · mapeo de campos</h2></header>
       <div class="card__b">
         <p class="muted">Cada pregunta del formulario del anuncio llega con un nombre propio. Escribe aquí el nombre tal como aparece en el lead (minúsculas, con guiones bajos) y a qué dato del CRM corresponde. Los nombres estándar de Meta ya están mapeados. Lo que no se mapee se ignora y queda anotado en el lead («campos sin mapear»).</p>
-        <p class="cn-def"><span class="label">YA INCLUIDOS</span> <?php foreach ($metaDefaults as $k => $v): ?><span class="chip chip--plain"><code><?= $e($k) ?></code> → <?= $e($metaTargets[$v] ?? $v) ?></span> <?php endforeach; ?></p>
+        <p class="cn-def"><span class="label">Ya incluidos</span> <?php foreach ($metaDefaults as $k => $v): ?><span class="chip chip--plain"><code><?= $e($k) ?></code> → <?= $e($metaTargets[$v] ?? $v) ?></span> <?php endforeach; ?></p>
         <div class="cn-map" role="group" aria-label="Mapeo de preguntas del formulario">
           <div class="cn-map__h" aria-hidden="true"><span>Pregunta de Meta</span><span>Dato del CRM</span></div>
           <?php foreach ($rows as $i => $r): ?>
@@ -46,7 +46,7 @@ $btn = static fn(string $t): string => '<button class="btn btn--primary" type="s
   <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>">
   <fieldset class="cfg-fs"<?= $locked ? ' disabled' : '' ?>>
     <section class="card cfg-card" aria-labelledby="cc-t">
-      <header class="card__h"><h2 class="label" id="cc-t">CAL.COM</h2></header>
+      <header class="card__h"><h2 class="label" id="cc-t">Cal.com</h2></header>
       <div class="card__b">
         <label class="field cn-w"><span>Enlace de reserva (A4)</span><input type="url" name="booking_url" value="<?= $e($cal['booking_url']) ?>" maxlength="200" placeholder="https://cal.com/…"><small>El enlace que n8n manda por WhatsApp cuando un lead pasa a Calificado. Vacío = A4 no envía nada.</small></label>
         <label class="field cn-w"><span>Perfil de los leads que nacen de una reserva</span><select name="default_profile"><?php foreach ($profiles as $k => $l): ?><option value="<?= $e($k) ?>"<?= $cal['default_profile'] === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select><small>Solo cuando quien reserva no está en el CRM (si ya lo está, la cita se enlaza a su lead).</small></label>
@@ -60,7 +60,7 @@ $btn = static fn(string $t): string => '<button class="btn btn--primary" type="s
   <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>">
   <fieldset class="cfg-fs"<?= $locked ? ' disabled' : '' ?>>
     <section class="card cfg-card" aria-labelledby="tw-t">
-      <header class="card__h"><h2 class="label" id="tw-t">TWILIO · SMS</h2></header>
+      <header class="card__h"><h2 class="label" id="tw-t">Twilio · SMS</h2></header>
       <div class="card__b">
         <label class="field"><span>Respuesta a HELP</span><textarea name="help_text" rows="3" maxlength="320" placeholder="<?= $e(\Captacion\Services\SmsInbound::DEFAULT_HELP) ?>"><?= $e($tw['help_custom'] ? $tw['help_text'] : '') ?></textarea><small>Vacío = el texto por defecto (borrador: que lo revise el abogado antes de enviar SMS reales). STOP, STOPALL, UNSUBSCRIBE, CANCEL, END y QUIT revocan SMS y WhatsApp; START, YES y UNSTOP restablecen solo el SMS.</small></label>
       </div>
@@ -73,7 +73,7 @@ $btn = static fn(string $t): string => '<button class="btn btn--primary" type="s
   <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>">
   <fieldset class="cfg-fs"<?= $locked ? ' disabled' : '' ?>>
     <section class="card cfg-card" aria-labelledby="nn-t">
-      <header class="card__h"><h2 class="label" id="nn-t">N8N · PASOS QUE PUEDE ENVIAR POR WHATSAPP</h2></header>
+      <header class="card__h"><h2 class="label" id="nn-t">n8n · pasos que puede enviar por WhatsApp</h2></header>
       <div class="card__b">
         <p class="muted">n8n pregunta a <code>/internal/sequences/due</code> y solo recibe los pasos que marques aquí, y solo de leads con consentimiento vigente en ese canal. <b>Marca un paso solo cuando su plantilla de WhatsApp ya esté aprobada por Meta.</b> Todo apagado = n8n no envía nada.</p>
         <div class="eqgrid"><?php foreach ($steps as $k => $l): ?><label class="check check--box"><input type="checkbox" name="wa_steps[]" value="<?= $e($k) ?>"<?= in_array($k, $n8n['wa_steps'], true) ? ' checked' : '' ?>><span><?= $e($l) ?></span></label><?php endforeach; ?></div>

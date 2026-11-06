@@ -11,6 +11,6 @@
         <label class="field"><span>Contraseña</span>
           <input type="password" name="password" required autocomplete="current-password"<?= !empty($error) ? ' aria-describedby="err"' : '' ?>>
         </label>
-        <button class="btn btn--primary btn--block btn--lg" type="submit"><span class="btn__t">Continuar</span><span class="btn__cell"><?= Ui::icon('arrow-up-right') ?></span></button>
+        <button class="btn btn--primary btn--block btn--lg" type="submit"><span class="btn__t">Continuar</span></button>
       </form>
 <?php require __DIR__ . '/_auth_close.php'; ?>

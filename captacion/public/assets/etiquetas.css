@@ -1,26 +1,18 @@
 /* NorthStar Captación · etiquetas, barra de puntuación y avance (tarjetas del tablero y vistazo rápido). Pipeline la carga en la primera pantalla; las demás pantallas, junto con peek.css al abrir el vistazo. */
-.tag{display:inline-flex;align-items:center;gap:5px;height:22px;padding:0 8px;border-radius:var(--r-pill);font:500 11.5px var(--f-sans);background:var(--sunk);color:var(--ink-2);border:1px solid var(--line);white-space:nowrap}
-.tag i{width:6px;height:6px;border-radius:50%;background:var(--ink-3)}
+.tag{display:inline-flex;align-items:center;gap:5px;font:400 var(--fs-xs) var(--f-sans);color:var(--ink-3);white-space:nowrap}
+.tag i{display:none}
+.tag+.tag::before{content:"·";margin-right:5px;color:var(--ink-4)}
 .tag .ic{width:12px;height:12px}
-.tag--p-owner_operator i{background:var(--st-qualified)}
-.tag--p-small_carrier i{background:var(--st-contacted)}
-.tag--p-company_driver i{background:var(--hot-dot)}
-.tag--e-0 i{background:var(--seg-0)}
-.tag--e-1 i{background:var(--st-closed)}
-.tag--e-2 i{background:var(--warn-dot)}
-.tag--e-3 i{background:var(--cold-dot)}
-.tag--e-4 i{background:var(--st-lost)}
-.tag--bad{background:var(--bad-bg);color:var(--bad);border-color:transparent}
+.tag--bad{color:var(--bad)}
 .sbar{display:inline-flex;align-items:flex-end;gap:2px;height:14px}
-.sbar i{width:4px;border-radius:1px;background:var(--line-2)}
+.sbar i{width:3px;border-radius:1px;background:var(--line-2)}
 .sbar i:nth-child(1){height:5px}
 .sbar i:nth-child(2){height:8px}
 .sbar i:nth-child(3){height:11px}
 .sbar i:nth-child(4){height:14px}
-.sbar--hot .on{background:var(--hot-dot)}
-.sbar--warm .on{background:var(--warm-dot)}
-.sbar--cold .on{background:var(--cold-dot)}
-.sbar--dq .on{background:var(--dq-dot)}
+.sbar .on{background:var(--ink-2)}
+.sbar--dq .on{background:var(--ink-4)}
 .prog{display:inline-flex;gap:2px;flex:1;max-width:84px}
 .prog b{height:3px;flex:1;border-radius:2px;background:var(--line-2)}
-.prog b.on{background:var(--cyan)}
+.prog b.on{background:var(--accent)}
+.tag--bad::before{display:none}

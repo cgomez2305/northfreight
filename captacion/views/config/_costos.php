@@ -14,7 +14,7 @@ foreach ($costTable['months'] as $m) {
 <p class="cfg-intro">Cuánto gastas por canal cada mes. Con eso el dashboard calcula el <b>costo por lead</b> y, cuando ya hay firmados, el <b>costo por firmado</b>. Sin costos cargados, el dashboard dice «Sin costos cargados»: nunca inventa un número.</p>
 
 <section class="card cfg-card" aria-labelledby="co-m">
-  <header class="card__h"><h2 class="label" id="co-m">ESTE MES · <?= $e(strtoupper($monthName(Fmt::et($now)->format('Y-m')))) ?></h2></header>
+  <header class="card__h"><h2 class="label" id="co-m">Este mes · <?= $e($monthName(Fmt::et($now)->format('Y-m'))) ?></h2></header>
   <div class="card__b">
     <?php if (!$month['has_costs']): ?><p class="muted">Todavía no hay costos cargados. Agrega el primero abajo.</p>
     <?php else: ?><dl class="strip strip--3"><div><dt>Gasto del mes</dt><dd><?= $e($money($month['amount'])) ?></dd></div><div><dt>Costo por lead</dt><dd><?= $month['cpl'] !== null ? $e($money($month['cpl'])) : '<span class="dd-na">' . ($month['amount'] > 0 ? 'Sin leads de esos canales' : 'Sin gasto este mes') . '</span>' ?></dd></div><div><dt>Costo por firmado</dt><dd><?= $month['cps'] !== null ? $e($money($month['cps'])) : '<span class="dd-na">' . ($month['amount'] > 0 ? 'Aún sin firmados' : 'Sin gasto este mes') . '</span>' ?></dd></div></dl><?php endif; ?>
@@ -35,7 +35,7 @@ foreach ($costTable['months'] as $m) {
             <?php if (isset($errors['period'])): ?><small class="num__e"><?= $e($errors['period']) ?></small><?php endif; ?></label>
           <label class="field<?= isset($errors['amount']) ? ' has-err' : '' ?>"><span>Monto (USD)</span><input type="text" name="amount" value="<?= $e($f['amount']) ?>" inputmode="decimal" placeholder="350.00" maxlength="12" autocomplete="off" required<?= isset($errors['amount']) ? ' aria-invalid="true"' : '' ?>>
             <?php if (isset($errors['amount'])): ?><small class="num__e"><?= $e($errors['amount']) ?></small><?php endif; ?></label>
-          <button class="btn btn--primary co-go" type="submit"><span class="btn__t"><?= $f['id'] > 0 ? 'Guardar cambio' : 'Guardar costo' ?></span><span class="btn__cell"><?= Ui::icon('check') ?></span></button>
+          <button class="btn btn--primary co-go" type="submit"><span class="btn__t"><?= $f['id'] > 0 ? 'Guardar cambio' : 'Guardar costo' ?></span></button>
         </div>
         <p class="muted">Si ya hay un costo de esa fuente en ese mes, se reemplaza el monto.</p>
       </fieldset>
@@ -44,7 +44,7 @@ foreach ($costTable['months'] as $m) {
 </section>
 
 <section class="card cfg-card" aria-labelledby="co-l">
-  <header class="card__h"><h2 class="label" id="co-l">COSTOS CARGADOS</h2><span class="muted"><?= $e(count($rows)) ?> registro<?= count($rows) === 1 ? '' : 's' ?></span></header>
+  <header class="card__h"><h2 class="label" id="co-l">Costos cargados</h2><span class="muted"><?= $e(count($rows)) ?> registro<?= count($rows) === 1 ? '' : 's' ?></span></header>
   <?php if (!$rows): ?>
     <div class="empty empty--sm"><?= Ui::icon('star', 'empty__star ic--star') ?><h3>Sin costos cargados</h3><p>Agrega cuánto gastaste en Meta, Indeed u otros canales y el dashboard calculará el costo por lead.</p></div>
   <?php else: ?>

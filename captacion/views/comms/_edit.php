@@ -11,7 +11,7 @@ $mark = static fn(string $s): string => (string) preg_replace('/(\[\[[^\]]{1,200
 <div class="cm-edit">
   <form method="post" action="<?= $e($action) ?>" class="card cm-form" novalidate>
     <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>">
-    <header class="card__h"><h2 class="label"><?= $creating ? 'NUEVA PLANTILLA' : 'EDITAR · ' . $e(strtoupper($tpl['tkey'])) . ' · ' . $e(strtoupper($tpl['lang'])) ?></h2><a class="link" href="/comunicaciones">Volver</a></header>
+    <header class="card__h"><h2 class="label"><?= $creating ? 'Nueva plantilla' : 'Editar · ' . $e(strtoupper($tpl['tkey'])) . ' · ' . $e(strtoupper($tpl['lang'])) ?></h2><a class="link" href="/comunicaciones">Volver</a></header>
     <div class="card__b cm-fields">
       <label class="field<?= isset($errors['name']) ? ' has-err' : '' ?>"><span>Nombre</span><input type="text" name="name" value="<?= $e($form['name']) ?>" maxlength="120" required<?= $fe('name') ?>><?= $em('name') ?></label>
       <?php if ($creating): ?>
@@ -23,12 +23,12 @@ $mark = static fn(string $s): string => (string) preg_replace('/(\[\[[^\]]{1,200
       <p class="muted">Variables: <code>{nombre}</code> <code>{equipo}</code> <code>{estado}</code> <code>{link_baja}</code> <code>{link_calculadora}</code> <code>{whatsapp}</code>. El pie con la dirección física y el enlace de baja se añade siempre, no hace falta escribirlo.</p>
     </div>
     <footer class="card__f"><span class="muted"><?= $creating ? 'La clave se genera a partir del nombre.' : 'Clave: ' . $e($tpl['tkey']) . ($tpl['kind'] === 'system' ? ' · de fábrica' : '') ?></span>
-      <button class="btn btn--primary" type="submit"><span class="btn__t"><?= $creating ? 'Crear plantilla' : 'Guardar' ?></span><span class="btn__cell"><?= Ui::icon('check') ?></span></button></footer>
+      <button class="btn btn--primary" type="submit"><span class="btn__t"><?= $creating ? 'Crear plantilla' : 'Guardar' ?></span></button></footer>
   </form>
 
   <aside class="cm-side">
     <section class="card" aria-labelledby="pv-t">
-      <header class="card__h"><h2 class="label" id="pv-t">VISTA PREVIA</h2><span class="muted">Con un lead de ejemplo</span></header>
+      <header class="card__h"><h2 class="label" id="pv-t">Vista previa</h2><span class="muted">Con un lead de ejemplo</span></header>
       <div class="card__b cm-prev">
         <?php if ($preview['unresolved']): ?><p class="flash flash--bad" role="status"><?= Ui::icon('alert') ?><span><b>No se enviará.</b> Hay <?= $e(count($preview['unresolved'])) ?> texto<?= count($preview['unresolved']) === 1 ? '' : 's' ?> sin resolver: <?= $e(implode(' ', array_map(static fn($x) => mb_substr($x, 0, 120), array_slice($preview['unresolved'], 0, 3)))) ?></span></p><?php else: ?><p class="flash flash--ok" role="status"><?= Ui::icon('check-circle') ?>Sin marcadores pendientes: lista para enviar.</p><?php endif; ?>
         <p class="cm-subj"><b>Asunto:</b> <?= $mark($preview['subject']) ?></p>
@@ -37,12 +37,12 @@ $mark = static fn(string $s): string => (string) preg_replace('/(\[\[[^\]]{1,200
     </section>
     <?php if (!$creating): ?>
     <section class="card" aria-labelledby="ts-t">
-      <header class="card__h"><h2 class="label" id="ts-t">ENVIAR PRUEBA</h2></header>
+      <header class="card__h"><h2 class="label" id="ts-t">Enviar prueba</h2></header>
       <div class="card__b">
         <form method="post" action="/comunicaciones/plantillas/<?= $e($tpl['id']) ?>/test" class="cm-fields">
           <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>">
           <label class="field"><span>Enviar a</span><input type="email" name="to" value="<?= $e($userEmail) ?>" maxlength="190" required></label>
-          <button class="btn btn--secondary" type="submit"><span class="btn__t">Enviar prueba</span><span class="btn__cell"><?= Ui::icon('send') ?></span></button>
+          <button class="btn btn--secondary" type="submit"><span class="btn__t">Enviar prueba</span></button>
           <p class="muted"><?= $canDeliver ? 'Sale por el SMTP configurado, marcada como PRUEBA.' : 'Sin SMTP: la prueba solo queda registrada en storage/mail.log.' ?></p>
         </form>
         <div class="q3a">

@@ -16,7 +16,7 @@ $chips = ['ty' => static fn($v) => 'Tipo: ' . ActivityView::GROUPS[$v][0], 'us' 
   </div>
   <div class="page-head__a">
     <form method="post" action="/actividad/export"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="qs" value="<?= $e(http_build_query($f)) ?>">
-      <button class="btn btn--primary" type="submit"><span class="btn__t">Exportar CSV</span><span class="btn__cell"><?= Ui::icon('download') ?></span></button></form>
+      <button class="btn btn--secondary" type="submit"><span class="btn__t">Exportar CSV</span></button></form>
   </div>
 </div>
 
@@ -31,7 +31,7 @@ $chips = ['ty' => static fn($v) => 'Tipo: ' . ActivityView::GROUPS[$v][0], 'us' 
 <?php if ($nFilters): ?><div class="chips" aria-label="Filtros activos"><?php foreach ($f as $k => $v): ?><a class="fchip" href="/actividad<?= $e(Ui::qs(array_diff_key($f, [$k => 1]))) ?>" aria-label="Quitar filtro: <?= $e($chips[$k]($v)) ?>"><?= $e($chips[$k]($v)) ?><?= Ui::icon('x') ?></a><?php endforeach; ?></div><?php endif; ?>
 
 <section class="card card--table" aria-label="Registro de actividad">
-  <header class="card__h card__h--row"><h2 class="label">REGISTRO</h2><span class="muted"><?= $e(Fmt::num($res['total'])) ?> evento<?= $res['total'] === 1 ? '' : 's' ?><?= $nFilters ? ' con estos filtros' : '' ?></span></header>
+  <header class="card__h card__h--row"><h2 class="label">Registro</h2><span class="muted"><?= $e(Fmt::num($res['total'])) ?> evento<?= $res['total'] === 1 ? '' : 's' ?><?= $nFilters ? ' con estos filtros' : '' ?></span></header>
   <?php if (!$rows): ?>
     <div class="empty empty--sm"><?= Ui::icon('star', 'empty__star ic--star') ?><h3><?= $total === 0 ? 'Aún no hay actividad' : 'Nada coincide con esos filtros' ?></h3><p><?= $total === 0 ? 'Los inicios de sesión, cambios y exportaciones irán apareciendo aquí.' : 'Prueba con otro tipo, otras fechas o menos texto.' ?></p></div>
   <?php else: ?>
@@ -54,7 +54,7 @@ $chips = ['ty' => static fn($v) => 'Tipo: ' . ActivityView::GROUPS[$v][0], 'us' 
 </section>
 
 <section class="card cfg-card" id="retencion" aria-labelledby="ret-h">
-  <header class="card__h"><h2 class="label" id="ret-h">RETENCIÓN</h2></header>
+  <header class="card__h"><h2 class="label" id="ret-h">Retención</h2></header>
   <div class="card__b">
     <p class="muted">Se guarda el registro de los últimos <b><?= $e($retention) ?></b> días<?= $oldest !== null ? ' (el más antiguo es del ' . $e(Fmt::date((string) $oldest)) . ')' : '' ?>. Lo más viejo lo borra el cron diario (siempre queda una fila que cuenta cuántas se borraron).</p>
     <?php if ($locked): ?>
@@ -69,7 +69,7 @@ $chips = ['ty' => static fn($v) => 'Tipo: ' . ActivityView::GROUPS[$v][0], 'us' 
       <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>">
       <fieldset class="cfg-fs"<?= $locked ? ' disabled' : '' ?>>
         <label class="field"><span>Días de retención (30 a 3650)</span><input type="text" name="days" value="<?= $e($retention) ?>" inputmode="numeric" maxlength="4" autocomplete="off" required></label>
-        <button class="btn btn--primary" type="submit"><span class="btn__t">Guardar retención</span><span class="btn__cell"><?= Ui::icon('check') ?></span></button>
+        <button class="btn btn--primary" type="submit"><span class="btn__t">Guardar retención</span></button>
       </fieldset>
     </form>
   </div>

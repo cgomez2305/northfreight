@@ -25,7 +25,7 @@ $cmp = RepView::compareRows($m, $p);
 <?php require __DIR__ . '/rep/_kpis.php'; ?>
 
 <section class="card" aria-labelledby="i-cmp">
-  <header class="card__h"><h2 class="label" id="i-cmp">TENDENCIA FRENTE AL MES ANTERIOR</h2></header>
+  <header class="card__h"><h2 class="label" id="i-cmp">Tendencia frente al mes anterior</h2></header>
   <div class="tw"><table class="tbl tbl--rep"><thead><tr><th scope="col">Indicador</th><th scope="col" class="num-c"><?= $e(ucfirst($meta['label'] ?? 'Este mes')) ?></th><th scope="col" class="num-c"><?= $e(ucfirst($meta['prev_label'] ?? 'Mes anterior')) ?></th><th scope="col" class="num-c">Variación</th></tr></thead><tbody>
     <?php foreach ($cmp as $c): ?><tr><th scope="row" class="c-n"><?= $e($c['label']) ?></th><td class="num-c" data-l="Este mes"><?= $e($c['cur']) ?></td><td class="num-c" data-l="Mes anterior"><?= $e($c['prev']) ?></td><td class="num-c" data-l="Variación"><?= Ui::delta($c['delta']) ?></td></tr><?php endforeach; ?>
   </tbody></table></div>
@@ -33,21 +33,21 @@ $cmp = RepView::compareRows($m, $p);
 
 <div class="rep-grid">
   <section class="card" aria-labelledby="r-fn">
-    <header class="card__h"><h2 class="label" id="r-fn">EMBUDO DEL MES</h2></header>
+    <header class="card__h"><h2 class="label" id="r-fn">Embudo del mes</h2></header>
     <div class="card__b"><?php if ($m['received'] === 0): ?><p class="muted">Sin leads recibidos ese mes.</p><?php else: ?><?php require __DIR__ . '/rep/_funnel.php'; ?><?php endif; ?></div>
   </section>
   <section class="card" aria-labelledby="r-ls">
-    <header class="card__h"><h2 class="label" id="r-ls">MOTIVOS DE PÉRDIDA</h2><span class="muted"><?= $e($m['loss']['total']) ?> en total</span></header>
+    <header class="card__h"><h2 class="label" id="r-ls">Motivos de pérdida</h2><span class="muted"><?= $e($m['loss']['total']) ?> en total</span></header>
     <div class="card__b"><?php require __DIR__ . '/rep/_perdidas.php'; ?></div>
   </section>
 </div>
 <section class="card card--table" aria-labelledby="r-ch">
-  <header class="card__h"><h2 class="label" id="r-ch">COSTO POR FIRMADO POR CANAL</h2></header>
+  <header class="card__h"><h2 class="label" id="r-ch">Costo por firmado por canal</h2></header>
   <?php require __DIR__ . '/rep/_canales.php'; ?>
 </section>
 
 <section class="card" id="acciones" aria-labelledby="i-ac">
-  <header class="card__h"><h2 class="label" id="i-ac">LAS TRES ACCIONES PARA EL MES SIGUIENTE</h2><?php if ($isAdminView && !$published): ?><span class="muted">Editables hasta publicar</span><?php endif; ?></header>
+  <header class="card__h"><h2 class="label" id="i-ac">Las tres acciones para el mes siguiente</h2><?php if ($isAdminView && !$published): ?><span class="muted">Editables hasta publicar</span><?php endif; ?></header>
   <div class="card__b">
   <?php if ($isAdminView && !$published): ?>
     <form method="post" action="/informes/<?= $e($report['id']) ?>/actions" class="cfg-form" novalidate>
@@ -64,11 +64,11 @@ $cmp = RepView::compareRows($m, $p);
 
 <?php if ($isAdminView): ?>
 <section class="card rep-nop" aria-labelledby="i-pb">
-  <header class="card__h"><h2 class="label" id="i-pb">PUBLICACIÓN</h2></header>
+  <header class="card__h"><h2 class="label" id="i-pb">Publicación</h2></header>
   <div class="card__b">
     <?php if (!$published): ?>
       <p>Al publicar, NorthStar lo ve en <b>Informes</b><?= $recipients ? ' y se envía el enlace a ' . $e(implode(', ', $recipients)) : ' (no hay destinatarios configurados para el enlace: Configuración &gt; Correo)' ?>.</p>
-      <form method="post" action="/informes/<?= $e($report['id']) ?>/publish"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><div class="q3a"><button class="btn btn--primary" type="submit" data-confirm="¿Publicar este informe para NorthStar? Las acciones ya no se podrán editar."><span class="btn__t">Publicar</span><span class="btn__cell"><?= Ui::icon('send') ?></span></button></div></form>
+      <form method="post" action="/informes/<?= $e($report['id']) ?>/publish"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><div class="q3a"><button class="btn btn--primary" type="submit" data-confirm="¿Publicar este informe para NorthStar? Las acciones ya no se podrán editar."><span class="btn__t">Publicar</span></button></div></form>
     <?php else: ?>
       <p>Publicado <?= $e(Fmt::dateTime($report['published_at'])) ?>. <?= $report['sent_at'] !== null ? 'Enlace enviado ' . $e(Fmt::dateTime($report['sent_at'])) . '.' : 'El enlace no se ha enviado.' ?></p>
       <form method="post" action="/informes/<?= $e($report['id']) ?>/resend"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><div class="q3a"><button class="btn btn--secondary" type="submit"<?= $recipients ? '' : ' disabled' ?>><span class="btn__t">Reenviar el enlace</span></button></div></form>

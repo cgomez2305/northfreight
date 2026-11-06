@@ -18,7 +18,7 @@ $activeSeq = array_filter($seqs, static fn($s) => $s['status'] === 'active');
 ?>
 <?php if ($hl !== null || $presented): ?>
 <section class="card" id="entrega" aria-labelledby="h-ho">
-  <header class="card__h"><h2 class="label" id="h-ho">ENTREGA A NORTHSTAR</h2><?php if ($hl !== null): ?><span class="muted">Versión <?= $e($hl['version']) ?></span><?php endif; ?></header>
+  <header class="card__h"><h2 class="label" id="h-ho">Entrega a NorthStar</h2><?php if ($hl !== null): ?><span class="muted">Versión <?= $e($hl['version']) ?></span><?php endif; ?></header>
   <div class="card__b">
     <?php if ($presented && !$handoff['configured']): ?><p class="flash flash--warn" role="status"><?= Ui::icon('alert') ?><span><b>Destino de entrega sin configurar.</b> No se envió nada a NorthStar. <a href="/config?tab=entrega">Configurar destino</a>.</span></p><?php endif; ?>
     <?php if ($hl === null): ?><p class="muted">Este lead está en «Presentado a NorthStar» pero no tiene una entrega registrada. Usa «Reenviar entrega» para crearla.</p>
@@ -51,7 +51,7 @@ $activeSeq = array_filter($seqs, static fn($s) => $s['status'] === 'active');
     <p class="dlg__m">El lead pasa a «<?= $e($lead['pipeline'] === 'B' ? 'Descartado' : 'Perdido') ?>» con este motivo y queda una tarea para revisarlo.</p>
     <label class="field"><span>Motivo</span><select name="reason" required><?php foreach (Catalog::LOSS_REASONS as $k => $l): ?><option value="<?= $e($k) ?>"<?= $k === 'rejected' ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
     <label class="field"><span>Nota (opcional; obligatoria con «Otro»)</span><textarea name="note" rows="2" maxlength="500"></textarea></label>
-    <div class="dlg__a"><button class="btn btn--ghost" type="button" data-close>Cancelar</button><button class="btn btn--primary" type="submit"><span class="btn__t">Marcar rechazado</span><span class="btn__cell"><?= Ui::icon('arrow-up-right') ?></span></button></div>
+    <div class="dlg__a"><button class="btn btn--ghost" type="button" data-close>Cancelar</button><button class="btn btn--primary" type="submit"><span class="btn__t">Marcar rechazado</span></button></div>
   </form>
 </dialog>
 <?php endif; ?>
@@ -59,7 +59,7 @@ $activeSeq = array_filter($seqs, static fn($s) => $s['status'] === 'active');
 
 <?php if ($seqs): ?>
 <section class="card" id="secuencias" aria-labelledby="h-sq">
-  <header class="card__h"><h2 class="label" id="h-sq">SECUENCIAS DE CORREO</h2><span class="muted"><?= $e(count($activeSeq)) ?> activa<?= count($activeSeq) === 1 ? '' : 's' ?></span></header>
+  <header class="card__h"><h2 class="label" id="h-sq">Secuencias de correo</h2><span class="muted"><?= $e(count($activeSeq)) ?> activa<?= count($activeSeq) === 1 ? '' : 's' ?></span></header>
   <div class="card__b">
     <ul class="q3l">
       <?php foreach ($seqs as $s): $def = Sequences::DEFS[$s['sequence_key']] ?? ['name' => $s['sequence_key']]; ?>

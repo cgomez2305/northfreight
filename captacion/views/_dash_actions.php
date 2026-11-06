@@ -13,7 +13,7 @@ use Captacion\Ui;
         <h3 class="act__t"><?= $e($a['title']) ?></h3>
         <p class="act__d"><?= $e($a['detail']) ?></p>
         <div class="act__f">
-          <span class="act__i"><span class="label">IMPACTO</span><?= Ui::ticks((int) round($a['impact'] / 5), 20, 'Impacto ' . $a['impact'] . ' de 100', 'tk--i tk--' . $a['level']) ?><b class="mono"><?= $e($a['impact']) ?></b></span>
+          <span class="act__i"><span class="label">Impacto</span><?= Ui::ticks((int) round($a['impact'] / 5), 20, 'Impacto ' . $a['impact'] . ' de 100', 'tk--i tk--' . $a['level']) ?><b class="mono"><?= $e($a['impact']) ?></b></span>
           <a class="btn btn--secondary btn--sm" href="<?= $e($a['href']) ?>"><?= $e($a['cta']) ?><?= Ui::icon('chevron-right') ?></a>
         </div>
       </li>

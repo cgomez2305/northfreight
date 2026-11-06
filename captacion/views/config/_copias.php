@@ -11,7 +11,7 @@ $stLabel = ['ok' => 'Correcta', 'failed' => 'Falló', 'running' => 'En curso'];
 <p class="cfg-intro">Copia diaria de TODA la base del CRM (leads, notas, tareas, consentimientos, configuración…), hecha por el servidor a las 3:30 a. m. de Nueva York, verificada y guardada <?= $e($retentionDays) ?> días fuera de la carpeta pública. Contiene datos personales: descárgala solo con confirmación de identidad y guárdala en un lugar privado.</p>
 
 <section class="card cfg-card" aria-labelledby="bk-s">
-  <header class="card__h"><h2 class="label" id="bk-s">ESTADO</h2><span class="stat stat--<?= $e($cls) ?>"><?= Ui::icon($ic) ?><?= $e($health['level'] === 'ok' ? 'Al día' : ($health['failed'] ? 'La última falló' : 'Requiere atención')) ?></span></header>
+  <header class="card__h"><h2 class="label" id="bk-s">Estado</h2><span class="stat stat--<?= $e($cls) ?>"><?= Ui::icon($ic) ?><?= $e($health['level'] === 'ok' ? 'Al día' : ($health['failed'] ? 'La última falló' : 'Requiere atención')) ?></span></header>
   <div class="card__b bk-s">
     <p><?= $e($health['msg']) ?></p>
     <form method="post" action="/config/backups/run" class="bk-run">
@@ -24,7 +24,7 @@ $stLabel = ['ok' => 'Correcta', 'failed' => 'Falló', 'running' => 'En curso'];
 </section>
 
 <section class="card cfg-card" aria-labelledby="bk-l">
-  <header class="card__h"><h2 class="label" id="bk-l">COPIAS</h2><span class="muted"><?= $e(count($backups)) ?> registro<?= count($backups) === 1 ? '' : 's' ?> · carpeta <code><?= $e($dirName) ?></code></span></header>
+  <header class="card__h"><h2 class="label" id="bk-l">Copias</h2><span class="muted"><?= $e(count($backups)) ?> registro<?= count($backups) === 1 ? '' : 's' ?> · carpeta <code><?= $e($dirName) ?></code></span></header>
   <?php if (!$backups): ?>
     <div class="empty empty--sm"><?= Ui::icon('star', 'empty__star ic--star') ?><h3>Aún no hay copias</h3><p>La primera se hará esta noche a las 3:30 a. m. (hora de Nueva York) o ahora mismo con «Hacer copia ahora». Si el cron de copias no está creado, mira el README §11.</p></div>
   <?php else: ?>

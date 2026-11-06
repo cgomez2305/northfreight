@@ -58,13 +58,13 @@ $hasFilters = count($f) > 0 || $sortQ || $plQ;
     <div class="dd" data-dd>
       <button class="btn btn--secondary btn--sm vbtn" type="button" aria-expanded="false" aria-haspopup="true" aria-controls="vmenu"><?= Ui::icon('bookmark') ?><span class="vbtn__t"><?= $av !== null ? $e($av['name']) : 'Vistas' ?></span><?= $dirty ? '<i class="vdirty" title="Modificada"></i><span class="sr"> (modificada)</span>' : '' ?><?= Ui::icon('chevron-down') ?></button>
       <div class="dd__panel vmenu" id="vmenu" hidden>
-        <p class="label vmenu__h">DEL SISTEMA</p>
+        <p class="label vmenu__h">Del sistema</p>
         <ul class="vlist">
           <?php foreach ($sysViews as $v): ?>
             <li><a class="vitem<?= $av !== null && $av['id'] === $v['id'] ? ' is-on' : '' ?>" href="<?= $e(SavedViews::href($v, $screen)) ?>"><?= Ui::icon($v['icon']) ?><span><?= $e($v['name']) ?></span></a></li>
           <?php endforeach; ?>
         </ul>
-        <p class="label vmenu__h">MIS VISTAS</p>
+        <p class="label vmenu__h">Mis vistas</p>
         <?php if (!$myViews): ?><p class="vmenu__e">Aún no guardas ninguna. Aplica filtros y pulsa «Guardar vista».</p><?php endif; ?>
         <ul class="vlist">
           <?php foreach ($myViews as $v): $on = $av !== null && $av['id'] === $v['id']; ?>
@@ -93,7 +93,7 @@ $hasFilters = count($f) > 0 || $sortQ || $plQ;
     <div class="dd" data-dd>
       <button class="btn btn--secondary btn--sm" type="button" aria-expanded="false" aria-haspopup="true" aria-controls="cmenu"><?= Ui::icon('columns') ?>Columnas</button>
       <div class="dd__panel vmenu vmenu--c" id="cmenu" hidden>
-        <p class="label vmenu__h">COLUMNAS VISIBLES</p>
+        <p class="label vmenu__h">Columnas visibles</p>
         <?php foreach (Prefs::COLUMNS as $k => $l): ?><label class="check check--c"><input type="checkbox" data-col-toggle="<?= $e($k) ?>"<?= in_array($k, $cols, true) ? ' checked' : '' ?>><span><?= $e($l) ?></span></label><?php endforeach; ?>
       </div>
     </div>

@@ -39,7 +39,7 @@ $loc = trim(($lead['city'] ? $lead['city'] . ', ' : '') . ($lead['state'] ?? '')
   <div class="lead__id">
     <?= Ui::avatar($name, 'xl') ?>
     <div class="lead__who">
-      <p class="label">LEAD #<?= $e(str_pad((string) $id, 4, '0', STR_PAD_LEFT)) ?> · RECIBIDO <?= $e(strtoupper(Fmt::ago($lead['created_at']))) ?> · <?= $e(strtoupper(Fmt::dateTime($lead['created_at']))) ?></p>
+      <p class="label">Lead #<?= $e(str_pad((string) $id, 4, '0', STR_PAD_LEFT)) ?> · recibido <?= $e(Fmt::ago($lead['created_at'])) ?> · <?= $e(Fmt::dateTime($lead['created_at'])) ?></p>
       <h1 class="h1 lead__n" id="lead-name"><?= $e($name) ?></h1>
       <div class="lead__chips">
         <span class="chip chip--plain"><?= Ui::icon($lead['profile'] === 'company_driver' ? 'user' : 'truck') ?><?= $e(Catalog::label(Catalog::PROFILES, $lead['profile'])) ?></span>
@@ -54,7 +54,7 @@ $loc = trim(($lead['city'] ? $lead['city'] . ', ' : '') . ($lead['state'] ?? '')
   </div>
 
   <div class="lead__acts">
-    <?php if ($phone): ?><a class="btn btn--primary" href="tel:<?= $e($phone) ?>"><span class="btn__t">Llamar</span><span class="btn__cell"><?= Ui::icon('phone') ?></span></a><?php endif; ?>
+    <?php if ($phone): ?><a class="btn btn--primary" href="tel:<?= $e($phone) ?>"><span class="btn__t">Llamar</span></a><?php endif; ?>
     <?php if ($wa): ?><a class="btn btn--secondary" href="https://wa.me/<?= $e($wa) ?>?text=<?= $e(rawurlencode($waText)) ?>" rel="noopener noreferrer" target="_blank"><?= Ui::icon('chat') ?>WhatsApp</a><?php endif; ?>
     <?php if ($lead['email']): ?><a class="btn btn--secondary" href="mailto:<?= $e($lead['email']) ?>"><?= Ui::icon('mail') ?>Correo</a><?php endif; ?>
     <button class="btn btn--secondary" type="button" data-open="#call-dlg"><?= Ui::icon('history') ?>Registrar llamada</button>
@@ -82,7 +82,7 @@ $loc = trim(($lead['city'] ? $lead['city'] . ', ' : '') . ($lead['state'] ?? '')
 <?php endif; ?>
 
 <section class="card pipe" aria-label="Etapa del pipeline <?= $e($pipeline) ?>">
-  <header class="card__h"><h2 class="label">PIPELINE <?= $pipeline === 'B' ? 'COMPANY DRIVERS' : 'OWNER-OPERATORS Y CARRIERS' ?></h2><span class="muted"><?= $curIdx !== false ? 'Etapa ' . ($curIdx + 1) . ' de ' . count($keys) : 'Fuera del pipeline' ?></span></header>
+  <header class="card__h"><h2 class="label">Pipeline <?= $pipeline === 'B' ? 'de company drivers' : 'de owner-operators y carriers' ?></h2><span class="muted"><?= $curIdx !== false ? 'Etapa ' . ($curIdx + 1) . ' de ' . count($keys) : 'Fuera del pipeline' ?></span></header>
   <ol class="pipe__l">
     <?php foreach ($keys as $i => $k): $state = $curIdx === false ? 'todo' : ($i < $curIdx ? 'done' : ($i === $curIdx ? 'now' : 'todo')); ?>
       <li class="pipe__s pipe__s--<?= $e($state) ?><?= $k === $closedKey ? ' pipe__s--end' : '' ?>"<?= $state === 'now' ? ' aria-current="step"' : '' ?>><span class="pipe__d"><?= $state === 'done' ? Ui::icon('check') : $e($i + 1) ?></span><span class="pipe__t"><?= $e($flow[$k]) ?></span></li>
@@ -93,7 +93,7 @@ $loc = trim(($lead['city'] ? $lead['city'] . ', ' : '') . ($lead['state'] ?? '')
 <div class="lead__grid">
   <div class="lead__main">
     <section class="card" id="tareas" aria-labelledby="h-tasks">
-      <header class="card__h"><h2 class="label" id="h-tasks">TAREAS</h2><span class="muted"><?= $e(count($openTasks)) ?> abierta<?= count($openTasks) === 1 ? '' : 's' ?></span></header>
+      <header class="card__h"><h2 class="label" id="h-tasks">Tareas</h2><span class="muted"><?= $e(count($openTasks)) ?> abierta<?= count($openTasks) === 1 ? '' : 's' ?></span></header>
       <div class="card__b">
         <?php if (!$tasks): ?><p class="muted pad-b">Sin tareas. Agenda el siguiente paso para no perder este lead.</p><?php endif; ?>
         <ul class="tasks">
@@ -116,7 +116,7 @@ $loc = trim(($lead['city'] ? $lead['city'] . ', ' : '') . ($lead['state'] ?? '')
     </section>
 
     <section class="card" id="notas" aria-labelledby="h-notes">
-      <header class="card__h"><h2 class="label" id="h-notes">NOTAS</h2><span class="muted"><?= $e(count($notes)) ?></span></header>
+      <header class="card__h"><h2 class="label" id="h-notes">Notas</h2><span class="muted"><?= $e(count($notes)) ?></span></header>
       <div class="card__b">
         <form class="notef" method="post" action="/leads/<?= $e($id) ?>/note">
           <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>">
@@ -145,7 +145,7 @@ $loc = trim(($lead['city'] ? $lead['city'] . ', ' : '') . ($lead['state'] ?? '')
     </section>
 
     <section class="card" id="linea" aria-labelledby="h-tl" data-tl>
-      <header class="card__h"><h2 class="label" id="h-tl">LÍNEA DE TIEMPO</h2><span class="muted"><?= $e($gc['all']) ?> eventos</span></header>
+      <header class="card__h"><h2 class="label" id="h-tl">Línea de tiempo</h2><span class="muted"><?= $e($gc['all']) ?> eventos</span></header>
       <div class="card__b">
         <div class="seg seg--sm seg--wrap" role="group" aria-label="Filtrar la línea de tiempo">
           <?php foreach ($groups as $g => $l): if ($g !== 'all' && $gc[$g] === 0) { continue; } ?><button class="seg__i<?= $g === 'all' ? ' is-on' : '' ?>" type="button" data-g="<?= $e($g) ?>" aria-pressed="<?= $g === 'all' ? 'true' : 'false' ?>"><?= $e($l) ?> <span class="seg__n"><?= $e($gc[$g]) ?></span></button><?php endforeach; ?>
@@ -166,7 +166,7 @@ $loc = trim(($lead['city'] ? $lead['city'] . ', ' : '') . ($lead['state'] ?? '')
   <div class="lead__side">
     <?php require __DIR__ . '/_lead_q3.php'; ?>
     <section class="card" aria-labelledby="h-score">
-      <header class="card__h"><h2 class="label" id="h-score">PUNTUACIÓN DESGLOSADA</h2><b class="mono"><?= $e($lead['score']) ?>/100</b></header>
+      <header class="card__h"><h2 class="label" id="h-score">Puntuación desglosada</h2><b class="mono"><?= $e($lead['score']) ?>/100</b></header>
       <div class="card__b">
         <?php if (!$items): ?><p class="muted">Sin desglose guardado.</p><?php else: ?>
         <ul class="scorel">
@@ -176,7 +176,7 @@ $loc = trim(($lead['city'] ? $lead['city'] . ', ' : '') . ($lead['state'] ?? '')
           <?php endforeach; ?>
         </ul>
         <?php if (!empty($bd['rules'])): ?>
-        <h3 class="label scorel__rh">REGLAS QUE INFLUYERON</h3>
+        <h3 class="label scorel__rh">Reglas que influyeron</h3>
         <ul class="scorel">
           <?php foreach ((array) $bd['rules'] as $ru): $fx = array_values(array_filter(array_map([\Captacion\Services\RulePhrase::class, 'effect'], (array) ($ru['effects'] ?? [])))); ?>
             <li class="is-on"><span class="scorel__t"><?= $e($ru['name'] ?? 'Regla') ?><small><?= $e($ru['set'] ?? '') ?></small></span><b class="mono"><?= $e(implode(' · ', $fx)) ?></b></li>
@@ -191,7 +191,7 @@ $loc = trim(($lead['city'] ? $lead['city'] . ', ' : '') . ($lead['state'] ?? '')
     </section>
 
     <section class="card" aria-labelledby="h-op">
-      <header class="card__h"><h2 class="label" id="h-op">ELEGIBILIDAD Y OPERACIÓN</h2></header>
+      <header class="card__h"><h2 class="label" id="h-op">Elegibilidad y operación</h2></header>
       <div class="card__b"><dl class="kv">
         <div><dt>CDL</dt><dd><?= $e(Catalog::label(Catalog::CDL, $lead['cdl_type'])) ?><?= $lead['cdl_class'] ? ' · clase ' . $e($lead['cdl_class']) : '' ?></dd></div>
         <div><dt>Inglés</dt><dd><?= $e(Catalog::label(Catalog::ENGLISH, $lead['english_level'])) ?></dd></div>
@@ -229,7 +229,7 @@ $loc = trim(($lead['city'] ? $lead['city'] . ', ' : '') . ($lead['state'] ?? '')
     </section>
 
     <section class="card" aria-labelledby="h-at">
-      <header class="card__h"><h2 class="label" id="h-at">ATRIBUCIÓN</h2><span class="muted">Intento <?= $e($lead['attempt']) ?></span></header>
+      <header class="card__h"><h2 class="label" id="h-at">Atribución</h2><span class="muted">Intento <?= $e($lead['attempt']) ?></span></header>
       <div class="card__b"><dl class="kv">
         <div><dt>Fuente</dt><dd><?= $e(Catalog::source($lead['source'])) ?></dd></div>
         <div><dt>Página de llegada</dt><dd class="mono wrap"><?= $e($lead['landing_page'] ?? '—') ?></dd></div>
@@ -241,7 +241,7 @@ $loc = trim(($lead['city'] ? $lead['city'] . ', ' : '') . ($lead['state'] ?? '')
     </section>
 
     <section class="card" id="consentimientos" aria-labelledby="h-co">
-      <header class="card__h"><h2 class="label" id="h-co">CONSENTIMIENTOS</h2><?php if ($stopped): ?><span class="chip chip--bad"><?= Ui::icon('alert') ?>STOP</span><?php endif; ?></header>
+      <header class="card__h"><h2 class="label" id="h-co">Consentimientos</h2><?php if ($stopped): ?><span class="chip chip--bad"><?= Ui::icon('alert') ?>STOP</span><?php endif; ?></header>
       <div class="card__b">
         <?php if (!$consents): ?><p class="muted">Este lead no dio consentimiento por escrito para llamadas, SMS ni correo. Solo contáctalo si él escribió primero.</p><?php else: ?>
         <ul class="cons">
@@ -260,7 +260,7 @@ $loc = trim(($lead['city'] ? $lead['city'] . ', ' : '') . ($lead['state'] ?? '')
 
     <?php if ($dupes): ?>
     <section class="card" aria-labelledby="h-du">
-      <header class="card__h"><h2 class="label" id="h-du">OTROS LEADS CON LOS MISMOS DATOS</h2></header>
+      <header class="card__h"><h2 class="label" id="h-du">Otros leads con los mismos datos</h2></header>
       <div class="card__b"><ul class="dupes"><?php foreach ($dupes as $dp): ?><li><a href="/leads/<?= $e($dp['id']) ?>"><?= $e(Fmt::name($dp)) ?> <small class="mono">#<?= $e(str_pad((string) $dp['id'], 4, '0', STR_PAD_LEFT)) ?></small></a><?= Ui::stage($dp['stage']) ?></li><?php endforeach; ?></ul></div>
     </section>
     <?php endif; ?>
@@ -291,7 +291,7 @@ $loc = trim(($lead['city'] ? $lead['city'] . ', ' : '') . ($lead['state'] ?? '')
       <select name="reason"><option value="">Elige un motivo…</option><?php foreach (Catalog::LOSS_REASONS as $k => $l): ?><option value="<?= $e($k) ?>"><?= $e($l) ?></option><?php endforeach; ?></select></label>
     <label class="field"><span>Nota (opcional; obligatoria con «Otro»)</span><textarea name="note" rows="2" maxlength="500"></textarea></label>
     <label class="check" data-override-box hidden><input type="checkbox" name="override" value="1"><span>Confirmo que quiero saltarme el orden de las etapas.</span></label>
-    <div class="dlg__a"><button class="btn btn--ghost" type="button" data-close>Cancelar</button><button class="btn btn--primary" type="submit"><span class="btn__t">Cambiar etapa</span><span class="btn__cell"><?= Ui::icon('arrow-up-right') ?></span></button></div>
+    <div class="dlg__a"><button class="btn btn--ghost" type="button" data-close>Cancelar</button><button class="btn btn--primary" type="submit"><span class="btn__t">Cambiar etapa</span></button></div>
   </form>
 </dialog>
 <?php endif; ?>
@@ -305,6 +305,6 @@ $loc = trim(($lead['city'] ? $lead['city'] . ', ' : '') . ($lead['state'] ?? '')
     <label class="field"><span>Duración (minutos, opcional)</span><input type="number" name="minutes" min="0" max="600" inputmode="numeric"></label>
     <label class="field"><span>Nota (opcional)</span><textarea name="note" rows="2" maxlength="500"></textarea></label>
     <p class="dlg__m small">Si el lead contestó y está en «Nuevo», pasa a «Contactado» y se cancela la segunda alerta.</p>
-    <div class="dlg__a"><button class="btn btn--ghost" type="button" data-close>Cancelar</button><button class="btn btn--primary" type="submit"><span class="btn__t">Guardar llamada</span><span class="btn__cell"><?= Ui::icon('arrow-up-right') ?></span></button></div>
+    <div class="dlg__a"><button class="btn btn--ghost" type="button" data-close>Cancelar</button><button class="btn btn--primary" type="submit"><span class="btn__t">Guardar llamada</span></button></div>
   </form>
 </dialog>

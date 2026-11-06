@@ -53,7 +53,7 @@ $action = $isNew ? '/vacantes/new' : '/vacantes/' . $job['id'] . '/save';
     <div class="vf-all"><?= $err('pay') ?></div>
   </fieldset>
   <div class="vform__a">
-    <button class="btn btn--primary" type="submit"><span class="btn__t"><?= $isNew ? 'Guardar borrador' : 'Guardar cambios' ?></span><span class="btn__cell"><?= Ui::icon('arrow-up-right') ?></span></button>
+    <button class="btn btn--primary" type="submit"><span class="btn__t"><?= $isNew ? 'Guardar borrador' : 'Guardar cambios' ?></span></button>
     <a class="btn btn--ghost" href="/vacantes">Cancelar</a>
   </div>
 </form>

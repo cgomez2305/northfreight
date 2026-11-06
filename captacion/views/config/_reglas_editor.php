@@ -59,7 +59,7 @@ $hasErr = (bool) $errors;
       <?php endif; ?>
 
       <section class="rp__hist" id="rp-hist" aria-label="Historial de versiones">
-        <h3 class="label">HISTORIAL DE VERSIONES (<?= $e(count($history)) ?>)</h3>
+        <h3 class="label">Historial de versiones (<?= $e(count($history)) ?>)</h3>
         <?php if (!$history): ?><p class="muted">Todavía no hay versiones. Guarda un borrador para crear la primera.</p><?php endif; ?>
         <ol class="rp-hist">
           <?php foreach ($history as $h): ?>
@@ -80,7 +80,7 @@ $hasErr = (bool) $errors;
 
     <aside class="rp__side" aria-label="Impacto y simulación">
       <section class="rp-card" aria-labelledby="rp-imp-t">
-        <header class="rp-card__h"><h3 class="label" id="rp-imp-t">VISTA PREVIA DE IMPACTO</h3>
+        <header class="rp-card__h"><h3 class="label" id="rp-imp-t">Vista previa de impacto</h3>
           <label class="rp-scope"><span class="sr">Alcance de la vista previa</span><select name="impact_scope" data-impact-scope>
             <?php foreach (['last:100' => 'Últimos 100 leads', 'last:500' => 'Últimos 500 leads', 'last:1000' => 'Últimos 1.000 leads', 'days:7' => 'Últimos 7 días', 'days:30' => 'Últimos 30 días', 'days:90' => 'Últimos 90 días'] as $v => $l): ?><option value="<?= $e($v) ?>"<?= $impactScope === $v ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?>
           </select></label></header>
@@ -89,7 +89,7 @@ $hasErr = (bool) $errors;
       </section>
 
       <section class="rp-card" aria-labelledby="rp-sim-t">
-        <header class="rp-card__h"><h3 class="label" id="rp-sim-t">SIMULACIÓN</h3></header>
+        <header class="rp-card__h"><h3 class="label" id="rp-sim-t">Simulación</h3></header>
         <div class="rp-card__b">
           <div class="rp-simform">
             <label class="rp-scope"><span class="sr">Alcance de la simulación</span><select name="sim_scope" data-sim-scope>
@@ -108,13 +108,13 @@ $hasErr = (bool) $errors;
     <button class="btn btn--ghost" type="submit" name="op" value="simulate" data-sim-go><?= Ui::icon('flask') ?>Ejecutar simulación</button>
     <span class="rp__foot-sp"></span>
     <button class="btn btn--secondary" type="submit" name="op" value="save"><?= Ui::icon('check') ?>Guardar borrador</button>
-    <button class="btn btn--primary" type="submit" formaction="/config/rules/publish"<?= $locked ? ' disabled title="Confirma tu identidad para publicar"' : '' ?> data-confirm="¿Publicar la versión <?= $e($nextVer) ?>? Se aplicará a los leads nuevos y a los que cambien; los existentes solo con «Recalcular». Quedará en el registro de actividad."><span class="btn__t">Publicar v<?= $e($nextVer) ?></span><span class="btn__cell"><?= Ui::icon('check') ?></span></button>
+    <button class="btn btn--primary" type="submit" formaction="/config/rules/publish"<?= $locked ? ' disabled title="Confirma tu identidad para publicar"' : '' ?> data-confirm="¿Publicar la versión <?= $e($nextVer) ?>? Se aplicará a los leads nuevos y a los que cambien; los existentes solo con «Recalcular». Quedará en el registro de actividad."><span class="btn__t">Publicar v<?= $e($nextVer) ?></span></button>
   </footer>
 </form>
 
 <?php if ($locked): ?>
 <section class="rp__unlock" aria-labelledby="rp-ul-t">
-  <h3 class="label" id="rp-ul-t">CONFIRMA TU IDENTIDAD PARA PUBLICAR O REVERTIR</h3>
+  <h3 class="label" id="rp-ul-t">Confirma tu identidad para publicar o revertir</h3>
   <form method="post" action="/config/unlock" autocomplete="off" class="rp__ulf">
     <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="tab" value="reglas"><input type="hidden" name="set" value="<?= $e($set['id']) ?>">
     <label class="field"><span>Contraseña</span><input type="password" name="password" required autocomplete="current-password"></label>

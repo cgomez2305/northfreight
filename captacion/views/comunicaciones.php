@@ -8,7 +8,7 @@ use Captacion\Ui;
     <h1 class="h1">Comunicaciones</h1>
     <p class="sub">Plantillas de correo en inglés y español, secuencias de seguimiento (A6 tibios, A12 referidos) y registro de envíos. Solo administradores.</p>
   </div>
-  <?php if ($view === 'list'): ?><div class="page-head__a"><a class="btn btn--primary" href="/comunicaciones/plantillas/new"><span class="btn__t">Nueva plantilla</span><span class="btn__cell"><?= Ui::icon('plus') ?></span></a></div><?php endif; ?>
+  <?php if ($view === 'list'): ?><div class="page-head__a"><a class="btn btn--primary" href="/comunicaciones/plantillas/new"><span class="btn__t">Nueva plantilla</span></a></div><?php endif; ?>
 </div>
 <nav class="ptabs cfg-tabs" aria-label="Secciones de comunicaciones">
   <?php foreach ($tabs as $k => $label): ?><a class="ptab<?= $tab === $k ? ' is-on' : '' ?>" href="/comunicaciones<?= $k === 'plantillas' ? '' : '/' . $e($k) ?>"<?= $tab === $k ? ' aria-current="page"' : '' ?>><?= $e($label) ?></a><?php endforeach; ?>

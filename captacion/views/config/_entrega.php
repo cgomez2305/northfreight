@@ -14,7 +14,7 @@ $active = ($hand['email'] !== '' ? 1 : 0) + (($hand['webhook_on'] && $hand['webh
 <p class="cfg-intro">A dónde va la ficha de un lead cuando lo pasas a «Presentado a NorthStar» (documento maestro §11). NorthStar confirma <b>Firmó</b> o <b>Lo rechazamos</b> con un clic desde el correo, sin iniciar sesión. Los documentos de los conductores nunca pasan por este sistema.</p>
 <?php if ($active === 0): ?><p class="flash flash--warn" role="status"><?= Ui::icon('alert') ?><span><b>Destino de entrega sin configurar.</b> Mientras no haya un correo o un webhook, los leads que presentes quedan en «pendiente» y no se envía nada a nadie.<?php if ($handView['waiting'] > 0): ?> Hay <b><?= $e($handView['waiting']) ?></b> esperando destino.<?php endif; ?></span></p><?php endif; ?>
 <?php if (!empty($once) && $once['kind'] === 'secret'): ?>
-  <section class="card cfg-card en-once" aria-labelledby="en-once"><header class="card__h"><h2 class="label" id="en-once">SECRETO DE FIRMA NUEVO · SE MUESTRA UNA SOLA VEZ</h2></header>
+  <section class="card cfg-card en-once" aria-labelledby="en-once"><header class="card__h"><h2 class="label" id="en-once">Secreto de firma nuevo · se muestra una sola vez</h2></header>
     <div class="card__b"><p class="secret"><code><?= $e($once['value']) ?></code></p><p class="muted">Cópialo ahora en tu n8n (o donde recibas el webhook). Después solo se verá «configurado»; si lo pierdes, genera otro.</p></div></section>
 <?php endif; ?>
 
@@ -22,14 +22,14 @@ $active = ($hand['email'] !== '' ? 1 : 0) + (($hand['webhook_on'] && $hand['webh
   <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>">
   <fieldset class="cfg-fs"<?= $locked ? ' disabled' : '' ?>>
     <section class="card cfg-card" aria-labelledby="en-m">
-      <header class="card__h"><h2 class="label" id="en-m">1 · CORREO A NORTHSTAR</h2><span class="chip chip--<?= $hand['email'] !== '' ? 'warm' : 'plain' ?>"><i class="dot"></i><?= $hand['email'] !== '' ? 'Activo' : 'Sin configurar' ?></span></header>
+      <header class="card__h"><h2 class="label" id="en-m">1 · Correo a NorthStar</h2><span class="chip chip--<?= $hand['email'] !== '' ? 'warm' : 'plain' ?>"><i class="dot"></i><?= $hand['email'] !== '' ? 'Activo' : 'Sin configurar' ?></span></header>
       <div class="card__b">
         <label class="field<?= isset($errors['email']) ? ' has-err' : '' ?>"><span>Correo del equipo de NorthStar que recibe la ficha</span><input type="email" name="email" value="<?= $e($hand['email']) ?>" maxlength="190" autocomplete="off" placeholder="equipo@dominio.com"<?= $fe('email') ?>><?= $em('email') ?>
           <small>Lleva los botones «Firmó» y «Lo rechazamos». Sin SMTP en el servidor, la ficha queda en <code>storage/mail.log</code> (no sale).</small></label>
       </div>
     </section>
     <section class="card cfg-card" aria-labelledby="en-w">
-      <header class="card__h"><h2 class="label" id="en-w">2 · WEBHOOK FIRMADO (n8n → Google Sheet)</h2><span class="chip chip--<?= ($hand['webhook_on'] && $hand['secret_set']) ? 'warm' : 'plain' ?>"><i class="dot"></i><?= ($hand['webhook_on'] && $hand['secret_set']) ? 'Activo' : 'Apagado' ?></span></header>
+      <header class="card__h"><h2 class="label" id="en-w">2 · Webhook firmado (n8n → Google Sheet)</h2><span class="chip chip--<?= ($hand['webhook_on'] && $hand['secret_set']) ? 'warm' : 'plain' ?>"><i class="dot"></i><?= ($hand['webhook_on'] && $hand['secret_set']) ? 'Activo' : 'Apagado' ?></span></header>
       <div class="card__b en-grid">
         <label class="tgl"><input type="checkbox" name="webhook_on" value="1"<?= $hand['webhook_on'] ? ' checked' : '' ?>><span class="tgl__t"><b>Enviar también por webhook</b><small>POST JSON (<code>northstar.handoff.v1</code>) firmado con HMAC-SHA256. Reintenta a 1, 5 y 15 minutos.</small></span></label>
         <label class="field<?= isset($errors['webhook_url']) ? ' has-err' : '' ?>"><span>URL del webhook</span><input type="url" name="webhook_url" value="<?= $e($hand['webhook_url']) ?>" maxlength="300" autocomplete="off" placeholder="https://n8n.ejemplo.com/webhook/northstar"<?= $fe('webhook_url') ?>><?= $em('webhook_url') ?></label>
@@ -46,26 +46,26 @@ $active = ($hand['email'] !== '' ? 1 : 0) + (($hand['webhook_on'] && $hand['webh
       </div>
     </section>
     <section class="card cfg-card" aria-labelledby="en-c">
-      <header class="card__h"><h2 class="label" id="en-c">3 · CRM DE DISPATCH</h2><span class="chip chip--plain"><i class="dot"></i>No activo</span></header>
+      <header class="card__h"><h2 class="label" id="en-c">3 · CRM de dispatch</h2><span class="chip chip--plain"><i class="dot"></i>No activo</span></header>
       <div class="card__b"><p class="muted">El CRM grande de NorthStar está en pausa. El código (<code>Handoff/DispatchCrmTarget.php</code>) trae el esqueleto documentado; cuando exista, solo cambia ese archivo.</p></div>
       <footer class="card__f"><span class="muted"><?= $active ?> destino<?= $active === 1 ? '' : 's' ?> activo<?= $active === 1 ? '' : 's' ?>.</span>
-        <button class="btn btn--primary" type="submit"><span class="btn__t">Guardar destino</span><span class="btn__cell"><?= Ui::icon('check') ?></span></button></footer>
+        <button class="btn btn--primary" type="submit"><span class="btn__t">Guardar destino</span></button></footer>
     </section>
   </fieldset>
 </form>
 
 <section class="card cfg-card" id="prueba" aria-labelledby="en-t">
-  <header class="card__h"><h2 class="label" id="en-t">PRUEBA DE ENTREGA</h2></header>
+  <header class="card__h"><h2 class="label" id="en-t">Prueba de entrega</h2></header>
   <div class="card__b">
     <p class="muted">Envía una ficha de un lead <b>ficticio</b> a cada destino activo, marcada como «PRUEBA» y sin enlaces de confirmación. Si el correo de NorthStar está activo y hay SMTP, ellos recibirán ese correo.</p>
     <?php if ($lt): ?><ul class="en-res"><?php foreach ($lt['results'] as $k => $r): ?><li><span class="chip chip--<?= $r['ok'] ? 'warm' : 'hot' ?>"><i class="dot"></i><?= $e($tn[$k] ?? $k) ?></span> <?= $e($r['msg']) ?></li><?php endforeach; ?></ul><p class="muted">Última prueba: <?= $e(Fmt::dateTime($lt['at'])) ?> · <?= $e(Fmt::ago($lt['at'])) ?></p><?php endif; ?>
     <form method="post" action="/config/handoff/test"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>">
-      <fieldset class="cfg-fs"<?= $locked ? ' disabled' : '' ?>><div class="en-act"><button class="btn btn--secondary" type="submit"<?= $active === 0 ? ' disabled' : '' ?>><span class="btn__t">Enviar prueba</span><span class="btn__cell"><?= Ui::icon('send') ?></span></button></div></fieldset></form>
+      <fieldset class="cfg-fs"<?= $locked ? ' disabled' : '' ?>><div class="en-act"><button class="btn btn--secondary" type="submit"<?= $active === 0 ? ' disabled' : '' ?>><span class="btn__t">Enviar prueba</span></button></div></fieldset></form>
   </div>
 </section>
 
 <section class="card cfg-card" aria-labelledby="en-s">
-  <header class="card__h"><h2 class="label" id="en-s">ÚLTIMAS ENTREGAS</h2>
+  <header class="card__h"><h2 class="label" id="en-s">Últimas entregas</h2>
     <?php if ($handView['waiting'] > 0): ?><form method="post" action="/config/handoff/retry"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><button class="btn btn--sm btn--secondary" type="submit"<?= $active === 0 || $locked ? ' disabled' : '' ?>><span class="btn__t">Poner en cola las <?= $e($handView['waiting']) ?> pendientes</span></button></form><?php endif; ?></header>
   <?php if (!$handView['recent']): ?>
     <div class="empty empty--sm"><?= Ui::icon('star', 'empty__star ic--star') ?><h3>Aún no se ha presentado ningún lead</h3><p>Cuando pases uno a «Presentado a NorthStar», su entrega aparece aquí con el estado de cada destino.</p></div>
@@ -81,7 +81,7 @@ $active = ($hand['email'] !== '' ? 1 : 0) + (($hand['webhook_on'] && $hand['webh
 </section>
 
 <section class="card cfg-card" aria-labelledby="en-d">
-  <header class="card__h"><h2 class="label" id="en-d">PARA QUIEN RECIBE EL WEBHOOK</h2></header>
+  <header class="card__h"><h2 class="label" id="en-d">Para quien recibe el webhook</h2></header>
   <div class="card__b en-doc">
     <p>Cada entrega es un <code>POST</code> con <code>Content-Type: application/json</code>. Verifica la firma antes de usar el cuerpo:</p>
     <ol>

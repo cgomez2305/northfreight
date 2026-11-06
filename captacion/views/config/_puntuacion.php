@@ -39,7 +39,7 @@ $resultBlock = static function (array $p, string $title, string $note) use ($tem
   <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>">
   <fieldset class="cfg-fs"<?= $locked ? ' disabled' : '' ?>>
     <section class="card cfg-card" aria-labelledby="sc-o">
-      <header class="card__h"><h2 class="label" id="sc-o">OWNER-OPERATORS Y CARRIERS PEQUEÑOS</h2><span class="muted">Máximo posible: <b data-sum="owner"><?= $e($ownerMax) ?></b> (se limita a 100)</span></header>
+      <header class="card__h"><h2 class="label" id="sc-o">Owner-operators y carriers pequeños</h2><span class="muted">Máximo posible: <b data-sum="owner"><?= $e($ownerMax) ?></b> (se limita a 100)</span></header>
       <div class="card__b">
         <div class="numgrid"><?php foreach (ScoringConfig::OWNER_POINTS as $k => $l) { echo $num("owner[$k]", $form['owner'][$k], "owner.$k", $e($l)); } ?>
           <?= $num('owner[experience_min_years]', $form['owner']['experience_min_years'], 'owner.experience_min_years', 'Años mínimos de experiencia', 'años') ?></div>
@@ -47,7 +47,7 @@ $resultBlock = static function (array $p, string $title, string $note) use ($tem
       </div>
     </section>
     <section class="card cfg-card" aria-labelledby="sc-d">
-      <header class="card__h"><h2 class="label" id="sc-d">COMPANY DRIVERS</h2></header>
+      <header class="card__h"><h2 class="label" id="sc-d">Company drivers</h2></header>
       <div class="card__b">
         <?php if (in_array('scoring.driver.experience', $provPending, true)): ?><p class="prov-note"><?= Ui::icon('alert') ?>Los tramos de experiencia están <b>pendientes de confirmar con NorthStar</b>.</p><?php endif; ?>
         <div class="numgrid"><?php foreach (ScoringConfig::DRIVER_POINTS as $k => $l) { echo $num("driver[$k]", $form['driver'][$k], "driver.$k", $e($l)); } ?></div>
@@ -55,7 +55,7 @@ $resultBlock = static function (array $p, string $title, string $note) use ($tem
       </div>
     </section>
     <section class="card cfg-card" aria-labelledby="sc-t">
-      <header class="card__h"><h2 class="label" id="sc-t">UMBRALES DE TEMPERATURA</h2></header>
+      <header class="card__h"><h2 class="label" id="sc-t">Umbrales de temperatura</h2></header>
       <div class="card__b">
         <?php if (isset($errors['temp'])): ?><p class="flash flash--bad" role="alert"><?= Ui::icon('alert') ?><?= $e($errors['temp']) ?></p><?php endif; ?>
         <div class="numgrid numgrid--2"><?= $num('temp[hot_min]', $form['temp']['hot_min'], 'temp.hot_min', 'Caliente desde', 'pts') ?><?= $num('temp[warm_min]', $form['temp']['warm_min'], 'temp.warm_min', 'Tibio desde', 'pts') ?></div>
@@ -63,7 +63,7 @@ $resultBlock = static function (array $p, string $title, string $note) use ($tem
       </div>
       <footer class="card__f cfg-actions">
         <div class="cfg-actions__a">
-          <button class="btn btn--primary" type="submit"><span class="btn__t">Guardar puntuación</span><span class="btn__cell"><?= Ui::icon('check') ?></span></button>
+          <button class="btn btn--primary" type="submit"><span class="btn__t">Guardar puntuación</span></button>
           <button class="btn btn--secondary" type="submit" formaction="/config/scoring/preview"><?= Ui::icon('refresh') ?>Vista previa</button>
         </div>
         <div class="cfg-actions__b">
@@ -75,13 +75,13 @@ $resultBlock = static function (array $p, string $title, string $note) use ($tem
 </form>
 
 <?php if ($preview !== null): ?>
-  <section class="card cfg-card" aria-labelledby="pv-h"><header class="card__h"><h2 class="label" id="pv-h">VISTA PREVIA · NADA GUARDADO</h2></header><div class="card__b">
+  <section class="card cfg-card" aria-labelledby="pv-h"><header class="card__h"><h2 class="label" id="pv-h">Vista previa · nada guardado</h2></header><div class="card__b">
     <?= $resultBlock($preview, 'Con los valores del formulario, sobre los ' . Fmt::num($preview['total']) . ' leads actuales', $preview['changed'] === 0 ? 'Ningún lead cambiaría de puntuación ni de temperatura.' : Fmt::num($preview['changed']) . ' leads cambiarían de puntuación o temperatura (' . $preview['to_hot'] . ' pasarían a caliente y ' . $preview['from_hot'] . ' dejarían de serlo).') ?>
   </div></section>
 <?php endif; ?>
 
 <section class="card cfg-card" id="recalcular" aria-labelledby="rc-h">
-  <header class="card__h"><h2 class="label" id="rc-h">RECALCULAR LEADS EXISTENTES</h2></header>
+  <header class="card__h"><h2 class="label" id="rc-h">Recalcular leads existentes</h2></header>
   <div class="card__b">
     <?php if ($recalc !== null): ?>
       <?php $running = ($recalc['status'] ?? '') === 'running'; ?>
@@ -105,7 +105,7 @@ $resultBlock = static function (array $p, string $title, string $note) use ($tem
 </section>
 
 <section class="card cfg-card" id="provisionales" aria-labelledby="pr-h">
-  <header class="card__h"><h2 class="label" id="pr-h">AJUSTES PROVISIONALES</h2><?php if ($provPending): ?><span class="chip chip--warm-o"><?= Ui::icon('alert') ?>Pendientes de confirmar con NorthStar</span><?php else: ?><span class="chip chip--plain"><?= Ui::icon('check') ?>Todos confirmados</span><?php endif; ?></header>
+  <header class="card__h"><h2 class="label" id="pr-h">Ajustes provisionales</h2><?php if ($provPending): ?><span class="chip chip--warm-o"><?= Ui::icon('alert') ?>Pendientes de confirmar con NorthStar</span><?php else: ?><span class="chip chip--plain"><?= Ui::icon('check') ?>Todos confirmados</span><?php endif; ?></header>
   <div class="card__b">
     <p class="muted">Valores que el documento deja «por confirmar» con el cliente. Cámbialos cuando NorthStar los confirme y marca «Confirmado» para quitar el aviso.</p>
     <form method="post" action="/config/provisional" class="cfg-form" novalidate>
@@ -129,7 +129,7 @@ $resultBlock = static function (array $p, string $title, string $note) use ($tem
           <input type="text" name="driver_min_years" value="<?= $e($curYears) ?>" inputmode="numeric" maxlength="2" autocomplete="off"<?= isset($provErrors['driver_min_years']) ? ' aria-invalid="true"' : '' ?>>
           <small><?= isset($provErrors['driver_min_years']) ? '<span class="num__e">' . $e($provErrors['driver_min_years']) . '</span>' : 'Por debajo se marca la bandera «Experiencia bajo el mínimo» (no descarta).' ?></small></label><?= $conf('driver_min_years') ?></div>
         <div class="pr-item"><p class="pr-item__t">Tramos de experiencia de company drivers <?= in_array('scoring.driver.experience', $provPending, true) ? '<span class="chip chip--warm-o">Provisional</span>' : '' ?></p><p class="muted">Se editan arriba, en «Company drivers».</p><?= $conf('scoring.driver.experience') ?></div>
-        <button class="btn btn--primary" type="submit"><span class="btn__t">Guardar ajustes provisionales</span><span class="btn__cell"><?= Ui::icon('check') ?></span></button>
+        <button class="btn btn--primary" type="submit"><span class="btn__t">Guardar ajustes provisionales</span></button>
       </fieldset>
     </form>
     <h3 class="cfg-h3">Historial de cambios</h3>

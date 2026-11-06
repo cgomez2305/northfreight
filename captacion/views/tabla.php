@@ -61,11 +61,11 @@ $numCols = ['trucks' => 1, 'exp' => 1, 'pts' => 1];
   </div>
   <?php if (!$isEmptyDb): ?>
   <div class="page-head__a">
-    <button class="btn btn--secondary" type="button" data-new-lead><?= Ui::icon('plus') ?>Nuevo lead</button>
+    <button class="btn btn--primary" type="button" data-new-lead>Nuevo lead</button>
     <button class="btn btn--secondary filters-toggle" type="button" data-toggle="#filters" aria-expanded="<?= $nFilters > 0 ? 'true' : 'false' ?>" aria-controls="filters"><?= Ui::icon('filter') ?>Filtros<?= $nFilters > 0 ? ' <b class="badge">' . $e($nFilters) . '</b>' : '' ?></button>
     <form method="post" action="/tabla/export">
       <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="scope" value="filters"><input type="hidden" name="qs" value="<?= $e(ltrim($qsAll(), '?')) ?>">
-      <button class="btn btn--primary" type="submit"><span class="btn__t">Exportar CSV</span><span class="btn__cell"><?= Ui::icon('download') ?></span></button>
+      <button class="btn btn--secondary" type="submit"><span class="btn__t">Exportar CSV</span></button>
     </form>
   </div>
   <?php endif; ?>
@@ -77,7 +77,7 @@ $numCols = ['trucks' => 1, 'exp' => 1, 'pts' => 1];
   <svg class="empty__star empty__star--lg" aria-hidden="true"><use href="#i-star"/></svg>
   <h2 class="h2">Todavía no ha llegado ningún lead</h2>
   <p>Cuando llegue el primero, aparecerá en esta tabla con todos sus datos para compararlo con los demás. Mientras tanto puedes crear uno a mano.</p>
-  <button class="btn btn--secondary" type="button" data-new-lead><?= Ui::icon('plus') ?>Nuevo lead</button>
+  <button class="btn btn--primary" type="button" data-new-lead>Nuevo lead</button>
 </section>
 <?php else: ?>
 

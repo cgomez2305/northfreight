@@ -33,21 +33,22 @@ $tip = static fn(string $t): string => Ui::tip($t);
     </div>
     <form method="post" action="/leads/export">
       <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="scope" value="period"><input type="hidden" name="period" value="<?= $e($period) ?>">
-      <button class="btn btn--primary" type="submit"><span class="btn__t">Exportar CSV</span><span class="btn__cell"><?= Ui::icon('download') ?></span></button>
+      <button class="btn btn--secondary" type="submit"><?= Ui::icon('download') ?><span class="btn__t">Exportar CSV</span></button>
     </form>
+    <button class="btn btn--primary" type="button" data-new-lead><span class="btn__t">Nuevo lead</span></button>
   </div>
 </div>
 
 <section class="kpis" aria-label="Indicadores del periodo" data-live="kpis"><?php require __DIR__ . '/_dash_kpis.php'; ?></section>
 
 <section class="card acts" aria-labelledby="h-next">
-  <header class="card__h"><h2 class="label" id="h-next">SIGUIENTE MEJOR ACCIÓN</h2><?= $tip('Hasta tres acciones, ordenadas por impacto (0 a 100). Reglas fijas sobre los datos de hoy: calientes sin contactar, trabajos fallidos, tareas vencidas, presentados sin respuesta, prospectos, leads sin tarea, bonos y cola de revisión.') ?></header>
+  <header class="card__h"><h2 class="label" id="h-next">Siguiente mejor acción</h2><?= $tip('Hasta tres acciones, ordenadas por impacto (0 a 100). Reglas fijas sobre los datos de hoy: calientes sin contactar, trabajos fallidos, tareas vencidas, presentados sin respuesta, prospectos, leads sin tarea, bonos y cola de revisión.') ?></header>
   <div class="acts__b" data-live="actions"><?php require __DIR__ . '/_dash_actions.php'; ?></div>
 </section>
 
 <div class="grid grid--main">
   <section class="card chart" aria-labelledby="h-chart" data-tabs>
-    <header class="card__h"><h2 class="label" id="h-chart">LEADS POR SEMANA</h2><?= $tip('Leads recibidos por semana (lunes a domingo, hora del este), separados entre owner-operators y carriers, y company drivers. El último periodo está en curso: no entra en el promedio.') ?></header>
+    <header class="card__h"><h2 class="label" id="h-chart">Leads por semana</h2><?= $tip('Leads recibidos por semana (lunes a domingo, hora del este), separados entre owner-operators y carriers, y company drivers. El último periodo está en curso: no entra en el promedio.') ?></header>
     <div class="card__b">
       <div class="chart__top">
         <div>
@@ -77,7 +78,7 @@ $tip = static fn(string $t): string => Ui::tip($t);
   </section>
 
   <section class="card" aria-labelledby="h-src">
-    <header class="card__h"><h2 class="label" id="h-src">LEADS POR FUENTE</h2><?= $tip('Reparto de los leads recibidos en los últimos 90 días según su fuente. La variación compara los últimos 30 días con los 30 previos y solo aparece con ' . Dashboard::MIN_BASE . ' leads o más entre los dos.') ?></header>
+    <header class="card__h"><h2 class="label" id="h-src">Leads por fuente</h2><?= $tip('Reparto de los leads recibidos en los últimos 90 días según su fuente. La variación compara los últimos 30 días con los 30 previos y solo aparece con ' . Dashboard::MIN_BASE . ' leads o más entre los dos.') ?></header>
     <div class="card__b">
       <p class="pillnote"><?= Ui::icon('calendar') ?><?= $e($src['label']) ?></p>
       <p class="muted">Total</p>
@@ -98,7 +99,7 @@ $tip = static fn(string $t): string => Ui::tip($t);
 
 <section class="card" aria-labelledby="h-recent">
   <header class="card__h card__h--row">
-    <h2 class="label" id="h-recent">LEADS RECIENTES</h2>
+    <h2 class="label" id="h-recent">Leads recientes</h2>
     <div class="card__tools">
       <form class="minisearch" method="get" action="/" role="search">
         <?php if ($period !== 'today'): ?><input type="hidden" name="p" value="<?= $e($period) ?>"><?php endif; ?>
@@ -141,7 +142,7 @@ $tip = static fn(string $t): string => Ui::tip($t);
 
 <div class="grid grid--3">
   <section class="card" aria-labelledby="h-heat">
-    <header class="card__h"><h2 class="label" id="h-heat">ACTIVIDAD</h2><?= $tip('Leads recibidos por día de la semana en las últimas 13 semanas (hora del este). Más intenso = más leads; los puntos huecos son días sin leads.') ?></header>
+    <header class="card__h"><h2 class="label" id="h-heat">Actividad</h2><?= $tip('Leads recibidos por día de la semana en las últimas 13 semanas (hora del este). Más intenso = más leads; los puntos huecos son días sin leads.') ?></header>
     <div class="card__b">
       <p class="muted">Leads en 13 semanas</p>
       <p class="chart__v"><?= $e(Fmt::num($heat['total'])) ?> <?= Ui::delta($heat['delta']) ?></p>
@@ -161,7 +162,7 @@ $tip = static fn(string $t): string => Ui::tip($t);
   </section>
 
   <section class="card" aria-labelledby="h-today">
-    <header class="card__h"><h2 class="label" id="h-today">HOY</h2><?= $tip('Tareas vencidas o con vencimiento hoy y citas de hoy, en hora del este.') ?></header>
+    <header class="card__h"><h2 class="label" id="h-today">Hoy</h2><?= $tip('Tareas vencidas o con vencimiento hoy y citas de hoy, en hora del este.') ?></header>
     <div class="card__b">
       <?php if (!$today['tasks'] && !$today['appointments']): ?>
         <div class="empty empty--sm"><svg class="empty__star" aria-hidden="true"><use href="#i-star"/></svg><h3>Nada pendiente para hoy</h3><p>Las tareas y citas con fecha de hoy aparecerán aquí. Crea una desde la ficha de un lead.</p></div>
@@ -180,7 +181,7 @@ $tip = static fn(string $t): string => Ui::tip($t);
   </section>
 
   <section class="card" aria-labelledby="h-sys" id="cola">
-    <header class="card__h"><h2 class="label" id="h-sys">ESTADO DEL SISTEMA</h2><?= $tip('Cola de trabajos (alertas, FMCSA, correos), tarea de cron e integraciones configuradas.') ?></header>
+    <header class="card__h"><h2 class="label" id="h-sys">Estado del sistema</h2><?= $tip('Cola de trabajos (alertas, FMCSA, correos), tarea de cron e integraciones configuradas.') ?></header>
     <div class="card__b">
       <ul class="sysl">
         <li><i class="dot<?= $cronAgo !== null && !$cronLate ? ' is-ok' : ' is-bad' ?>"></i><span>Cron de la cola</span><b><?= $cronAgo !== null ? $e($cronAgo) : 'nunca' ?></b></li>

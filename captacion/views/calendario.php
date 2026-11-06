@@ -65,7 +65,7 @@ $addHref = static fn(string $ymd): string => $q(['nueva' => $ymd]) . '#nueva';
   <div class="page-head__a">
     <button class="btn btn--secondary filters-toggle filters-toggle--on" type="button" data-toggle="#filters" aria-expanded="<?= $nFilters > 0 ? 'true' : 'false' ?>" aria-controls="filters"><?= Ui::icon('filter') ?>Filtros<?= $nFilters > 0 ? ' <b class="badge">' . $e($nFilters) . '</b>' : '' ?></button>
     <?php if ($canWrite): ?>
-      <a class="btn btn--primary" href="<?= $e($addHref($sel)) ?>" data-cal-new="<?= $e($sel) ?>"><span class="btn__t">Nueva tarea</span><span class="btn__cell"><?= Ui::icon('plus') ?></span></a>
+      <a class="btn btn--primary" href="<?= $e($addHref($sel)) ?>" data-cal-new="<?= $e($sel) ?>"><span class="btn__t">Nueva tarea</span></a>
     <?php endif; ?>
   </div>
 </div>
@@ -105,7 +105,7 @@ $addHref = static fn(string $ymd): string => $q(['nueva' => $ymd]) . '#nueva';
         <label class="field"><span>Para (hora <?= $e($tz) ?>)</span><input type="datetime-local" name="due" value="<?= $e($newDay . 'T' . $startTime) ?>"></label>
         <label class="field"><span>Prioridad</span><select name="priority"><?php foreach ($prios as $k => $l): ?><option value="<?= $e($k) ?>"<?= $k === 2 ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
       </div>
-      <div class="dlg__a"><a class="btn btn--ghost" href="<?= $e($q(['nueva' => null])) ?>">Cancelar</a><button class="btn btn--primary" type="submit"><span class="btn__t">Crear tarea</span><span class="btn__cell"><?= Ui::icon('arrow-up-right') ?></span></button></div>
+      <div class="dlg__a"><a class="btn btn--ghost" href="<?= $e($q(['nueva' => null])) ?>">Cancelar</a><button class="btn btn--primary" type="submit"><span class="btn__t">Crear tarea</span></button></div>
     </form>
   </section>
   <?php endif; ?>
@@ -175,7 +175,7 @@ $addHref = static fn(string $ymd): string => $q(['nueva' => $ymd]) . '#nueva';
       <label class="field"><span>Para (hora <?= $e($tz) ?>)</span><input type="datetime-local" name="due" required></label>
       <label class="field"><span>Prioridad</span><select name="priority"><?php foreach ($prios as $k => $l): ?><option value="<?= $e($k) ?>"<?= $k === 2 ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
     </div>
-    <div class="dlg__a"><button class="btn btn--ghost" type="button" data-close>Cancelar</button><button class="btn btn--primary" type="submit"><span class="btn__t">Crear tarea</span><span class="btn__cell"><?= Ui::icon('arrow-up-right') ?></span></button></div>
+    <div class="dlg__a"><button class="btn btn--ghost" type="button" data-close>Cancelar</button><button class="btn btn--primary" type="submit"><span class="btn__t">Crear tarea</span></button></div>
   </form>
 </dialog>
 <?php endif; ?>

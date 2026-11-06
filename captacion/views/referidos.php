@@ -15,7 +15,7 @@ $empty = !$ov['codes'] && !$ov['referrals'];
     <p class="sub">Códigos de referido, los leads que llegan con ellos y los bonos por pagar.</p>
   </div>
   <div class="page-head__a">
-    <button class="btn btn--primary" type="button" data-open="#code-new"><span class="btn__t">Nuevo código</span><span class="btn__cell"><?= Ui::icon('plus') ?></span></button>
+    <button class="btn btn--primary" type="button" data-open="#code-new"><span class="btn__t">Nuevo código</span></button>
   </div>
 </div>
 
@@ -36,7 +36,7 @@ $empty = !$ov['codes'] && !$ov['referrals'];
     <li><span class="steps__n">2</span><div><b>Comparte el enlace</b><p><code><?= $e($siteUrl) ?>/careers/?ref=CODIGO</code>. El sitio lo recuerda 60 días y lo manda con la solicitud, sin cookies.</p></div></li>
     <li><span class="steps__n">3</span><div><b>Aprueba el bono</b><p>Cuando el referido firma, el bono pasa a «pendiente de aprobar» y te avisamos.</p></div></li>
   </ol>
-  <button class="btn btn--primary" type="button" data-open="#code-new"><span class="btn__t">Crear el primer código</span><span class="btn__cell"><?= Ui::icon('plus') ?></span></button>
+  <button class="btn btn--primary" type="button" data-open="#code-new"><span class="btn__t">Crear el primer código</span></button>
 </section>
 <?php else: ?>
 
@@ -124,6 +124,6 @@ $empty = !$ov['codes'] && !$ov['referrals'];
     </div>
     <label class="field"><span>Bono en dólares (provisional)</span><input type="text" name="bonus_amount" inputmode="decimal" maxlength="9" autocomplete="off" placeholder="Pendiente de confirmar con NorthStar"></label>
     <label class="field"><span>Nota (opcional)</span><input type="text" name="note" maxlength="255" autocomplete="off"></label>
-    <div class="dlg__a"><button class="btn btn--ghost" type="button" data-close>Cancelar</button><button class="btn btn--primary" type="submit"><span class="btn__t">Crear código</span><span class="btn__cell"><?= Ui::icon('arrow-up-right') ?></span></button></div>
+    <div class="dlg__a"><button class="btn btn--ghost" type="button" data-close>Cancelar</button><button class="btn btn--primary" type="submit"><span class="btn__t">Crear código</span></button></div>
   </form>
 </dialog>

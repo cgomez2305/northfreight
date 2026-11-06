@@ -10,13 +10,13 @@ $nowIn = static fn(string $tz): string => (new DateTimeImmutable('now', new Date
   <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>">
   <fieldset class="cfg-fs"<?= $locked ? ' disabled' : '' ?>>
     <section class="card cfg-card" aria-labelledby="hz-t">
-      <header class="card__h"><h2 class="label" id="hz-t">ZONA HORARIA DE VISUALIZACIÓN</h2></header>
+      <header class="card__h"><h2 class="label" id="hz-t">Zona horaria de visualización</h2></header>
       <div class="card__b">
         <label class="field hz-tz"><span>Zona</span><select name="timezone"><?php foreach ($zones as $k => [$name, $abbr]): ?><option value="<?= $e($k) ?>"<?= $tz === $k ? ' selected' : '' ?>><?= $e($name) ?> · <?= $e($abbr) ?> · ahora <?= $e($nowIn($k)) ?></option><?php endforeach; ?></select><small>Por defecto, la del este de EE. UU. (America/New_York), donde está NorthStar.</small></label>
       </div>
     </section>
     <section class="card cfg-card" aria-labelledby="hh-t">
-      <header class="card__h"><h2 class="label" id="hh-t">HORARIO COMERCIAL</h2></header>
+      <header class="card__h"><h2 class="label" id="hh-t">Horario comercial</h2></header>
       <div class="card__b">
         <div class="dlg__row hz-h">
           <label class="field"><span>Abre</span><input type="time" name="start" value="<?= $e($hours['start']) ?>" required></label>
@@ -27,7 +27,7 @@ $nowIn = static fn(string $tz): string => (new DateTimeImmutable('now', new Date
         </fieldset>
       </div>
       <footer class="card__f"><span class="muted">Hoy son las <?= $e(Fmt::et(\Captacion\Clock::time())->format('H:i')) ?> <?= $e(Fmt::zone()) ?>.</span>
-        <button class="btn btn--primary" type="submit"><span class="btn__t">Guardar horario</span><span class="btn__cell"><?= Ui::icon('check') ?></span></button></footer>
+        <button class="btn btn--primary" type="submit"><span class="btn__t">Guardar horario</span></button></footer>
     </section>
   </fieldset>
 </form>

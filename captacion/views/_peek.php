@@ -21,7 +21,7 @@ $lost = $lead['stage'] === 'lost';
   <div class="pk__id">
     <?= Ui::avatar($name, 'lg') ?>
     <div class="pk__who">
-      <p class="label"><?= $e(Fmt::code($id)) ?> · <?= $e(strtoupper(Fmt::ago($lead['created_at']))) ?></p>
+      <p class="label"><?= $e(Fmt::code($id)) ?> · <?= $e(Fmt::ago($lead['created_at'])) ?></p>
       <h2 class="pk__n" id="pk-title" tabindex="-1"><?= $e($name) ?></h2>
     </div>
   </div>
@@ -32,7 +32,7 @@ $lost = $lead['stage'] === 'lost';
     <span class="pk__score"><?= Ui::scoreBar((int) $lead['score'], (string) $lead['temperature']) ?><b><?= $e($lead['score']) ?></b><small>/100</small></span>
   </div>
   <div class="pk__acts">
-    <?php if ($phone): ?><a class="btn btn--primary btn--sm" href="tel:<?= $e($phone) ?>"><span class="btn__t">Llamar</span><span class="btn__cell"><?= Ui::icon('phone') ?></span></a><?php endif; ?>
+    <?php if ($phone): ?><a class="btn btn--primary btn--sm" href="tel:<?= $e($phone) ?>"><span class="btn__t">Llamar</span></a><?php endif; ?>
     <?php if ($wa): ?><a class="btn btn--secondary btn--sm" href="https://wa.me/<?= $e($wa) ?>?text=<?= $e(rawurlencode($waText)) ?>" rel="noopener noreferrer" target="_blank"><?= Ui::icon('chat') ?>WhatsApp</a><?php endif; ?>
     <?php if ($lead['email']): ?><a class="btn btn--secondary btn--sm" href="mailto:<?= $e($lead['email']) ?>"><?= Ui::icon('mail') ?>Correo</a><?php endif; ?>
   </div>
@@ -41,7 +41,7 @@ $lost = $lead['stage'] === 'lost';
 <div class="pk__body">
   <section class="pk__sec" aria-label="Etapa">
     <div class="pk__row">
-      <span class="label">ETAPA</span>
+      <span class="label">Etapa</span>
       <span class="pk__prog" title="Avance en el pipeline"><?= $pos > 0 ? $e($pos . '/' . $tot) : '—' ?><i class="prog" role="img" aria-label="<?= $pos > 0 ? $e('Etapa ' . $pos . ' de ' . $tot) : 'Fuera del pipeline' ?>"><?php for ($i = 1; $i <= $tot; $i++): ?><b<?= $i <= $pos ? ' class="on"' : '' ?>></b><?php endfor; ?></i></span>
     </div>
     <?php if ($lost): ?>
@@ -58,7 +58,7 @@ $lost = $lead['stage'] === 'lost';
   </section>
 
   <section class="pk__sec" aria-label="Datos clave">
-    <h3 class="label">DATOS CLAVE</h3>
+    <h3 class="label">Datos clave</h3>
     <dl class="pk__dl">
       <div><dt>Teléfono</dt><dd class="mono"><?= $phone ? $e(Fmt::phone($phone)) : '<span class="muted">' . ($lead['phone_raw'] ? $e($lead['phone_raw']) . ' (inválido)' : '—') . '</span>' ?></dd></div>
       <div><dt>Correo</dt><dd><?= $lead['email'] ? $e($lead['email']) : '—' ?></dd></div>
@@ -79,7 +79,7 @@ $lost = $lead['stage'] === 'lost';
 
   <?php $pkRules = is_array($lead['score_breakdown'] ?? null) ? (array) ($lead['score_breakdown']['rules'] ?? []) : []; if ($pkRules): ?>
   <section class="pk__sec" aria-label="Reglas que influyeron">
-    <h3 class="label">REGLAS QUE INFLUYERON</h3>
+    <h3 class="label">Reglas que influyeron</h3>
     <ul class="pk__rules">
       <?php foreach ($pkRules as $ru): $fx = array_values(array_filter(array_map([\Captacion\Services\RulePhrase::class, 'effect'], (array) ($ru['effects'] ?? [])))); ?>
         <li><span><?= $e($ru['name'] ?? 'Regla') ?><small><?= $e($ru['set'] ?? '') ?></small></span><b class="mono"><?= $e(implode(' · ', $fx)) ?></b></li>
@@ -89,7 +89,7 @@ $lost = $lead['stage'] === 'lost';
   <?php endif; ?>
 
   <section class="pk__sec" aria-label="Próximas tareas">
-    <h3 class="label">PRÓXIMAS TAREAS <span class="muted">(<?= $e($openTasks) ?>)</span></h3>
+    <h3 class="label">Próximas tareas <span class="muted">(<?= $e($openTasks) ?>)</span></h3>
     <?php if (!$tasks): ?><p class="muted">Sin tareas abiertas. Agenda el siguiente paso abajo.</p><?php endif; ?>
     <ul class="pk__tasks">
       <?php foreach ($tasks as $t): $late = $t['due_at'] !== null && (int) Clock::parse((string) $t['due_at']) < $now; ?>
@@ -100,7 +100,7 @@ $lost = $lead['stage'] === 'lost';
   </section>
 
   <section class="pk__sec" aria-label="Actividad reciente">
-    <h3 class="label">ACTIVIDAD RECIENTE</h3>
+    <h3 class="label">Actividad reciente</h3>
     <?php if (!$timeline): ?><p class="muted">Sin actividad todavía.</p><?php endif; ?>
     <ol class="pk__tl">
       <?php foreach ($timeline as $t): ?>

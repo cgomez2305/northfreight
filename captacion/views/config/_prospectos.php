@@ -18,7 +18,7 @@ $c = is_array($pRun) ? ($pRun['counters'] ?? []) : [];
   <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>">
   <fieldset class="cfg-fs"<?= $locked ? ' disabled' : '' ?>>
     <section class="card cfg-card" aria-labelledby="pf-t">
-      <header class="card__h"><h2 class="label" id="pf-t">QUÉ PROSPECTOS ENTRAN</h2></header>
+      <header class="card__h"><h2 class="label" id="pf-t">Qué prospectos entran</h2></header>
       <div class="card__b pf-grid">
         <label class="tgl pf-all"><input type="checkbox" name="enabled" value="1"<?= $cur['enabled'] ? ' checked' : '' ?>><span class="tgl__t"><b>Buscar prospectos nuevos cada día</b><small>A las 6:00 a. m. de Nueva York. Apagarlo no borra nada de la lista.</small></span></label>
         <label class="field"><span>Antigüedad máxima de la autoridad (meses)</span><input type="text" name="max_age_months" value="<?= $e($cur['max_age_months']) ?>" inputmode="numeric" maxlength="2" autocomplete="off"><small>De 1 a 24. Por defecto 12.</small><?= $em('max_age_months') ?></label>
@@ -28,7 +28,7 @@ $c = is_array($pRun) ? ($pRun['counters'] ?? []) : [];
       </div>
     </section>
     <section class="card cfg-card" aria-labelledby="pc-t">
-      <header class="card__h"><h2 class="label" id="pc-t">CARGA DECLARADA (OPCIONAL)</h2></header>
+      <header class="card__h"><h2 class="label" id="pc-t">Carga declarada (opcional)</h2></header>
       <div class="card__b">
         <p class="muted pf-hint">Sin marcar = cualquier carga. FMCSA publica la carga que el carrier declara, <b>no</b> el tipo de equipo (dry van, reefer, flatbed no existen como dato). Con un filtro activo, un carrier que no declara carga se descarta.</p>
         <div class="eqgrid"><?php foreach (ProspectConfig::CARGO as $k => [$label]): ?><label class="check check--box"><input type="checkbox" name="cargo[]" value="<?= $e($k) ?>"<?= in_array($k, $cur['cargo'], true) ? ' checked' : '' ?>><span><?= $e($label) ?></span></label><?php endforeach; ?></div>
@@ -36,19 +36,19 @@ $c = is_array($pRun) ? ($pRun['counters'] ?? []) : [];
       </div>
     </section>
     <section class="card cfg-card" aria-labelledby="ps-t">
-      <header class="card__h"><h2 class="label" id="ps-t">ESTADOS (VACÍO = TODO EE. UU.)</h2></header>
+      <header class="card__h"><h2 class="label" id="ps-t">Estados (vacío = todo EE. UU.)</h2></header>
       <div class="card__b">
         <div class="pf-states"><?php foreach (UsStates::NAMES as $k => $l): ?><label class="check check--box check--st" title="<?= $e($l) ?>"><input type="checkbox" name="states[]" value="<?= $e($k) ?>"<?= in_array($k, $cur['states'], true) ? ' checked' : '' ?>><span><?= $e($k) ?></span></label><?php endforeach; ?></div>
         <?= $em('states') ?>
       </div>
       <footer class="card__f"><span class="muted">Territorios, Canadá y México quedan fuera siempre.</span>
-        <button class="btn btn--primary" type="submit"><span class="btn__t">Guardar filtros</span><span class="btn__cell"><?= Ui::icon('check') ?></span></button></footer>
+        <button class="btn btn--primary" type="submit"><span class="btn__t">Guardar filtros</span></button></footer>
     </section>
   </fieldset>
 </form>
 
 <section class="card cfg-card" aria-labelledby="pr-t">
-  <header class="card__h"><h2 class="label" id="pr-t">ÚLTIMA CORRIDA</h2></header>
+  <header class="card__h"><h2 class="label" id="pr-t">Última corrida</h2></header>
   <div class="card__b">
     <?php if (!is_array($pRun)): ?>
       <p class="muted">Todavía no ha corrido. Programa <code>cron/fmcsa_daily.php</code> (cada hora, minuto 20) o prueba por SSH con <code>--force</code>. Pasos en el README §19.</p>

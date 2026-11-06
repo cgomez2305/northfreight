@@ -37,7 +37,7 @@ $run = $recalc !== null && ($recalc['status'] ?? '') === 'running';
 <?php if ($sets): ?>
 <section class="card rl-recalc" id="aplicar" aria-labelledby="rl-rc-t">
   <div class="rl-recalc__t">
-    <h2 class="label" id="rl-rc-t">APLICAR A LEADS EXISTENTES</h2>
+    <h2 class="label" id="rl-rc-t">Aplicar a leads existentes</h2>
     <p>Publicar una versión afecta a los leads nuevos y a los que cambian. Para que los que ya están en la base reciban puntos, temperatura, etiquetas y cola de revisión, recalcula: corre por la cola, en lotes, y no crea alertas ni tareas en masa.</p>
     <?php if ($recalc !== null): ?>
       <div class="rl-recalc__s<?= $run ? ' is-run' : '' ?>"<?= $run ? ' data-running' : '' ?>>
@@ -73,7 +73,7 @@ $run = $recalc !== null && ($recalc['status'] ?? '') === 'running';
   <h3 id="rl-e-t">Todavía no hay reglas</h3>
   <p>La puntuación sigue exactamente la del documento. Crea un conjunto para ajustar puntos, avisar por Telegram o crear tareas, o empieza con cinco ejemplos desactivados que puedes editar.</p>
   <div class="rl-empty__a">
-    <button class="btn btn--primary" type="button" data-open="#newset"><span class="btn__t">Nuevo conjunto</span><span class="btn__cell"><?= Ui::icon('plus') ?></span></button>
+    <button class="btn btn--primary" type="button" data-open="#newset"><span class="btn__t">Nuevo conjunto</span></button>
     <form method="post" action="/config/rules/starter"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><button class="btn btn--secondary" type="submit">Empezar con ejemplos</button></form>
   </div>
 </section>
@@ -81,7 +81,7 @@ $run = $recalc !== null && ($recalc['status'] ?? '') === 'running';
 
 <?php foreach (Rules::KINDS as $kind => $label): if (empty($byKind[$kind])) { continue; } ?>
 <section class="rl-group" aria-labelledby="rl-g-<?= $e($kind) ?>">
-  <header class="rl-group__h"><h3 class="label" id="rl-g-<?= $e($kind) ?>"><?= $e(strtoupper($label)) ?></h3><span class="muted"><?= $e(Rules::KIND_HELP[$kind]) ?></span></header>
+  <header class="rl-group__h"><h3 class="label" id="rl-g-<?= $e($kind) ?>"><?= $e($label) ?></h3><span class="muted"><?= $e(Rules::KIND_HELP[$kind]) ?></span></header>
   <ul class="rl-list">
     <?php foreach ($byKind[$kind] as $s): [$cc, $cl] = $chipOf[$s['status']]; $p = $s['published']; $d = $s['draft']; ?>
     <li><a class="rl-card<?= $editor && $editor['set']['id'] === $s['id'] ? ' is-cur' : '' ?>" href="/config?tab=reglas&amp;set=<?= $e($s['id']) ?>" data-rl-open="<?= $e($s['id']) ?>">
@@ -106,12 +106,12 @@ $run = $recalc !== null && ($recalc['status'] ?? '') === 'running';
   <form method="post" action="/config/rules/newset">
     <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>">
     <div class="dlg__h"><h2 class="dlg__t" id="newset-t">Nuevo conjunto de reglas</h2><button class="icon-btn icon-btn--sm" type="button" data-close aria-label="Cerrar"><?= Ui::icon('x') ?></button></div>
-    <fieldset class="rl-kinds"><legend class="label">TIPO</legend>
+    <fieldset class="rl-kinds"><legend class="label">Tipo</legend>
       <?php foreach (Rules::KINDS as $k => $l): ?><label class="rl-kind"><input type="radio" name="kind" value="<?= $e($k) ?>"<?= $k === 'scoring' ? ' checked' : '' ?>><span><b><?= $e($l) ?></b><small><?= $e(Rules::KIND_HELP[$k]) ?></small></span></label><?php endforeach; ?>
     </fieldset>
     <label class="field"><span>Nombre</span><input type="text" name="name" required maxlength="80" autocomplete="off" placeholder="Ajustes por fuente"></label>
     <label class="field"><span>Descripción <small>(opcional)</small></span><input type="text" name="description" maxlength="300" autocomplete="off"></label>
-    <div class="dlg__a"><button class="btn btn--ghost" type="button" data-close>Cancelar</button><button class="btn btn--primary" type="submit"><span class="btn__t">Crear y editar</span><span class="btn__cell"><?= Ui::icon('arrow-up-right') ?></span></button></div>
+    <div class="dlg__a"><button class="btn btn--ghost" type="button" data-close>Cancelar</button><button class="btn btn--primary" type="submit"><span class="btn__t">Crear y editar</span></button></div>
   </form>
 </dialog>
 

@@ -1,24 +1,24 @@
 /* NorthStar Captación · Q5a: barra de vistas, columnas, densidad, etiquetas, barra de puntuación y avance. Solo en /leads y /pipeline. Sin estilos en línea. */
 .vbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-.vtabs{display:inline-flex;gap:2px;padding:3px;background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-pill)}
+.vtabs{display:inline-flex;gap:2px;padding:2px;background:var(--sunk);border-radius:var(--r-ctl)}
 .vtabs{max-width:100%;overflow-x:auto;scrollbar-width:none}
 .vtabs::-webkit-scrollbar{display:none}
-.vtab{display:inline-flex;align-items:center;gap:7px;min-height:38px;padding:0 15px;border-radius:var(--r-pill);color:var(--ink-2);font-weight:500;white-space:nowrap;text-decoration:none!important}
+.vtab{display:inline-flex;align-items:center;gap:7px;min-height:32px;padding:0 12px;border-radius:var(--r-sm);color:var(--ink-3);font-size:var(--fs-sm);font-weight:500;white-space:nowrap;text-decoration:none!important}
 .vtab:hover{color:var(--ink)}
-.vtab.is-on{background:var(--navy-2);color:var(--on-fill)}
+.vtab.is-on{background:var(--surface);color:var(--ink);box-shadow:0 0 0 1px var(--line)}
 .vbar__r{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .vbtn{max-width:240px}
 .vbtn__t{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .vdirty{width:8px;height:8px;border-radius:50%;background:var(--warn-dot);flex:none}
 .vdens .seg__i{padding:0 10px}
 .tbl tr[data-peek]{cursor:pointer}
-.tbl tr.is-cur td,.tbl tr.is-open td{background:var(--cyan-tint)}
+.tbl tr.is-cur td,.tbl tr.is-open td{background:var(--accent-tint)}
 .c-tk{white-space:nowrap}
 [data-hide~=prof] .k-prof,[data-hide~=st] .k-st,[data-hide~=eq] .k-eq,[data-hide~=pts] .k-pts,[data-hide~=temp] .k-temp,[data-hide~=stage] .k-stage,[data-hide~=src] .k-src,[data-hide~=when] .k-when,[data-hide~=task] .k-task{display:none}
-html[data-density=compact] .tbl--leads td,html[data-density=compact] .tbl--leads th{padding-top:6px;padding-bottom:6px}
+html[data-density=compact] .tbl--leads td,html[data-density=compact] .tbl--leads th{height:44px;padding-top:4px;padding-bottom:4px}
 html[data-density=compact] .tbl--leads .av{width:28px;height:28px;font-size:11px}
 .dot--ok{background:var(--ok-dot)}
-.dot--info{background:var(--cyan)}
+.dot--info{background:var(--accent)}
 @media (max-width:1024px){
   .vbar__r{width:100%}
   .vbar>.vtabs{width:100%}
@@ -27,14 +27,14 @@ html[data-density=compact] .tbl--leads .av{width:28px;height:28px;font-size:11px
   .vbtn{max-width:170px}
 }
 .chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.fchip{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 8px 0 12px;border-radius:var(--r-pill);background:var(--cyan-tint);border:1px solid var(--cyan-line);color:var(--ink);font-size:13px;font-weight:500;text-decoration:none!important}
+.fchip{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 8px 0 10px;border-radius:var(--r-ctl);background:var(--surface);border:1px solid var(--line-2);color:var(--ink);font-size:var(--fs-sm);font-weight:500;text-decoration:none!important}
 .fchip .ic{width:14px;height:14px}
-.fchip:hover{background:var(--cyan-line)}
+.fchip:hover{background:var(--sunk)}
 /* chips de tipo (calendario y cronología): filtros por enlace, con el tono del tipo */
 .cal__types{display:flex;gap:6px;flex-wrap:wrap}
-.tchip{display:inline-flex;align-items:center;gap:7px;min-height:34px;padding:0 12px;border-radius:var(--r-pill);border:1px solid var(--line-2);background:var(--surface);color:var(--ink-2);font-size:13px;font-weight:500;text-decoration:none!important}
-.tchip:hover{border-color:var(--ink-3)}
-.tchip.is-on{background:var(--ev-bg,var(--cyan-tint));border-color:transparent;color:var(--ev-ink,var(--cyan-ink))}
+.tchip{display:inline-flex;align-items:center;gap:7px;min-height:32px;padding:0 12px;border-radius:var(--r-ctl);border:1px solid var(--line-2);background:var(--surface);color:var(--ink-2);font-size:var(--fs-sm);font-weight:500;text-decoration:none!important}
+.tchip:hover{border-color:var(--ink-4)}
+.tchip.is-on{background:var(--ev-bg,var(--accent-tint));border-color:transparent;color:var(--ev-ink,var(--accent-ink))}
 .tchip:not(.is-on){opacity:.7}
 .tchip .ic{width:15px;height:15px}
-.tchip b{font:600 11px var(--f-mono)}
+.tchip b{font:500 11px var(--f-sans);font-variant-numeric:tabular-nums}

@@ -9,7 +9,7 @@ require __DIR__ . '/_pub_open.php';
       <form class="pub__card" method="post" action="/u/<?= $e($token) ?>">
         <h1 class="pub__t"><?= $es ? '¿Darte de baja?' : 'Unsubscribe?' ?></h1>
         <p class="pub__s"><?= $es ? 'Pulsa el botón para dejar de recibir correos de seguimiento de NorthStar Freight Solutions.' : 'Press the button to stop receiving follow-up emails from NorthStar Freight Solutions.' ?></p>
-        <button class="btn btn--primary btn--block btn--lg" type="submit"><span class="btn__t"><?= $es ? 'Confirmar baja' : 'Confirm unsubscribe' ?></span><span class="btn__cell"><?= Ui::icon('check') ?></span></button>
+        <button class="btn btn--primary btn--block btn--lg" type="submit"><span class="btn__t"><?= $es ? 'Confirmar baja' : 'Confirm unsubscribe' ?></span></button>
         <p class="pub__n"><?= $es ? 'Si no querías darte de baja, cierra esta página: no se guarda nada hasta que pulses.' : 'If you did not mean to unsubscribe, just close this page: nothing is saved until you press the button.' ?></p>
       </form>
 <?php elseif ($state === 'done'): ?>

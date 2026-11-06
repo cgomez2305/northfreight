@@ -6,7 +6,7 @@ use Captacion\Ui;
 $st = ['sent' => ['Enviado', 'warm'], 'logged' => ['Solo registrado (sin SMTP)', 'plain'], 'failed' => ['Falló', 'hot']];
 ?>
 <section class="card card--table" aria-labelledby="sn-t">
-  <header class="card__h"><h2 class="label" id="sn-t">ÚLTIMOS CORREOS A LEADS</h2><span class="muted"><?= $e(count($rows)) ?></span></header>
+  <header class="card__h"><h2 class="label" id="sn-t">Últimos correos a leads</h2><span class="muted"><?= $e(count($rows)) ?></span></header>
   <?php if (!$rows): ?>
     <div class="empty empty--sm"><?= Ui::icon('star', 'empty__star ic--star') ?><h3>Aún no se ha enviado ningún correo</h3><p>Los correos de las secuencias aparecerán aquí con su estado. «Solo registrado» significa que no hay SMTP y nadie lo recibió.</p></div>
   <?php else: ?>

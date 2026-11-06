@@ -12,11 +12,11 @@ $act = static function (string $action, int $id, string $label, string $cls, str
 ?>
 <p class="cfg-intro">Cuentas de <b>solo lectura</b> para NorthStar. Un lector ve únicamente <b>Resultados</b> (totales, embudo, firmados, costo por firmado, tendencia y motivos de pérdida) e <b>Informes</b> mensuales: nunca nombres, teléfonos, correos, USDOT ni exportaciones. Se invita con un enlace de un solo uso (48 h) para fijar contraseña y activar el 2FA.</p>
 <?php if (!empty($once) && $once['kind'] === 'link'): ?>
-  <section class="card cfg-card en-once" aria-labelledby="us-once"><header class="card__h"><h2 class="label" id="us-once">ENLACE DE INVITACIÓN · SE MUESTRA UNA SOLA VEZ</h2></header>
+  <section class="card cfg-card en-once" aria-labelledby="us-once"><header class="card__h"><h2 class="label" id="us-once">Enlace de invitación · se muestra una sola vez</h2></header>
     <div class="card__b"><p>Para <b><?= $e($once['name']) ?></b>. Vale <?= $e($once['ttl']) ?> y se usa una sola vez. Envíaselo por un canal privado.</p><p class="secret"><code><?= $e($once['value']) ?></code></p></div></section>
 <?php endif; ?>
 <section class="card cfg-card" aria-labelledby="us-i">
-  <header class="card__h"><h2 class="label" id="us-i">INVITAR A UN LECTOR</h2></header>
+  <header class="card__h"><h2 class="label" id="us-i">Invitar a un lector</h2></header>
   <div class="card__b">
     <form method="post" action="/config/users/invite" class="cfg-form us-form" novalidate>
       <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>">
@@ -24,14 +24,14 @@ $act = static function (string $action, int $id, string $label, string $cls, str
         <div class="us-grid">
           <label class="field<?= isset($errors['name']) ? ' has-err' : '' ?>"><span>Nombre</span><input type="text" name="name" value="<?= $e($inviteForm['name']) ?>" maxlength="120" autocomplete="off" required<?= $fe('name') ?>><?= $em('name') ?></label>
           <label class="field<?= isset($errors['email']) ? ' has-err' : '' ?>"><span>Correo</span><input type="email" name="email" value="<?= $e($inviteForm['email']) ?>" maxlength="190" autocomplete="off" required<?= $fe('email') ?>><?= $em('email') ?></label>
-          <button class="btn btn--primary us-go" type="submit"><span class="btn__t">Crear invitación</span><span class="btn__cell"><?= Ui::icon('user-plus') ?></span></button>
+          <button class="btn btn--primary us-go" type="submit"><span class="btn__t">Crear invitación</span></button>
         </div>
       </fieldset>
     </form>
   </div>
 </section>
 <section class="card cfg-card" aria-labelledby="us-l">
-  <header class="card__h"><h2 class="label" id="us-l">LECTORES</h2><span class="muted"><?= $e(count($viewers)) ?> cuenta<?= count($viewers) === 1 ? '' : 's' ?></span></header>
+  <header class="card__h"><h2 class="label" id="us-l">Lectores</h2><span class="muted"><?= $e(count($viewers)) ?> cuenta<?= count($viewers) === 1 ? '' : 's' ?></span></header>
   <?php if (!$viewers): ?>
     <div class="empty empty--sm"><?= Ui::icon('star', 'empty__star ic--star') ?><h3>Aún no hay lectores</h3><p>Invita a la persona de NorthStar que verá los resultados y los informes.</p></div>
   <?php else: ?>

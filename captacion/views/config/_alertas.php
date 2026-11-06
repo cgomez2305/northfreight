@@ -14,7 +14,7 @@ $em = static fn(string $k) => isset($errors[$k]) ? '<small class="num__e" id="ea
   <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>">
   <fieldset class="cfg-fs"<?= $locked ? ' disabled' : '' ?>>
     <section class="card cfg-card" aria-labelledby="al-t">
-      <header class="card__h"><h2 class="label" id="al-t">TELEGRAM</h2></header>
+      <header class="card__h"><h2 class="label" id="al-t">Telegram</h2></header>
       <div class="card__b al-list">
         <label class="tgl"><input type="checkbox" name="hot_telegram" value="1"<?= $a['hot_telegram'] ? ' checked' : '' ?>><span class="tgl__t"><b>Lead caliente (A2)</b><small>Un mensaje al instante cuando llega un lead caliente.</small></span></label>
         <label class="tgl"><input type="checkbox" name="followup_telegram" value="1"<?= $a['followup_telegram'] ? ' checked' : '' ?>><span class="tgl__t"><b>Segunda alerta (A3)</b><small>Si nadie lo contactó pasado este tiempo, vuelve a avisarte. Se cancela solo al contactar el lead.</small></span></label>
@@ -28,7 +28,7 @@ $em = static fn(string $k) => isset($errors[$k]) ? '<small class="num__e" id="ea
       </div>
     </section>
     <section class="card cfg-card" aria-labelledby="al-m">
-      <header class="card__h"><h2 class="label" id="al-m">CORREO</h2></header>
+      <header class="card__h"><h2 class="label" id="al-m">Correo</h2></header>
       <div class="card__b al-list">
         <label class="tgl"><input type="checkbox" name="email" value="1"<?= $a['email'] ? ' checked' : '' ?>><span class="tgl__t"><b>Avisos por correo</b><small>Leads tibios y fríos, reingresos y, si Telegram de calientes está apagado, también los calientes.</small></span></label>
         <label class="field<?= isset($errors['mail_to']) ? ' has-err' : '' ?>"><span>Correo de aviso</span><input type="email" name="mail_to" value="<?= $e($a['mail_to']) ?>" placeholder="<?= $e($envMail !== '' ? $envMail : 'nombre@dominio.com') ?>" maxlength="190" autocomplete="off"<?= $fe('mail_to') ?>><?= $em('mail_to') ?>
@@ -36,7 +36,7 @@ $em = static fn(string $k) => isset($errors[$k]) ? '<small class="num__e" id="ea
       </div>
     </section>
     <section class="card cfg-card" aria-labelledby="al-q">
-      <header class="card__h"><h2 class="label" id="al-q">HORARIO DE SILENCIO</h2></header>
+      <header class="card__h"><h2 class="label" id="al-q">Horario de silencio</h2></header>
       <div class="card__b al-list">
         <label class="tgl"><input type="checkbox" name="quiet_enabled" value="1" data-quiet<?= $q['enabled'] ? ' checked' : '' ?>><span class="tgl__t"><b>Silenciar alertas no urgentes</b><small>El Telegram de tibios y los correos esperan a que termine el silencio. Hora de <?= $e(Fmt::zone()) ?>.</small></span></label>
         <div class="dlg__row al-q<?= isset($errors['quiet']) ? ' has-err' : '' ?>">
@@ -46,7 +46,7 @@ $em = static fn(string $k) => isset($errors[$k]) ? '<small class="num__e" id="ea
         <?= $em('quiet') ?>
       </div>
       <footer class="card__f"><span class="muted">Se aplica a lo que se encole a partir de guardar.</span>
-        <button class="btn btn--primary" type="submit"><span class="btn__t">Guardar alertas</span><span class="btn__cell"><?= Ui::icon('check') ?></span></button></footer>
+        <button class="btn btn--primary" type="submit"><span class="btn__t">Guardar alertas</span></button></footer>
     </section>
   </fieldset>
 </form>

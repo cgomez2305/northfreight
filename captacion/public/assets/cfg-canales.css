@@ -3,9 +3,9 @@
 .cn-def code,.cfg-card code{font:500 12px var(--f-mono)}
 .cn-map{display:grid;gap:8px;margin:14px 0 18px}
 .cn-map__h,.cn-map__r{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:10px}
-.cn-map__h{font:500 11px var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.cn-map__h{font:500 12px/1.3 var(--f-sans);color:var(--ink-3)}
 .cn-w{max-width:520px;margin-top:14px}
-.cn-h{font:700 22px/1 var(--f-cond);margin:22px 0 6px}
+.cn-h{font:600 17px/1 var(--f-sans);margin:22px 0 6px}
 @media (max-width:760px){
   .cn-map__h{display:none}
   .cn-map__r{grid-template-columns:1fr}

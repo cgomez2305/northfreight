@@ -6,7 +6,7 @@ use Captacion\Ui;
 /** Variables: $templates (con pending) */
 ?>
 <section class="card card--table" aria-labelledby="t-l">
-  <header class="card__h"><h2 class="label" id="t-l">PLANTILLAS</h2><span class="muted"><?= $e(count($templates)) ?></span></header>
+  <header class="card__h"><h2 class="label" id="t-l">Plantillas</h2><span class="muted"><?= $e(count($templates)) ?></span></header>
   <div class="tw"><table class="tbl tbl--cm">
     <thead><tr><th scope="col">Nombre</th><th scope="col">Clave</th><th scope="col">Idioma</th><th scope="col">Estado</th><th scope="col">Editada</th><th scope="col"><span class="sr">Abrir</span></th></tr></thead>
     <tbody>

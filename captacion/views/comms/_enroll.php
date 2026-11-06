@@ -10,7 +10,7 @@ $btn = static fn(int $id, string $a, string $label, string $cls, string $confirm
 <div class="cm-seqs">
   <?php foreach (Sequences::DEFS as $key => $def): $c = $counts[$key] ?? []; ?>
     <section class="card" aria-labelledby="sq-<?= $e($key) ?>">
-      <header class="card__h"><h2 class="label" id="sq-<?= $e($key) ?>"><?= $e(strtoupper($def['name'])) ?></h2><span class="muted"><?= $e($c['active'] ?? 0) ?> activa<?= ($c['active'] ?? 0) === 1 ? '' : 's' ?></span></header>
+      <header class="card__h"><h2 class="label" id="sq-<?= $e($key) ?>"><?= $e($def['name']) ?></h2><span class="muted"><?= $e($c['active'] ?? 0) ?> activa<?= ($c['active'] ?? 0) === 1 ? '' : 's' ?></span></header>
       <div class="card__b">
         <ol class="cm-steps"><?php foreach ($def['steps'] as $s): ?><li><b><?= $e($s['label']) ?></b><?php if (!empty($s['needs_source'])): ?><small class="muted"><?= $caps['rates_source'] === '' ? 'Se omite: no hay fuente real de tarifas' : 'Fuente: ' . $e($caps['rates_source']) ?></small><?php endif; ?></li><?php endforeach; ?></ol>
         <p class="muted"><?= $def['pause_on_progress'] ? 'Se pausa sola cuando el lead pasa a Contactado, Calificado, Perdido, Firmado… o con «El lead respondió» en su ficha.' : 'Se programa al firmar el lead.' ?></p>
@@ -19,13 +19,13 @@ $btn = static fn(int $id, string $a, string $label, string $cls, string $confirm
     </section>
   <?php endforeach; ?>
   <section class="card" aria-labelledby="sq-cap">
-    <header class="card__h"><h2 class="label" id="sq-cap">TOPES DE ENVÍO</h2></header>
+    <header class="card__h"><h2 class="label" id="sq-cap">Topes de envío</h2></header>
     <div class="card__b"><p>Esta hora: <b><?= $e($sentHour) ?></b> de <b><?= $e($caps['cap_hour']) ?></b> correos de secuencias.</p><p class="muted">Máximo <?= $e($caps['cap_lead']) ?> por lead cada 24 horas. Se cambian en <a href="/config?tab=correo">Configuración &gt; Correo</a>.</p></div>
   </section>
 </div>
 
 <section class="card card--table" aria-labelledby="en-l">
-  <header class="card__h"><h2 class="label" id="en-l">INSCRIPCIONES</h2>
+  <header class="card__h"><h2 class="label" id="en-l">Inscripciones</h2>
     <form class="cm-filter" method="get" action="/comunicaciones/inscripciones">
       <label class="sr" for="f-sq">Secuencia</label><select id="f-sq" name="sq"><option value="">Todas las secuencias</option><?php foreach (Sequences::DEFS as $k => $d): ?><option value="<?= $e($k) ?>"<?= $sq === $k ? ' selected' : '' ?>><?= $e($d['name']) ?></option><?php endforeach; ?></select>
       <label class="sr" for="f-st">Estado</label><select id="f-st" name="st"><option value="">Todos los estados</option><?php foreach (Sequences::STATUS as $k => $l): ?><option value="<?= $e($k) ?>"<?= $st === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select>

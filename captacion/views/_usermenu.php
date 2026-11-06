@@ -6,7 +6,7 @@ $tp = $prefs['theme'] ?? 'auto';
 ?>
 <div class="dd__head"><b><?= $e($user['name']) ?></b><small><?= $e($user['email']) ?></small></div>
 <div class="dd__theme" role="group" aria-label="Tema de color">
-  <span class="label">TEMA</span>
+  <span class="label">Tema</span>
   <div class="seg seg--tight">
     <?php foreach (['light' => ['sun', 'Claro'], 'dark' => ['moon', 'Oscuro'], 'auto' => ['monitor', 'Auto']] as $k => [$ic, $l]): ?>
       <button class="seg__i<?= $tp === $k ? ' is-on' : '' ?>" type="button" data-theme-set="<?= $e($k) ?>" aria-pressed="<?= $tp === $k ? 'true' : 'false' ?>"><?= Ui::icon($ic) ?><?= $e($l) ?></button>

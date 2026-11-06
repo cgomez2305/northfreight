@@ -34,7 +34,7 @@ if ($impactErr !== ''): ?>
     <div><dt>Tareas que se habrían creado</dt><dd><?= $e((int) $s['tasks']) ?></dd></div>
     <div><dt>Etiquetas o cola de revisión</dt><dd><?= $e((int) $s['tags'] + (int) $s['review']) ?></dd></div>
   </dl>
-  <h4 class="label rp-h">MUESTRAS (<?= $e(count($impact['samples'])) ?>)</h4>
+  <h4 class="label rp-h">Muestras (<?= $e(count($impact['samples'])) ?>)</h4>
   <?php if (!$impact['samples']): ?><p class="rp-note"><?= Ui::icon('info') ?><span>Ningún lead de este alcance cambiaría ni coincidiría con la regla.</span></p><?php endif; ?>
   <ul class="rp-samples">
     <?php foreach ($impact['samples'] as $m): $b = $m['before']; $a = $m['after']; $moved = $b !== $a; ?>

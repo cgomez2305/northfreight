@@ -39,12 +39,12 @@ foreach ($errors as $p => $_) {
   <p class="rule__phrase" data-phrase aria-live="polite"><?php if ($phr): ?><?= $e($phr['when']) ?>. <b><?= $e($phr['then']) ?>.</b><?= $phr['except'] !== '' ? ' ' . $e($phr['except']) . '.' : '' ?><?php else: ?><span class="muted">La frase aparece cuando la regla está completa.</span><?php endif; ?></p>
 
   <section class="rule__s" aria-label="Cuando">
-    <h4 class="label rule__l">CUANDO</h4>
+    <h4 class="label rule__l">Cuando</h4>
     <?= \Captacion\View::render('config/_rule_block', ['np' => $np . '[when]', 'dp' => $dp . '.when', 'block' => $when, 'errors' => $errors, 'which' => 'when', 'key' => $k, 'e' => $e], false) ?>
   </section>
 
   <section class="rule__s" aria-label="Entonces">
-    <h4 class="label rule__l">ENTONCES</h4>
+    <h4 class="label rule__l">Entonces</h4>
     <div class="ra__list" data-acts>
       <?php foreach ($then as $ak => $a): echo \Captacion\View::render('config/_rule_act', ['np' => $np . '[then][' . $ak . ']', 'dp' => $dp . '.then.' . $ak, 'a' => (array) $a, 'kind' => $kind, 'errors' => $errors, 'delOp' => 'del_act:' . $k . '.' . $ak, 'e' => $e], false); endforeach; ?>
     </div>
@@ -53,7 +53,7 @@ foreach ($errors as $p => $_) {
   </section>
 
   <section class="rule__s rule__s--except" aria-label="Excepto" data-except-wrap>
-    <h4 class="label rule__l">EXCEPTO</h4>
+    <h4 class="label rule__l">Excepto</h4>
     <div data-except<?= $except === null ? ' hidden' : '' ?>>
       <?php if ($except !== null): ?><?= \Captacion\View::render('config/_rule_block', ['np' => $np . '[except]', 'dp' => $dp . '.except', 'block' => $except, 'errors' => $errors, 'which' => 'except', 'key' => $k, 'e' => $e], false) ?><?php endif; ?>
       <button class="link rule__noex" type="submit" name="op" value="del_except:<?= $e($k) ?>" data-del="except"><?= Ui::icon('x') ?>Quitar la excepción</button>

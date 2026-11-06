@@ -26,7 +26,7 @@ $err = static fn(string $path): string => $errors[$path] ?? '';
       <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="tab" value="<?= $e($tab) ?>">
       <label class="field"><span>Contraseña</span><input type="password" name="password" required autocomplete="current-password"></label>
       <label class="field"><span>Código de 6 dígitos</span><input type="text" name="code" required inputmode="numeric" pattern="[0-9 ]{6,7}" maxlength="7" autocomplete="one-time-code"></label>
-      <button class="btn btn--primary" type="submit"><span class="btn__t">Confirmar</span><span class="btn__cell"><?= Ui::icon('arrow-up-right') ?></span></button>
+      <button class="btn btn--primary" type="submit"><span class="btn__t">Confirmar</span></button>
     </form>
   </section>
   <?php else: ?>

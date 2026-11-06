@@ -26,7 +26,7 @@ $star = '<svg class="empty__star" aria-hidden="true"><use href="#i-star"/></svg>
 
 <div class="rep-grid">
   <section class="card" aria-labelledby="r-fn" data-rs-fn>
-    <header class="card__h"><h2 class="label" id="r-fn">EMBUDO · NUEVO → FIRMADO</h2></header>
+    <header class="card__h"><h2 class="label" id="r-fn">Embudo · nuevo → firmado</h2></header>
     <div class="card__b">
       <?php if ($m['received'] === 0): ?>
         <div class="empty empty--sm"><?= $star ?><h3>Aún no hay leads en este rango</h3><p>Cuando lleguen, el embudo mostrará cuántos avanzan a cada etapa hasta la firma.</p></div>
@@ -37,12 +37,12 @@ $star = '<svg class="empty__star" aria-hidden="true"><use href="#i-star"/></svg>
     </div>
   </section>
   <section class="card" aria-labelledby="r-tr" data-rs-tr>
-    <header class="card__h"><h2 class="label" id="r-tr">TENDENCIA</h2></header>
+    <header class="card__h"><h2 class="label" id="r-tr">Tendencia</h2></header>
     <div class="card__b"><?php require __DIR__ . '/rep/_tendencia.php'; ?></div>
   </section>
 </div>
 <section class="card card--table" aria-labelledby="r-ch" data-rs-ch>
-  <header class="card__h"><h2 class="label" id="r-ch">COSTO POR FIRMADO POR CANAL</h2></header>
+  <header class="card__h"><h2 class="label" id="r-ch">Costo por firmado por canal</h2></header>
   <?php if (!$m['channels']['rows']): ?>
     <div class="empty empty--sm"><?= $star ?><h3>Aún no hay leads en este rango</h3><p>Cuando lleguen, verás de qué canal vienen y cuánto cuesta cada firmado.</p></div>
   <?php else: ?>
@@ -50,7 +50,7 @@ $star = '<svg class="empty__star" aria-hidden="true"><use href="#i-star"/></svg>
   <?php endif; ?>
 </section>
 <section class="card" aria-labelledby="r-ls" data-rs-ls>
-  <header class="card__h"><h2 class="label" id="r-ls">MOTIVOS DE PÉRDIDA</h2><span class="muted"><?= $e($m['loss']['total']) ?> en total</span></header>
+  <header class="card__h"><h2 class="label" id="r-ls">Motivos de pérdida</h2><span class="muted"><?= $e($m['loss']['total']) ?> en total</span></header>
   <div class="card__b">
     <?php if (!$m['loss']['rows']): ?>
       <div class="empty empty--sm"><?= $star ?><h3><?= $m['received'] === 0 ? 'Sin leads, sin pérdidas que mostrar' : 'Ninguna pérdida todavía' ?></h3><p><?= $m['received'] === 0 ? 'Cuando haya leads, aquí verás por qué se pierden.' : 'Ningún lead recibido en el rango se perdió todavía.' ?></p></div>
