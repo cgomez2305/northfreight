@@ -102,6 +102,7 @@ function ns_lead_crm_ingest(array $lead): array
         if (!is_file($boot)) {
             return ['ok' => false, 'reason' => 'not_installed', 'lead_id' => null];
         }
+        defined('CAPTACION_EMBEDDED') || define('CAPTACION_EMBEDDED', true);   // el arranque no comprueba extensiones ni sale: aqui un fallo cae al JSONL (try/catch de abajo)
         require_once $boot;
         $r = \Captacion\Services\LeadIngest::handle(\Captacion\Services\LeadIngest::fromSiteLead($lead), 'web_careers', ['ip' => ns_client_ip(), 'public' => true]);
         return ['ok' => (bool) $r['ok'], 'reason' => $r['ok'] ? null : (string) ($r['reason'] ?? 'rejected'), 'lead_id' => $r['lead_id'] ?? null];
@@ -117,6 +118,8 @@ function ns_lead_flush_response(): void
     ignore_user_abort(true);
     if (function_exists('fastcgi_finish_request')) {
         fastcgi_finish_request();
+    } elseif (function_exists('litespeed_finish_request')) {
+        litespeed_finish_request();
     }
 }
 

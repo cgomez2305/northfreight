@@ -219,6 +219,6 @@ final class UxController extends Responder
     private static function backUrl(string $default): string
     {
         $b = is_string($_POST['back'] ?? null) ? $_POST['back'] : $default;
-        return preg_match('#^/[A-Za-z0-9_/\-]{0,60}(\?[A-Za-z0-9_%=&.\-+]{0,800})?(\#[A-Za-z0-9_-]{1,40})?$#', $b) === 1 ? $b : $default;
+        return preg_match('#^/(?!/)[A-Za-z0-9_/\-]{0,60}(\?[A-Za-z0-9_%=&.\-+]{0,800})?(\#[A-Za-z0-9_-]{1,40})?$#', $b) === 1 ? $b : $default;   // (?!/): nunca //host (ruta relativa al protocolo = redireccion abierta)
     }
 }

@@ -34,7 +34,7 @@ final class PublicController
 
     private static function limited(string $bucket): bool
     {
-        $ip = substr((string) ($_SERVER['REMOTE_ADDR'] ?? ''), 0, 45);
+        $ip = \Captacion\Services\ClientIp::get();
         if (RateLimiter::tooMany($bucket, $ip, self::LIMIT, 3600)) {
             return true;
         }

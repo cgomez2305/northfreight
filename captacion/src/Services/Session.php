@@ -1,7 +1,7 @@
 <?php
 /**
  * Sesion PHP propia del panel (doc §17): cookie NSCRM HttpOnly + Secure + SameSite=Lax, archivos en storage/sessions (0700), ID regenerado al iniciar sesion,
- * caduca a las 8 h de inactividad (SESSION_IDLE_SECONDS) y token CSRF por sesion.
+ * caduca a las 8 h de inactividad (SESSION_IDLE_SECONDS) y, aunque haya actividad, a las 24 h de haber iniciado sesion (SESSION_ABSOLUTE_SECONDS), y token CSRF por sesion.
  * En APP_ENV=local (pruebas por http) la cookie no lleva Secure; en cualquier otro entorno SIEMPRE.
  */
 
@@ -20,6 +20,12 @@ final class Session
     public static function idle(): int
     {
         return max(1, Env::int('SESSION_IDLE_SECONDS', 28800));
+    }
+
+    /** Vida maxima de una sesion autenticada desde el login, con o sin actividad (24 h por defecto): una cookie robada no vale para siempre. */
+    public static function absolute(): int
+    {
+        return max(60, Env::int('SESSION_ABSOLUTE_SECONDS', 86400));
     }
 
     public static function start(): void
@@ -53,7 +59,8 @@ final class Session
 
         // Caducidad por inactividad
         $last = (int) ($_SESSION['last_activity'] ?? 0);
-        if ($last > 0 && Clock::time() - $last > self::idle()) {
+        $loginAt = (int) ($_SESSION['login_at'] ?? 0);
+        if (($last > 0 && Clock::time() - $last > self::idle()) || (!empty($_SESSION['uid']) && $loginAt > 0 && Clock::time() - $loginAt > self::absolute())) {
             self::$expired = true;
             $_SESSION = ['expired_notice' => 1];   // el login lo muestra una vez
             session_regenerate_id(true);
@@ -80,7 +87,7 @@ final class Session
     public static function login(int $userId): void
     {
         session_regenerate_id(true);
-        $_SESSION = ['uid' => $userId, 'last_activity' => Clock::time(), 'csrf' => bin2hex(random_bytes(32))];
+        $_SESSION = ['uid' => $userId, 'last_activity' => Clock::time(), 'login_at' => Clock::time(), 'csrf' => bin2hex(random_bytes(32))];
     }
 
     /** Contrasena correcta, falta el segundo factor (valido 5 min). */

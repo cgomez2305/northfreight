@@ -122,7 +122,7 @@ final class ActivityLog
 
     public static function ip(): ?string
     {
-        $ip = $_SERVER['REMOTE_ADDR'] ?? null;
+        $ip = ClientIp::get() ?: null;
         return is_string($ip) && $ip !== '' ? substr($ip, 0, 45) : null;
     }
 }

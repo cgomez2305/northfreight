@@ -90,7 +90,7 @@ return [
         ],
         [
             'q' => 'What happens after I apply?',
-            'a' => 'The desk reads your application and gets in touch, on WhatsApp if you prefer. Together we agree on who approves loads, how and when we report, and which tasks the desk owns from day one.',
+            'a' => 'The desk reads your application. If it looks like a fit, we get in touch the way you chose, on WhatsApp if you prefer, and together we agree on who approves loads, how and when we report, and which tasks the desk owns.',
         ],
     ],
     // FAQ global (doc de copy §FAQ) — textos exactos. Se usa en el home.

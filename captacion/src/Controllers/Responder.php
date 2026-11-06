@@ -171,7 +171,7 @@ abstract class Responder
 
     protected static function ip(): string
     {
-        return substr((string) ($_SERVER['REMOTE_ADDR'] ?? ''), 0, 45);
+        return \Captacion\Services\ClientIp::get();
     }
 
     protected static function json(array $body, int $status = 200, array $headers = []): never

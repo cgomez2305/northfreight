@@ -26,4 +26,23 @@ spl_autoload_register(static function (string $class): void {
     }
 });
 
+// Extensiones obligatorias. Sin ellas el panel y los cron fallarian a medias (sodium cifra el TOTP, pdo_mysql es la base, mbstring/openssl/curl los textos, el correo y los avisos).
+// Panel y API web: 503 plano y amable (sin detalles). Cron y bin: mensaje claro y codigo 1. Embebido en el sitio (CAPTACION_EMBEDDED, app/forms/lead.php): no hace nada; el sitio ya cae a su JSONL.
+if (!defined('CAPTACION_EMBEDDED')) {
+    $missing = array_values(array_filter(['pdo_mysql', 'sodium', 'mbstring', 'openssl', 'curl'], static fn(string $e): bool => !extension_loaded($e)));
+    if ($missing) {
+        if (PHP_SAPI === 'cli') {
+            fwrite(STDERR, 'Faltan extensiones de PHP: ' . implode(', ', $missing) . ". Actívalas en hPanel (Avanzado > Configuración de PHP) y vuelve a ejecutar.\n");
+            exit(1);
+        }
+        http_response_code(503);
+        header('Content-Type: text/plain; charset=utf-8');
+        header('Cache-Control: no-store');
+        header('Retry-After: 300');
+        error_log('captacion: faltan extensiones de PHP: ' . implode(', ', $missing));
+        echo 'Service temporarily unavailable.';
+        exit;
+    }
+}
+
 \Captacion\Env::load();

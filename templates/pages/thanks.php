@@ -18,7 +18,7 @@ partial('hero', [
     'route' => $route,
     'cls'   => 'cr-hero cr-hero--thanks',
     'h1'    => 'Application {hl}received{/hl}',
-    'lead'  => 'Thanks for applying. Here is what happens next. If you would rather not wait, you can message the desk on WhatsApp now.',
+    'lead'  => 'Thanks for applying. Here is what happens next. You can also message the desk on WhatsApp now.',
     'aside' => $aside,
     'stack' => true,
 ]);
@@ -28,7 +28,7 @@ partial('hero', [
     <?php partial('section-head', ['id' => 'th-next', 'eyebrow' => 'What happens next', 'title' => 'Your next steps']); ?>
     <?php partial('steps', ['label' => 'What happens after you apply', 'items' => [
         ['title' => 'The desk reads your application', 'text' => 'A dispatcher goes through your answers.'],
-        ['title' => 'We get in touch', 'text' => 'On WhatsApp or the way you chose, so we can learn your operation.'],
+        ['title' => 'We get in touch if it is a fit', 'text' => 'On WhatsApp or the way you chose, so we can learn your operation.'],
         ['title' => 'We agree on scope & contacts', 'text' => 'Who approves loads, how and when we report, and which tasks the desk owns from day one.'],
     ]]); ?>
     <p class="cr-more"><a class="cr-link" href="<?= e(url('/how-it-works/')) ?>">See how dispatching works with NorthStar <span class="arrow" aria-hidden="true">→</span></a></p>
