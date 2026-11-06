@@ -150,6 +150,8 @@ final class LeadPayload
             'at'         => isset($cs['at']) && is_string($cs['at']) ? $cs['at'] : null,
             'ip'         => isset($cs['ip']) && is_string($cs['ip']) ? substr($cs['ip'], 0, 45) : null,
             'user_agent' => isset($cs['user_agent']) && is_string($cs['user_agent']) ? substr($cs['user_agent'], 0, 255) : null,
+            // Canales que cubre el texto aceptado (lista blanca). Sin la clave: los del formulario del sitio (call, sms, email). Meta Lead Ads indica los de su aviso.
+            'channels'   => self::channels($cs['channels'] ?? null),
         ];
 
         // Identificadores
@@ -160,6 +162,16 @@ final class LeadPayload
         $lead['created_at'] = ($created !== false && $created <= Clock::time() + 86400 && $created > 946684800) ? Clock::at($created) : Clock::now();
 
         return ['lead' => $lead, 'errors' => $errors, 'flags' => $flags];
+    }
+
+    /** @return list<string> */
+    private static function channels(mixed $v): array
+    {
+        if (!is_array($v)) {
+            return Consent::FORM_CHANNELS;
+        }
+        $out = array_values(array_intersect(['call', 'sms', 'email', 'whatsapp'], array_map(static fn($x) => is_string($x) ? strtolower($x) : '', $v)));
+        return $out;
     }
 
     private static function str(mixed $v, int $max, bool $multiline = false): string

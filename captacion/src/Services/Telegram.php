@@ -90,6 +90,29 @@ final class Telegram
         return implode("\n", $lines);
     }
 
+    /** Avisos cortos (Q4b): el lead respondio, el bot termino, un handoff esta listo. Sin datos que no hagan falta; el texto del lead va recortado y escapado. */
+    public static function noticeText(array $lead, string $kind, string $channel = '', string $snippet = ''): string
+    {
+        $name = trim(($lead['first_name'] ?? '') . ' ' . ($lead['last_name'] ?? ''));
+        $head = match ($kind) {
+            'reply'          => 'RESPONDIÓ por ' . ($channel !== '' ? $channel : 'mensaje'),
+            'bot_qualified'  => 'El bot precalificó a un lead',
+            'bot_needs_human' => 'El bot pide que atiendas a un lead',
+            'handoff_ready'  => 'Lead listo para hablar contigo',
+            default          => 'Aviso',
+        };
+        $phone = (string) ($lead['phone_e164'] ?? '');
+        $lines = ['<b>' . self::e($head) . '</b>', '<b>' . self::e($name !== '' ? $name : 'Sin nombre') . '</b> | Puntuacion: ' . self::e($lead['score'] ?? 0) . '/100'];
+        if ($snippet !== '') {
+            $lines[] = '«' . self::e($snippet) . '»';
+        }
+        if ($phone !== '') {
+            $lines[] = 'Llamar: <a href="tel:' . self::e($phone) . '">' . self::e($phone) . '</a>';
+        }
+        $lines[] = 'Panel: <a href="' . self::e(Url::lead((int) ($lead['id'] ?? 0))) . '">abrir lead #' . (int) ($lead['id'] ?? 0) . '</a>';
+        return implode("\n", $lines);
+    }
+
     /** Banderas rojas de FMCSA y similares (red:*), para que Carlos las vea antes de llamar. */
     private static function redFlags(array $lead): string
     {

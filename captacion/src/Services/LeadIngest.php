@@ -158,7 +158,7 @@ final class LeadIngest
         }
 
         if ($lead['consent']['given']) {
-            Consent::record($leadId, $lead['consent']);
+            Consent::record($leadId, $lead['consent'], $lead['consent']['channels'] ?? Consent::FORM_CHANNELS);
         }
         $daysLost = $reopen ? (int) floor((Clock::time() - (int) Clock::parse((string) $existing['lost_at'])) / 86400) : null;
         self::event($leadId, $reopen ? 'reopened' : 'reentry', [
@@ -218,7 +218,7 @@ final class LeadIngest
             'consent_given' => $lead['consent']['given'], 'flags' => $flags,
         ], $lead['created_at']);
         if ($lead['consent']['given']) {
-            Consent::record($leadId, $lead['consent']);
+            Consent::record($leadId, $lead['consent'], $lead['consent']['channels'] ?? Consent::FORM_CHANNELS);
         }
         if ($fm !== null) {
             self::event($leadId, 'fmcsa', self::fmcsaSummary($fm));

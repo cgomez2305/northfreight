@@ -119,9 +119,9 @@ final class Templates
      * Genera asunto, texto y HTML de una plantilla para un lead (o un lead de muestra).
      * @return array{subject:string,text:string,html:string,unresolved:list<string>}
      */
-    public static function render(array $tpl, array $lead, string $lang, string $unsubUrl): array
+    public static function render(array $tpl, array $lead, string $lang, string $unsubUrl, array $extra = []): array
     {
-        $vars = self::vars($lead, $lang, $unsubUrl);
+        $vars = $extra + self::vars($lead, $lang, $unsubUrl);
         if (str_contains((string) $tpl['subject'] . "\n" . (string) $tpl['body'], '{link_referido}')) {
             $vars['{link_referido}'] = Referrals::linkForLead($lead);   // crea el codigo del lead si no tiene (A12)
         }

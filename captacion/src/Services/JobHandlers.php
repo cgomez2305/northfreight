@@ -32,6 +32,9 @@ final class JobHandlers
             'handoff_notify'          => [Handoff::class, 'notify'],
             'referral_notify'         => [Referrals::class, 'notify'],
             'sequence_step'           => [Sequences::class, 'runStep'],
+            'meta_fetch_lead'         => [MetaLeads::class, 'jobFetch'],
+            'appointment_reminder'    => [Appointments::class, 'jobReminder'],
+            'telegram_notice'         => [self::class, 'telegramNotice'],
         ];
     }
 
@@ -74,6 +77,15 @@ final class JobHandlers
         LeadIngest::event((int) $lead['id'], 'alert_sent', ['channel' => 'telegram', 'kind' => 'followup']);
         // TODO Q4: sms_backup_alert (SMS de respaldo a Carlos con Twilio, requiere A2P 10DLC). Hoy solo queda registrado como 'parked'.
         Queue::push('sms_backup_alert', ['lead_id' => (int) $lead['id']], Clock::now(), 'sms_backup:' . $lead['id'] . ':' . $lead['attempt'], 'parked', 'TODO Q4: SMS de respaldo a Carlos (no ejecutado en Q1)');
+    }
+
+    /** Avisos de Q4b a Carlos: respuesta del lead, bot terminado, handoff listo. */
+    public static function telegramNotice(array $payload): void
+    {
+        $lead = self::lead($payload);
+        $kind = in_array($payload['kind'] ?? '', ['reply', 'bot_qualified', 'bot_needs_human', 'handoff_ready'], true) ? (string) $payload['kind'] : 'reply';
+        Telegram::send(Telegram::noticeText($lead, $kind, (string) ($payload['channel'] ?? ''), (string) ($payload['snippet'] ?? '')));
+        LeadIngest::event((int) $lead['id'], 'alert_sent', ['channel' => 'telegram', 'kind' => $kind]);
     }
 
     public static function fmcsaEnrich(array $payload): void
