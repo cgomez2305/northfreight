@@ -384,6 +384,31 @@ return static function (array $ctx): void {
     T::eq($r['status'], 403, 'lector: no puede guardar el modo de vista (solo el tema)');
     T::ok(str_contains($v->get('/resultados')['body'], 'href="/resultados"') && !str_contains($v->get('/resultados')['body'], '/calendario') && !str_contains($v->get('/resultados')['body'], '/cronologia'), 'el shell del lector no trae enlaces a Tabla, Calendario ni Cronología');
 
+    // ------------------------------------------------------------------ Con datos: las clases de tarjetas, chips y filas también tienen regla (lo que la base vacía no pinta)
+    $cssDefs = static function (array $sheets) use ($ctx): array {
+        $set = [];
+        foreach ($sheets as $sh) {
+            preg_match_all('/\.(-?[_a-zA-Z][\w-]*)/', (string) preg_replace('#/\*.*?\*/#s', '', (string) @file_get_contents($ctx['root'] . '/public/assets/' . $sh . '.css')), $mm);
+            foreach ($mm[1] as $c) {
+                $set[$c] = true;
+            }
+        }
+        return $set;
+    };
+    $noRule = [];
+    foreach (['/calendario?vm=mes&d=2026-10-15', '/calendario?vm=semana&d=2026-10-22', '/calendario?vm=dia&d=2026-10-20', '/tabla', '/cronologia'] as $path) {
+        $r = $s->get($path);
+        preg_match_all('#<link rel="stylesheet" href="/assets/([a-z0-9-]+)\.css\?v=#', $r['body'], $mm);
+        $def = $cssDefs(array_merge($mm[1], ['ux', 'peek', 'etiquetas']));
+        preg_match_all('/\sclass="([^"]*)"/', $r['body'], $cm);
+        $used = array_unique(array_merge(...array_map(static fn($a) => preg_split('/\s+/', trim($a)) ?: [], $cm[1])));
+        $miss = array_values(array_filter($used, static fn($c) => $c !== '' && !isset($def[$c]) && !in_array($c, ['app', 'js', 'btn__t', 'srch', 'dlg--confirm', 'chart', 'donut', 'tc', 'bulk__n', 'feed__g', 'fe--slate'], true) && preg_match('/^tc-[a-z]+$/', $c) !== 1));   // ganchos sin estilo: columnas (tc, tc-<clave>), contador, grupo de día y tono neutro
+        if ($miss) {
+            $noRule[] = "$path: " . implode(', ', $miss);
+        }
+    }
+    T::ok(!$noRule, 'con datos, Tabla, Calendario (mes, semana, día) y Cronología: toda clase usada tiene regla en las hojas de la pantalla' . ($noRule ? ' · FALTAN → ' . implode(' | ', $noRule) : ''));
+
     // ------------------------------------------------------------------ Seguridad de la salida
     $r = $s->get('/calendario?vm=mes&d=2026-10-15&q=' . rawurlencode('"><script>alert(1)</script>'));
     T::ok(!str_contains($r['body'], '<script>alert(1)') && !preg_match('/\sstyle="/i', $r['body']) && !preg_match('/\son[a-z]+="/i', $r['body']) && preg_match('/<script(?![^>]*\bnonce=")/i', $r['body']) === 0, 'calendario: la búsqueda se escapa, sin estilos ni handlers en línea y scripts con nonce');

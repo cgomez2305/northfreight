@@ -28,4 +28,10 @@
  $$('[data-view-rename]').forEach(function (b) {
   b.addEventListener('click', function () { rf.action = '/vistas/' + b.getAttribute('data-view-rename') + '/rename'; rf.elements.name.value = b.getAttribute('data-name'); rd.showModal(); rf.elements.name.focus(); rf.elements.name.select(); });
  });
+ /* Menú de columnas de la Tabla (<details>, funciona sin JS): se cierra al hacer clic fuera o con Esc. */
+ var tcm = $('details[data-tcm]');
+ if (tcm) {
+  D.addEventListener('click', function (e) { if (tcm.open && !tcm.contains(e.target)) tcm.removeAttribute('open'); });
+  tcm.addEventListener('keydown', function (e) { if (e.key === 'Escape' && tcm.open) { e.stopPropagation(); tcm.removeAttribute('open'); $('summary', tcm).focus(); } });
+ }
 })();

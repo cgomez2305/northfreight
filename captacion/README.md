@@ -1,4 +1,4 @@
-# NorthStar Captación (mini-CRM) — fases Q1, Q2a, Q2b, Q3, Q4a, Q4b, Q5a y Q5b
+# NorthStar Captación (mini-CRM) — fases Q1, Q2a, Q2b, Q3, Q4a, Q4b, Q5a, Q5b y Q5c
 
 Aplicación PHP **aparte del sitio** (el sitio sigue sin base de datos) que capta, califica y da seguimiento a owner-operators, carriers pequeños y company drivers. La opera una sola persona (Carlos, ClikRank). Documento maestro: `sistema-captacion-choferes-northstar.md` v2.0.
 
@@ -10,6 +10,7 @@ Aplicación PHP **aparte del sitio** (el sitio sigue sin base de datos) que capt
 **Q4b (canales externos, §20):** webhooks de Meta Lead Ads, Cal.com, Twilio y n8n, API interna para n8n, WhatsApp entrante, reactivación A11 y paquete de integración (`docs/`).
 **Q5a (base de la experiencia, §21):** tema claro/oscuro/automático por usuario, vistazo rápido de un lead, vistas guardadas, tarjetas nuevas del tablero, barra lateral plegable con vistas y bandeja, paleta de comandos, atajos de teclado y «Deshacer». Las vistas de tabla, calendario y cronología (Q5c) no están.
 **Q5b (editor de reglas, §22):** reglas CUANDO / ENTONCES / EXCEPTO sobre la puntuación del documento, alertas y tareas, con panel lateral, vista previa de impacto, simulación sin escritura, versiones con historial, diferencias y reversión.
+**Q5c (vistas de trabajo, §23):** modos Tabla, Calendario y Cronología con los mismos filtros, chips, vistas guardadas (que ahora recuerdan el modo), densidad y vistazo rápido; reprogramar tareas arrastrando (con «Deshacer»); barrido de pulido de todas las pantallas y prueba automática de clases CSS.
 **Qué NO incluye todavía:** parser de job boards y «Send me my results» (`docs/job-boards.md`); envío saliente de SMS (A2P 10DLC pendiente).
 
 Sin dependencias nuevas: PHP 8.2+ (el servidor tiene 8.3), PDO MySQL, curl, sodium, openssl, mbstring. PHPMailer (el del sitio, `../vendor/`) solo si hay SMTP; el CRM funciona sin él.
@@ -67,6 +68,7 @@ MySQL 8 y MariaDB 10.11 (`utf8mb4`, `utf8mb4_unicode_ci`, InnoDB, borrados lógi
 
 | `011_ux_prefs_views.sql` | Q5a: `user_prefs` (tema, barra lateral, densidad, columnas de la lista y leads recientes de la paleta, una fila por usuario y clave) y `saved_views` (vistas guardadas por usuario: filtros en JSON, orden, pipeline, fijada, borrado lógico). `CREATE TABLE IF NOT EXISTS`, idempotente; probada desde cero y sobre la base de Q2b. |
 | `012_rules.sql` | Q5b: `rule_sets` (conjuntos por tipo: puntuación, alertas, tareas y etiquetas), `rule_versions` (versiones con JSON validado; UNA publicada y UN borrador por conjunto garantizados por `pub_slot` y `draft_slot`), `rule_applications` (qué regla influyó en cada lead, con `dedupe_key` único para alertas, tareas y etiquetas), `rule_simulations` y `rule_simulation_rows` (resultado de las simulaciones). `CREATE TABLE IF NOT EXISTS`, idempotente; probada desde cero y sobre la base de Q5a con datos. En el servidor: `php captacion/bin/migrate.php`. |
+| `013_lead_modes.sql` | Q5c: `saved_views.mode` (la vista recuerda el modo en que se guardó; NULL = la pantalla actual) y cuatro índices: `lead_events (created_at, id)` (cronología con cursor), `tasks (deleted_at, due_at)` y `jobs (type, status, run_at)` (calendario por rango). Idempotente con `ADD COLUMN/KEY IF NOT EXISTS` (**MariaDB 10.1 o superior**, que es lo que corre en Hostinger; MySQL 8 no acepta esa sintaxis). |
 
 Columnas añadidas a `leads` respecto al documento (necesarias para esta fase): `site_lead_id` (UNIQUE, id `ld_…` del sitio: idempotencia), `phone_raw`, `authority_status`, `endorsements`, `contact_pref`, `best_time`, `job_slug`, `disqualified_reason`, `lost_at`, `attempt`, `updated_at`. `jobs` añade `dedupe_key` (UNIQUE), `started_at`, `finished_at`.
 
@@ -766,3 +768,85 @@ Primera pantalla de la pestaña (fonts 2,7 + panel 27,0 + config 6,1 + `cfg-regl
 - «Aplicar a leads existentes» recalcula todos los leads (como el recálculo de Puntuación); no hay recálculo por conjunto.
 - Una regla duplicada o nueva tiene un id nuevo: si se quiere que una regla vuelva a disparar su alerta o tarea para leads que ya la recibieron, hay que crearla como regla nueva (la deduplicación es por regla, lead e intento).
 - La temperatura mínima puede dejar una temperatura mayor que la que daría la puntuación (así se pidió); el desglose lo dice.
+
+---
+
+## 23. Vistas de trabajo (Q5c): Tabla, Calendario y Cronología, y barrido final de la experiencia
+
+Migración nueva: **`013_lead_modes.sql`** (§2); en el servidor basta `php captacion/bin/migrate.php` tras el deploy. Sin variables nuevas, sin crons nuevos, sin dependencias. Cierra la tanda de la referencia de Carlos (pestañas de vistas Overview / Board / List / Table / Calendar / Timeline con barra de filtro y orden): se tomaron componentes, nunca marca, textos ni colores.
+
+### A. Selector de vistas y modos
+
+La barra de vistas de §21 pasa de dos a cinco pestañas: **Lista · Tablero · Tabla · Calendario · Cronología**. Todas comparten `LeadQuery::filters` (los mismos filtros, chips y «Quitar filtros»), las vistas guardadas, la densidad y el vistazo rápido (clic en una fila, un evento o una tarjeta abre el panel lateral; `data-peek-link` permite que un enlace de un evento abra el vistazo en vez de navegar).
+
+- **El modo va en la RUTA**, no en `?v=`: `v` ya identifica la vista guardada (`sys-…` o su id). Rutas: `/leads`, `/pipeline`, `/tabla`, `/calendario`, `/cronologia`. Por compatibilidad con el pedido, **`/leads?v=tabla|calendario|cronologia` redirige (302) al modo** conservando los demás parámetros.
+- **Se recuerda por usuario** (`user_prefs`: `lmode` = último modo usado, `calm` = escala del calendario, `tcols` = columnas de la Tabla). «Leads» de la barra lateral y de la barra inferior lleva al último modo (`Prefs::home`). Escribir una preferencia solo ocurre si cambia.
+- **Una vista guardada recuerda también el modo** (`saved_views.mode`): al abrirla desde el menú, la barra lateral o la paleta va a su pantalla; las anteriores a Q5c (sin modo) y las del sistema se abren en la pantalla actual (o en la Lista desde la barra lateral). «Guardar cambios» actualiza el modo. El orden guardado vale para la Lista o la Tabla (`LeadTable::cleanSort`).
+- Sin JS cada modo es una página servida por el servidor (enlaces y formularios); el JS solo mejora.
+
+### B. Tabla (`/tabla`)
+
+Para comparar muchos leads: más columnas y sin tarjetas (no se convierte en tarjetas en móvil: se desplaza en horizontal con la **columna del nombre fija**). Columnas disponibles (`LeadTable::COLUMNS`): código, perfil, estado, idioma, equipo, camiones, años, USDOT, teléfono, correo, puntos, temperatura, etapa, fuente, primer contacto, recibido, último cambio y próxima tarea; **elegibles y reordenables** (menú «Columnas», un `<details>` con un formulario `POST /tabla/cols`: marcar, subir, bajar, restablecer; funciona sin JS). **Orden por columna** con lista blanca (`LeadTable::SORTS`): la clave de la URL nunca llega al SQL, siempre cierra con `l.id DESC` (orden estable), los vacíos van al final y la etapa se ordena por su posición en el embudo (no alfabéticamente); claves o direcciones inválidas caen en «Recibido, descendente». Selección masiva con las acciones de siempre (`/leads/bulk`, que ahora acepta volver a `/tabla`), paginación (25/50/100) y **exportación CSV de lo filtrado o de la selección** (`POST /tabla/export`, columnas visibles en su orden, BOM, protección contra fórmulas, tope de 10.000 filas, 20 por hora y usuario, registro `leads_export` con `mode: tabla`).
+
+### C. Calendario (`/calendario`)
+
+Mes, semana y día con: **tareas** (por vencer, vencidas y hechas), **citas** de Cal.com, **primer contacto pendiente** (leads nuevos sin contactar, el día que llegaron), **próximos pasos de secuencias** y **entregas a NorthStar programadas** (`jobs` `handoff_deliver` pendientes). Chips por tipo con color semántico del tema (`ev=` en la URL), hoy resaltado, horas en la zona configurada, navegación con botones y teclado (flechas entre días, RePág/AvPág de mes, Home/End, Intro abre el día), clic en un evento abre el vistazo del lead (una tarea sin lead abre `/tareas` en su semana) y **clic en el hueco de un día crea una tarea** (diálogo con selector de lead; sin JS, `?nueva=AAAA-MM-DD` muestra un formulario). En móvil el mes es una cuadrícula compacta de puntos y al tocar un día se abre su agenda (vista Día); la semana se apila.
+
+- **Reprogramar**: arrastrar una tarea abierta a otro día, `Alt` + flechas con la tarea enfocada, o el menú «Posponer / Mover» de la tarjeta (1 hora, mañana, otro día; formularios sin JS). `Tasks::reschedule` conserva la hora LOCAL (9:00 ET sigue siendo 9:00 ET aunque cambie el horario de verano), valida el día, rechaza tareas hechas o inexistentes y deja evento `task_rescheduled` en la ficha y `task_resched` en Actividad. **«Deshacer» de 6 s** (`Undo::resched`): vuelve a la fecha anterior solo si la tarea sigue abierta y con la fecha que se le puso.
+- **Carga por rango visible** (nunca el histórico): la cuadrícula cubre semanas completas; cada tipo de evento tiene un tope de 250 y, si se alcanza, la pantalla avisa («acota con un filtro»). Los límites de día se calculan con `DateTimeImmutable` en la zona de visualización: el día del cambio de horario mide 23 o 25 horas y un evento de las 23:30 locales cae en SU día. Con algún filtro de lead solo entran eventos de leads que lo cumplen (y no las tareas sin lead).
+
+### D. Cronología (`/cronologia`)
+
+Hilo global de actividad (llegadas, etapas, notas, llamadas, tareas, citas, entregas, firmas, mensajes y alertas; la puntuación, FMCSA y similares son ruido y no salen) de lo más nuevo a lo más viejo, **agrupado por día**, con los mismos filtros de lead, chips por tipo (`tp=`), «solo este lead» (`ld=`) y **paginación por cursor** `(created_at, id)`: «Cargar más» (JS, `POST /ajax/timeline`) o, sin JS, un enlace `?cur=`. Estable aunque lleguen eventos nuevos mientras se pagina. Solo datos que el administrador ya ve en la ficha: **sin cuerpos de mensajes, sin texto de notas, sin teléfonos ni correos**. La consulta corre con tope de tiempo (`Db::withTimeout`: `max_statement_time` de MariaDB o `max_execution_time` de MySQL; si se pasa, la pantalla lo dice y ofrece reintentar).
+
+### E. Revisión transversal
+
+Con la base VACÍA (migrada desde cero, solo el admin) y con la de demostración, a 1440, 1024, 834 y 390 px en claro y oscuro (360 con la base vacía y 384 con la de demostración, fuera del repo) y con un script que mide desbordes, iconos sin símbolo o sin tamaño, controles pequeños, barras de desplazamiento gruesas, contraste y errores de consola. Encontrado y corregido:
+
+| Hallazgo | Corrección |
+|---|---|
+| **Error de JS** al filtrar sin resultados en la Lista (`[data-clear]` no existe y rompía el resto de `panel.js`: reloj, formulario de etapa, línea de tiempo) | `panel.js` solo enlaza la barra masiva si existe |
+| `/tareas` usaba `page-head--kb` pero esa regla solo estaba en `kanban.css` (botones sin la versión compacta de móvil) | regla copiada a `tareas.css` (las dos hojas nunca se cargan juntas) |
+| 34 reglas CSS repetidas entre `panel.css` y las hojas de pantalla (comms, config, lead, reportes, tareas) más 5 `.empty*` en `leads.css` | eliminadas; verificado con la comparación de estilos calculados de 29 rutas × 2 anchos × 2 temas, sin diferencias reales (solo carreras de transición) |
+| Contraste: tareas hechas atenuadas con `opacity` (2,9:1 en la semana de `/tareas`, ahora también en el calendario), `.seg__n` 4,4:1 | tono propio en lugar de opacidad; ahora ≥ 4,5:1 en las pantallas revisadas (los botones y textos deshabilitados de Configuración bloqueada están exentos) |
+| Desborde horizontal a 390 px: `<code>` largo en el estado vacío de Referidos, chip de «Ajustes provisionales», selector de Inscripciones; `.sr` absolutos dentro de `.tw` ensanchaban la página con `overflow-x: clip` desactivado | `overflow-wrap` en `code`, `flex-wrap` en `.card__h`, `max-width` del selector y `.tw { position: relative }` |
+| Barras de desplazamiento gruesas (tablero, textareas) | `scrollbar-width: thin` con el color de la línea |
+| Controles táctiles de 24–26 px (botón «i» de los KPI, URLs de webhooks, teléfono y correo de la ficha) | área de 44 px en móvil, campo de 40 px |
+| Textos: «Limpiar» (filtros), «Quitar los filtros» y «Quitar todos» conviven; «Limpiar» también deseleccionaba filas | «Quitar filtros» en botones y estados vacíos, «Quitar todos» en los chips y «Deseleccionar» en la barra masiva |
+
+**Prueba automática `36_css_classes`**: renderiza 42 pantallas con la base vacía y comprueba que cada clase del HTML está definida en las hojas que esa pantalla carga (`fonts` + `panel` + su hoja + las diferidas `ux`, `peek`, `etiquetas` y `rules`); falla y dice qué clase falta en qué pantalla. Las clases sin regla A PROPÓSITO (ganchos, 15) están listadas con su motivo en la propia prueba. Las clases que solo aparecen con datos no se cubren (la prueba usa la base vacía, como se pidió).
+
+### F. Atajos y paleta
+
+`g b` Tabla, `g c` Calendario, `g r` Cronología (se conservan `g d`, `g l`, `g p` y `g t`; `c` y `n` solo actúan con un lead abierto, así que no chocan). La paleta (`Ctrl/⌘ K`) ofrece «Ir a Tabla», «Ir a Calendario» e «Ir a Cronología» (solo administradores). La hoja de atajos (`?`) trae el grupo «Calendario» (flechas, RePág/AvPág, `Alt` + flechas).
+
+### Rutas nuevas (solo administradores; el lector responde 403 en todas, con prueba negativa en `19_viewer` y `35_modes_q5c`)
+
+| Ruta | Qué es |
+|---|---|
+| `GET /tabla` · `/calendario` · `/cronologia` | Las tres pantallas |
+| `POST /tabla/export` · `POST /tabla/cols` | CSV de la Tabla (CSRF, 20/h) · columnas (CSRF, funciona sin JS) |
+| `POST /calendario/move` | Mover una tarea de día sin JS (CSRF; vuelve al calendario con «Deshacer») |
+| `POST /ajax/calendar/move {task_id, ymd \| mode}` | Reprogramar o posponer (JSON, `X-CSRF-Token`, 120/min); devuelve el token de «Deshacer» |
+| `POST /ajax/timeline {qs, cursor}` | Siguiente página de la cronología (JSON, 120/min) |
+
+`POST /tareas/new`, `/tareas/{id}/done` y `/tareas/{id}/snooze` aceptan ahora volver a `/calendario?…` (`back` solo admite rutas internas). Sin datos personales en las URLs salvo ids; parámetros de orden, rango, escala, tipos, cursor y filtros con lista blanca.
+
+### Rendimiento (local, MariaDB 10.11, 5.000 leads, 28.000 eventos, 4.000 tareas, 600 citas, 2.500 secuencias)
+
+Mejor de 5 repeticiones: **Tabla** página de 100 filas ordenada por cualquier columna 2 a 4 ms (página 50: 4 ms, con filtros 4 ms); CSV de 5.000 filas 206 ms. **Calendario** mes completo (5 tipos) 38 ms, semana 21 ms, día 6 ms, con filtro de perfil 38 ms. **Cronología** primera página 8 ms (antes de forzar el orden de unión con `STRAIGHT_JOIN` cuando no hay filtros de lead: 60 ms), cursor profundo (página 60) 21 ms, filtro por tipo 22 ms, por perfil 33 ms, un lead 2 ms. `EXPLAIN`: tareas `idx_tasks_due_range` (range), citas `idx_appt_starts`, secuencias `idx_sequences_due`, entregas `idx_jobs_type_run` (índice cubriente), cronología con cursor `idx_events_created` (range) y `eq_ref` por clave primaria a `leads`; los únicos `filesort` son el de ordenar por puntos o por etapa en la Tabla (5.000 filas).
+
+### CSS y JS
+
+Se partió `views.css` (ahora 2,9 KB) en `filtros.css` (1,3 KB: el formulario de filtros, común a Lista, Tabla, Calendario y Cronología) y `etiquetas.css` (1,6 KB: etiquetas, barra de puntuación y avance; Pipeline la carga y las demás la piden junto con `peek.css`). Primera pantalla (fonts + panel + hojas, sin comprimir): Lista 40,1 KB, **Tabla 43,2**, **Calendario 44,3**, **Cronología 38,7**, Pipeline 44,6, Dashboard 44,9, Ficha 44,7 (todas ≤ 45 KB; `17_pulido` lo comprueba por ruta). Los `.lp*` del selector de lead pasaron de `tareas.css` a `ux.css` (diferida). JS (gzip): `calendario.js` 9,3 KB (3,3), `cronologia.js` 2,4 KB (1,1); en el calendario también se carga `tareas.js` (selector de lead). Sin librerías, con nonce, sin estilos en línea.
+
+### Pruebas
+
+`php captacion/tests/run.php` (3.073 pruebas, todas verdes): nuevos **`35_modes_q5c`** (preferencias, vistas con modo, orden y columnas de la Tabla con inyección, CSV, calendario por rango con cambio de horario de verano en ET, fin de mes y tope, reprogramar con «Deshacer», cronología con cursor, filtros y manipulación, tope de tiempo, atajos, y la prueba negativa del lector en cada ruta nueva) y **`36_css_classes`**; `01_migrations` prueba la 013 sobre una base de Q5b con datos; `17_pulido` y `19_viewer` incluyen las rutas nuevas. No cubierto: el comportamiento del navegador (arrastre, teclado, foco), revisado con Chromium a 1440, 1024, 834 y 390 px en claro y oscuro; Firefox y Safari siguen sin probarse (el arrastre usa la API nativa de HTML5, que no funciona con el dedo: en móvil quedan «Posponer / Mover» y la vista Día).
+
+### Límites conocidos
+
+- El primer contacto pendiente se pinta el día de llegada del lead (no hay un SLA propio que lo mueva) y desaparece al contactarlo.
+- Las entregas programadas casi siempre son inmediatas (el cron las toma en un minuto): solo se ven en el calendario mientras esperan o si reintentan.
+- Una tarea sin lead abre `/tareas` en su semana (no hay diálogo de edición en el calendario).
+- `ADD … IF NOT EXISTS` de la migración 013 requiere MariaDB.
