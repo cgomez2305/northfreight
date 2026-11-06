@@ -1,16 +1,11 @@
 /* NorthStar Captación · configuración (/config y /actividad): base compartida de las pestañas. Se carga solo en esa pantalla, encima de panel.css. Sin estilos en línea (CSP): clases y variables. */
 /* Q5a: reglas que estaban en panel.css y solo usa esta pantalla */
-.flash{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:var(--r-in);font-size:14px;border:1px solid}
-.flash .ic{margin-top:2px}
 .flash--ok{background:var(--ok-bg);color:var(--ok);border-color:var(--ok-dot)}
 .flash--bad{background:var(--bad-bg);color:var(--bad);border-color:var(--bad-dot)}
 .flash--warn{background:var(--warn-bg);color:var(--warn);border-color:var(--warn-dot)}
 .flash__t{flex:1}
 .flash__u{margin-left:auto}
 .flash__u .link{display:inline-flex;gap:6px;align-items:center;font-weight:600;padding:0;color:inherit;text-decoration:underline}
-.empty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;padding:44px 24px;color:var(--ink-2)}
-.empty h3{font:700 24px/1.1 var(--f-cond);color:var(--ink)}
-.empty p{max-width:46ch}
 .empty--sm{padding:24px 8px}
 .empty--lg{padding:56px 24px 48px}
 .empty__star{width:30px;height:30px;color:var(--cyan)}

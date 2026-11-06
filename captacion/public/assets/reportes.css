@@ -1,8 +1,5 @@
 /* NorthStar Captación · reportes, resultados e informes (/reportes, /resultados, /informes). Encima de panel.css + charts.css. Sin estilos en línea (CSP): clases y variables. Incluye la hoja de impresión. */
 /* Q5a: reglas que estaban en panel.css y solo usa esta pantalla */
-.empty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;padding:44px 24px;color:var(--ink-2)}
-.empty h3{font:700 24px/1.1 var(--f-cond);color:var(--ink)}
-.empty p{max-width:46ch}
 .empty--sm{padding:24px 8px}
 .empty--lg{padding:56px 24px 48px}
 .empty__star{width:30px;height:30px;color:var(--cyan)}
@@ -73,3 +70,5 @@
   .tbl td,.tbl th{padding:5px 6px;font-size:10.5px;white-space:normal}
   .tbl thead th{font-size:9px;letter-spacing:.03em}
 }
+.sw--ops{background:var(--c-ops)}
+.sw--drv{background:var(--c-drv)}

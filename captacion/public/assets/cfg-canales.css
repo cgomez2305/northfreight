@@ -10,3 +10,5 @@
   .cn-map__h{display:none}
   .cn-map__r{grid-template-columns:1fr}
 }
+.hz-days{border:0;padding:0;margin:14px 0 0;min-width:0}
+.hz-days legend{font-size:13px;font-weight:600;color:var(--ink-2);margin-bottom:8px;padding:0}
