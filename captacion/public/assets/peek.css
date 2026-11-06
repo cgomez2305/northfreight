@@ -1,4 +1,23 @@
 /* NorthStar Captación · Q5a: barra de vistas, vistazo rápido (panel lateral / hoja inferior), etiquetas, barra de puntuación y avance. Solo en /leads y /pipeline. Sin estilos en línea. */
+/* Q5a: reglas que estaban en panel.css y solo usa esta pantalla */
+.mono{font-family:var(--f-mono);font-size:.88em}
+.page-head__a{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.btn--sm{min-height:36px;padding:0 14px;font-size:13.5px}
+.inp{display:flex;align-items:center;gap:8px;padding-left:12px;background:var(--surface);border:1px solid var(--field);border-radius:var(--r-in);color:var(--ink-3)}
+.inp input{border:0;box-shadow:none!important;padding-left:0;background:none}
+.ptabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px;margin-bottom:-6px;scrollbar-width:none}
+.ptabs::-webkit-scrollbar{display:none}
+.ptab{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:0 14px;border-radius:var(--r-pill);border:1px solid var(--line-2);background:var(--surface);color:var(--ink-2);font-weight:500;white-space:nowrap;text-decoration:none!important}
+.ptab:hover{border-color:var(--ink-3)}
+.ptab.is-on{background:var(--navy-2);border-color:var(--navy-2);color:var(--on-fill)}
+.ptab__n{font:600 11.5px var(--f-mono);padding:2px 7px;border-radius:var(--r-pill);background:var(--sunk);color:var(--ink-2)}
+.ptab.is-on .ptab__n{background:var(--navy-3);color:var(--on-fill)}
+@media (max-width:760px){
+  .page-head__a,.page-head__a form{width:100%}
+  .page-head__a .btn,.page-head__a .seg{flex:1}
+  .tab.is-on{color:var(--ink);background:var(--sunk)}
+  .tab.is-on .ic{color:var(--cyan-ink)}
+}
 .vbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .vtabs{display:inline-flex;gap:2px;padding:3px;background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-pill)}
 .vtab{display:inline-flex;align-items:center;gap:7px;min-height:38px;padding:0 16px;border-radius:var(--r-pill);color:var(--ink-2);font-weight:500;text-decoration:none!important}
