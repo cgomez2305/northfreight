@@ -22,7 +22,7 @@ foreach ($costTable['months'] as $m) {
 </section>
 
 <section class="card cfg-card" aria-labelledby="co-f">
-  <header class="card__h"><h2 class="label" id="co-f"><?= $f['id'] > 0 ? 'EDITAR COSTO' : 'AGREGAR COSTO' ?></h2><?php if ($f['id'] > 0): ?><a class="link" href="/config?tab=costos">Cancelar edición</a><?php endif; ?></header>
+  <header class="card__h"><h2 class="label" id="co-f"><?= $f['id'] > 0 ? 'Editar costo' : 'Agregar costo' ?></h2><?php if ($f['id'] > 0): ?><a class="link" href="/config?tab=costos">Cancelar edición</a><?php endif; ?></header>
   <div class="card__b">
     <form method="post" action="/config/costs/save" class="cfg-form co-form" novalidate>
       <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>">

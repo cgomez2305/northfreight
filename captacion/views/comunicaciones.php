@@ -10,8 +10,8 @@ use Captacion\Ui;
   </div>
   <?php if ($view === 'list'): ?><div class="page-head__a"><a class="btn btn--primary" href="/comunicaciones/plantillas/new"><span class="btn__t">Nueva plantilla</span></a></div><?php endif; ?>
 </div>
-<nav class="ptabs cfg-tabs" aria-label="Secciones de comunicaciones">
-  <?php foreach ($tabs as $k => $label): ?><a class="ptab<?= $tab === $k ? ' is-on' : '' ?>" href="/comunicaciones<?= $k === 'plantillas' ? '' : '/' . $e($k) ?>"<?= $tab === $k ? ' aria-current="page"' : '' ?>><?= $e($label) ?></a><?php endforeach; ?>
+<nav class="utabs" aria-label="Secciones de comunicaciones">
+  <?php foreach ($tabs as $k => $label): ?><a class="utab<?= $tab === $k ? ' is-on' : '' ?>" href="/comunicaciones<?= $k === 'plantillas' ? '' : '/' . $e($k) ?>"<?= $tab === $k ? ' aria-current="page"' : '' ?>><?= $e($label) ?></a><?php endforeach; ?>
 </nav>
-<?php foreach ($warnings as $w): ?><p class="flash flash--<?= $w['level'] === 'bad' ? 'bad' : ($w['level'] === 'warn' ? 'warn' : 'ok') ?>" role="status"><?= Ui::icon($w['level'] === 'info' ? 'info' : 'alert') ?><span><?= $e($w['text']) ?><?= $w['level'] !== 'info' && !$canDeliver && str_contains($w['text'], 'SMTP') ? '' : '' ?></span></p><?php endforeach; ?>
+<?php foreach ($warnings as $w): ?><p class="flash flash--<?= $w['level'] === 'bad' ? 'bad' : ($w['level'] === 'warn' ? 'warn' : 'info') ?>" role="status"><?= Ui::icon($w['level'] === 'info' ? 'info' : 'alert') ?><span><?= $e($w['text']) ?><?= $w['level'] !== 'info' && !$canDeliver && str_contains($w['text'], 'SMTP') ? '' : '' ?></span></p><?php endforeach; ?>
 <?php require __DIR__ . '/comms/_' . $view . '.php'; ?>

@@ -70,9 +70,9 @@ $empty = !$ov['codes'] && !$ov['referrals'];
         <?php if ($b === 'pending'): ?>
           <form class="rrow__f" method="post" action="/referidos/<?= $e($r['id']) ?>/bonus"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="op" value="approve">
             <label class="field rrow__amt"><span class="sr">Monto del bono en dólares</span><input type="text" name="bonus_amount" inputmode="decimal" placeholder="Monto $" value="<?= $e($r['bonus_amount'] !== null ? number_format((float) $r['bonus_amount'], 2, '.', '') : '') ?>" autocomplete="off"></label>
-            <button class="btn btn--primary btn--sm" type="submit">Aprobar</button></form>
+            <button class="btn btn--secondary btn--sm" type="submit">Aprobar</button></form>
         <?php elseif ($b === 'approved'): ?>
-          <form method="post" action="/referidos/<?= $e($r['id']) ?>/bonus"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="op" value="pay"><button class="btn btn--primary btn--sm" type="submit" data-confirm="¿Marcar el bono de <?= $e($money($r['bonus_amount'])) ?> como pagado?">Marcar pagado</button></form>
+          <form method="post" action="/referidos/<?= $e($r['id']) ?>/bonus"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="op" value="pay"><button class="btn btn--secondary btn--sm" type="submit" data-confirm="¿Marcar el bono de <?= $e($money($r['bonus_amount'])) ?> como pagado?">Marcar pagado</button></form>
         <?php elseif ($b === 'cancelled' && $r['status'] === 'signed'): ?>
           <form method="post" action="/referidos/<?= $e($r['id']) ?>/bonus"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="op" value="reopen"><button class="btn btn--ghost btn--sm" type="submit">Reabrir</button></form>
         <?php endif; ?>

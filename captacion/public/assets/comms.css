@@ -1,7 +1,6 @@
 /* NorthStar Captación · comunicaciones (plantillas, inscripciones, correos enviados). Encima de panel.css + config.css-like helpers. Sin estilos en línea (CSP). */
 /* Q5a: reglas que estaban en panel.css y solo usa esta pantalla */
 .cfg-intro{max-width:78ch}
-.cfg-tabs{margin-bottom:2px}
 .cm-note{padding:12px 20px 16px;line-height:1.45}
 .cm-edit{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:14px;align-items:start}
 .cm-fields{display:flex;flex-direction:column;gap:14px}
@@ -32,12 +31,12 @@
 }
 .cm-fields .btn{align-self:flex-start}
 .cm-sw{display:grid;gap:12px;max-width:340px}
-.re-big{font:400 15px var(--f-body);margin:0 0 10px}
+.re-big{font:400 var(--fs-md)/1.4 var(--f-sans);margin:0 0 10px}
 .re-big b{font:500 36px/1 var(--f-sans);margin-right:6px}
 .re-tpl{display:grid;gap:10px;list-style:none;margin:0;padding:0}
 .re-tpl li{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding-bottom:10px;border-bottom:1px solid var(--line);font-size:14px}
 .re-d{display:grid;gap:8px;margin:0}
 .re-d div{display:flex;justify-content:space-between;gap:12px;padding-bottom:8px;border-bottom:1px solid var(--line);font-size:14px}
 .re-d dt{color:var(--ink-3)}
-.re-d dd{margin:0;font:500 13px var(--f-mono)}
+.re-d dd{margin:0;font-weight:500;font-variant-numeric:tabular-nums}
 .cm-seqs .flash{margin:12px 0 0}

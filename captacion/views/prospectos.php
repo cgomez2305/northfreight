@@ -42,7 +42,7 @@ $cronAt = is_array($cron) ? ($cron['at'] ?? null) : null;
     <button class="btn btn--secondary filters-toggle" type="button" data-toggle="#filters" aria-expanded="<?= $nFilters > 0 ? 'true' : 'false' ?>" aria-controls="filters"><?= Ui::icon('filter') ?>Filtros<?= $nFilters > 0 ? ' <b class="badge">' . $e($nFilters) . '</b>' : '' ?></button>
     <form method="post" action="/prospectos/export">
       <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="qs" value="<?= $e(ltrim(Ui::qs($qsBase), '?')) ?>">
-      <button class="btn btn--primary" type="submit"><span class="btn__t">Exportar CSV</span></button>
+      <button class="btn btn--secondary" type="submit"><span class="btn__t">Exportar CSV</span></button>
     </form>
   </div>
   <?php endif; ?>
@@ -111,7 +111,7 @@ $cronAt = is_array($cron) ? ($cron['at'] ?? null) : null;
 <ol class="plist" aria-label="Prospectos">
 <?php foreach ($rows as $r):
     $id = (int) $r['id'];
-    $name = (string) ($r['legal_name'] ?: ($r['dba'] ?: 'USDOT ' . $r['usdot']));
+    $name = Fmt::company((string) ($r['legal_name'] ?: ($r['dba'] ?: 'USDOT ' . $r['usdot'])));
     $tz = UsTimeZones::check($r['state'], $now);
     $dnc = (int) $r['do_not_call'] === 1 || $r['status'] === 'dnc';
     $conv = $r['converted_lead_id'] !== null;
@@ -127,7 +127,7 @@ $cronAt = is_array($cron) ? ($cron['at'] ?? null) : null;
       <header class="pc__h">
         <div class="pc__id">
           <h2 id="pn-<?= $e($id) ?>" class="pc__n"><?= $e($name) ?></h2>
-          <p class="pc__ids mono">USDOT <?= $e($r['usdot']) ?><?= $r['mc_number'] ? ' · ' . $e($r['mc_number']) : '' ?><?= $r['dba'] && $r['dba'] !== $r['legal_name'] ? ' · DBA ' . $e($r['dba']) : '' ?></p>
+          <p class="pc__ids mono">USDOT <?= $e($r['usdot']) ?><?= $r['mc_number'] ? ' · ' . $e($r['mc_number']) : '' ?><?= $r['dba'] && $r['dba'] !== $r['legal_name'] ? ' · DBA ' . $e(Fmt::company((string) $r['dba'])) : '' ?></p>
         </div>
         <div class="pc__tags">
           <span class="chip chip--<?= $e($statusChip) ?>"><?php if ($statusChip !== 'plain'): ?><i class="dot"></i><?php endif; ?><?= $e(Prospects::STATUSES[$r['status']] ?? $r['status']) ?></span>
@@ -148,13 +148,13 @@ $cronAt = is_array($cron) ? ($cron['at'] ?? null) : null;
         <?php if ($dnc): ?>
           <p class="pc__note"><?= Ui::icon('shield') ?>Marcado «No llamar más»: permanente. No volverá a listarse.</p>
         <?php elseif ($r['phone'] === null): ?>
-          <span class="btn btn--primary is-off" aria-disabled="true"><span class="btn__t">Llamar</span></span><span class="pc__local pc__local--off">Sin teléfono en FMCSA</span>
+          <span class="btn btn--secondary is-off" aria-disabled="true"><span class="btn__t">Llamar</span></span><span class="pc__local pc__local--off">Sin teléfono en FMCSA</span>
         <?php elseif ($tz['allowed']): ?>
-          <a class="btn btn--primary" href="tel:<?= $e($r['phone']) ?>" aria-label="Llamar a <?= $e($name) ?>, <?= $e(Fmt::phone($r['phone'])) ?>"><span class="btn__t">Llamar</span></a>
+          <a class="btn btn--secondary" href="tel:<?= $e($r['phone']) ?>" aria-label="Llamar a <?= $e($name) ?>, <?= $e(Fmt::phone($r['phone'])) ?>"><span class="btn__t">Llamar</span></a>
           <span class="pc__num mono"><?= $e(Fmt::phone($r['phone'])) ?></span>
           <span class="pc__local">Allá son las <?= $e($tz['local_hm']) ?> <?= $e($tz['zone_label']) ?><?= $tz['multi'] ? ' · dos zonas horarias' : '' ?></span>
         <?php else: ?>
-          <span class="btn btn--primary is-off" role="link" aria-disabled="true" title="<?= $e($tz['reason']) ?>"><span class="btn__t">Llamar</span></span>
+          <span class="btn btn--secondary is-off" role="link" aria-disabled="true" title="<?= $e($tz['reason']) ?>"><span class="btn__t">Llamar</span></span>
           <span class="pc__local pc__local--off"><?= $tz['known'] ? 'Fuera de horario · allá son las ' . $e($tz['local_hm']) . ' ' . $e($tz['zone_label']) . ($tz['opens_in'] ? ' · abre en ' . $e(Fmt::dur((int) $tz['opens_in'])) : '') : 'Sin estado: no se sabe la hora local' ?></span>
           <details class="pc__ph"><summary>Ver teléfono</summary><span class="mono"><?= $e(Fmt::phone($r['phone'])) ?></span></details>
         <?php endif; ?>

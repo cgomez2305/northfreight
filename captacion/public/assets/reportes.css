@@ -1,11 +1,11 @@
 /* NorthStar Captación · reportes, resultados e informes (/reportes, /resultados, /informes). Encima de panel.css + charts.css (y viz.css en /resultados). Sin estilos en línea (CSP): clases y variables. Incluye la hoja de impresión. */
 /* Q5a: reglas que estaban en panel.css y solo usa esta pantalla */
-.rk{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:14px}
-.rk__c{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);padding:14px 18px 16px;display:flex;flex-direction:column;gap:6px;min-width:0}
-.rk__v{font:500 36px/1 var(--f-sans);letter-spacing:-.01em;overflow-wrap:anywhere}
-.rk__v--na{font-size:24px;line-height:1.15;color:var(--ink-2)}
-.rk__d{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12.5px;color:var(--ink-3)}
-.rk__s{font-size:12.5px;color:var(--ink-3);line-height:1.4}
+.rk{display:grid;grid-template-columns:repeat(auto-fit,minmax(236px,1fr));gap:12px}
+.rk__c{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);padding:16px 20px 20px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.rk__v{font:500 var(--fs-num)/1 var(--f-sans);font-variant-numeric:tabular-nums;letter-spacing:-.02em;overflow-wrap:anywhere}
+.rk__v--na{font-size:var(--fs-xl);line-height:1.15;color:var(--ink-2)}
+.rk__d{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:var(--fs-sm);color:var(--ink-3)}
+.rk__s{font-size:var(--fs-sm);color:var(--ink-3);line-height:1.4}
 .rep-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;align-items:start}
 .rep-grid--3{grid-template-columns:repeat(3,minmax(0,1fr))}
 .rep-range{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap}
@@ -15,20 +15,20 @@
 .fn{display:flex;flex-direction:column;gap:13px}
 .fn__r{display:grid;grid-template-columns:minmax(110px,36%) minmax(0,1fr) 76px;gap:12px;align-items:center}
 .fn__l{display:flex;flex-direction:column;min-width:0}
-.fn__l b{font-weight:600}
-.fn__l small{color:var(--ink-3);font-size:12px;line-height:1.3}
+.fn__l b{font-weight:500}
+.fn__l small{color:var(--ink-3);font-size:var(--fs-xs);line-height:1.3}
 .fn__n{display:flex;flex-direction:column;text-align:right}
-.fn__n b{font:500 15px var(--f-sans);font-variant-numeric:tabular-nums}
-.fn__n small{color:var(--ink-3);font-size:12px}
+.fn__n b{font:500 var(--fs-md) var(--f-sans);font-variant-numeric:tabular-nums}
+.fn__n small{color:var(--ink-3);font-size:var(--fs-xs)}
 .fn--loss .fn__r{grid-template-columns:minmax(110px,44%) minmax(0,1fr) 64px}
 .hb{width:100%;height:10px;display:block}
 .hb__bg{fill:var(--seg-e)}
 .hb__fg{fill:var(--accent)}
 .hb--end .hb__fg{fill:var(--accent)}
 .tbl--rep th.num-c,.tbl--rep td.num-c{text-align:right}
-.tbl--rep tfoot th,.tbl--rep tfoot td{font-weight:600;border-top:1px solid var(--line-2);background:var(--sunk)}
+.tbl--rep tfoot th,.tbl--rep tfoot td{font-weight:500;border-top:1px solid var(--line-2);background:var(--sunk)}
 .tbl--rep .c-act{text-align:right;white-space:nowrap}
-.rep-acts{list-style:decimal;padding-left:22px;display:grid;gap:10px;font-size:16px;line-height:1.45}
+.rep-acts{list-style:decimal;padding-left:22px;display:grid;gap:10px;font-size:var(--fs-lg);line-height:1.45}
 .rep-print-h{display:none}
 .inl{display:inline-block}
 .q3a{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
@@ -36,11 +36,11 @@
 .kpis--rs{grid-template-columns:repeat(6,minmax(0,1fr))}
 .kpis--rs .kpi{grid-column:span 2}
 .kpis--rs .kpi:nth-child(n+4){grid-column:span 3}
-.kpi__s{font-size:12.5px;line-height:1.4;color:var(--ink-3)}
-.kpi__v--na{font-size:22px;line-height:1.15;letter-spacing:-.01em;color:var(--ink-2)}
+.kpi__s{font-size:var(--fs-sm);line-height:1.4;color:var(--ink-3)}
+.kpi__v--na{font-size:var(--fs-xl);line-height:1.15;letter-spacing:-.01em;color:var(--ink-2)}
 .rs-meta{margin-top:6px}
-.fn-note{margin-top:16px;padding-top:12px;border-top:1px solid var(--line);font-size:13px;line-height:1.45;color:var(--ink-2)}
-.fn-note b{font-weight:600;color:var(--ink)}
+.fn-note{margin-top:16px;padding-top:12px;border-top:1px solid var(--line);font-size:var(--fs-sm);line-height:1.45;color:var(--ink-2)}
+.fn-note b{font-weight:500;color:var(--ink)}
 @media (max-width:1023px){
 .kpis--rs .kpi,.kpis--rs .kpi:nth-child(n+4){grid-column:span 3}
 .kpis--rs .kpi:last-child{grid-column:1/-1}
@@ -48,23 +48,22 @@
 @media (max-width:1100px){.rep-grid--3{grid-template-columns:1fr}}
 @media (max-width:1024px){.rep-grid{grid-template-columns:1fr}}
 @media (max-width:760px){
-  .rk__v{font-size:38px}
   .fn__r{grid-template-columns:minmax(0,1fr) 64px;gap:4px 10px}
   .fn__r .hb{grid-column:1/-1;grid-row:2}
   .rep-range .field{width:100%}
 }
 @container (max-width:700px){
   .tbl--rep tbody tr,.tbl--rep tfoot tr{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;padding:12px 16px;border-bottom:1px solid var(--line)}
-  .tbl--rep tbody th.c-n,.tbl--rep tfoot th.c-n{order:-1;grid-column:1/-1;font:600 14px var(--f-sans)}
-  .tbl--rep tbody td,.tbl--rep tfoot td{display:flex;justify-content:space-between;gap:8px;font-size:13.5px;text-align:right}
-  .tbl--rep td[data-l]::before{content:attr(data-l);color:var(--ink-3);font-size:12px;text-align:left}
+  .tbl--rep tbody th.c-n,.tbl--rep tfoot th.c-n{order:-1;grid-column:1/-1;font:500 var(--fs-md) var(--f-sans)}
+  .tbl--rep tbody td,.tbl--rep tfoot td{display:flex;justify-content:space-between;gap:8px;font-size:var(--fs-sm);text-align:right}
+  .tbl--rep td[data-l]::before{content:attr(data-l);color:var(--ink-3);font-size:var(--fs-xs);text-align:left}
   .tbl--rep td[colspan]{grid-column:1/-1}
   .tbl--rep td:empty{display:none}
   .tbl--rep .c-act{grid-column:1/-1;justify-content:flex-end}
 }
 @media print{
   @page{size:A4;margin:14mm}
-  html,body{background:#fff!important;font-size:12px}
+  html,body{background:var(--surface)!important;font-size:12px}
   .side,.top,.tabbar,.scrim,.skip,.rep-nop,.page-head__a,.flash,dialog,.dd,.icon-btn{display:none!important}
   .shell{display:block}
   .col,.main{display:block;padding:0;margin:0;max-width:none}
@@ -83,6 +82,6 @@
 }
 .sw--ops{background:var(--c-ops)}
 .sw--drv{background:var(--c-drv)}
-.legend{display:flex;gap:16px;flex-wrap:wrap;font:500 12px/1.3 var(--f-sans);color:var(--ink-2)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font:400 var(--fs-sm)/1.3 var(--f-sans);color:var(--ink-2)}
 .legend li{display:flex;align-items:center;gap:7px}
 @media (max-width:760px){.legend{gap:8px 14px}}

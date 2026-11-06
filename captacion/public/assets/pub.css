@@ -1,6 +1,6 @@
 /* NorthStar Captación · páginas públicas con token (/c confirmación de NorthStar, /u baja de correo, /invite alta del lector). Encima de panel.css + auth.css. Sin estilos en línea (CSP). */
 .pub{min-height:100vh;display:grid;place-items:center;padding:24px 16px;background:var(--canvas)}
-.pub__wrap{width:min(440px,100%);display:flex;flex-direction:column;gap:20px}
+.pub__wrap{width:min(420px,100%);display:flex;flex-direction:column;gap:20px}
 .brand--pub{display:flex;align-items:center;gap:10px;align-self:center;height:auto;padding:0}
 .pub__card{display:flex;flex-direction:column;gap:16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);padding:32px}
 .pub__t{font:600 24px/1.2 var(--f-sans);letter-spacing:-.02em;overflow-wrap:anywhere}

@@ -11,12 +11,14 @@ $err = static fn(string $path): string => $errors[$path] ?? '';
   </div>
 </div>
 
-<nav class="ptabs cfg-tabs" aria-label="Secciones de configuración">
+<div class="cfg-layout">
+<nav class="utabs cfg-tabs" aria-label="Secciones de configuración">
   <?php foreach ($tabs as $k => $label): ?>
-    <a class="ptab<?= $tab === $k ? ' is-on' : '' ?>" href="/config<?= $k === 'puntuacion' ? '' : '?tab=' . $e($k) ?>"<?= $tab === $k ? ' aria-current="page"' : '' ?>><?= $e($label) ?></a>
+    <a class="utab<?= $tab === $k ? ' is-on' : '' ?>" href="/config<?= $k === 'puntuacion' ? '' : '?tab=' . $e($k) ?>"<?= $tab === $k ? ' aria-current="page"' : '' ?>><?= $e($label) ?></a>
   <?php endforeach; ?>
 </nav>
 
+<div class="cfg-body">
 <?php if ($needsUnlock): ?>
   <?php if ($locked): ?>
   <section class="card cfg-unlock" aria-labelledby="unlock-t">
@@ -36,3 +38,5 @@ $err = static fn(string $path): string => $errors[$path] ?? '';
 <?php endif; ?>
 
 <?php require __DIR__ . '/config/_' . $tab . '.php'; ?>
+</div>
+</div>

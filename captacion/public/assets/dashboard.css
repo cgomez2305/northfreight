@@ -103,7 +103,7 @@ a.pg__n:hover{background:var(--sunk)}
 tr:hover .rowa,.rowa:focus-visible{opacity:1}
 @media (hover:none){.rowa{opacity:1}}
 .minisearch{display:flex;align-items:center;gap:8px;height:32px;padding:0 10px;border:1px solid var(--field);border-radius:var(--r-ctl);background:var(--surface);color:var(--ink-3)}
-.minisearch input{border:0;outline:0;background:none;width:160px;font-size:var(--fs-sm);min-width:0}
+.minisearch input{border:0;outline:0;background:none;width:160px;font-size:var(--fs-sm);min-width:0;align-self:stretch}
 .minisearch:focus-within{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
 @container (max-width:1080px){
 .tbl--dash .c-src{display:none}

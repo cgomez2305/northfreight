@@ -2,12 +2,12 @@
 /* Q5a: reglas que estaban en panel.css y solo usa esta pantalla */
 .who{display:flex;align-items:center;gap:11px;color:var(--ink)!important;min-width:0}
 .who>span:not(.av){display:flex;flex-direction:column;min-width:0}
-.who b,.tbl--dash .who>span:not(.av){font-weight:600}
+.who b,.tbl--dash .who>span:not(.av){font-weight:500}
 .who small{color:var(--ink-3);font-weight:400;font-size:12px}
 .us-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:12px;align-items:end}
 .tbl--users .c-act{white-space:nowrap;text-align:right}
 .tbl--users .c-act .inl{margin-left:6px}
-.en-once{border-color:var(--warn-dot);background:var(--warn-bg)}
+.en-once{background:var(--warn-bg);border-color:transparent}
 .secret{overflow-wrap:anywhere}
 @media (max-width:1024px){.us-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.us-go{grid-column:1/-1}}
 @media (max-width:760px){

@@ -197,13 +197,13 @@ final class ResultadosBoard
         $pd = (int) $m['presented'];
         $sd = (int) $m['signed'];
         $out = [
-            ['k' => 'received', 'label' => 'RECIBIDOS', 'tip' => 'Leads que llegaron en el rango. La microlínea es su evolución por ' . (($tr['unit'] ?? 'day') === 'day' ? 'día' : 'semana') . '.',
+            ['k' => 'received', 'label' => 'Recibidos', 'tip' => 'Leads que llegaron en el rango. La microlínea es su evolución por ' . (($tr['unit'] ?? 'day') === 'day' ? 'día' : 'semana') . '.',
                 'text' => Fmt::num($rec), 'count' => $int($rec), 'na' => false, 'delta' => self::countDelta($rec, (int) ($p['received'] ?? 0), 'lead', 'leads'), 'sub' => 'Leads que llegaron en el rango', 'viz' => $sparkOf($tr['received'] ?? [])],
-            ['k' => 'qualified', 'label' => 'CALIFICADOS', 'tip' => 'Leads recibidos en el rango que llegaron a la etapa Calificado. Cada raya del medidor es 1/' . self::TICKS . ' de los recibidos.',
+            ['k' => 'qualified', 'label' => 'Calificados', 'tip' => 'Leads recibidos en el rango que llegaron a la etapa Calificado. Cada raya del medidor es 1/' . self::TICKS . ' de los recibidos.',
                 'text' => Fmt::num($qd), 'count' => $int($qd), 'na' => false, 'delta' => self::countDelta($qd, (int) ($p['qualified'] ?? 0), 'calificado', 'calificados'), 'sub' => $ofRec($qd), 'viz' => $meter($qd, 'Calificados', 'tk--q')],
-            ['k' => 'presented', 'label' => 'PRESENTADOS', 'tip' => 'Leads recibidos en el rango que ya fueron presentados a NorthStar. Cada raya del medidor es 1/' . self::TICKS . ' de los recibidos.',
+            ['k' => 'presented', 'label' => 'Presentados', 'tip' => 'Leads recibidos en el rango que ya fueron presentados a NorthStar. Cada raya del medidor es 1/' . self::TICKS . ' de los recibidos.',
                 'text' => Fmt::num($pd), 'count' => $int($pd), 'na' => false, 'delta' => self::countDelta($pd, (int) ($p['presented'] ?? 0), 'presentado', 'presentados'), 'sub' => $ofRec($pd), 'viz' => $meter($pd, 'Presentados', 'tk--q')],
-            ['k' => 'signed', 'label' => 'FIRMADOS', 'tip' => 'Leads recibidos en el rango que firmaron. Debajo, cuántas firmas hubo en el rango sea cual sea el mes de llegada. La microlínea cuenta las firmas por ' . (($tr['unit'] ?? 'day') === 'day' ? 'día' : 'semana') . '.',
+            ['k' => 'signed', 'label' => 'Firmados', 'tip' => 'Leads recibidos en el rango que firmaron. Debajo, cuántas firmas hubo en el rango sea cual sea el mes de llegada. La microlínea cuenta las firmas por ' . (($tr['unit'] ?? 'day') === 'day' ? 'día' : 'semana') . '.',
                 'text' => Fmt::num($sd), 'count' => $int($sd), 'na' => false, 'delta' => self::countDelta($sd, (int) ($p['signed'] ?? 0), 'firmado', 'firmados'), 'sub' => 'De los recibidos · firmas por fecha en el rango: ' . (int) $m['signed_in_period'], 'viz' => $sparkOf($tr['signed'] ?? [])],
         ];
         // Costo por firmado: dinero, no conteo; su variacion exige 5 o mas firmados en AMBOS periodos
@@ -215,7 +215,7 @@ final class ResultadosBoard
             $delta = $pcps !== null && (int) $m['channels']['total']['signed'] >= Dashboard::MIN_BASE && (int) ($p['channels']['total']['signed'] ?? 0) >= Dashboard::MIN_BASE
                 ? Dashboard::delta((float) $cps, (float) $pcps, false) : ['text' => 'Pocos firmados para comparar', 'dir' => 'flat', 'good' => null];
         }
-        $out[] = ['k' => 'cps', 'label' => 'COSTO POR FIRMADO', 'tip' => 'Costo cargado de los meses completos del rango entre los firmados de esos meses. Los costos se cargan por mes: sin mes completo no hay cifra. La variación exige ' . Dashboard::MIN_BASE . ' o más firmados en cada periodo.',
+        $out[] = ['k' => 'cps', 'label' => 'Costo por firmado', 'tip' => 'Costo cargado de los meses completos del rango entre los firmados de esos meses. Los costos se cargan por mes: sin mes completo no hay cifra. La variación exige ' . Dashboard::MIN_BASE . ' o más firmados en cada periodo.',
             'text' => $cpsText, 'count' => $cps !== null ? ['v' => round((float) $cps), 'dec' => 0, 'suf' => '', 'pre' => '$'] : null, 'na' => $cps === null, 'delta' => $delta, 'sub' => $cpsSub, 'viz' => null];
         return $out;
     }

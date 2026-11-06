@@ -35,18 +35,18 @@ final class RepView
         $pctOf = static fn(int $n) => $m['received'] > 0 ? Fmt::num($n / $m['received'] * 100, 0) . '% de los recibidos' : 'Sin leads en el rango';
         [$cpsV, $cpsSub] = self::cpsText($m);
         $out = [
-            ['label' => 'RECIBIDOS', 'value' => Fmt::num($m['received']), 'delta' => $d($m['received'], $p['received'] ?? 0), 'sub' => 'Leads que llegaron en el rango', 'na' => false],
-            ['label' => 'CALIFICADOS', 'value' => Fmt::num($m['qualified']), 'delta' => $d($m['qualified'], $p['qualified'] ?? 0), 'sub' => $pctOf($m['qualified']), 'na' => false],
-            ['label' => 'PRESENTADOS', 'value' => Fmt::num($m['presented']), 'delta' => $d($m['presented'], $p['presented'] ?? 0), 'sub' => $pctOf($m['presented']), 'na' => false],
-            ['label' => 'FIRMADOS', 'value' => Fmt::num($m['signed']), 'delta' => $d($m['signed'], $p['signed'] ?? 0), 'sub' => 'De los recibidos · por fecha de firma en el rango: ' . $m['signed_in_period'], 'na' => false],
-            ['label' => 'COSTO POR FIRMADO', 'value' => $cpsV, 'delta' => $p !== null && $m['channels']['total']['cps'] !== null && ($p['channels']['total']['cps'] ?? null) !== null ? Dashboard::delta((float) $m['channels']['total']['cps'], (float) $p['channels']['total']['cps'], false) : null, 'sub' => $cpsSub, 'na' => $m['channels']['total']['cps'] === null],
+            ['label' => 'Recibidos', 'value' => Fmt::num($m['received']), 'delta' => $d($m['received'], $p['received'] ?? 0), 'sub' => 'Leads que llegaron en el rango', 'na' => false],
+            ['label' => 'Calificados', 'value' => Fmt::num($m['qualified']), 'delta' => $d($m['qualified'], $p['qualified'] ?? 0), 'sub' => $pctOf($m['qualified']), 'na' => false],
+            ['label' => 'Presentados', 'value' => Fmt::num($m['presented']), 'delta' => $d($m['presented'], $p['presented'] ?? 0), 'sub' => $pctOf($m['presented']), 'na' => false],
+            ['label' => 'Firmados', 'value' => Fmt::num($m['signed']), 'delta' => $d($m['signed'], $p['signed'] ?? 0), 'sub' => 'De los recibidos · por fecha de firma en el rango: ' . $m['signed_in_period'], 'na' => false],
+            ['label' => 'Costo por firmado', 'value' => $cpsV, 'delta' => $p !== null && $m['channels']['total']['cps'] !== null && ($p['channels']['total']['cps'] ?? null) !== null ? Dashboard::delta((float) $m['channels']['total']['cps'], (float) $p['channels']['total']['cps'], false) : null, 'sub' => $cpsSub, 'na' => $m['channels']['total']['cps'] === null],
         ];
         if ($full) {
             $r = $m['response'];
-            $out[] = ['label' => 'PRIMERA RESPUESTA', 'value' => $r['median'] !== null ? Fmt::dur($r['median']) : '—', 'delta' => $r['median'] !== null && ($p['response']['median'] ?? null) !== null ? Dashboard::delta((float) $r['median'], (float) $p['response']['median'], false) : null,
+            $out[] = ['label' => 'Primera respuesta', 'value' => $r['median'] !== null ? Fmt::dur($r['median']) : '—', 'delta' => $r['median'] !== null && ($p['response']['median'] ?? null) !== null ? Dashboard::delta((float) $r['median'], (float) $p['response']['median'], false) : null,
                 'sub' => $r['median'] !== null ? 'Mediana · p90 ' . Fmt::dur($r['p90']) . ' · ' . $r['n'] . ' con contacto' : 'Ningún lead contactado', 'na' => $r['median'] === null];
             $s = $m['sign_time'];
-            $out[] = ['label' => 'TIEMPO HASTA LA FIRMA', 'value' => $s['median_days'] !== null ? Fmt::num($s['median_days'], 1) . ' d' : '—', 'delta' => null, 'sub' => $s['median_days'] !== null ? 'Mediana · ' . $s['n'] . ' firmado' . ($s['n'] === 1 ? '' : 's') : 'Aún sin firmados', 'na' => $s['median_days'] === null];
+            $out[] = ['label' => 'Tiempo hasta la firma', 'value' => $s['median_days'] !== null ? Fmt::num($s['median_days'], 1) . ' d' : '—', 'delta' => null, 'sub' => $s['median_days'] !== null ? 'Mediana · ' . $s['n'] . ' firmado' . ($s['n'] === 1 ? '' : 's') : 'Aún sin firmados', 'na' => $s['median_days'] === null];
         }
         return $out;
     }

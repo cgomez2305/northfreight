@@ -30,11 +30,12 @@ html[data-density=compact] .tbl--leads .av{width:28px;height:28px;font-size:11px
 .fchip{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 8px 0 10px;border-radius:var(--r-ctl);background:var(--surface);border:1px solid var(--line-2);color:var(--ink);font-size:var(--fs-sm);font-weight:500;text-decoration:none!important}
 .fchip .ic{width:14px;height:14px}
 .fchip:hover{background:var(--sunk)}
-/* chips de tipo (calendario y cronología): filtros por enlace, con el tono del tipo */
+/* chips de tipo (calendario y cronología): filtros por enlace; el activo lleva el tinte de selección y los desactivados, borde punteado */
 .cal__types{display:flex;gap:6px;flex-wrap:wrap}
 .tchip{display:inline-flex;align-items:center;gap:7px;min-height:32px;padding:0 12px;border-radius:var(--r-ctl);border:1px solid var(--line-2);background:var(--surface);color:var(--ink-2);font-size:var(--fs-sm);font-weight:500;text-decoration:none!important}
 .tchip:hover{border-color:var(--ink-4)}
-.tchip.is-on{background:var(--ev-bg,var(--accent-tint));border-color:transparent;color:var(--ev-ink,var(--accent-ink))}
-.tchip:not(.is-on){opacity:.7}
+.tchip.is-on{background:var(--surface);border-color:var(--line-2);color:var(--ink)}
+.tchip:not(.is-on){border-style:dashed;background:none;color:var(--ink-3)}
 .tchip .ic{width:15px;height:15px}
-.tchip b{font:500 11px var(--f-sans);font-variant-numeric:tabular-nums}
+.tchip b{font:500 var(--fs-xs) var(--f-sans);font-variant-numeric:tabular-nums}
+@media (max-width:760px){.tchip{min-height:44px}}

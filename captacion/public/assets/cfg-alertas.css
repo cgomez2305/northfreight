@@ -2,7 +2,6 @@
 .al-list{display:flex;flex-direction:column;gap:6px}
 .al-min{max-width:260px;padding:10px 0}
 .al-q{max-width:440px}
-.warm__why{display:flex;gap:9px;align-items:flex-start;margin-top:12px;padding:11px 13px;border-radius:var(--r-in);background:var(--sunk);border:1px solid var(--line);font-size:13.5px;color:var(--ink-2);line-height:1.45}
+.warm__why{display:flex;gap:8px;align-items:flex-start;margin-top:12px;padding:12px 14px;border-radius:var(--r-in);background:var(--sunk);font-size:var(--fs-sm);color:var(--ink-2);line-height:1.45}
 .warm__why .ic{margin-top:2px;flex:none;width:16px;height:16px}
-.warm__why.is-on{background:var(--accent-tint);border-color:var(--accent-line)}
-.warm__why.is-on .ic{color:var(--accent-ink)}
+.warm__why.is-on .ic{color:var(--ok)}

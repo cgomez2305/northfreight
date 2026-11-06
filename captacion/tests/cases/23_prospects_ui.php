@@ -39,7 +39,7 @@ return static function (array $ctx): void {
     $s = Panel::start($ctx, 'panel-pro');
     T::ok($s->login($admin['email']), 'login del administrador');
     $r = $s->get('/prospectos');
-    T::ok($r['status'] === 200 && str_contains($r['body'], 'Prospectos FMCSA') && str_contains($r['body'], 'FIXTURE CARRIER 04 LLC') && str_contains($r['body'], 'Reglas de las llamadas en frío'), 'pantalla: lista de hoy con los prospectos y el recordatorio de reglas');
+    T::ok($r['status'] === 200 && str_contains($r['body'], 'Prospectos FMCSA') && str_contains($r['body'], 'Fixture Carrier 04 LLC') && str_contains($r['body'], 'Reglas de las llamadas en frío'), 'pantalla: lista de hoy con los prospectos y el recordatorio de reglas');
     T::ok(str_contains($r['body'], '10</span></a>') || str_contains($r['body'], 'ptab__n">10<'), '  contador «Lista de hoy» = 10');
     T::ok(!str_contains($r['body'], 'Warning') && !str_contains($r['body'], 'Fatal error') && !str_contains($r['body'], 'Stack trace'), '  sin errores de PHP');
     T::ok(str_contains($r['body'], 'validar') || str_contains($r['body'], 'abogado'), '  recuerda validar con el abogado (TCPA y listas estatales)');
@@ -65,7 +65,7 @@ return static function (array $ctx): void {
     Db::pdo()->exec('DELETE FROM prospects_fmcsa WHERE id = ' . $sinTel);
 
     // Busqueda y pestañas
-    T::ok(str_contains($s->get('/prospectos?q=9100007')['body'], 'FIXTURE CARRIER 07 LLC') && !str_contains($s->get('/prospectos?q=9100007')['body'], 'FIXTURE CARRIER 04 LLC'), 'pantalla: buscar por USDOT filtra la lista');
+    T::ok(str_contains($s->get('/prospectos?q=9100007')['body'], 'Fixture Carrier 07 LLC') && !str_contains($s->get('/prospectos?q=9100007')['body'], 'Fixture Carrier 04 LLC'), 'pantalla: buscar por USDOT filtra la lista');
     T::ok(str_contains($s->get('/prospectos?q=zzzz-nada')['body'], 'Ningún prospecto coincide'), '  y sin coincidencias muestra el estado vacío con salida');
     T::ok(str_contains($s->get('/prospectos?tab=dnc')['body'], 'Aquí no hay nadie todavía'), 'pantalla: la pestaña «No llamar más» vacía lo explica');
 

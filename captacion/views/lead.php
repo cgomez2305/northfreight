@@ -218,7 +218,7 @@ $loc = trim(($lead['city'] ? $lead['city'] . ', ' : '') . ($lead['state'] ?? '')
         <?php else: ?>
           <?php foreach ((array) ($fm['red_flags'] ?? []) as $rf): ?><p class="flash flash--bad"><?= Ui::icon('alert') ?><b><?= $e(Catalog::label(Catalog::FLAGS, 'red:' . $rf)) ?></b></p><?php endforeach; ?>
           <dl class="kv">
-            <div><dt>Razón social</dt><dd><?= $e($fm['legal_name'] ?? '—') ?></dd></div>
+            <div><dt>Razón social</dt><dd><?= $e(isset($fm['legal_name']) ? Fmt::company((string) $fm['legal_name']) : '—') ?></dd></div>
             <div><dt>Autoridad</dt><dd><?= $e(Catalog::label(Catalog::AUTHORITY, $fm['authority_status'] ?? null)) ?><?= isset($fm['authority_age_months']) ? ' · ' . $e($fm['authority_age_months']) . ' meses' : '' ?></dd></div>
             <div><dt>Seguro (BIPD)</dt><dd><?= ($fm['insured'] ?? null) === true ? 'Vigente' . (isset($fm['bipd_on_file']) ? ' · $' . $e(Fmt::num((int) $fm['bipd_on_file'])) . ' mil' : '') : (($fm['insured'] ?? null) === false ? 'Sin seguro registrado' : '—') ?></dd></div>
             <div><dt>Unidades / choferes</dt><dd><?= $e($fm['power_units'] ?? '—') ?> / <?= $e($fm['drivers'] ?? '—') ?></dd></div>

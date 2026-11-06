@@ -142,6 +142,35 @@ final class Fmt
         return $n !== '' ? $n : 'Sin nombre';
     }
 
+    /**
+     * Razon social legible: FMCSA publica los nombres en MAYUSCULAS («NORTH FORK CARRIERS LLC»). Solo cuando el texto viene TODO en mayusculas se pasa a
+     * «North Fork Carriers LLC» (solo presentacion; el dato guardado no cambia). Se conservan en mayusculas las siglas societarias (LLC, INC, LP...), las
+     * palabras de 1 a 3 letras sin vocales (JKL, TNT, DM), las que llevan digitos y los numerales romanos. Un nombre que ya trae minusculas se deja como esta.
+     */
+    public static function company(string $s): string
+    {
+        $s = trim($s);
+        if ($s === '' || $s !== mb_strtoupper($s) || !preg_match('/\p{L}/u', $s)) {
+            return $s;
+        }
+        $keep = ['LLC' => 1, 'LP' => 1, 'LLP' => 1, 'LTD' => 1, 'USA' => 1, 'US' => 1, 'DBA' => 1, 'II' => 1, 'III' => 1, 'IV' => 1, 'PLLC' => 1, 'NA' => 1, 'TX' => 1];
+        $low = ['CO' => 'Co', 'INC' => 'Inc', 'CORP' => 'Corp', 'AND' => 'and', 'OF' => 'of', 'THE' => 'the'];
+        $first = true;
+        $out = (string) preg_replace_callback('/[\p{L}\p{N}]+/u', static function (array $m) use (&$first, $keep, $low): string {
+            $w = $m[0];
+            $isFirst = $first;
+            $first = false;
+            if (isset($keep[$w]) || preg_match('/\d/', $w) || (mb_strlen($w) <= 3 && !preg_match('/[AEIOUYÁÉÍÓÚ]/u', $w))) {
+                return $w;
+            }
+            if (isset($low[$w]) && ($w === 'CO' || $w === 'CORP' || $w === 'INC' || !$isFirst)) {
+                return $low[$w];
+            }
+            return mb_strtoupper(mb_substr($w, 0, 1)) . mb_strtolower(mb_substr($w, 1));
+        }, $s);
+        return (string) preg_replace('/([\'’])S\b/u', '$1s', $out);
+    }
+
     /** Codigo corto del lead (LD-0142), el mismo que muestra la ficha. */
     public static function code(int $id): string
     {

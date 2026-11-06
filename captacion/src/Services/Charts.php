@@ -202,6 +202,19 @@ final class Charts
                     $yp = min($yp, $py((float) ($s['values'][$i] ?? 0)));
                 }
                 $ty = $yp > 26 ? $yp - 12 : $yp + 10;
+                if (isset($ay)) {
+                    // R2: la anotacion (dos lineas: ~10 % de alto) no puede cruzarse con la linea del promedio ni con su rotulo (arriba de la linea, ~6 %):
+                    // se prueba el lado contrario del punto y, si tambien choca, se coloca justo encima o justo debajo de la linea
+                    $hits = static fn(float $y): bool => $y + 5.5 >= $ay - 6.5 && $y - 4.5 <= $ay + 2.0;
+                    if ($hits($ty)) {
+                        $alt = $yp > 26 && $ty < $yp ? $yp + 10 : $yp - 12;
+                        if (!$hits($alt) && $alt >= 6 && $alt <= 94) {
+                            $ty = $alt;
+                        } else {
+                            $ty = $ay - 6.5 - 5.5 >= 6 ? $ay - 12.5 : min(94, $ay + 2.0 + 4.5);
+                        }
+                    }
+                }
                 $anchor = $i <= 1 ? 'start' : ($i >= $n - 3 ? 'end' : 'middle');
                 $ov .= '<g class="lc__note"><circle class="lc__ring" cx="' . self::n($x) . '%" cy="' . self::n($yp) . '%" r="8"/>'
                     . '<text x="' . self::n($x) . '%" y="' . self::n($ty) . '%" text-anchor="' . $anchor . '"><tspan class="lc__n1" x="' . self::n($x) . '%">' . $esc((string) $note['l1']) . '</tspan><tspan class="lc__n2" x="' . self::n($x) . '%" dy="13">' . $esc((string) $note['l2']) . '</tspan></text></g>';
