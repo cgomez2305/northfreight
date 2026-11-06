@@ -1,6 +1,6 @@
 <?php
 /**
- * Índice del blog (Blog.html de la maqueta): hero, tarjeta destacada, filtro por tema + rejilla, newsletter (solo maquetado).
+ * Índice del blog (Blog.html de la maqueta): hero, tarjeta destacada, filtro por tema + rejilla.  Sin newsletter: no hay herramienta de correo (decisión de fase O).
  * Datos: app/data/posts.php. Sin JS se ven todas las tarjetas; blog-filter.js añade el filtro (chips con aria-pressed).
  */
 require_once NS_ROOT . '/templates/partials/kit.php';
@@ -83,19 +83,5 @@ $chips = ['all' => 'All', 'dispatch' => 'Dispatch', 'relay' => 'Amazon Relay', '
       </li>
       <?php endforeach; ?>
     </ul>
-  </div>
-</section>
-
-<section class="section section--surface blog-news" aria-labelledby="blog-news-title">
-  <div class="container blog-news__in">
-    <div class="blog-news__copy">
-      <span class="t-eyebrow">One email a month</span>
-      <h2 class="t-h2-s c-navy" id="blog-news-title">Get the new guides from the desk</h2>
-    </div>
-    <!-- Solo maquetado: sin envío real hasta que el cliente elija herramienta (CLAUDE.md §9). Añadir name="email" al conectarla. -->
-    <form class="blog-news__form" action="<?= e(url('/blog/')) ?>" method="get" aria-label="Newsletter" data-newsletter>
-      <label class="field blog-news__field">Email<input class="input" type="email" autocomplete="email"></label>
-      <button type="submit" class="btn btn--navy btn--block-m">Subscribe</button>
-    </form>
   </div>
 </section>

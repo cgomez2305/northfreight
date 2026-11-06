@@ -271,16 +271,36 @@ function canonical(array $route): string
     return abs_url($route['path'] ?? '/');
 }
 
-/** Imagen OG 1200x630 absoluta. $route['og'] la fija; si no, assets/img/og/{template}.jpg o og-default.jpg. */
+/**
+ * Imagen OG 1200x630 absoluta. Orden: $route['og'] > assets/img/og/post-{slug}.jpg (portada de cada artículo) > assets/img/og/{template}.jpg > assets/img/og-default.jpg.
+ */
 function og_image(array $route): string
 {
     $rel = $route['og'] ?? null;
     if ($rel === null) {
-        // Imagen OG por plantilla si existe (img/og/<plantilla>.jpg); si no, la genérica.
-        $try = 'img/og/' . ($route['template'] ?? 'default') . '.jpg';
-        $rel = is_file(NS_ROOT . '/assets/' . $try) ? $try : 'img/og-default.jpg';
+        $cands = [];
+        if (($route['template'] ?? '') === 'post' && preg_match('/^[a-z0-9-]+$/', (string) ($route['slug'] ?? '')) === 1) {
+            $cands[] = 'img/og/post-' . $route['slug'] . '.jpg';
+        }
+        $cands[] = 'img/og/' . ($route['template'] ?? 'default') . '.jpg';
+        $rel = 'img/og-default.jpg';
+        foreach ($cands as $try) {
+            if (is_file(NS_ROOT . '/assets/' . $try)) {
+                $rel = $try;
+                break;
+            }
+        }
     }
     return 'https://' . DOMAIN . asset($rel);
+}
+
+/** Texto alternativo de la imagen OG (og:image:alt / twitter:image:alt): describe la imagen, no repite el título. */
+function og_image_alt(array $route): string
+{
+    if (($route['template'] ?? '') === 'post' && str_contains(og_image($route), '/og/post-')) {
+        return BRAND . ' article cover: ' . (string) ($route['h1'] ?? '');
+    }
+    return BRAND . ': white semi truck on a foggy highway at dusk, with the NorthStar logo';
 }
 
 /** true => <meta robots noindex> (staging, rutas draft o error). */
@@ -427,16 +447,39 @@ function org_services(): array
     return $out;
 }
 
+/** URL absoluta del logo para JSON-LD (PNG cuadrado de 512 px: Google prefiere raster ≥ 112 px a un SVG). */
+function org_logo_url(): string
+{
+    return 'https://' . DOMAIN . '/assets/img/logo-512.png';
+}
+
+/**
+ * Organization MÍNIMA en línea (name, url, logo) para `provider`/`publisher` en las páginas que no son el home.
+ * Un {"@id": "…#organization"} no se resuelve fuera del documento del home (Google no sigue @id entre páginas), así que se incrusta el objeto.
+ * Lleva el mismo @id que el nodo completo del home para que los consumidores puedan unirlos.
+ */
+function org_ref(): array
+{
+    return [
+        '@type' => 'Organization',
+        '@id'   => abs_url('/') . '#organization',
+        'name'  => BRAND,
+        'url'   => abs_url('/'),
+        'logo'  => org_logo_url(),
+    ];
+}
+
 /** Nodo Organization (o ProfessionalService con $type). Address/sameAs/foundingDate/legalName solo si están en config. */
 function organization_schema(string $type = 'Organization'): array
 {
     $services = org_services();
+    // Un solo nodo con los dos tipos (Organization + ProfessionalService) y un solo @id: antes eran dos nodos duplicados con los mismos datos.
     $node = [
-        '@type'        => $type,
-        '@id'          => abs_url('/') . '#' . strtolower($type),
+        '@type'        => $type === 'Organization' ? ['Organization', 'ProfessionalService'] : $type,
+        '@id'          => abs_url('/') . '#organization',
         'name'         => BRAND,
         'url'          => abs_url('/'),
-        'logo'         => 'https://' . DOMAIN . '/assets/img/isotype.svg',
+        'logo'         => org_logo_url(),
         'telephone'    => PHONE,
         'email'        => EMAIL,
         'areaServed'   => 'US',
@@ -499,7 +542,7 @@ function website_schema(): array
         'name'       => BRAND,
         'url'        => abs_url('/'),
         'inLanguage' => 'en-US',
-        'publisher'  => ['@id' => abs_url('/') . '#organization'],
+        'publisher'  => ['@id' => abs_url('/') . '#organization'],   // el nodo Organization está en el mismo documento (home)
     ];
 }
 
@@ -513,7 +556,7 @@ function service_schema(array $route): array
         'url'         => canonical($route),
         'serviceType' => $route['breadcrumb'] ?? $route['h1'],
         'areaServed'  => 'US',
-        'provider'    => ['@id' => abs_url('/') . '#organization'],
+        'provider'    => org_ref(),
     ];
 }
 
@@ -562,15 +605,15 @@ function page_schema(array $route): array
         $graph[] = match ($type) {
             'Organization'        => organization_schema(),
             'WebSite'             => website_schema(),
-            'ProfessionalService' => organization_schema('ProfessionalService'),
+            'ProfessionalService' => in_array('Organization', $types, true) ? null : organization_schema('ProfessionalService'),   // fusionado con Organization (un solo nodo, dos tipos)
             'Service'             => service_schema($route),
             'WebPage'             => [
                 '@type'       => 'WebPage',
                 'name'        => $route['h1'],
                 'description' => $route['meta'],
                 'url'         => canonical($route),
-                'isPartOf'    => ['@id' => abs_url('/') . '#website'],
-                'about'       => ['@id' => abs_url('/') . '#organization'],
+                'isPartOf'    => ['@type' => 'WebSite', '@id' => abs_url('/') . '#website', 'name' => BRAND, 'url' => abs_url('/')],
+                'about'       => org_ref(),
             ],
             'JobPosting'          => job_schema($route),
             'FAQPage'             => faq_schema(route_faq_items($route)),
@@ -583,7 +626,7 @@ function page_schema(array $route): array
                 'applicationCategory' => 'BusinessApplication',
                 'operatingSystem'     => 'Any',
                 'offers'              => ['@type' => 'Offer', 'price' => '0', 'priceCurrency' => 'USD'],
-                'publisher'           => ['@id' => abs_url('/') . '#organization'],
+                'publisher'           => org_ref(),
             ],
             'Article'             => article_schema($route),
             'ItemList'            => item_list_schema($route),
@@ -629,7 +672,7 @@ function job_schema(array $route): ?array
         'employmentType'     => (string) ($j['employment_type'] ?? 'FULL_TIME'),
         'directApply'        => true,
         'url'                => canonical($route),
-        'hiringOrganization' => ['@type' => 'Organization', 'name' => BRAND, 'sameAs' => abs_url('/'), 'logo' => 'https://' . DOMAIN . '/assets/img/isotype.svg'],
+        'hiringOrganization' => ['@type' => 'Organization', 'name' => BRAND, 'sameAs' => abs_url('/'), 'logo' => org_logo_url()],
         'jobLocation'        => [
             '@type'   => 'Place',
             'address' => [
@@ -716,14 +759,15 @@ function article_schema(array $route): array
         'description'      => $route['meta'],
         'mainEntityOfPage' => canonical($route),
         'author'           => ['@type' => 'Organization', 'name' => 'NorthStar dispatch desk'],
-        'publisher'        => ['@id' => abs_url('/') . '#organization'],
-        'image'            => og_image($route),
+        'publisher'        => org_ref(),
+        'image'            => strtok(og_image($route), '?'),   // sin ?v= (cambia en cada despliegue)
     ];
     $dates = post_dates(post_by_slug((string) ($route['slug'] ?? '')));
     if ($dates['published'] !== '') {
         $node['datePublished'] = $dates['published'];
     }
-    if ($dates['modified'] !== '') {
+    // dateModified solo si hay datePublished real: una modificación sin publicación es contradictoria para un artículo.
+    if ($dates['published'] !== '' && $dates['modified'] !== '') {
         $node['dateModified'] = $dates['modified'];
     }
     return $node;
@@ -757,6 +801,75 @@ function item_list_schema(array $route): ?array
 }
 
 // ---------------------------------------------------------------------
+// Cabeceras de seguridad y CSP (modo Report-Only)
+// ---------------------------------------------------------------------
+
+/** true si la petición llegó por HTTPS (directo o detrás de un proxy que lo declara). */
+function ns_is_https(): bool
+{
+    return (!empty($_SERVER['HTTPS']) && strtolower((string) $_SERVER['HTTPS']) !== 'off')
+        || strtolower((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')) === 'https';
+}
+
+/**
+ * Hashes CSP ('sha256-…') de los scripts inline de un HTML ya renderizado: <script> sin src y que no sea JSON-LD ni otro tipo de datos.
+ * Se calculan en CADA respuesta a partir del HTML final, así que nunca quedan desfasados cuando cambia un script inline (tabs, hero del home, asistente de /careers/apply/).
+ */
+function ns_inline_script_hashes(string $html): array
+{
+    $hashes = [];
+    if (preg_match_all('#<script(?![^>]*\bsrc=)([^>]*)>(.*?)</script>#is', $html, $m, PREG_SET_ORDER)) {
+        foreach ($m as $x) {
+            if (preg_match('#\btype=["\']?(?!text/javascript|module)#i', $x[1]) === 1) {
+                continue;   // application/ld+json y otros bloques de datos no se ejecutan
+            }
+            $hashes["'sha256-" . base64_encode(hash('sha256', $x[2], true)) . "'"] = true;
+        }
+    }
+    return array_keys($hashes);
+}
+
+/**
+ * Política CSP. Se envía SOLO como Content-Security-Policy-Report-Only: recoge violaciones (report-uri /csp-report/ -> storage/csp.log) sin bloquear nada,
+ * para pasar a modo bloqueo más adelante cambiando el nombre de la cabecera. Probada sin violaciones en 8 páginas (GSAP, calculadoras, pestañas, FAQ).
+ *  - scripts: propios, GSAP/ScrollTrigger de cdnjs (con SRI) y los hashes de los scripts inline de la página.
+ *  - style-src-attr 'unsafe-inline': hay atributos style="" (variables CSS por foto, object-position); los estilos en <style> no se permiten.
+ *  - img-src data: (máscara de flecha en tokens.css). frame-src: YouTube nocookie y Vimeo (video del equipo, cuando exista).
+ */
+function ns_csp_policy(array $scriptHashes = []): string
+{
+    $script = trim("'self' https://cdnjs.cloudflare.com " . implode(' ', $scriptHashes));
+    return "default-src 'self'; script-src $script; style-src 'self'; style-src-attr 'unsafe-inline'; img-src 'self' data:; font-src 'self'; media-src 'self'; connect-src 'self'; "
+        . "frame-src https://www.youtube-nocookie.com https://player.vimeo.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'; report-uri /csp-report/";
+}
+
+/** Cabeceras de seguridad comunes a toda respuesta HTML (las mismas que fija .htaccess para el resto de archivos). */
+function ns_security_headers(): void
+{
+    if (headers_sent()) {
+        return;
+    }
+    header_remove('X-Powered-By');
+    header('X-Content-Type-Options: nosniff');
+    header('X-Frame-Options: SAMEORIGIN');
+    header('Referrer-Policy: strict-origin-when-cross-origin');
+    header('Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()');
+    if (is_production() && ns_is_https()) {
+        header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
+    }
+}
+
+/** Envía un HTML ya renderizado con sus cabeceras de seguridad y la CSP Report-Only con los hashes de sus scripts inline. */
+function ns_send_html(string $html): void
+{
+    ns_security_headers();
+    if (!headers_sent()) {
+        header('Content-Security-Policy-Report-Only: ' . ns_csp_policy(ns_inline_script_hashes($html)));
+    }
+    echo $html;
+}
+
+// ---------------------------------------------------------------------
 // Render
 // ---------------------------------------------------------------------
 
@@ -787,7 +900,9 @@ function render_route(array $route): void
         return (string) ob_get_clean();
     })($page, $route, $cfg);
 
+    ob_start();
     (static function (array $route, array $cfg, string $content): void {
         include NS_ROOT . '/templates/layout.php';
     })($route, $cfg, $content);
+    ns_send_html((string) ob_get_clean());
 }

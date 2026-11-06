@@ -22,7 +22,7 @@ partial('hero', [
     'cls'     => 'cr-hero',
     'h1'      => 'Owner operator jobs: partner with a {hl}dispatcher{/hl}',
     'tagline' => 'A dispatch partnership, not a job offer.',
-    'lead'    => 'NorthStar is not an employer. You keep running your own truck and you approve every load, while the desk works as your independent truck dispatcher: we find and book the loads, deal with brokers, track every trip and keep the paperwork that gets you paid.',
+    'lead'    => 'NorthStar is not an employer. You keep running your own truck and you approve every load, while the desk works as your dispatch desk: we find and book the loads, deal with brokers, track every trip and keep the paperwork that gets you paid.',
     'ctas'    => [
         ['label' => 'Start your application', 'href' => $applyUrl . '?type=owner-operator', 'arrow' => true],
         ['label' => 'Talk to a dispatcher', 'href' => wa($route['wa']), 'variant' => 'ghost', 'wa' => true, 'arrow' => true],
@@ -46,7 +46,7 @@ partial('summary', [
         'title' => $g[0], 'text' => $g[1],
         'href'  => wa("Hi, I'm an owner-operator and I'd like to talk about " . strtolower($g[0]) . ' with NorthStar.'),
         'label' => 'Ask the desk about ' . strtolower($g[0]) . ' on WhatsApp',
-    ], $included), 'cta' => ['title' => 'Talk to the desk', 'text' => 'No forms first. Open WhatsApp with a ready message and a dispatcher replies.', 'href' => wa($route['wa']), 'label' => 'Talk to a dispatcher on WhatsApp']]); ?>
+    ], $included), 'cta' => ['title' => 'Talk to the desk', 'text' => 'No forms first. Open WhatsApp with a ready message to send to a dispatcher.', 'href' => wa($route['wa']), 'label' => 'Talk to a dispatcher on WhatsApp']]); ?>
   </div>
 </section>
 
@@ -54,7 +54,7 @@ partial('summary', [
     'id'      => 'co-control',
     'eyebrow' => 'Who decides',
     'title'   => 'Your truck, your decision.',
-    'lead'    => 'You approve every load. We tell you what we booked and why, and you can reach the desk on WhatsApp at any time.',
+    'lead'    => 'You approve every load. We tell you what we booked and why, and you can message the desk on WhatsApp.',
     'image'   => ['base' => 'nf-check-owner-approve', 'alt' => 'A hand holding a phone with a check mark on the screen inside a truck cab at dusk', 'pos' => '60% 100%'],
     'extra'   => ns_checks(['Every load approved by you', 'Updates on WhatsApp, where you already work', 'A team, not one dispatcher who disappears'], 'What staying in control means'),
 ]); ?>
@@ -63,7 +63,7 @@ partial('summary', [
 $used = ['nf-setup-owner-operator', 'nf-check-owner-approve'];
 $equip = [
     ['/amazon-relay-dispatch/', 'Amazon Relay dispatch', 'Load board, trips, scorecard and disputes, handled end to end.', ['Amazon Relay']],
-    ['/dry-van-dispatch/', 'Dry van dispatch', 'Steady freight booked and followed by one desk.', ['Dry van']],
+    ['/dry-van-dispatch/', 'Dry van dispatch', 'Dry van freight booked and followed by one desk.', ['Dry van']],
 ];
 ?>
 <section class="section" aria-labelledby="co-equip">

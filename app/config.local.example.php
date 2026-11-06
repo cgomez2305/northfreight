@@ -43,7 +43,10 @@ define('RATE_LIMIT', 5);
 // Opcional: flags de contenido (ver app/config.php).
 // define('HERO_VARIANT', 'B');
 // define('SHOW_RESOURCES', true);
-// define('SHOW_ON_SHIFT', true);
+// Chip "On shift · ET hh:mm" del header: en STAGING se ve siempre; en PRODUCCIÓN queda oculto salvo que se active aquí (solo con el horario confirmado por el cliente).
+// define('SHOW_ON_SHIFT_PRODUCTION', true);
+// Video del equipo (YouTube, Vimeo o .mp4). Vacío = en producción no se muestran la fachada del video, el play ni los capítulos.
+// define('DESK_VIDEO_URL', 'https://www.youtube.com/watch?v=XXXXXXXXXXX');
 // define('SHOW_EQUIPMENT_CHIPS', false);
 
 // --- Entidad y SEO (opcionales; no inventes datos: déjalos comentados hasta que el cliente los confirme) ---

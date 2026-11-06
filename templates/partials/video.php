@@ -7,7 +7,7 @@
  *  title   string  pie: "Meet the desk {hl}· 3 chapters{/hl}"           meta string  "Video · 3–4 min"
  *  chapters array  [['title','desc'?,'t'=>'0:00'|null,'href'?], …]  t=null => ph('0:00') (pendiente); con href es <a>, sin href <button>
  *  chapters_label string ("Jump to a chapter")
- *  src     string  URL del video real (data-video-src) cuando exista
+ *  src     string  URL del video real (data-video-src); por defecto DESK_VIDEO_URL. En ENV=production sin URL el partial imprime solo la foto (sin play, pie ni capítulos)
  *  theme   'dark' (defecto, sobre navy) | 'light'
  *  part    'all' (defecto: fachada + pie + capítulos) | 'player' (solo fachada+pie) | 'chapters' (solo la lista, p. ej. en otra columna)
  *  id      string  id del contenedor (defecto "video"); enlaza capítulos y reproductor aunque estén en columnas distintas
@@ -25,8 +25,10 @@ $id = $id ?? 'video';
 $chapters = $chapters ?? [];
 $chapters_label = $chapters_label ?? 'Jump to a chapter';
 $image = $image ?? null;
+$src = $src ?? ns_video_src();
+$ready = ns_video_ready();   // producción sin video real: foto sola, sin play, sin pie (título y duración) y sin capítulos
 $showPlayer = in_array($part, ['all', 'player'], true) && $image;
-$showChapters = in_array($part, ['all', 'chapters'], true) && $chapters;
+$showChapters = in_array($part, ['all', 'chapters'], true) && $chapters && $ready;
 $chaptersHtml = static function () use ($chapters, $chapters_label, $id): void { ?>
   <div class="video__chapters" role="group" aria-label="<?= e($chapters_label) ?>">
     <span class="video__chapters-label t-meta"><?= e($chapters_label) ?></span>
@@ -41,14 +43,14 @@ $chaptersHtml = static function () use ($chapters, $chapters_label, $id): void {
   </div>
 <?php };
 ?>
-<div class="video<?= $theme ?><?= !empty($cls) ? ' ' . e($cls) : '' ?>"<?= !empty($pos) ? ' style="--pos:' . e($pos) . '"' : '' ?> data-video id="<?= e($part === 'chapters' ? $id . '-chapters' : $id) ?>"<?= !empty($src) ? ' data-video-src="' . e($src) . '"' : '' ?><?= $part === 'chapters' ? ' data-video-for="' . e($id) . '"' : '' ?>>
+<div class="video<?= $theme ?><?= !empty($cls) ? ' ' . e($cls) : '' ?>"<?= !empty($pos) ? ' style="--pos:' . e($pos) . '"' : '' ?> data-video id="<?= e($part === 'chapters' ? $id . '-chapters' : $id) ?>"<?= $src !== '' ? ' data-video-src="' . e($src) . '"' : '' ?><?= $part === 'chapters' ? ' data-video-for="' . e($id) . '"' : '' ?>>
   <?php if ($showChapters && $part === 'chapters') { $chaptersHtml(); } ?>
   <?php if ($showPlayer): ?>
   <div class="video__frame px">
     <?= ns_img(['base' => $image['base'], 'alt' => $image['alt'] ?? '', 'sizes' => $sizes ?? '(min-width:1025px) 700px, (min-width:641px) calc(100vw - 72px), calc(80vw - 32px)']) ?>
-    <button type="button" class="video__play" data-video-play aria-label="Play the video"><?= ns_icon('play', 28) ?></button>
+    <?php if ($ready): ?><button type="button" class="video__play" data-video-play aria-label="Play the video"><?= ns_icon('play', 28) ?></button><?php endif; ?>
   </div>
-  <?php if (($foot ?? true) !== false): ?>
+  <?php if (($foot ?? true) !== false && $ready): ?>
   <div class="video__foot">
     <p class="head video__title"><?= ns_rich($title ?? '') ?></p>
     <?php if (!empty($meta)): ?><span class="video__meta"><?= e($meta) ?></span><?php endif; ?>

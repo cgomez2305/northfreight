@@ -30,6 +30,11 @@ RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 # RewriteCond %{HTTP_HOST} ^example\.com$ [NC]
 # RewriteRule ^ https://www.example.com%{REQUEST_URI} [L,R=301]
 
+# ---- 2b) "//ruta/" -> "/ruta/" (301, sin URLs duplicadas; index.php hace lo mismo como respaldo) ----
+RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$
+RewriteCond %{THE_REQUEST} \s[^\s?]*//
+RewriteRule ^(.*)$ /$1 [R=301,L,NE]
+
 # ---- 3) Bloquear acceso web a código, datos y secretos --------------
 # Directorios internos (también los bloquea index.php en php -S).
 RewriteRule ^(app|templates|storage|vendor|bin|node_modules|\.git|\.claude)(/|$) - [F,L]
@@ -37,6 +42,8 @@ RewriteRule ^(app|templates|storage|vendor|bin|node_modules|\.git|\.claude)(/|$)
 # cuya raiz debe ser captacion/public/ (ver captacion/README.md); el subdominio tiene su propio .htaccess y no pasa por esta regla (condicion de host).
 RewriteCond %{HTTP_HOST} !^captacion\. [NC]
 RewriteRule ^(captacion|cron)(/|$) - [F,L,NC]
+# Las plantillas descargables (assets/downloads/) solo se entregan desde el formulario (app/forms/download.php): la URL directa devuelve 403.
+RewriteRule ^assets/downloads(/|$) - [F,L]
 # Archivos sueltos: composer.*, configuración local, markdown, dotfiles (menos .well-known).
 RewriteRule ^composer\.(json|lock)$ - [F,L]
 RewriteRule (^|/)config\.local(\.example)?\.php$ - [F,L]
@@ -120,6 +127,14 @@ ErrorDocument 404 /index.php
         Header set Accept-Ranges "bytes"
     </FilesMatch>
     Header always set X-Content-Type-Options "nosniff"
+    # Seguridad (fase O). Las páginas HTML pasan por index.php, que emite las mismas y añade la CSP Report-Only con los hashes de sus scripts inline (por eso la CSP NO se fija aquí).
+    # HSTS un año con includeSubDomains (sin "preload" todavía). Solo por HTTPS.
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains" env=HTTPS
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+    Header always unset X-Powered-By
+    Header unset X-Powered-By
 </IfModule>
 AddType font/woff2 .woff2
 AddType video/mp4 .mp4

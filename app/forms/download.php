@@ -25,7 +25,7 @@ declare(strict_types=1);
         ],
         '/resources/dispatcher-carrier-agreement/' => [
             'label' => 'Dispatcher-carrier agreement',
-            'files' => ['docx' => 'dispatcher-carrier-agreement.docx', 'pdf' => 'dispatcher-carrier-agreement.pdf'],
+            'files' => ['docx' => 'dispatcher-carrier-agreement.docx'],
         ],
     ];
     $mimes = [

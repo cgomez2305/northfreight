@@ -7,7 +7,8 @@
  */
 require_once NS_ROOT . '/templates/partials/kit.php';
 
-$team = data('team');
+// Equipo: en producción solo se muestran las personas con nombre real (sin placeholders); si no queda ninguna, se omite la sección entera. En staging se ven las fichas con sus [ placeholders ].
+$team = array_values(array_filter(data('team'), static fn(array $p): bool => !is_production() || (trim((string) ($p['name'] ?? '')) !== '' && !has_ph((string) $p['name']) && !has_ph((string) ($p['role'] ?? '')))));
 $chapters = [
     ['title' => 'How we coordinate', 'desc' => 'Loads, drivers and tracking, with real daily tasks', 't' => null],
     ['title' => 'How we respond', 'desc' => 'Documenting an incident, communicating and following up', 't' => null],
@@ -34,25 +35,32 @@ $reasons = [
 ];
 ?>
 <?php
-// Hero fotográfico (patrón A): la fachada del video ES la foto del hero (marco `hero__pic`, play centrado); el título del video, su meta y los 3 capítulos van en una tarjeta de vidrio abajo a la derecha.
-ob_start();
-partial('video', [
-    'part'  => 'player',
-    'id'    => 'desk',
-    'image' => ['base' => 'nf-dispatch-room-maps', 'alt' => 'Dispatch room at night with monitors showing route maps and an empty chair'],
-    'cls'   => 'hero__pic',
-    'foot'  => false,
-    'pos'   => '60% 50%',
-    'sizes' => '(min-width:1025px) 1160px, (min-width:761px) 100vw, (min-width:641px) calc(100vw - 72px), calc(80vw - 32px)',
-]);
-$bg = ob_get_clean();
-ob_start(); ?>
+// Hero fotográfico (patrón A). Con video (o en staging): la fachada del video ES la foto del hero (marco `hero__pic`, play centrado) y el título, la meta y los 3 capítulos van en una tarjeta de vidrio abajo a la derecha.
+// Producción sin video real (DESK_VIDEO_URL vacío): solo la foto del hero, sin play, sin duración y sin capítulos.
+$deskPhoto = ['base' => 'nf-dispatch-room-maps', 'alt' => 'Dispatch room at night with monitors showing route maps and an empty chair'];
+$deskSizes = '(min-width:1025px) 1160px, (min-width:761px) 100vw, (min-width:641px) calc(100vw - 72px), calc(80vw - 32px)';
+$bg = '';
+$aside = '';
+if (ns_video_ready()) {
+    ob_start();
+    partial('video', [
+        'part'  => 'player',
+        'id'    => 'desk',
+        'image' => $deskPhoto,
+        'cls'   => 'hero__pic',
+        'foot'  => false,
+        'pos'   => '60% 50%',
+        'sizes' => $deskSizes,
+    ]);
+    $bg = ob_get_clean();
+    ob_start(); ?>
 <div class="hero__glass">
   <p class="head video__title"><?= ns_rich('Meet the desk {hl}· 3 chapters{/hl}') ?></p>
   <span class="video__meta">Video · 3 to 4 min</span>
   <?php partial('video', ['part' => 'chapters', 'id' => 'desk', 'chapters' => $chapters, 'chapters_label' => 'Jump to a chapter']); ?>
 </div>
 <?php $aside = ob_get_clean();
+}
 
 partial('hero', [
     'route' => $route,
@@ -60,10 +68,12 @@ partial('hero', [
     'h1'    => 'Built by dispatchers. {hl}Run as a team.{/hl}',
     'lead'  => 'At NorthStar, behind every load there are people coordinating information, decisions and follow-up. We want you to know who we are and how we work with you.',
     'bg'    => $bg,
+    'image' => $bg === '' ? $deskPhoto + ['pos' => '60% 50%', 'sizes' => $deskSizes] : null,
     'aside' => $aside,
 ]);
 ?>
 
+<?php if ($team): ?>
 <section class="section" aria-labelledby="dk-team">
   <div class="container stack sb-dk-stack">
     <?php partial('section-head', ['eyebrow' => 'The team', 'title' => 'The people on your loads', 'id' => 'dk-team']); ?>
@@ -89,6 +99,7 @@ partial('hero', [
     </ul>
   </div>
 </section>
+<?php endif; ?>
 
 <section class="section sb-dk-rules" aria-labelledby="dk-rules">
   <div class="container stack sb-dk-stack">

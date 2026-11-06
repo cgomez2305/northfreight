@@ -4,7 +4,11 @@
  * Requiere app/helpers.php cargado.
  */
 
-/** XML del sitemap: solo rutas status=live y sitemap=true. lastmod = mtime real de la plantilla. */
+/**
+ * XML del sitemap: solo rutas status=live y sitemap=true.
+ * Sin <lastmod> por defecto: tras un despliegue por Git todos los archivos tienen la fecha del despliegue y el valor sería falso (y Google lo ignora si no es fiable).
+ * Una ruta lo emite solo si declara una fecha real en su entrada de routes.php: 'lastmod' => 'YYYY-MM-DD'.
+ */
 function sitemap_xml(): string
 {
     $out = '<?xml version="1.0" encoding="UTF-8"?>' . "\n"
@@ -13,11 +17,10 @@ function sitemap_xml(): string
         if ($key === '404' || ($r['status'] ?? '') !== 'live' || empty($r['sitemap'])) {
             continue;
         }
-        $file = NS_ROOT . '/templates/pages/' . $r['template'] . '.php';
-        $mtime = is_file($file) ? filemtime($file) : filemtime(NS_ROOT . '/app/routes.php');
+        $lastmod = trim((string) ($r['lastmod'] ?? ''));
         $out .= "  <url>\n"
               . '    <loc>' . htmlspecialchars(abs_url($key), ENT_XML1 | ENT_QUOTES, 'UTF-8') . "</loc>\n"
-              . '    <lastmod>' . date('Y-m-d', $mtime) . "</lastmod>\n"
+              . (iso_date_ok($lastmod) ? '    <lastmod>' . $lastmod . "</lastmod>\n" : '')
               . '    <priority>' . number_format((float) ($r['priority'] ?? 0.5), 1, '.', '') . "</priority>\n"
               . "  </url>\n";
     }

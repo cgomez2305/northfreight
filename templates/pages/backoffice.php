@@ -10,7 +10,7 @@ $jobs = [
     ['Settlement preparation', 'Every load reconciled against its rate confirmation.'],
     ['Dispute management', 'Claims followed with the evidence our desk collected on the road.'],
     ['Document organization', 'Rate cons, BOLs, PODs and receipts filed per load.'],
-    ['Driver onboarding', 'New drivers set up and ready to roll on day one.'],
+    ['Driver onboarding', 'New drivers set up in your accounts.'],
     ['Account performance', 'Follow-up on scorecards and account health on Amazon Relay.'],
 ];
 $flow = ['Book', 'Track', 'Document', 'Get paid'];
@@ -46,7 +46,7 @@ partial('summary', [
   <div class="container stack">
     <?php partial('section-head', ['eyebrow' => 'Included', 'title' => 'Five back office jobs off your desk', 'id' => 'bo-included', 'count' => count($jobItems)]); ?>
     <?php partial('numgrid', ['items' => $jobItems, 'label' => 'Back office jobs',
-        'cta' => ['title' => 'Talk to the desk', 'text' => 'No forms first. Open WhatsApp with a ready message and a dispatcher replies.', 'href' => wa($route['wa']), 'label' => 'Talk to the desk about your back office on WhatsApp']]); ?>
+        'cta' => ['title' => 'Talk to the desk', 'text' => 'No forms first. Open WhatsApp with a ready message to send to a dispatcher.', 'href' => wa($route['wa']), 'label' => 'Talk to the desk about your back office on WhatsApp']]); ?>
   </div>
 </section>
 

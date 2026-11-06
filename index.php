@@ -15,6 +15,48 @@
 declare(strict_types=1);
 
 define('NS_ROOT', __DIR__);
+
+// Página de error mínima y amistosa (500): sin rutas ni detalles internos, sin caché y fuera del índice. Se registra ANTES de cargar nada para cubrir también fallos de arranque
+// (excepciones no capturadas y errores fatales; un parse error del propio index.php no se puede capturar, para eso sirve el ErrorDocument 500 del servidor).
+function ns_error_page(): void
+{
+    while (ob_get_level() > 0) {
+        @ob_end_clean();
+    }
+    if (!headers_sent()) {
+        http_response_code(500);
+        header_remove('X-Powered-By');
+        header('Content-Type: text/html; charset=utf-8');
+        header('Cache-Control: no-store');
+        header('X-Robots-Tag: noindex, nofollow');
+        header('X-Content-Type-Options: nosniff');
+    }
+    $phone = defined('PHONE') ? (string) PHONE : '';
+    $wa = defined('WA_BASE') ? (string) WA_BASE : '';
+    $esc = static fn(string $v): string => htmlspecialchars($v, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+    echo '<!doctype html><html lang="en-US"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex">'
+        . '<title>Something went wrong | NorthStar Freight</title></head>'
+        . '<body style="margin:0;background:#04101F;color:#EEF3F8;font:18px/1.5 system-ui,sans-serif;display:grid;place-items:center;min-height:100vh;padding:24px">'
+        . '<main style="max-width:520px"><h1 style="font-size:32px;margin:0 0 12px">Something went wrong on our side.</h1>'
+        . '<p style="color:#B9C8D8">Please try again in a minute.' . ($phone !== '' ? ' If it is urgent, message us on WhatsApp at ' . ($wa !== '' ? '<a style="color:#6FD3EC" href="' . $esc($wa) . '">' . $esc($phone) . '</a>' : $esc($phone)) . '.' : '') . '</p>'
+        . '<p><a style="color:#6FD3EC" href="/">Back to the home page</a></p></main></body></html>';
+}
+set_exception_handler(static function (Throwable $t): void {
+    $detail = get_class($t) . ': ' . $t->getMessage() . ' @' . basename($t->getFile()) . ':' . $t->getLine();
+    if (function_exists('ns_log_error')) {
+        ns_log_error('uncaught', $detail);
+    } else {
+        error_log('uncaught ' . $detail);
+    }
+    ns_error_page();
+});
+register_shutdown_function(static function (): void {
+    $e = error_get_last();
+    if ($e !== null && in_array($e['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR, E_USER_ERROR, E_RECOVERABLE_ERROR], true)) {
+        ns_error_page();
+    }
+});
+
 require NS_ROOT . '/app/helpers.php';   // carga también app/config.php
 require NS_ROOT . '/app/sitemap.php';
 require NS_ROOT . '/app/llms.php';       // /llms.txt y /llms-full.txt (generados desde routes + data)
@@ -47,6 +89,11 @@ function ns_redirect(string $path, string $method): never
 }
 
 $method = strtoupper((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET'));
+// "//ruta/" o "///": parse_url lo leería como host. Se normaliza con un 301 a la ruta limpia (sin URLs duplicadas de la home).
+$rawUri = (string) ($_SERVER['REQUEST_URI'] ?? '/');
+if (str_starts_with($rawUri, '//')) {
+    ns_redirect((string) preg_replace('#/{2,}#', '/', explode('?', $rawUri, 2)[0]), $method);
+}
 $rawPath = parse_url((string) ($_SERVER['REQUEST_URI'] ?? '/'), PHP_URL_PATH);
 if (!is_string($rawPath) || $rawPath === '') {
     ns_plain(400, 'Bad request');
@@ -77,6 +124,35 @@ if ($blocked) {
     http_response_code(404);
     render_route(routes()['404'] + ['path' => '/404/']);
     exit;
+}
+
+// --- /favicon.ico: los navegadores y bots lo piden siempre; se sirve el .ico de assets/img (si no existe, 404 en texto plano, sin la plantilla HTML) ---
+if ($collapsed === '/favicon.ico') {
+    $ico = NS_ROOT . '/assets/img/favicon.ico';
+    if (!is_file($ico)) {
+        ns_plain(404, 'Not found');
+    }
+    header('Content-Type: image/x-icon');
+    header('Cache-Control: public, max-age=604800');
+    header('X-Content-Type-Options: nosniff');
+    readfile($ico);
+    exit;
+}
+
+// --- Informes de la CSP (report-uri): se anota un extracto en storage/csp.log (rotación a 1 MB) y se responde 204 ---
+if ($collapsed === '/csp-report/' && $method === 'POST') {
+    $raw = (string) file_get_contents('php://input', false, null, 0, 4096);
+    if ($raw !== '') {
+        ns_log('csp', gmdate('c') . ' ' . ns_redact(mb_substr((string) preg_replace('/\s+/', ' ', mb_scrub($raw)), 0, 1500)));
+    }
+    http_response_code(204);
+    header('Cache-Control: no-store');
+    exit;
+}
+
+// --- Descargas de plantillas: solo salen del formulario (app/forms/download.php); la URL directa no existe ---
+if (str_starts_with($collapsed, '/assets/downloads/')) {
+    ns_plain(404, 'Not found');
 }
 
 // --- Assets reales: php -S los sirve con return false; en Apache ya los sirvió el servidor ---
@@ -156,8 +232,7 @@ if (!is_production() || $isDraft) {
     header('X-Robots-Tag: noindex, follow');   // apply / gracias: live pero fuera del indice (la meta robots del layout dice lo mismo)
 }
 header($isDraft ? 'Cache-Control: no-store' : (is_production() ? 'Cache-Control: public, max-age=300' : 'Cache-Control: no-cache'));
-header('X-Content-Type-Options: nosniff');
-header('Referrer-Policy: strict-origin-when-cross-origin');
+ns_security_headers();
 
 // --- Pagina de gracias de las solicitudes: solo con el token firmado de un envio real (sin sesiones); sin el, 303 al formulario ---
 if (($route['gate'] ?? '') === 'lead-thanks') {
@@ -183,6 +258,10 @@ $formByPath = [
 $form = $route['form'] ?? ($formByPath[$candidate] ?? null);
 if (!is_string($form) || !in_array($form, $formHandlers, true) || !is_file(NS_ROOT . '/app/forms/' . $form . '.php')) {
     $form = null;
+}
+
+if ($form !== null && $method === 'GET') {
+    header('Cache-Control: no-store');   // el HTML de un formulario lleva el token CSRF y la hora de carga: no se cachea (ni en LiteSpeed ni en intermediarios)
 }
 
 if ($method === 'POST') {

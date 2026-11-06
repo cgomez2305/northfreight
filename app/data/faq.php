@@ -20,7 +20,7 @@ return [
     'careers' => [
         [
             'q' => 'Is this a job offer?',
-            'a' => 'For owner-operators, no. NorthStar is a dispatch service: the desk works as your independent truck dispatcher while you keep running your own truck and approving every load.',
+            'a' => 'For owner-operators, no. NorthStar is a dispatch service: the desk works as your dispatch desk while you keep running your own truck and approving every load.',
             'link' => ['label' => 'Owner operator partnership', 'path' => '/careers/owner-operators/'],
         ],
         [
@@ -61,7 +61,7 @@ return [
     'careers-owner' => [
         [
             'q' => 'Is this an owner operator job?',
-            'a' => 'No. It is a dispatch partnership: you keep running your own truck and the NorthStar desk works as your independent truck dispatcher.',
+            'a' => 'No. It is a dispatch partnership: you keep running your own truck and the NorthStar desk works as your dispatch desk.',
         ],
         [
             'q' => 'How much does a dispatcher charge an owner-operator?',
@@ -238,7 +238,7 @@ return [
         ],
         [
             'q' => 'Can I see NorthStar\'s agreement before starting?',
-            'a' => 'Yes. We send it before onboarding so you can read every clause and ask questions on WhatsApp.',
+            'a' => '{{ph:confirm with the client whether NorthStar sends its agreement before onboarding, and who reviewed it}}',   // sin respaldo todavía (informe de auditoría I1): oculta en producción
         ],
     ],
     'post-how-much-does-truck-dispatch-cost' => [
@@ -258,11 +258,11 @@ return [
     'post-amazon-relay-requirements' => [
         [
             'q' => 'Do I need my own trailer for Amazon Relay?',
-            'a' => 'Not always. Many Relay loads are power-only, using Amazon trailers. Some loads require your own 53\' dry van.',
+            'a' => 'It depends on the load. Check the load details inside Relay and the current requirements on relay.amazon.com before you book.',
         ],
         [
             'q' => 'How long does Amazon Relay approval take?',
-            'a' => 'It varies. Having consistent FMCSA, insurance and SCAC information ready speeds it up.',
+            'a' => 'It varies, and Amazon decides. Having your FMCSA and insurance information consistent and ready helps.',
         ],
         [
             'q' => 'Can a dispatcher manage my Relay account?',

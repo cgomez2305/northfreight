@@ -18,7 +18,6 @@ $doc = [
     'formats' => [['pdf', 'PDF (print and fill by hand)'], ['docx', 'Word (fill on your computer)']],
     'submit'  => 'Download the BOL template',
     'notice'  => 'this is a generic template. Check it against what your shippers, brokers and receivers require before you use it.',
-    'files'   => [['PDF', 'bol-template.pdf'], ['Word', 'bol-template.docx']],
     'inside_title' => 'Every field of the BOL template, already in place',
     'steps_title' => 'Fill it in four steps',
     'steps' => [

@@ -15,10 +15,9 @@ $doc = [
         ['Limited authorization', 'what the dispatcher can sign or send on your behalf, and what it cannot'],
         ['Term & termination', 'notice period and what happens to loads in transit'],
     ],
-    'formats' => [['docx', 'Word (editable .docx)'], ['pdf', 'PDF (read only)']],
+    'formats' => [['docx', 'Word (editable .docx)']],
     'submit'  => 'Download the agreement',
     'notice'  => 'this template is not legal advice. Have it reviewed for your state and your business before you sign it.',
-    'files'   => [['Word', 'dispatcher-carrier-agreement.docx']],
     'inside_title' => 'Every clause of the agreement, already in place',
     'steps_title' => 'Review it in four steps',
     'steps' => [

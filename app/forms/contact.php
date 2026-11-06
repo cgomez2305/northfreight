@@ -7,8 +7,9 @@
  *   honeypot         -> mismo 303, sin enviar nada (exito falso)
  *   validacion       -> 422 con la misma pagina y $flash['errors'] / $flash['old']
  *   csrf / rapido    -> 403 / 422;  limite por IP -> 429;  fallo SMTP -> 503
- * Campos: name* company mc trucks equipment message*  (+ website=honeypot, form_ts, csrf).
- * La maqueta no tiene campo de correo/telefono de respuesta: el mensaje llega sin forma de contestar por escrito.
+ * Campos: name* contact* (correo o telefono de respuesta) company mc trucks equipment message*  (+ website=honeypot, form_ts, csrf).
+ * contact: un correo valido, o un telefono con al menos 7 digitos. Si es un correo, el aviso lo lleva como Reply-To.
+ * Produccion sin SMTP valido: no se responde exito (503 con WhatsApp y correo como alternativa); el mensaje queda en storage/mail.log.
  */
 
 declare(strict_types=1);
@@ -26,6 +27,7 @@ declare(strict_types=1);
 
     $v = [
         'name'      => ns_clean($in['name'] ?? '', 100),
+        'contact'   => ns_clean($in['contact'] ?? '', 120),
         'company'   => ns_clean($in['company'] ?? '', 120),
         'mc'        => ns_clean($in['mc'] ?? '', 20),
         'trucks'    => ns_clean($in['trucks'] ?? '', 4),
@@ -40,6 +42,10 @@ declare(strict_types=1);
     $errors = [];
     if ($v['name'] === '') {
         $errors['name'] = 'Please enter your name.';
+    }
+    $contactKind = ns_contact_kind($v['contact']);
+    if ($contactKind === null) {
+        $errors['contact'] = 'Enter an email address, or a phone number with at least 7 digits, so we can reply.';
     }
     if ($v['message'] === '') {
         $errors['message'] = 'Please tell us a little about your trucks and what you need.';
@@ -56,17 +62,19 @@ declare(strict_types=1);
 
     $body = "New message from the website contact form.\n\n"
         . 'Name: ' . $v['name'] . "\n"
+        . 'Reply to (' . $contactKind . '): ' . $v['contact'] . "\n"
         . 'Company: ' . ($v['company'] ?: '-') . "\n"
         . 'MC#: ' . ($v['mc'] ?: '-') . "\n"
         . 'Number of trucks: ' . ($v['trucks'] ?: '-') . "\n"
         . 'Equipment: ' . ($v['equipment'] ?: '-') . "\n"
-        . "Reply address: none (the form has no email or phone field)\n\n"
+        . "\n"
         . "Message:\n" . $v['message'] . "\n"
         . ns_mail_footer();
 
     ns_rate_hit();
-    if (!ns_send_mail('New dispatch inquiry: ' . $v['name'], $body)) {
-        ns_render_page($route, ns_flash_error($form, [], $v, 'We could not send your message right now. Please message us on WhatsApp or email ' . ns_mail_to() . '.'), 503);
+    $replyTo = $contactKind === 'email' ? [$v['contact'], $v['name']] : null;
+    if (!ns_send_mail('New dispatch inquiry: ' . $v['name'], $body, $replyTo)) {
+        ns_render_page($route, ns_flash_error($form, [], $v, 'We could not send your message right now. Please message us on WhatsApp at ' . (string) $cfg['phone'] . ' or email ' . ns_mail_to() . '.'), 503);
     }
 
     header('Location: ' . url((string) $route['path'] . '?sent=1'), true, 303);

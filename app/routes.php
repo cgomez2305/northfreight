@@ -17,8 +17,10 @@
  *   motion     (opcional) true => carga GSAP + ScrollTrigger + motion.js + motion.css (escenas de scroll y parallax de fotos)
  *   faq        clave de app/data/faq.php (o null)
  *   extras     doc (legal), equip (equipment), slug (post), job (vacante: slug de app/data/jobs.php)
+ *   lastmod    (opcional) 'YYYY-MM-DD' real del último cambio de contenido: lo único que emite <lastmod> en el sitemap (no se inventan fechas)
  *   noindex    (opcional) true => <meta robots noindex, follow> en producción, aunque la ruta sea live (apply, gracias); no entra en sitemap ni llms
  *   gate       (opcional) 'lead-thanks' => solo se sirve con el token firmado de un envío real (?t=…); sin él, 303 a /careers/apply/ (sin sesiones)
+ *   needs_files (opcional) lista de archivos bajo assets/ que la página promete (descargas). En ENV=production, si falta alguno la ruta pasa a draft (404, fuera de sitemap, llms, menús y enlaces); en staging se ve igual para poder revisar el diseño
  *   schema_name (opcional) nombre del nodo Service/WebPage cuando el H1 no sirve como nombre
  *
  * La clave especial '404' no es una URL: es la ruta que usa index.php para el error 404.
@@ -48,7 +50,7 @@ $routes = [
         'template'   => 'owner',
         'motion'     => true,
         'title'      => 'Dispatch Services for Owner-Operators | NorthStar Freight',
-        'meta'       => 'Dispatch services for owner-operators: an independent truck dispatcher books your loads, handles brokers and tracks every trip. Updates on WhatsApp.',
+        'meta'       => 'Dispatch services for owner-operators: your dispatch desk books your loads, handles brokers and tracks every trip. Updates on WhatsApp.',
         'h1'         => 'Dispatch services for owner-operators',
         'schema'     => ['Service', 'FAQPage', 'BreadcrumbList'],
         'status'     => 'live',
@@ -217,6 +219,7 @@ $routes = [
         'template'   => 'doc-bol',
         'motion'     => true,
         'form'       => 'download',   // handler POST en app/forms/download.php
+        'needs_files' => ['downloads/bol-template.pdf', 'downloads/bol-template.docx'],   // en producción la ruta es draft (404) si falta alguno
         'title'      => 'BOL Template (Bill of Lading) in PDF & Word | NorthStar', // TODO verificar con doc de copy
         'meta'       => 'Free bill of lading (BOL) template in PDF and Word: every field brokers and receivers expect, ready to print. The same BOL our desk files on every load.', // TODO
         'h1'         => 'Bill of lading template',
@@ -263,6 +266,7 @@ $routes = [
         'template'   => 'doc-agreement',
         'motion'     => true,
         'form'       => 'download',   // handler POST en app/forms/download.php
+        'needs_files' => ['downloads/dispatcher-carrier-agreement.docx'],   // en producción la ruta es draft (404) mientras no exista el archivo revisado por el abogado
         'title'      => 'Dispatcher-Carrier Agreement Template | NorthStar', // TODO verificar con doc de copy
         'meta'       => 'Dispatcher carrier agreement template: what a fair dispatch contract covers, from scope and fees to your right to refuse loads. Not legal advice.', // TODO
         'h1'         => 'Dispatcher-carrier agreement',
@@ -575,6 +579,7 @@ foreach (jobs_all() as $nsSlug => $nsJob) {
         'template'   => 'job',
         'motion'     => true,
         'job'        => $nsSlug,
+        'lastmod'    => (string) ($nsJob['posted'] ?? ''),   // fecha real de publicación de la vacante (solo se emite si es una fecha ISO válida)
         'title'      => mb_strimwidth($nsTitle . ' | NorthStar Freight', 0, 60, '', 'UTF-8'),
         'meta'       => mb_strimwidth(trim((string) ($nsJob['summary'] ?? '')) !== '' ? trim((string) $nsJob['summary']) : $nsTitle . ' at NorthStar Freight Solutions. See what the job involves and how to apply.', 0, 155, '', 'UTF-8'),
         'h1'         => $nsTitle,
@@ -587,6 +592,20 @@ foreach (jobs_all() as $nsSlug => $nsJob) {
         'parent'     => '/careers/cdl-a-drivers/',
         'faq'        => null,
     ];
+}
+
+// Guarda de archivos (B1): una página que promete una descarga solo es pública en producción si el archivo existe.
+// Se aplica aquí, al construir el mapa, para que sitemap, llms, menús y route_is_live() lo vean igual.
+if (is_production()) {
+    foreach ($routes as $nsKey => $nsR) {
+        foreach ($nsR['needs_files'] ?? [] as $nsFile) {
+            if (!is_file(NS_ROOT . '/assets/' . $nsFile)) {
+                $routes[$nsKey]['status'] = 'draft';
+                $routes[$nsKey]['sitemap'] = false;
+                break;
+            }
+        }
+    }
 }
 
 return $routes;

@@ -2,7 +2,7 @@
 /**
  * Cuerpo compartido de doc-bol y doc-agreement (tras el hero): What's inside + formulario de descarga,
  * How to use it (4 pasos), FAQ en líneas + tarjetas relacionadas.
- * Espera $doc = [inside[[strong,resto]], form_title, formats[[valor,etiqueta]], submit, notice, files[[etiqueta,archivo]],
+ * Espera $doc = [inside[[strong,resto]], form_title, formats[[valor,etiqueta]], submit, notice,
  *                steps_title, steps[[título,texto]], (FAQ: route_faq_items($route), de app/data/faq.php), related[rc…]] y $route. Datos del cliente: nada inventado.
  */
 $action = url((string) $route['path']);
@@ -45,18 +45,8 @@ $csrf = function_exists('csrf_token') ? (string) csrf_token() : '';
           <input type="hidden" name="form_ts" value="<?= time() ?>">
           <input type="hidden" name="csrf" value="<?= e($csrf) ?>">
           <button type="submit" class="btn btn--navy"><?= e($doc['submit']) ?></button>
-          <p class="co-form__note">We only use your email to send the file and occasional guides from the desk. Unsubscribe anytime.</p>
+          <p class="co-form__note">We only use your email to send the file. See our <a href="<?= e(url('/privacy-policy/')) ?>">privacy policy</a>.</p>
           <p class="co-form__note"><strong>Please note:</strong> <?= e($doc['notice']) ?></p>
-          <?php
-          $links = [];
-          foreach ($doc['files'] as $f) {
-              if (is_file(NS_ROOT . '/assets/downloads/' . $f[1]) || !is_production()) {
-                  $links[] = '<a href="' . e(asset('downloads/' . $f[1])) . '" download>' . e($f[0]) . '</a>';
-              }
-          }
-          if ($links): ?>
-          <p class="co-form__note">Prefer to skip the form? Direct download: <?= implode(' · ', $links) ?></p>
-          <?php endif; ?>
         </form>
       </div>
     </div>

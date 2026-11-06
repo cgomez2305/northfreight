@@ -61,7 +61,7 @@
 .blog-aside__toc { display: flex; flex-direction: column; }
 .blog-toc__label { color: var(--cyan); letter-spacing: .1em; padding-bottom: 12px; }
 .blog-toc { display: flex; flex-direction: column; }
-.blog-toc a { display: block; padding: 9px 0 9px 14px; border-left: 2px solid var(--hairline); color: var(--text-2); text-decoration: none; font-size: 14px; line-height: 1.4; }
+.blog-toc a { display: flex; align-items: center; min-height: 44px; padding: 9px 0 9px 14px; border-left: 2px solid var(--hairline); color: var(--text-2); text-decoration: none; font-size: 14px; line-height: 1.4; }
 .blog-toc a:hover { border-left-color: var(--cyan); color: var(--text); }
 .blog-aside__card { background: var(--panel); border: 1px solid var(--hairline); border-radius: var(--r-card); padding: 22px; display: flex; flex-direction: column; gap: 8px; text-decoration: none; transition: background-color var(--t-fast); }
 .blog-aside__card:hover { background: var(--panel-2); }

@@ -18,7 +18,7 @@ partial('hero', [
     'route' => $route,
     'cls'   => 'sa-hero--dryvan sa-hero--lead560',
     'h1'    => 'Dry van {hl}dispatch service{/hl}',
-    'lead'  => 'Steady dry van freight, booked and followed by one desk. We search the boards, negotiate the rate, coordinate pickup and delivery and keep every document on file.',
+    'lead'  => 'Dry van freight, booked and followed by one desk. We search the boards, negotiate the rate, coordinate pickup and delivery and keep every document on file.',
     'ctas'  => [
         ['label' => 'Talk to a dispatcher', 'href' => wa($route['wa']), 'wa' => true, 'arrow' => true],
     ],
@@ -54,6 +54,11 @@ partial('summary', [
     'lead'    => 'The same desk books, tracks and documents every load, as one team.',
     'image'   => ['base' => 'nf-check-dry-van-interior', 'alt' => 'Inside an empty dry van trailer, with cargo rails along the walls and a worn wooden floor', 'pos' => '50% 55%'],
     'extra'   => ns_checks(['You approve every load', 'Updates on WhatsApp, where you already work', 'A record of every load', 'A team, not a single dispatcher'], 'What working with the desk means'),
+]); ?>
+
+<?php ns_read_next([
+    ['path' => '/how-it-works/', 'title' => 'How truck dispatching works with NorthStar', 'text' => 'Scope, contacts and the day-to-day, step by step.', 'chips' => ['How it works']],
+    ['path' => '/blog/how-much-does-truck-dispatch-cost/', 'title' => 'How much does truck dispatch service cost?', 'text' => 'The ways dispatchers charge and the red flags to check before you sign.', 'chips' => ['Article']],
 ]); ?>
 
 <?php partial('faq', ['items' => route_faq_items($route), 'title' => 'Dry van dispatch questions', 'surface' => 'light', 'pre_cta' => true]); ?>

@@ -41,7 +41,7 @@ $services = [
      'href' => url('/load-tracking/'), 'cta' => 'Load tracking',
      'image' => ['base' => 'nf-service-load-tracking', 'alt' => 'A hand holding a phone inside a truck cab at dusk, with a trailer parked beyond the windshield', 'sizes' => $railSizes]],
     ['num' => '03', 'title' => 'Trucking back office',
-     'text' => 'Paperwork organized, settlements prepared and disputes followed with evidence. We also help onboard new drivers so they are ready to roll on day one.',
+     'text' => 'Paperwork organized, settlements prepared and disputes followed with evidence. We also help onboard new drivers so they are set up in your accounts.',
      'href' => url('/trucking-back-office/'), 'cta' => 'Back office services',
      'image' => ['base' => 'nf-service-back-office', 'alt' => 'Desk with a stack of paper forms, a pen, a binder clip, a closed laptop and a tablet', 'sizes' => $railSizes]],
 ];
@@ -127,7 +127,7 @@ $figures = [
     </div>
     <div class="hero-wa" data-wa-widget data-wa-base="<?= e(cfg('wa_base')) ?>">
       <p class="hero-wa__title t-meta">Start in WhatsApp</p>
-      <p class="hero-wa__note" data-wa-note>Open WhatsApp with a ready message and a dispatcher replies.</p>
+      <p class="hero-wa__note" data-wa-note>Open WhatsApp with a ready message to send to a dispatcher.</p>
       <div class="hero-wa__ui" data-wa-ui hidden>
         <div class="hero-wa__tabs" role="tablist" aria-label="I am">
           <?php foreach ($waTabs as $i => [$key, $label, $who]): ?>
@@ -164,7 +164,7 @@ $figures = [
   <div class="home-services__pin">
     <div class="container">
       <?php partial('section-head', ['eyebrow' => '01 · What we manage', 'title' => 'Three fronts.{pill:nf-hero-amazon-relay}{br}One dispatch desk.{pill:nf-hero-dry-van}', 'id' => 'services-title', 'split' => true,
-          'lead' => 'Most truck dispatch companies stop at the booking. We stay on the load until the money is in. The same team that books it tracks it and closes it out.']); ?>
+          'lead' => 'We stay on the load until it is documented and settled. The same team that books it tracks it and closes it out.']); ?>
     </div>
     <div class="container home-rail">
       <div class="g3 home-cards">
@@ -193,7 +193,7 @@ $figures = [
          'image' => ['base' => 'nf-setup-owner-operator', 'alt' => 'White semi truck parked alone in an empty lot at dusk, with bare trees behind', 'pos' => '60% 100%'],
          'link' => ['label' => 'Dispatch for owner-operators', 'href' => url('/dispatch-for-owner-operators/')]],
         ['label' => 'Small fleet', 'title' => 'Small fleet', 'wa' => "Hi, I run a small fleet and I'd like to talk about dispatch with NorthStar.",
-         'points' => ['A team, not a single dispatcher', 'New drivers set up and ready to roll on day one', 'Who approves loads, how we report and which tasks the desk owns'],
+         'points' => ['A team, not a single dispatcher', 'New drivers set up in your accounts', 'Who approves loads, how we report and which tasks the desk owns'],
          'image' => ['base' => 'nf-setup-small-fleet', 'alt' => 'Several white semi trucks parked in a row in a depot lot at dusk', 'pos' => '50% 70%'],
          'link' => ['label' => 'See how we onboard', 'href' => url('/how-it-works/')]],
         ['label' => 'Amazon Relay carrier', 'title' => 'Amazon Relay carrier', 'wa' => 'relay',
@@ -274,21 +274,33 @@ $figures = [
   </div>
 </section>
 
-<!-- 05 TEAM + VIDEO: patrón B (foto ancha con tarjeta solapada). La fachada del video es la foto; el título y la meta del video van en una tarjeta de vidrio dentro de la foto y los 3 capítulos en 3 columnas debajo. -->
+<!-- 05 TEAM + VIDEO: patrón B (foto ancha con tarjeta solapada). Con video (o en staging) la fachada del video es la foto; el título y la meta del video van en una tarjeta de vidrio dentro de la foto y los 3 capítulos en 3 columnas debajo.
+     Producción sin video real (DESK_VIDEO_URL vacío): foto sola con un enlace a /our-desk/, sin play, duración ni capítulos, y un texto que no promete video. -->
 <?php
-ob_start();
-partial('video', ['part' => 'chapters', 'id' => 'desk', 'chapters' => $chapters, 'chapters_label' => 'Jump to a chapter']);
-$chaptersHtml = ob_get_clean();
-partial('photo-card', [
+$videoReady = ns_video_ready();
+$teamCard = [
     'id'      => 'team-title',
     'cls'     => 'home-team',
     'eyebrow' => '06 · The desk behind the load',
     'title'   => 'Built by dispatchers.{br}{hl}Run as a team.{/hl}',
-    'lead'    => 'Behind every trip there are people coordinating information, decisions and follow-up. Meet the team, hear how we work, and jump straight to the topic you care about.',
     'image'   => ['base' => 'nf-dispatch-room-wide-night', 'alt' => 'Dispatch room at night with rows of monitors showing glowing route maps, with a highway seen through the windows', 'pos' => '50% 50%'],
-    'video'   => ['id' => 'desk', 'title' => 'A load doesn’t dispatch itself. {hl}There’s a team behind it.{/hl}', 'meta' => 'Video · 3 to 4 min'],
-    'after'   => $chaptersHtml,
-]); ?>
+];
+if ($videoReady) {
+    ob_start();
+    partial('video', ['part' => 'chapters', 'id' => 'desk', 'chapters' => $chapters, 'chapters_label' => 'Jump to a chapter']);
+    $chaptersHtml = ob_get_clean();
+    $teamCard += [
+        'lead'  => 'Behind every trip there are people coordinating information, decisions and follow-up. Meet the team, hear how we work, and jump straight to the topic you care about.',
+        'video' => ['id' => 'desk', 'title' => 'A load doesn’t dispatch itself. {hl}There’s a team behind it.{/hl}', 'meta' => 'Video · 3 to 4 min'],
+        'after' => $chaptersHtml,
+    ];
+} else {
+    $teamCard += [
+        'lead' => 'Behind every trip there are people coordinating information, decisions and follow-up. See how the desk works with you.',
+        'link' => route_is_live('/our-desk/') ? ['label' => 'How the desk works', 'href' => url('/our-desk/')] : null,
+    ];
+}
+partial('photo-card', $teamCard); ?>
 
 <!-- 05 EVIDENCE -->
 <section class="section" aria-labelledby="evidence-title">

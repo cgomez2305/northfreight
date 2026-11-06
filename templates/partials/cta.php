@@ -18,7 +18,7 @@ $image = !empty($image['base']) ? $image : null;
     <div class="cta__main">
       <img class="cta__mark" src="<?= e(asset('img/isotype-white.svg')) ?>" alt="" width="56" height="56">
       <h2 class="t-cta" id="cta-title"><?= ns_rich($title ?? 'Let’s talk about{br}{hl}your operation.{/hl}') ?></h2>
-      <p class="cta__text"><?= ns_rich($text ?? 'No forms first. Open WhatsApp with a ready message and a dispatcher replies.') ?></p>
+      <p class="cta__text"><?= ns_rich($text ?? 'No forms first. Open WhatsApp with a ready message to send to a dispatcher.') ?></p>
     </div>
     <div class="cta__actions">
       <a class="btn btn--primary btn--contact" href="<?= e(wa($wa)) ?>" rel="noopener">

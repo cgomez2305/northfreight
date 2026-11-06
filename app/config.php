@@ -94,7 +94,12 @@ ns_default('HERO_HEADLINES', [
 // Foto de fondo del CTA final (assets/img/<base>-{640,1024,1280}.webp + .jpg). '' = panel liso. Una ruta puede anularla con 'cta_image' => 'base' | '' | false.
 ns_default('CTA_IMAGE', 'nf-cta-night-truck');
 ns_default('SHOW_RESOURCES', true);         // Resources y Blog en nav/footer (activos desde Fase 1)
-ns_default('SHOW_ON_SHIFT', true);          // chip "On shift · ET hh:mm" de la isla de acciones del header (revisar al confirmar horario)
+// Chip "On shift · ET hh:mm" de la isla de acciones del header. Afirma que el desk trabaja AHORA, así que solo se muestra en producción si config.local.php lo activa
+// de forma explícita con SHOW_ON_SHIFT_PRODUCTION = true (tras confirmar el horario con el cliente). En staging se ve para revisar el diseño.
+ns_default('SHOW_ON_SHIFT_PRODUCTION', false);
+ns_default('SHOW_ON_SHIFT', true);
+// URL del video del equipo (YouTube, Vimeo o .mp4). Vacía = no hay video: en producción se omiten la fachada, el play, la duración y los capítulos (en staging se ven para revisar el diseño).
+ns_default('DESK_VIDEO_URL', '');
 ns_default('SHOW_EQUIPMENT_CHIPS', false);  // chips "By equipment" del mega menú
 
 // --- Mensajes de WhatsApp por página -------------------------------------
@@ -142,7 +147,7 @@ function cfg(?string $key = null): mixed
             'hero_variant'         => HERO_VARIANT,
             'hero_headline'        => HERO_HEADLINES[HERO_VARIANT] ?? HERO_HEADLINES['B'],
             'show_resources'       => (bool) SHOW_RESOURCES,
-            'show_on_shift'        => (bool) SHOW_ON_SHIFT,
+            'show_on_shift'        => (bool) SHOW_ON_SHIFT && (ENV !== 'production' || (bool) SHOW_ON_SHIFT_PRODUCTION),   // en producción solo con SHOW_ON_SHIFT_PRODUCTION = true
             'show_equipment_chips' => (bool) SHOW_EQUIPMENT_CHIPS,
             'wa_messages'          => WA_MESSAGES,
         ];

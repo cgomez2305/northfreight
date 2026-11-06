@@ -92,6 +92,10 @@ a.idx__row:focus-visible { outline-offset: 4px; }
 .sb-ct-form textarea.input { min-height: 120px; resize: vertical; }
 .sb-ct-form .input[aria-invalid="true"] { border: 2px solid var(--text); }
 .sb-ct-err { font-size: 14px; font-weight: 600; color: var(--text); }
+.sb-ct-hint { font-size: 14px; color: var(--text-2); font-family: var(--font-body); letter-spacing: 0; text-transform: none; }
+.sb-ct-status[tabindex]:focus { outline: 2px solid var(--cyan); outline-offset: 2px; border-radius: var(--r-tile); }
+.sb-ct-errlist { margin: 10px 0 0; padding: 0 0 0 20px; display: grid; gap: 4px; color: var(--text-2); font-size: 15px; }
+.sb-ct-errlist a { color: var(--text); text-decoration: underline; text-underline-offset: 3px; display: inline-flex; align-items: center; min-height: 32px; }
 .sb-ct-submit { grid-column: 1 / -1; justify-self: start; }
 @media (max-width: 640px) {
   .sb-ct-submit { justify-self: stretch; }

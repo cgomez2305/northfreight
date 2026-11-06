@@ -16,7 +16,7 @@ partial('hero', [
     'cls'     => 'cr-hero',
     'h1'      => 'Truck driver jobs & owner operator {hl}partnerships{/hl}',
     'tagline' => 'For owner-operators this is a dispatch partnership, not a job offer.',
-    'lead'    => 'If you run your own truck, the NorthStar desk works as your independent truck dispatcher and you approve every load. Looking for a company driving job? Real openings are listed here when they exist.',
+    'lead'    => 'If you run your own truck, the NorthStar desk works as your dispatch desk and you approve every load. Looking for a company driving job? Real openings are listed here when they exist.',
     'ctas'    => [
         ['label' => 'Apply as an owner-operator', 'href' => $apply, 'arrow' => true],
         ['label' => 'How the partnership works', 'href' => url('/careers/owner-operators/'), 'variant' => 'ghost', 'arrow' => true],
@@ -73,7 +73,7 @@ $driverCard = $jobs
         'title' => $w[0], 'text' => $w[1],
         'href'  => wa("Hi, I'd like to know more about " . strtolower($w[0]) . ' with NorthStar.'),
         'label' => 'Ask the desk about ' . strtolower($w[0]) . ' on WhatsApp',
-    ], $why), 'cta' => ['title' => 'Talk to the desk', 'text' => 'No forms first. Open WhatsApp with a ready message and a dispatcher replies.', 'href' => wa($route['wa']), 'label' => 'Talk to a dispatcher on WhatsApp']]); ?>
+    ], $why), 'cta' => ['title' => 'Talk to the desk', 'text' => 'No forms first. Open WhatsApp with a ready message to send to a dispatcher.', 'href' => wa($route['wa']), 'label' => 'Talk to a dispatcher on WhatsApp']]); ?>
   </div>
 </section>
 

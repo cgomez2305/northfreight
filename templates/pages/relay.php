@@ -56,7 +56,7 @@ partial('summary', [
     'flip'  => true,
     'eyebrow' => 'Why it matters',
     'title' => 'Why Relay needs a dedicated desk',
-    'lead'  => 'Relay moves fast: good blocks go in minutes and a weak scorecard limits what you can book. A desk that watches the board and fixes issues early keeps your trucks earning.',
+    'lead'  => 'Relay moves fast: good blocks can go quickly and a weak scorecard limits what you can book. A desk that watches the board and fixes issues early keeps your trucks earning.',
     'image' => ['base' => 'nf-setup-amazon-relay', 'alt' => 'White semi truck at a warehouse dock wall at night under tall floodlights', 'pos' => '30% 55%'],
 ]); ?>
 

@@ -19,21 +19,21 @@ $related = [
     ['code' => 'TEMPLATE', 'title' => 'Dispatcher-carrier agreement', 'text' => 'What a fair contract covers.', 'href' => '/resources/dispatcher-carrier-agreement/'],
     ['code' => 'SERVICE', 'title' => 'Dispatch for owner-operators', 'text' => 'Let the desk run your loads.', 'href' => '/dispatch-for-owner-operators/', 'dark' => true],
 ];
-$pricing = ph('NorthStar pricing model: percentage, flat fee or plan details to be confirmed by the client.');
+$pricing = ph('NorthStar pricing model: percentage, flat fee or plan details to be confirmed by the client.');   // vacío en producción: el texto de respaldo no afirma ningún modelo ni cifra
 ?>
 <h2 class="t-prose-h2" id="models">The three ways dispatchers charge</h2>
-<p><strong>Percentage of the gross.</strong> The dispatcher takes a share of what each load pays. It is the most common model for owner-operators because the fee moves with your revenue: a slow week costs less. Rates for this model are commonly quoted somewhere between 5% and 10%, depending on what is included.</p>
+<p><strong>Percentage of the gross.</strong> The dispatcher takes a share of what each load pays. It is the most common model for owner-operators because the fee moves with your revenue: a slow week costs less. What the percentage is calculated on, and what it includes, changes from one service to another.</p>
 <p><strong>Flat weekly fee.</strong> A fixed amount per truck per week, whatever you haul. It is easy to budget, but you pay the same in a week with two short loads as in a week with five long ones.</p>
 <p><strong>Per-load fee.</strong> A fixed amount for every load booked. Simple, but it can push a dispatcher toward many short loads instead of the best-paying lanes.</p>
 
 <h2 class="t-prose-h2" id="math">What the math looks like</h2>
-<p>Use the same numbers to compare offers. A worked example with a percentage model:</p>
+<p>Ask every service for its terms in the same format so you can compare them. This is how each model turns into a fee:</p>
 <div class="blog-stats">
-  <p class="blog-stat"><span class="mono blog-stat__k">LOAD GROSS</span><span class="head blog-stat__v">$2,500</span></p>
-  <p class="blog-stat"><span class="mono blog-stat__k">8% FEE</span><span class="head blog-stat__v blog-stat__v--hl">$200</span></p>
-  <p class="blog-stat"><span class="mono blog-stat__k">4 LOADS / WEEK</span><span class="head blog-stat__v">$800</span></p>
+  <p class="blog-stat"><span class="mono blog-stat__k">PERCENTAGE MODEL</span><span class="head blog-stat__v">Gross × %</span></p>
+  <p class="blog-stat"><span class="mono blog-stat__k">WEEKLY MODEL</span><span class="head blog-stat__v blog-stat__v--hl">Same every week</span></p>
+  <p class="blog-stat"><span class="mono blog-stat__k">PER-LOAD MODEL</span><span class="head blog-stat__v">Same on every load</span></p>
 </div>
-<p>Then put that fee next to what the dispatcher actually does for you: hours of load-board searching, broker calls, rate negotiation, check calls and paperwork. Our <a href="<?= e(url('/resources/rate-per-mile-calculator/')) ?>">rate per mile calculator</a> helps you see what each load leaves after fuel and fees.</p>
+<p>Then put that fee next to what the dispatcher actually does for you: hours of load-board searching, broker calls, rate negotiation, check calls and paperwork. Run your own numbers for a typical week under each model, and use our <a href="<?= e(url('/resources/rate-per-mile-calculator/')) ?>">rate per mile calculator</a> to see what each load leaves after fuel and fees.</p>
 <?php partial('minicalc', ['id' => 'cost-rpm', 'title' => 'Try it: what does your load pay per mile?']); ?>
 <?php $callout(); ?>
 
@@ -55,8 +55,8 @@ $pricing = ph('NorthStar pricing model: percentage, flat fee or plan details to 
   <li><strong>Fees on everything.</strong> Check whether the percentage applies to line haul only or to the full gross.</li>
   <li><strong>Long contracts and exit penalties.</strong> Good service keeps clients without lock-ins.</li>
 </ul>
-<p>Our free <a href="<?= e(url('/resources/dispatcher-carrier-agreement/')) ?>">dispatcher-carrier agreement template</a> shows what a fair contract covers.</p>
+<?php if (route_is_live('/resources/dispatcher-carrier-agreement/')): ?><p>Our free <a href="<?= e(url('/resources/dispatcher-carrier-agreement/')) ?>">dispatcher-carrier agreement template</a> shows what a fair contract covers.</p><?php endif; ?>
 
 <h2 class="t-prose-h2" id="northstar">How NorthStar charges</h2>
-<?php if ($pricing !== ''): ?><p><?= $pricing ?></p><?php endif; ?>
-<p>Whatever the model, the fee covers booking, tracking and documenting every load, with updates on WhatsApp. <a href="<?= e(url('/how-it-works/')) ?>">See how truck dispatching works with us</a>, or explore our <a href="<?= e(url('/dispatch-for-owner-operators/')) ?>">dispatch services for owner-operators</a> and the rest of our <a href="<?= e(url('/')) ?>">truck dispatch services</a>.</p>
+<?php if ($pricing !== ''): ?><p><?= $pricing ?></p><?php else: ?><p>The fee model is something to agree on before you start. To see how NorthStar works, <a href="<?= e(wa('owner')) ?>" rel="noopener">message the desk on WhatsApp</a> and ask.</p><?php endif; ?>
+<p><a href="<?= e(url('/how-it-works/')) ?>">See how truck dispatching works with us</a>, or explore our <a href="<?= e(url('/dispatch-for-owner-operators/')) ?>">dispatch services for owner-operators</a> and the rest of our <a href="<?= e(url('/')) ?>">truck dispatch services</a>.</p>

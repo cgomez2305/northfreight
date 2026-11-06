@@ -207,6 +207,18 @@ function ns_hero_video(string $name = 'hero'): array
     return $out;
 }
 
+/** URL del video del equipo (DESK_VIDEO_URL de config.local.php) o ''. */
+function ns_video_src(): string
+{
+    return defined('DESK_VIDEO_URL') ? trim((string) DESK_VIDEO_URL) : '';
+}
+
+/** true si la fachada del video puede mostrarse: hay video real, o estamos en staging (revisión de diseño). En producción sin video se omiten fachada, play, duración y capítulos. */
+function ns_video_ready(): bool
+{
+    return ns_video_src() !== '' || !is_production();
+}
+
 /** Lockup del logo (§5.6). $variant: 'dark' (sobre navy, por defecto). */
 function ns_logo(string $class = 'logo'): string
 {
@@ -226,7 +238,7 @@ function ns_menu(): array
         'dispatch' => [
             ['Dispatch for owner-operators', 'Loads booked, brokers handled, you approve every load', '/dispatch-for-owner-operators/', 'star', null],
             ['Amazon Relay dispatch', 'Load board, trips, scorecard and disputes', '/amazon-relay-dispatch/', 'star', null],
-            ['Dry van dispatch', 'Steady freight booked and followed by one desk', '/dry-van-dispatch/', 'star', null],
+            ['Dry van dispatch', 'Dry van freight booked and followed by one desk', '/dry-van-dispatch/', 'star', null],
         ],
         'ops' => [
             ['Load tracking & check calls', 'Pickup to POD, every load logged', '/load-tracking/', 'star', 'Load tracking'],
@@ -298,6 +310,35 @@ function ns_thumb(string $path, array $exclude = [], array $alt = []): ?array
         $found = $alt[$path] ?? null;
     }
     return $found;
+}
+
+/**
+ * "Related reading": filas-tarjeta (partial row-card) con enlaces internos contextuales, sin H2 nuevo (la sección lleva aria-label). Solo imprime las rutas live.
+ * $items: [['path' => '/blog/…/', 'title' => '…', 'text' => '…', 'chips' => ['Article']], …]. La foto sale de ns_thumb() sin repetirse dentro del bloque.
+ */
+function ns_read_next(array $items, string $label = 'Related reading'): void
+{
+    $items = array_values(array_filter($items, static fn(array $i): bool => route_is_live((string) $i['path'])));
+    if (!$items) {
+        return;
+    }
+    echo '<section class="section" aria-label="' . e($label) . '"><div class="container"><div class="rlist">';
+    $used = [];
+    foreach ($items as $i) {
+        $t = ns_thumb((string) $i['path'], $used);
+        if ($t) {
+            $used[] = $t[0];
+        }
+        partial('row-card', [
+            'href'  => url((string) $i['path']),
+            'title' => (string) $i['title'],
+            'text'  => (string) ($i['text'] ?? ''),
+            'chips' => (array) ($i['chips'] ?? []),
+            'dark'  => !empty($i['dark']),
+            'image' => $t ? ['base' => $t[0], 'alt' => $t[1]] : null,
+        ]);
+    }
+    echo '</div></div></section>';
 }
 
 /** Lista de comprobación con checks circulares cian (panel con foto, patrón B). $items: textos ya afirmados en el sitio. */

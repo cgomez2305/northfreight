@@ -30,7 +30,7 @@ partial('hero', [
     'cls'     => 'sa-hero--lead560',
     'h1'      => 'Dispatch services for {hl}owner-operators{/hl}',
     'tagline' => 'You drive. We run the desk.',
-    'lead'    => 'NorthStar works as your independent truck dispatcher: we find and book the loads, deal with brokers, track every trip and keep the paperwork that gets you paid.',
+    'lead'    => 'NorthStar works as your dispatch desk: we find and book the loads, deal with brokers, track every trip and keep the paperwork that gets you paid.',
     'ctas'    => [
         ['label' => 'Talk to a dispatcher', 'href' => wa($route['wa']), 'wa' => true, 'arrow' => true],
         ['label' => 'How we onboard', 'href' => url('/how-it-works/'), 'variant' => 'ghost'],
@@ -40,7 +40,7 @@ partial('hero', [
 
 // Resumen "In short" (SEO/GEO): editable aquí. Solo información que ya está en el copy de esta página; sin cifras, tarifas ni promesas nuevas.
 partial('summary', [
-    'text'   => 'Dispatch services for owner-operators put an independent truck dispatcher behind your truck: the desk finds and books your loads, deals with brokers, tracks every trip and keeps the paperwork that gets you paid. NorthStar runs that desk for you.',
+    'text'   => 'Dispatch services for owner-operators put a dispatch desk behind your truck: the desk finds and books your loads, deals with brokers, tracks every trip and keeps the paperwork that gets you paid. NorthStar runs that desk for you.',
     'points' => [
         'You approve every load',
         'Updates on WhatsApp, where you already work',
@@ -52,7 +52,7 @@ partial('summary', [
   <div class="container stack">
     <?php partial('section-head', ['id' => 'owner-gets', 'eyebrow' => 'What you get', 'title' => 'One dispatch desk behind your truck']); ?>
     <?php partial('numgrid', ['items' => $getItems, 'label' => 'What you get',
-        'cta' => ['title' => 'Talk to the desk', 'text' => 'No forms first. Open WhatsApp with a ready message and a dispatcher replies.', 'href' => wa($route['wa']), 'label' => 'Talk to a dispatcher on WhatsApp']]); ?>
+        'cta' => ['title' => 'Talk to the desk', 'text' => 'No forms first. Open WhatsApp with a ready message to send to a dispatcher.', 'href' => wa($route['wa']), 'label' => 'Talk to a dispatcher on WhatsApp']]); ?>
   </div>
 </section>
 
@@ -60,7 +60,7 @@ partial('summary', [
     'id'      => 'owner-control',
     'eyebrow' => 'Why owner-operators work with us',
     'title'   => 'You stay in control.',
-    'lead'    => 'You approve every load. We tell you what we booked and why, and you can reach the desk on WhatsApp at any time.',
+    'lead'    => 'You approve every load. We tell you what we booked and why, and you can message the desk on WhatsApp.',
     'image'   => ['base' => 'nf-check-owner-approve', 'alt' => 'A hand holding a phone with a check mark on the screen inside a truck cab at dusk', 'pos' => '60% 100%'],
     'extra'   => ns_checks($control, 'What staying in control means'),
 ]); ?>
@@ -72,7 +72,7 @@ partial('summary', [
     'label'   => 'Choose your setup',
     'items'   => [
         ['label' => 'Small fleet', 'title' => 'Small fleet', 'wa' => "Hi, I run a small fleet and I'd like to talk about dispatch with NorthStar.",
-         'points' => ['A team, not a single dispatcher', 'New drivers set up and ready to roll on day one', 'Who approves loads, how we report and which tasks the desk owns'],
+         'points' => ['A team, not a single dispatcher', 'New drivers set up in your accounts', 'Who approves loads, how we report and which tasks the desk owns'],
          'image' => ['base' => 'nf-setup-small-fleet', 'alt' => 'Several white semi trucks parked in a row in a depot lot at dusk', 'pos' => '50% 70%'],
          'link' => ['label' => 'See how we onboard', 'href' => url('/how-it-works/')]],
         ['label' => 'Amazon Relay carrier', 'title' => 'Amazon Relay carrier', 'wa' => 'relay',
@@ -90,5 +90,10 @@ partial('summary', [
   </div>
 </section>
 <?php endif; ?>
+
+<?php ns_read_next([
+    ['path' => '/blog/how-much-does-truck-dispatch-cost/', 'title' => 'How much does truck dispatch service cost?', 'text' => 'The ways dispatchers charge and the red flags to check before you sign.', 'chips' => ['Article']],
+    ['path' => '/blog/lumper-fees-detention-pay/', 'title' => 'Lumper fees and detention pay', 'text' => 'How to document both and actually get paid.', 'chips' => ['Article']],
+]); ?>
 
 <?php partial('faq', ['items' => route_faq_items($route), 'title' => 'Owner-operator dispatch questions', 'pre_cta' => true]); ?>

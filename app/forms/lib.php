@@ -8,7 +8,7 @@
  *  - csrf_token()      token sin sesion "ts.hmac" (HMAC-SHA256, valido 2 h). Clave: APP_SECRET o storage/app.key.
  *  - ns_form_guard()   honeypot, CSRF, tiempo minimo, limite por IP.
  *  - ns_clean()        saneado UTF-8 / sin CRLF.
- *  - ns_send_mail()    PHPMailer por SMTP; sin credenciales -> storage/mail.log (comportamiento "exito").
+ *  - ns_send_mail()    PHPMailer por SMTP; sin credenciales: staging -> storage/mail.log como exito; produccion -> mail.log y false.
  *  - ns_render_page()  re-render de la misma pagina con $flash (el closure de render_route() no ve variables globales).
  *
  * Todo lo que se escribe va a storage/ (denegado por web): app.key, ratelimit/, *.log.
@@ -327,7 +327,7 @@ function ns_general_field(string $form): string
 {
     return match ($form) {
         'download' => 'format',
-        'lead'     => 'form',
+        'lead', 'contact' => 'form',
         default    => 'message',
     };
 }
@@ -380,9 +380,11 @@ function ns_render_page(array $route, ?array $flash = null, int $status = 200): 
         return (string) ob_get_clean();
     })($page, $route, $cfg, $flash);
 
+    ob_start();
     (static function (array $route, array $cfg, string $content, array $flash): void {
         include NS_ROOT . '/templates/layout.php';
     })($route, $cfg, $content, $flash);
+    ns_send_html((string) ob_get_clean());
     exit;
 }
 
@@ -411,7 +413,7 @@ function ns_mail_log_block(string $status, string $subject, string $body): strin
 
 /**
  * Envia un correo de texto plano al destino del sitio.
- *   Sin SMTP configurado: lo escribe completo en storage/mail.log y devuelve true (se comporta como exito).
+ *   Sin SMTP configurado: staging => lo escribe completo en storage/mail.log y devuelve true (como exito); produccion => lo escribe en mail.log y devuelve false (el formulario no finge exito).
  *   Con SMTP: PHPMailer; si falla registra el error (sin credenciales) y el mensaje en mail.log; devuelve false.
  * $replyTo = [email, nombre] opcional (email ya validado con filter_var).
  */
@@ -419,6 +421,12 @@ function ns_send_mail(string $subject, string $body, ?array $replyTo = null): bo
 {
     $subject = ns_clean($subject, 200);
     if (!ns_smtp_configured()) {
+        if (function_exists('is_production') && is_production()) {
+            // Produccion sin SMTP valido: NO se simula exito. El mensaje se conserva en mail.log y el visitante recibe la alternativa (WhatsApp / correo).
+            ns_log('mail', ns_mail_log_block('SMTP NOT CONFIGURED - not delivered', $subject, $body));
+            ns_log_error('mail-not-configured', 'ENV=production sin SMTP_USER/SMTP_PASS validos; mensaje guardado en storage/mail.log');
+            return false;
+        }
         ns_log('mail', ns_mail_log_block('SMTP not configured - logged only', $subject, $body));
         return true;
     }
@@ -456,6 +464,25 @@ function ns_send_mail(string $subject, string $body, ?array $replyTo = null): bo
         ns_log('mail', ns_mail_log_block('SEND FAILED - not delivered', $subject, $body));
         return false;
     }
+}
+
+/**
+ * Clasifica un dato de contacto de respuesta: 'email' (FILTER_VALIDATE_EMAIL), 'phone' (solo digitos y + ( ) . - espacios, de 7 a 15 digitos) o null si no vale.
+ */
+function ns_contact_kind(string $v): ?string
+{
+    $v = trim($v);
+    if ($v === '') {
+        return null;
+    }
+    if (str_contains($v, '@')) {
+        return filter_var($v, FILTER_VALIDATE_EMAIL) ? 'email' : null;
+    }
+    if (preg_match('/^\+?[0-9()\s.\-]{7,30}$/', $v) !== 1) {
+        return null;
+    }
+    $digits = strlen((string) preg_replace('/\D/', '', $v));
+    return ($digits >= 7 && $digits <= 15) ? 'phone' : null;
 }
 
 /** Texto comun al pie de los correos: huella de IP, user agent y fecha UTC. */

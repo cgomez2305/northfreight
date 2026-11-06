@@ -20,7 +20,7 @@ $sizes = $image['sizes'] ?? '(min-width:1025px) 1152px, (min-width:641px) 100vw,
 <section class="section pcard<?= !empty($cls) ? ' ' . e($cls) : '' ?>"<?= !empty($id) ? ' aria-labelledby="' . e($id) . '"' : '' ?>>
   <div class="container">
     <div class="pcard__in<?= !empty($flip) ? ' pcard--flip' : '' ?>">
-      <?php if ($video): partial('video', ['part' => 'player', 'id' => $video['id'], 'image' => ['base' => $image['base'], 'alt' => $image['alt'] ?? ''], 'title' => $video['title'], 'meta' => $video['meta'] ?? '', 'cls' => 'pcard__photo', 'sizes' => $sizes, 'pos' => $image['pos'] ?? '']);
+      <?php if ($video): partial('video', ['part' => 'player', 'id' => $video['id'], 'image' => ['base' => $image['base'], 'alt' => $image['alt'] ?? ''], 'title' => $video['title'], 'meta' => $video['meta'] ?? '', 'cls' => 'pcard__photo', 'src' => $video['src'] ?? ns_video_src(), 'sizes' => $sizes, 'pos' => $image['pos'] ?? '']);
       else: ?>
       <figure class="pcard__photo px"<?= !empty($image['pos']) ? ' style="--pos:' . e($image['pos']) . '"' : '' ?>>
         <?= ns_img(['base' => (string) $image['base'], 'alt' => (string) ($image['alt'] ?? ''), 'sizes' => $sizes]) ?>

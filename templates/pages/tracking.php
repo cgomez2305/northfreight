@@ -68,3 +68,8 @@ partial('summary', [
     'extra'   => ns_checks(['Rate confirmation filed with the load', 'Evidence on file for detention and disputes', 'Updates on WhatsApp, where you already work', 'A record of every load'], 'What the desk keeps on file'),
     'link'    => route_is_live('/trucking-back-office/') ? ['label' => 'How our back office uses this evidence', 'href' => url('/trucking-back-office/')] : null,
 ]); ?>
+
+<?php ns_read_next([
+    ['path' => '/how-it-works/', 'title' => 'How truck dispatching works with NorthStar', 'text' => 'Where load tracking fits in a load, stage by stage.', 'chips' => ['How it works']],
+    ['path' => '/blog/lumper-fees-detention-pay/', 'title' => 'Lumper fees and detention pay', 'text' => 'How to document both and actually get paid.', 'chips' => ['Article']],
+]); ?>

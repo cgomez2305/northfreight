@@ -43,7 +43,7 @@ a.btn--primary:is(:hover, :focus-visible)::after, a.btn--navy:is(:hover, :focus-
 @media (max-width: 640px) { .btn--block-m, .hero__ctas .btn { width: 100%; } }
 
 /* ---- Logo ---- */
-.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; flex: none; color: var(--text); }
+.logo { display: flex; align-items: center; min-height: 44px; gap: 10px; text-decoration: none; flex: none; color: var(--text); }
 .logo:hover { color: var(--text); }
 .logo__mark { width: 40px; height: 40px; display: block; flex: none; transform: translateY(-5%); }
 .logo__text { display: flex; flex-direction: column; gap: 3px; }
@@ -190,7 +190,7 @@ a.btn--primary:is(:hover, :focus-visible)::after, a.btn--navy:is(:hover, :focus-
 /* ---- Migas ---- */
 .crumbs ol { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; color: var(--text-3); }
 .crumbs li { display: inline-flex; gap: 10px; align-items: center; }
-.crumbs a { color: var(--text-3); text-decoration: none; display: inline-flex; align-items: center; min-height: 44px; margin-block: -14.5px; }
+.crumbs a { color: var(--text-3); text-decoration: none; display: inline-flex; align-items: center; justify-content: center; min-height: 44px; min-inline-size: 44px; margin-block: -14.5px; }
 .crumbs a:hover { color: var(--cyan-light); }
 .crumbs [aria-current] { color: var(--cyan-light); }
 
@@ -395,6 +395,7 @@ nav.footer__col .foot__link { font-family: var(--font-mono); font-size: 12px; te
 .footer__legal { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; }
 @media (min-width: 761px) { .footer__bar { padding-right: max(var(--gutter), 76px); } }   /* deja libre el botón flotante de WhatsApp */
 @media (pointer: coarse) { .foot__link { display: inline-flex; align-items: center; min-height: 44px; } .footer__col { gap: 0; } }
+.footer__bar .foot__link { display: inline-flex; align-items: center; min-height: 44px; min-inline-size: 44px; }
 @media (max-width: 760px) { .footer { margin-bottom: 96px; } }
 /* Wordmark gigante (decorativo): NORTHSTAR en Barlow Condensed 900, STAR en cian, recortado por abajo por el borde del panel. Su tamaño va en cqw del propio contenedor (el ancho del contenido): llena el ancho de 360 a 1920 sin desbordar. */
 .footer__mark { max-width: var(--wrap); margin: 0 auto; padding: clamp(8px, 1.6vw, 24px) var(--gutter) 0; pointer-events: none; user-select: none; }
@@ -448,7 +449,7 @@ body:has(.mobile-menu:not([hidden])) .wa-float, body.menu-open .wa-float { displ
 .log__row--on .log__time { color: var(--cyan); font-weight: 500; }
 .log__row--on .log__text { font-weight: 600; color: var(--text); }
 .log__row--on::before { content: ""; position: absolute; left: calc(-1 * var(--log-pad) - 4px); top: 6px; width: 7px; height: 7px; border-radius: 50%; background: var(--cyan); }
-.input { width: 100%; min-height: 52px; padding: 12px 18px; border: 1px solid var(--hairline-strong); border-radius: var(--r-tile); background: var(--bg); font-family: var(--font-body); font-size: 16px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--text); transition: border-color var(--t-fast); }
+.input { width: 100%; min-height: 52px; padding: 12px 18px; border: 1px solid var(--field-line); border-radius: var(--r-tile); background: var(--bg); font-family: var(--font-body); font-size: 16px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--text); transition: border-color var(--t-fast); }
 .input::placeholder { color: var(--text-3); }
 .input:hover { border-color: var(--text-3); }
 .input:focus { outline: 2px solid transparent; border-color: var(--cyan); box-shadow: 0 0 0 1px var(--cyan); }

@@ -16,9 +16,9 @@ $template = (string) ($route['template'] ?? '');
 $title = (string) ($route['title'] ?? cfg('brand'));
 $desc = (string) ($route['meta'] ?? '');
 
-// Imagen OG: la de la ruta/plantilla si existe; si no, assets/img/og-default.jpg
-$ogOwn = isset($route['og']) || is_file(NS_ROOT . '/assets/img/og/' . $template . '.jpg');
-$ogImage = $ogOwn ? og_image($route) : 'https://' . cfg('domain') . asset('img/og-default.jpg');
+// Imagen OG: la de la ruta, la del artículo (og/post-<slug>.jpg), la de la plantilla o assets/img/og-default.jpg (ver og_image() en helpers.php)
+$ogImage = og_image($route);
+$ogAlt = og_image_alt($route);
 
 // CSS: núcleo común (fuentes, tokens, base, components) + el grupo de página de la plantilla (assets/css/pages/<grupo>.css) + motion.css si la ruta carga GSAP.
 // La lista (y el mapa plantilla => grupo, anulable por ruta con 'css' => ['grupo', …]) vive en app/assets.php. Si el build (bin/build-assets.php) dejó un
@@ -62,10 +62,13 @@ $jsList = array_values(array_filter($jsList, static fn($j): bool => is_string($j
 <meta property="og:image" content="<?= e($ogImage) ?>">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="<?= e($ogAlt) ?>">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="<?= e($title) ?>">
 <meta name="twitter:description" content="<?= e($desc) ?>">
 <meta name="twitter:image" content="<?= e($ogImage) ?>">
+<meta name="twitter:image:alt" content="<?= e($ogAlt) ?>">
+<link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" href="<?= e(asset('img/favicon.svg')) ?>" type="image/svg+xml">
 <link rel="icon" href="<?= e(asset('img/favicon.png')) ?>" type="image/png" sizes="180x180">
 <link rel="apple-touch-icon" href="<?= e(asset('img/favicon.png')) ?>">
@@ -88,7 +91,7 @@ $jsList = array_values(array_filter($jsList, static fn($j): bool => is_string($j
 <?php partial('mobile-menu', ['wa' => $wa]); ?>
 </header>
 </div>
-<main id="main"<?= $ctaOn ? ' class="has-cta"' : '' ?>>
+<main id="main" tabindex="-1"<?= $ctaOn ? ' class="has-cta"' : '' ?>>
 <?= $content ?>
 </main>
 <?php if ($ctaOn): $ctaBase = array_key_exists('cta_image', $route) ? $route['cta_image'] : CTA_IMAGE; partial('cta', ['wa' => $wa, 'image' => $ctaBase ? ['base' => (string) $ctaBase, 'alt' => ''] : null]); endif; ?>

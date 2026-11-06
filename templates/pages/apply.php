@@ -59,7 +59,7 @@ partial('hero', [
     'route' => $route,
     'cls'   => 'cr-hero cr-hero--apply',
     'h1'    => 'Start your {hl}application{/hl}',
-    'lead'  => 'Four short steps, no phone call first. Prefer to talk? Open WhatsApp and a dispatcher replies.',
+    'lead'  => 'Four short steps, no phone call first. Prefer to talk? Open WhatsApp and message a dispatcher.',
     'ctas'  => [['label' => 'Message the desk on WhatsApp', 'href' => wa($route['wa']), 'variant' => 'ghost', 'wa' => true, 'arrow' => true]],
     'stack' => true,
 ]);
