@@ -42,10 +42,10 @@
 .ev{display:flex;align-items:center;gap:6px;min-width:0;min-height:24px;padding:2px 7px;border-radius:7px;background:var(--ev-bg);color:var(--ev-ink);font-size:12.5px;font-weight:500;line-height:1.2;text-decoration:none!important;border-left:3px solid var(--ev-dot)}
 .ev:hover{filter:brightness(.97)}
 :root[data-theme="dark"] .ev:hover{filter:brightness(1.12)}
-.ev__t{font-size:11px;flex:none;opacity:.9}
+.ev__t{font-size:11px;flex:none}
 .ev__n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .ev.is-late{--ev-bg:var(--bad-bg);--ev-ink:var(--bad);--ev-dot:var(--bad-dot)}
-.ev.is-done{opacity:.7}
+.ev.is-done,.evc.is-done{--ev-bg:var(--sunk);--ev-ink:var(--ink-2);--ev-dot:var(--ink-3)}
 .ev.is-done .ev__n{text-decoration:line-through}
 .ev[data-task]{cursor:grab}
 .ev.is-drag,.evc.is-drag{opacity:.45}
@@ -64,7 +64,6 @@
 .cal__c{display:flex;flex-direction:column;gap:6px}
 .evc{position:relative;display:flex;align-items:flex-start;gap:8px;padding:8px 8px 8px 10px;background:var(--ev-bg);border-radius:10px;border-left:3px solid var(--ev-dot);color:var(--ev-ink);min-width:0}
 .evc.is-late{--ev-bg:var(--bad-bg);--ev-ink:var(--bad);--ev-dot:var(--bad-dot)}
-.evc.is-done{opacity:.75}
 .evc[data-task],.evc .evc__m[data-task]{cursor:grab}
 .evc__ic{flex:none;width:26px;height:26px;display:grid;place-items:center}
 .evc__ic .ic{width:16px;height:16px}
@@ -72,9 +71,9 @@
 .evc__m{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;color:inherit!important;text-decoration:none!important}
 .evc__h{display:flex;gap:8px;align-items:baseline;font-size:11.5px}
 .evc__h time{font-weight:600}
-.evc__k{font-family:var(--f-mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase;opacity:.9}
+.evc__k{font-family:var(--f-mono);font-size:10px;letter-spacing:.07em;text-transform:uppercase}
 .evc__t{font-size:14px;color:var(--ink);font-weight:600;overflow-wrap:anywhere}
-.evc__m small{color:var(--ink-2);font-size:12.5px;overflow-wrap:anywhere}
+.evc__m small{color:var(--ink);font-size:12.5px;overflow-wrap:anywhere}
 .evm{position:relative;flex:none}
 .evm>summary{list-style:none;cursor:pointer;color:var(--ink-2)}
 .evm>summary::-webkit-details-marker{display:none}

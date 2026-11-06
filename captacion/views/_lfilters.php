@@ -33,7 +33,7 @@ $chipLabels = [
   <label class="field"><span>Desde (<?= $e(Fmt::zone()) ?>)</span><input type="date" name="from" value="<?= $e($f['from'] ?? '') ?>"></label>
   <label class="field"><span>Hasta (<?= $e(Fmt::zone()) ?>)</span><input type="date" name="to" value="<?= $e($f['to'] ?? '') ?>"></label>
   <label class="check check--f"><input type="checkbox" name="ct" value="none"<?= isset($f['ct']) ? ' checked' : '' ?>><span>Solo sin contactar</span></label>
-  <div class="filters__a"><button class="btn btn--primary btn--sm" type="submit"><span class="btn__t">Aplicar</span></button><?php if ($nFilters > 0 || isset($f['t'])): ?><a class="btn btn--ghost btn--sm" href="<?= $e($fa['path'] . Ui::qs($keep)) ?>">Limpiar</a><?php endif; ?></div>
+  <div class="filters__a"><button class="btn btn--primary btn--sm" type="submit"><span class="btn__t">Aplicar</span></button><?php if ($nFilters > 0 || isset($f['t'])): ?><a class="btn btn--ghost btn--sm" href="<?= $e($fa['path'] . Ui::qs($keep)) ?>">Quitar filtros</a><?php endif; ?></div>
 </form>
 
 <?php if ($nFilters > 0): ?>

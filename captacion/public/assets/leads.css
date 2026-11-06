@@ -5,11 +5,6 @@
 .score--warm{background:var(--warm-bg);color:var(--warm)}
 .score--cold{background:var(--cold-bg);color:var(--cold)}
 .score--dq{background:var(--dq-bg);color:var(--dq)}
-.empty--sm{padding:24px 8px}
-.empty--lg{padding:56px 24px 48px}
-.empty__star{width:30px;height:30px;color:var(--cyan)}
-.empty__star--lg{width:46px;height:46px}
-.empty--sm h3{font-size:20px}
 .who{display:flex;align-items:center;gap:11px;color:var(--ink)!important;min-width:0}
 .who>span:not(.av){display:flex;flex-direction:column;min-width:0}
 .who b,.tbl--dash .who>span:not(.av){font-weight:600}

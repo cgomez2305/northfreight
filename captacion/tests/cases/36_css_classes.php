@@ -14,6 +14,7 @@ use CaptacionTests\T;
  */
 return static function (array $ctx): void {
     T::reset(true);
+    Db::pdo()->exec('DELETE FROM channel_costs');   // otros bloques dejan costos: aquí la base tiene que estar de verdad vacía
     $assets = $ctx['root'] . '/public/assets/';
     $css = static fn(string $f): string => (string) @file_get_contents($assets . $f . '.css');
     $defs = static function (array $sheets) use ($css): array {

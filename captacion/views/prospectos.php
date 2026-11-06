@@ -93,14 +93,14 @@ $cronAt = is_array($cron) ? ($cron['at'] ?? null) : null;
   <label class="field"><span>Estado (EE. UU.)</span><select name="us"><option value="">Todos</option><?php foreach (UsStates::NAMES as $k => $l): ?><option value="<?= $e($k) ?>"<?= $f['us'] === $k ? ' selected' : '' ?>><?= $e($k) ?> · <?= $e($l) ?></option><?php endforeach; ?></select></label>
   <label class="field"><span>Flota</span><select name="fl"><option value="">Cualquiera</option><?php foreach (Prospects::FLEETS as $k => $l): ?><option value="<?= $e($k) ?>"<?= $f['fl'] === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
   <label class="field"><span>Autoridad</span><select name="ag"><option value="">Cualquier antigüedad</option><?php foreach (Prospects::AGES as $k => $l): ?><option value="<?= $e($k) ?>"<?= $f['ag'] === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
-  <div class="filters__a"><button class="btn btn--primary btn--sm" type="submit"><span class="btn__t">Aplicar</span></button><?php if ($nFilters > 0): ?><a class="btn btn--ghost btn--sm" href="<?= $e($tabHref($f['tab'])) ?>">Limpiar</a><?php endif; ?></div>
+  <div class="filters__a"><button class="btn btn--primary btn--sm" type="submit"><span class="btn__t">Aplicar</span></button><?php if ($nFilters > 0): ?><a class="btn btn--ghost btn--sm" href="<?= $e($tabHref($f['tab'])) ?>">Quitar filtros</a><?php endif; ?></div>
 </form>
 
 <?php if (!$rows): ?>
 <section class="card empty">
   <svg class="empty__star" aria-hidden="true"><use href="#i-star"/></svg>
   <?php if ($nFilters > 0): ?>
-    <h3>Ningún prospecto coincide con estos filtros</h3><p>Prueba quitando algún filtro o buscando por otro dato.</p><a class="btn btn--secondary" href="<?= $e($tabHref($f['tab'])) ?>">Quitar los filtros</a>
+    <h3>Ningún prospecto coincide con estos filtros</h3><p>Prueba quitando algún filtro o buscando por otro dato.</p><a class="btn btn--secondary" href="<?= $e($tabHref($f['tab'])) ?>">Quitar filtros</a>
   <?php elseif ($f['tab'] === 'today'): ?>
     <h3>La lista de hoy está vacía</h3><p>Ya atendiste a todos los que tocaban. Los reintentos vuelven a la lista en su fecha y mañana a las 6:00 a. m. (Nueva York) llegan prospectos nuevos.</p>
   <?php else: ?>

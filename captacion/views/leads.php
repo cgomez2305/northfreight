@@ -61,7 +61,7 @@ $isEmptyDb = $grandTotal === 0;
 <form method="post" action="/leads/bulk" class="card card--table" id="bulk" data-bulk>
   <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="back" value="/leads<?= $e($qsAll(['page' => $list['page'] > 1 ? $list['page'] : null])) ?>">
   <?php if (!$rows): ?>
-    <div class="empty"><svg class="empty__star" aria-hidden="true"><use href="#i-star"/></svg><h3>Ningún lead coincide con estos filtros</h3><p>Prueba quitando algún filtro o buscando por otro dato.</p><a class="btn btn--secondary" href="/leads">Quitar los filtros</a></div>
+    <div class="empty"><svg class="empty__star" aria-hidden="true"><use href="#i-star"/></svg><h3>Ningún lead coincide con estos filtros</h3><p>Prueba quitando algún filtro o buscando por otro dato.</p><a class="btn btn--secondary" href="/leads">Quitar filtros</a></div>
   <?php else: ?>
   <div class="tw">
     <table class="tbl tbl--leads" data-hide="<?= $e(implode(' ', array_values(array_diff(array_keys(\Captacion\Services\Prefs::COLUMNS), $cols)))) ?>" data-leads-table>

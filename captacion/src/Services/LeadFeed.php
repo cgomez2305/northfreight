@@ -81,7 +81,7 @@ final class LeadFeed
             return ['days' => [], 'count' => 0, 'next' => null];
         }
         $sql = "SELECT e.id, e.lead_id, e.type, e.payload, e.user_id, e.created_at, l.first_name, l.last_name, l.pipeline, l.stage, l.temperature
-                  FROM lead_events e JOIN leads l ON l.id = e.lead_id
+                  FROM lead_events e " . ($f === [] ? 'STRAIGHT_JOIN' : 'JOIN') . " leads l ON l.id = e.lead_id
                  WHERE $where AND e.type IN (" . implode(',', array_fill(0, count($names), '?')) . ')';
         $params = [...$params, ...$names];
         if ($leadId !== null) {

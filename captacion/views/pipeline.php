@@ -48,7 +48,7 @@ $filtered = count($f) > 0;
     </select></label>
   <label class="inp kq__q"><?= Ui::icon('search') ?><input type="search" name="q" value="<?= $e($f['q'] ?? '') ?>" placeholder="Buscar lead…" maxlength="100" aria-label="Buscar por nombre, teléfono, correo o USDOT"></label>
   <button class="btn btn--secondary btn--sm kq__go" type="submit">Filtrar</button>
-  <?php if ($filtered): ?><a class="btn btn--ghost btn--sm" href="/pipeline<?= $pl === 'B' ? '?pl=B' : '' ?>"><?= Ui::icon('x') ?>Limpiar</a><?php endif; ?>
+  <?php if ($filtered): ?><a class="btn btn--ghost btn--sm" href="/pipeline<?= $pl === 'B' ? '?pl=B' : '' ?>"><?= Ui::icon('x') ?>Quitar filtros</a><?php endif; ?>
 </form>
 <?php
 $chipLabels = [

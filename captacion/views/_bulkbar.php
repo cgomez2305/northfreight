@@ -13,6 +13,6 @@ use Captacion\Ui;
       <select id="bulk-reason" name="reason" data-bulk-reason hidden><option value="">Motivo…</option><?php foreach (Catalog::LOSS_REASONS as $k => $l): if ($k === 'other') { continue; } ?><option value="<?= $e($k) ?>"><?= $e($l) ?></option><?php endforeach; ?></select>
       <button class="btn btn--primary btn--sm" type="submit" name="do" value="stage"><span class="btn__t">Cambiar etapa</span></button>
       <button class="btn btn--secondary btn--sm" type="submit" name="do" value="export"<?= !empty($exportAction) ? ' formaction="' . $e($exportAction) . '"' : '' ?>><?= Ui::icon('download') ?>Exportar selección</button>
-      <button class="btn btn--ghost btn--sm" type="button" data-clear>Limpiar</button>
+      <button class="btn btn--ghost btn--sm" type="button" data-clear>Deseleccionar</button>
     </div>
   </div>

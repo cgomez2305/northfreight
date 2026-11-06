@@ -51,7 +51,7 @@ a:hover{text-decoration:underline}
 img,svg{display:block}
 button,input,select,textarea{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:6px}
-code{font:500 .86em var(--f-mono);background:var(--sunk);border:1px solid var(--line);border-radius:6px;padding:1px 5px}
+code{overflow-wrap:anywhere;font:500 .86em var(--f-mono);background:var(--sunk);border:1px solid var(--line);border-radius:6px;padding:1px 5px}
 .sprite{position:absolute;width:0;height:0}
 .sr{position:absolute!important;max-width:1px;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .skip{position:fixed;left:12px;top:-60px;z-index:100;background:var(--pop);color:var(--pop-ink);padding:10px 16px;border-radius:var(--r-pill)}
@@ -179,7 +179,7 @@ input[type=checkbox],input[type=radio]{accent-color:var(--navy-2)}
 .seg__i:hover{color:var(--ink)}
 .seg__i.is-on{background:var(--navy-2);color:var(--on-fill)}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);min-width:0}
-.card__h{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px 10px}
+.card__h{display:flex;align-items:center;justify-content:space-between;gap:8px 12px;flex-wrap:wrap;padding:16px 20px 10px}
 .card__h--row{flex-wrap:wrap}
 .card__b{padding:2px 20px 20px}
 .card__f{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 20px;border-top:1px solid var(--line)}
@@ -219,7 +219,7 @@ input[type=checkbox],input[type=radio]{accent-color:var(--navy-2)}
 .av-7{background:var(--av7);color:var(--av7i)}
 table.sr{display:block}
 .dd-na{font:500 13px var(--f-sans);color:var(--ink-3)}
-.tw{container-type:inline-size;overflow-x:auto}
+.tw{container-type:inline-size;overflow-x:auto;position:relative}
 .tbl{width:100%;border-collapse:collapse;font-size:14px}
 .tbl thead th{font:500 10.5px/1 var(--f-mono);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);text-align:left;padding:12px 10px;background:var(--sunk);border-top:1px solid var(--line);border-bottom:1px solid var(--line);white-space:nowrap}
 .tbl th:first-child,.tbl td:first-child{padding-left:20px}
@@ -363,4 +363,4 @@ html{scrollbar-width:thin;scrollbar-color:var(--line-2) transparent}
 .side__nav::-webkit-scrollbar-track{background:transparent}
 .side__nav::-webkit-scrollbar-thumb{background:transparent;border-radius:var(--r-pill)}
 .side__nav:hover::-webkit-scrollbar-thumb,.side__nav:focus-within::-webkit-scrollbar-thumb{background:var(--line-2)}
-.tw,.dd,.peek__body,dialog{scrollbar-width:thin;scrollbar-color:var(--line-2) transparent}
+.tw,.dd,.peek__body,dialog,textarea,.kb__scroll{scrollbar-width:thin;scrollbar-color:var(--line-2) transparent}

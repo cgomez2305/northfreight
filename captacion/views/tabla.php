@@ -95,7 +95,7 @@ $numCols = ['trucks' => 1, 'exp' => 1, 'pts' => 1];
   <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="back" value="/tabla<?= $e($qsAll(['page' => $list['page'] > 1 ? $list['page'] : null])) ?>">
   <input type="hidden" name="qs" value="<?= $e(ltrim($qsAll(), '?')) ?>">
   <?php if (!$rows): ?>
-    <div class="empty"><svg class="empty__star" aria-hidden="true"><use href="#i-star"/></svg><h3>Ningún lead coincide con estos filtros</h3><p>Prueba quitando algún filtro o buscando por otro dato.</p><a class="btn btn--secondary" href="/tabla">Quitar los filtros</a></div>
+    <div class="empty"><svg class="empty__star" aria-hidden="true"><use href="#i-star"/></svg><h3>Ningún lead coincide con estos filtros</h3><p>Prueba quitando algún filtro o buscando por otro dato.</p><a class="btn btn--secondary" href="/tabla">Quitar filtros</a></div>
   <?php else: ?>
   <div class="tw tw--tabla">
     <table class="tbl tbl--tabla" data-tabla>

@@ -2,6 +2,7 @@
 /* Q5a: reglas que estaban en panel.css y solo usa esta pantalla */
 .info{position:relative;display:inline-grid;place-items:center;width:24px;height:24px;border:0;background:none;color:var(--ink-3);cursor:help;border-radius:50%;padding:0}
 .info .ic{width:15px;height:15px}
+@media (max-width:760px){.info{width:44px;height:44px;margin:-10px}}
 .info:hover{color:var(--ink)}
 .info::after{content:attr(data-tip);position:absolute;right:-4px;top:calc(100% + 6px);width:230px;padding:9px 11px;background:var(--pop);color:var(--pop-ink);border-radius:10px;font:400 12.5px/1.4 var(--f-sans);text-align:left;opacity:0;visibility:hidden;transition:opacity .15s;z-index:20;pointer-events:none;box-shadow:var(--shadow-pop)}
 .info:hover::after,.info:focus-visible::after{opacity:1;visibility:visible}

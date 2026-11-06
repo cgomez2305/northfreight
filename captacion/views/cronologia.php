@@ -46,7 +46,7 @@ $qsNext = ltrim(Ui::qs(array_merge($f, ['tp' => $allTypes ? null : implode(',', 
     <div class="card empty empty--lg"><?= Ui::icon('star', 'empty__star empty__star--lg ic--star') ?>
       <h2 class="h2"><?= $grandTotal === 0 ? 'Todavía no hay actividad' : 'Nada coincide con estos filtros' ?></h2>
       <p><?= $grandTotal === 0 ? 'Cuando lleguen leads, aquí verás cada llegada, cambio de etapa, nota, llamada, entrega y firma, en orden.' : 'Prueba quitando algún filtro o eligiendo más tipos de actividad.' ?></p>
-      <?php if ($nFilters > 0 || !$allTypes || $ld !== null): ?><a class="btn btn--secondary" href="/cronologia">Quitar los filtros</a><?php endif; ?></div>
+      <?php if ($nFilters > 0 || !$allTypes || $ld !== null): ?><a class="btn btn--secondary" href="/cronologia">Quitar filtros</a><?php endif; ?></div>
   <?php else: ?>
     <div class="feed__days" data-feed-days><?= $render($feed['days']) ?></div>
     <div class="feed__more" data-feed-more>
