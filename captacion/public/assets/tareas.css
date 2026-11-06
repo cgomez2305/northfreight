@@ -1,4 +1,13 @@
 /* NorthStar Captación · tareas y agenda (/tareas). Se carga solo en esa pantalla, encima de panel.css. */
+/* Q5a: reglas que estaban en panel.css y solo usa esta pantalla */
+.tick{width:30px;height:30px;border-radius:50%;border:2px solid var(--line-2);background:var(--surface);display:grid;place-items:center;color:transparent;cursor:pointer;flex:none;padding:0}
+.tick:hover{border-color:var(--ok-dot);color:var(--ok-dot)}
+.tick.is-on{background:var(--ok-dot);border-color:var(--ok-dot);color:var(--on-fill);cursor:default}
+.tick .ic{width:15px;height:15px;stroke-width:2.6}
+.pri{width:8px;height:8px;border-radius:50%;display:inline-block}
+.pri--1{background:var(--hot-dot)}
+.pri--2{background:var(--cyan)}
+.pri--3{background:var(--dq-dot)}
 .ptab--late .ptab__n{background:var(--bad-bg);color:var(--bad)}.ptab--late.is-on .ptab__n{background:var(--bad);color:var(--on-fill)}
 .tgroups{display:flex;flex-direction:column;gap:14px}
 .tgroup .card__h{padding-bottom:6px}

@@ -1,4 +1,45 @@
 /* NorthStar Captación · bandeja de leads (/leads). Se carga solo en esa pantalla, encima de panel.css. Sin estilos en línea (CSP): clases y variables. */
+/* Q5a: reglas que estaban en panel.css y solo usa esta pantalla */
+.score{display:inline-grid;place-items:center;min-width:38px;height:26px;padding:0 8px;border-radius:9px;font:600 13px/1 var(--f-mono)}
+.score--hot{background:var(--hot-bg);color:var(--hot)}
+.score--warm{background:var(--warm-bg);color:var(--warm)}
+.score--cold{background:var(--cold-bg);color:var(--cold)}
+.score--dq{background:var(--dq-bg);color:var(--dq)}
+.empty{display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;padding:44px 24px;color:var(--ink-2)}
+.empty h3{font:700 24px/1.1 var(--f-cond);color:var(--ink)}
+.empty p{max-width:46ch}
+.empty--sm{padding:24px 8px}
+.empty--lg{padding:56px 24px 48px}
+.empty__star{width:30px;height:30px;color:var(--cyan)}
+.empty__star--lg{width:46px;height:46px}
+.empty--sm h3{font-size:20px}
+.who{display:flex;align-items:center;gap:11px;color:var(--ink)!important;min-width:0}
+.who>span:not(.av){display:flex;flex-direction:column;min-width:0}
+.who b,.tbl--dash .who>span:not(.av){font-weight:600}
+.who small{color:var(--ink-3);font-weight:400;font-size:12px}
+.sort{color:inherit;display:inline-flex;gap:4px;text-decoration:none!important}
+.sort:hover,.sort.is-on{color:var(--ink)}
+.pg ul{display:flex;gap:4px;align-items:center}
+.pg__n{min-width:34px;height:34px;display:inline-grid;place-items:center;padding:0 8px;border:1px solid var(--line-2);border-radius:10px;font:500 13px var(--f-mono);color:var(--ink-2);background:var(--surface);text-decoration:none!important}
+a.pg__n:hover{border-color:var(--ink-3)}
+.pg__n.is-on{background:var(--navy-2);color:var(--on-fill);border-color:var(--navy-2)}
+.pg__n.is-off{opacity:.4}
+.pg__gap{color:var(--ink-3);padding:0 4px}
+.pg .ic{width:16px;height:16px}
+.filters{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px 14px;padding:16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);align-items:end}
+@media (max-width:1180px){
+  .filters{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (max-width:760px){
+  .filters{grid-template-columns:1fr 1fr}
+}
+.chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.fchip{display:inline-flex;align-items:center;gap:6px;height:30px;padding:0 8px 0 12px;border-radius:var(--r-pill);background:var(--cyan-tint);border:1px solid var(--cyan-line);color:var(--ink);font-size:13px;font-weight:500;text-decoration:none!important}
+.fchip .ic{width:14px;height:14px}
+.fchip:hover{background:var(--cyan-line)}
+@media (max-width:760px){
+  .js .filters:not(.is-open){display:none}
+}
 .steps{display:flex;flex-direction:column;gap:12px;margin-top:10px;text-align:left;width:min(560px,100%)}
 .steps li{display:flex;gap:14px;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--sunk)}
 .steps b{display:block;color:var(--ink)}

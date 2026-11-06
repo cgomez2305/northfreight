@@ -68,3 +68,36 @@
   .dlg--search{margin-top:8px}
   .dd__panel--notes{position:fixed;left:12px;right:12px;top:68px;width:auto}
 }
+/* menús de vistas y «Mover a…» y tarjeta fantasma del arrastre (solo tras un clic) */
+.vmenu{width:340px;max-width:calc(100vw - 24px);padding:6px 0 8px;right:auto;left:0;max-height:70vh;overflow:auto}
+.vmenu--c{width:240px;padding:6px 10px 10px}
+.vmenu__h{padding:10px 14px 6px}
+.vmenu--c .vmenu__h{padding:10px 4px 6px}
+.vmenu__e{padding:2px 14px 8px;color:var(--ink-3);font-size:13.5px}
+.vlist{display:flex;flex-direction:column;padding:0 6px}
+.vmrow{display:flex;align-items:center;gap:2px}
+.vitem{flex:1;min-width:0;display:flex;align-items:center;gap:10px;min-height:40px;padding:0 10px;border-radius:10px;color:var(--ink);text-decoration:none!important}
+.vitem:hover{background:var(--sunk)}
+.vitem.is-on{background:var(--cyan-tint);color:var(--cyan-ink);font-weight:600}
+.vitem .ic{color:var(--ink-3)}
+.vitem span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vmrow .icon-btn{border-color:transparent;background:none}
+.vmrow .icon-btn.is-pin{color:var(--cyan-ink)}
+.check--c{min-height:36px;align-items:center}
+@media (max-width:1024px){
+  .vmenu{left:0}
+}
+.kcard--ghost{position:fixed;left:0;top:0;z-index:90;pointer-events:none;margin:0;transform-origin:20px 20px}
+.kcard--ghost .kc{background:var(--surface);border-color:var(--cyan);box-shadow:var(--shadow-pop);cursor:grabbing}
+body.is-dragging{user-select:none;-webkit-user-select:none;cursor:grabbing}
+body.is-dragging *{cursor:grabbing!important}
+.kmenu{position:absolute;z-index:70;width:236px;padding:6px;background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow-pop)}
+.kmenu__t{padding:8px 10px 6px;font:500 10.5px/1 var(--f-mono);letter-spacing:.09em;text-transform:uppercase;color:var(--ink-3)}
+.kmenu button{display:flex;align-items:center;gap:10px;width:100%;min-height:44px;padding:0 12px;border:0;border-radius:10px;background:none;color:var(--ink);font-weight:500;text-align:left;cursor:pointer}
+.kmenu button:hover,.kmenu button:focus-visible{background:var(--cyan-tint);outline-offset:-2px}
+.kmenu button[aria-disabled=true]{color:var(--ink-3);cursor:default;background:none}
+.kmenu .dot{width:9px;height:9px}
+@media (max-width:760px){
+  .kmenu{position:fixed;left:8px!important;right:8px!important;top:auto!important;bottom:calc(8px + env(safe-area-inset-bottom));width:auto;padding:8px;border-radius:20px}
+  .kmenu button{min-height:52px;font-size:16px}
+}

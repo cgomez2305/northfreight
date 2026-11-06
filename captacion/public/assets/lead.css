@@ -1,4 +1,32 @@
 /* NorthStar Captación · ficha del lead (/leads/{id}). Se carga solo en esa pantalla, encima de panel.css. Sin estilos en línea (CSP): clases y variables. */
+/* Q5a: reglas que estaban en panel.css y solo usa esta pantalla */
+.flash{display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:var(--r-in);font-size:14px;border:1px solid}
+.flash .ic{margin-top:2px}
+.flash--ok{background:var(--ok-bg);color:var(--ok);border-color:var(--ok-dot)}
+.flash--bad{background:var(--bad-bg);color:var(--bad);border-color:var(--bad-dot)}
+.flash--warn{background:var(--warn-bg);color:var(--warn);border-color:var(--warn-dot)}
+.flash__t{flex:1}
+.flash__u{margin-left:auto}
+.flash__u .link{display:inline-flex;gap:6px;align-items:center;font-weight:600;padding:0;color:inherit;text-decoration:underline}
+.lead{display:flex;flex-direction:column;gap:14px;min-width:0}
+.contact{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px 22px;padding-top:16px;border-top:1px solid var(--line)}
+.contact dt,.kv dt{font:500 10.5px var(--f-mono);letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3);margin-bottom:3px}
+.contact dd{overflow-wrap:anywhere}
+@media (max-width:760px){
+  .contact{grid-template-columns:1fr}
+}
+.tasks{display:flex;flex-direction:column}
+.task{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line)}
+.task.is-done{opacity:.65}
+.tick{width:30px;height:30px;border-radius:50%;border:2px solid var(--line-2);background:var(--surface);display:grid;place-items:center;color:transparent;cursor:pointer;flex:none;padding:0}
+.tick:hover{border-color:var(--ok-dot);color:var(--ok-dot)}
+.tick.is-on{background:var(--ok-dot);border-color:var(--ok-dot);color:var(--on-fill);cursor:default}
+.tick .ic{width:15px;height:15px;stroke-width:2.6}
+.pri{width:8px;height:8px;border-radius:50%;display:inline-block}
+.pri--1{background:var(--hot-dot)}
+.pri--2{background:var(--cyan)}
+.pri--3{background:var(--dq-dot)}
+.dupes li{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
 .wrap{overflow-wrap:anywhere}
 .btn--danger-o{background:var(--surface);border-color:var(--bad-dot);color:var(--bad)}
 .btn--danger-o:hover{background:var(--bad-bg)}

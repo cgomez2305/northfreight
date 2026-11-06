@@ -43,7 +43,7 @@ $hasFilters = count($f) > 0 || $sortQ || $plQ;
         <?php if (!$myViews): ?><p class="vmenu__e">Aún no guardas ninguna. Aplica filtros y pulsa «Guardar vista».</p><?php endif; ?>
         <ul class="vlist">
           <?php foreach ($myViews as $v): $on = $av !== null && $av['id'] === $v['id']; ?>
-            <li class="vrow">
+            <li class="vmrow">
               <a class="vitem<?= $on ? ' is-on' : '' ?>" href="<?= $e(SavedViews::href($v, $screen)) ?>"><?= Ui::icon('star') ?><span><?= $e($v['name']) ?></span></a>
               <form method="post" action="/vistas/<?= $e($v['id']) ?>/<?= $v['pinned'] ? 'unpin' : 'pin' ?>"><?= $hid() ?><button class="icon-btn icon-btn--sm<?= $v['pinned'] ? ' is-pin' : '' ?>" type="submit" aria-pressed="<?= $v['pinned'] ? 'true' : 'false' ?>" aria-label="<?= $v['pinned'] ? 'Quitar de la barra lateral' : 'Fijar en la barra lateral' ?>: <?= $e($v['name']) ?>"><?= Ui::icon('pin') ?></button></form>
               <button class="icon-btn icon-btn--sm" type="button" data-view-rename="<?= $e($v['id']) ?>" data-name="<?= $e($v['name']) ?>" aria-label="Renombrar la vista <?= $e($v['name']) ?>"><?= Ui::icon('pencil') ?></button>

@@ -1,4 +1,13 @@
 /* NorthStar Captación · prospectos FMCSA (/prospectos). Se carga solo en esa pantalla, encima de panel.css. Sin estilos en línea (CSP). Móvil primero: se llama desde el celular. */
+/* Q5a: reglas que estaban en panel.css y solo usa esta pantalla */
+.filters{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px 14px;padding:16px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);align-items:end}
+@media (max-width:1180px){
+  .filters{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (max-width:760px){
+  .filters{grid-template-columns:1fr 1fr}
+  .js .filters:not(.is-open){display:none}
+}
 .steps{display:flex;flex-direction:column;gap:12px;margin-top:10px;text-align:left;width:min(560px,100%)}
 .steps li{display:flex;gap:14px;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--sunk)}
 .steps b{display:block;color:var(--ink)}

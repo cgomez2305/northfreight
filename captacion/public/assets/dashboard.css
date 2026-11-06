@@ -1,4 +1,47 @@
 /* NorthStar Captación · dashboard (/). Se carga solo en esa pantalla, encima de panel.css. Sin estilos en línea (CSP): clases y variables. */
+/* Q5a: reglas que estaban en panel.css y solo usa esta pantalla */
+.info{position:relative;display:inline-grid;place-items:center;width:24px;height:24px;border:0;background:none;color:var(--ink-3);cursor:help;border-radius:50%;padding:0}
+.info .ic{width:15px;height:15px}
+.info:hover{color:var(--ink)}
+.info::after{content:attr(data-tip);position:absolute;right:-4px;top:calc(100% + 6px);width:230px;padding:9px 11px;background:var(--pop);color:var(--pop-ink);border-radius:10px;font:400 12.5px/1.4 var(--f-sans);text-align:left;opacity:0;visibility:hidden;transition:opacity .15s;z-index:20;pointer-events:none;box-shadow:var(--shadow-pop)}
+.info:hover::after,.info:focus-visible::after{opacity:1;visibility:visible}
+.spark{overflow:visible}
+.score{display:inline-grid;place-items:center;min-width:38px;height:26px;padding:0 8px;border-radius:9px;font:600 13px/1 var(--f-mono)}
+.score--hot{background:var(--hot-bg);color:var(--hot)}
+.score--warm{background:var(--warm-bg);color:var(--warm)}
+.score--cold{background:var(--cold-bg);color:var(--cold)}
+.score--dq{background:var(--dq-bg);color:var(--dq)}
+.strip{display:grid;grid-template-columns:repeat(3,1fr);margin-top:16px;border:1px solid var(--line);border-radius:14px;background:var(--sunk)}
+.strip>div{padding:12px 16px;border-left:1px solid var(--line)}
+.strip>div:first-child{border:0}
+.strip dt{font-size:12.5px;color:var(--ink-3)}
+.strip dd{font:700 24px/1.2 var(--f-cond);margin-top:2px}
+@media (max-width:760px){
+  .strip{grid-template-columns:1fr}
+  .strip>div{border-left:0;border-top:1px solid var(--line)}
+  .strip>div:first-child{border-top:0}
+}
+.insight{display:flex;gap:10px;align-items:flex-start;margin-top:14px;padding:12px 14px;border-radius:14px;background:var(--cyan-tint);border:1px solid var(--cyan-line);color:var(--ink);font-size:13.5px}
+.insight .ic{width:16px;height:16px;margin-top:2px;color:var(--cyan-ink)}
+.heat{width:100%;height:auto}
+.heat rect{stroke:transparent;stroke-width:2}
+.heat rect:hover{stroke:var(--navy-2);stroke-width:1.5}
+.today{display:flex;flex-direction:column}
+.today li{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.today li:last-child{border:0}
+.today time{font-size:12px;color:var(--ink-2);white-space:nowrap}
+.today .is-late{color:var(--bad);font-weight:600}
+.who{display:flex;align-items:center;gap:11px;color:var(--ink)!important;min-width:0}
+.who>span:not(.av){display:flex;flex-direction:column;min-width:0}
+.who b,.tbl--dash .who>span:not(.av){font-weight:600}
+.who small{color:var(--ink-3);font-weight:400;font-size:12px}
+.pg ul{display:flex;gap:4px;align-items:center}
+.pg__n{min-width:34px;height:34px;display:inline-grid;place-items:center;padding:0 8px;border:1px solid var(--line-2);border-radius:10px;font:500 13px var(--f-mono);color:var(--ink-2);background:var(--surface);text-decoration:none!important}
+a.pg__n:hover{border-color:var(--ink-3)}
+.pg__n.is-on{background:var(--navy-2);color:var(--on-fill);border-color:var(--navy-2)}
+.pg__n.is-off{opacity:.4}
+.pg__gap{color:var(--ink-3);padding:0 4px}
+.pg .ic{width:16px;height:16px}
 .dot.is-bad{background:var(--bad-dot)}
 .dot.is-warn{background:var(--warn-dot)}
 .card__tools{display:flex;gap:10px;align-items:center}
