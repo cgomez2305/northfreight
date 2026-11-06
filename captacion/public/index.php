@@ -14,6 +14,7 @@ use Captacion\Controllers\AjaxController;
 use Captacion\Controllers\AuthController;
 use Captacion\Controllers\ComunicacionesController;
 use Captacion\Controllers\ConfigController;
+use Captacion\Controllers\ReglasController;
 use Captacion\Controllers\DashboardController;
 use Captacion\Controllers\InviteController;
 use Captacion\Controllers\LeadActionsController;
@@ -87,6 +88,8 @@ switch (true) {
         UxController::undo();
     case $path === '/ajax/counters':
         UxController::counters();
+    case preg_match('#^/ajax/rules/(panel|row|preview|simulate|simstatus)$#', $path, $m) === 1:
+        ReglasController::ajax($m[1]);
     case $path === '/undo':
         UxController::undoForm();
     case preg_match('#^/vistas/(new|\d{1,12})(?:/(rename|pin|unpin|delete|update))?$#', $path, $m) === 1:

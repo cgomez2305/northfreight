@@ -48,7 +48,7 @@
  d.addEventListener('click', function (e) { if (e.target === d) d.close(); });
  });
  var cd = $('#confirm'), pending = null;
- $$('[data-confirm]').forEach(function (b) { b.addEventListener('click', function (e) { if (!cd || !cd.showModal) return; e.preventDefault(); pending = b; $('#confirm-m').textContent = b.getAttribute('data-confirm'); cd.showModal(); $('#confirm-y').focus(); }); });
+ D.addEventListener('click', function (e) { var b = e.target.closest ? e.target.closest('[data-confirm]') : null; if (!b || !cd || !cd.showModal || b.disabled) return; e.preventDefault(); pending = b; $('#confirm-m').textContent = b.getAttribute('data-confirm'); cd.showModal(); $('#confirm-y').focus(); });
  if (cd) cd.addEventListener('close', function () { if (cd.returnValue === 'yes' && pending) { var f = pending.form; pending.removeAttribute('data-confirm'); if (f.requestSubmit) f.requestSubmit(pending); else f.submit(); } cd.returnValue = ''; pending = null; });
  $$('[data-toggle]').forEach(function (b) { b.addEventListener('click', function () { var t = $(b.getAttribute('data-toggle')); if (!t) return; var show = t.hidden || (t.classList.contains('filters') && !t.classList.contains('is-open')); if (t.classList.contains('filters')) t.classList.toggle('is-open', show); else t.hidden = !show; b.setAttribute('aria-expanded', show ? 'true' : 'false'); if (show) { var f = $('textarea,input:not([type=hidden])', t); if (f) f.focus(); } }); });
  $$('[data-print]').forEach(function (b) { b.addEventListener('click', function () { window.print(); }); });

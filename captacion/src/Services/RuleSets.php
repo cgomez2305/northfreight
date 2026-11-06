@@ -56,7 +56,8 @@ final class RuleSets
             $dr = $r['did'] !== null;
             $out[] = [
                 'id' => (int) $r['id'], 'kind' => (string) $r['kind'], 'name' => (string) $r['name'], 'description' => (string) $r['description'],
-                'published' => $pub ? ['id' => (int) $r['pid'], 'version' => (int) $r['pver'], 'at' => (string) $r['published_at'], 'by' => $r['pby'], 'count' => (int) $r['prc'], 'enabled' => $enabled] : null,
+                'published' => $pub ? ['id' => (int) $r['pid'], 'version' => (int) $r['pver'], 'at' => (string) $r['published_at'], 'by' => $r['pby'], 'count' => (int) $r['prc'], 'enabled' => $enabled,
+                    'names' => array_map(static fn($x) => ['name' => (string) ($x['name'] ?? ''), 'enabled' => !empty($x['enabled'])], array_slice($rules, 0, 4))] : null,
                 'draft' => $dr ? ['id' => (int) $r['did'], 'version' => (int) $r['dver'], 'at' => (string) $r['dupd'], 'count' => (int) $r['drc']] : null,
                 'versions' => (int) $r['nver'],
                 'status' => $pub ? ($dr ? 'published_draft' : 'published') : ($dr ? 'draft' : ((int) $r['nver'] > 0 ? 'retired' : 'empty')),

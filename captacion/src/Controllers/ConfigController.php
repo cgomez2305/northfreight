@@ -40,10 +40,10 @@ final class ConfigController extends Responder
 {
     public const TABS = [
         'puntuacion' => 'Puntuación', 'alertas' => 'Alertas', 'costos' => 'Costos por canal', 'integraciones' => 'Integraciones', 'horario' => 'Horario y zona', 'copias' => 'Copias de seguridad',
-        'entrega' => 'Entrega a NorthStar', 'correo' => 'Correo y secuencias', 'usuarios' => 'Usuarios', 'prospectos' => 'Prospectos', 'canales' => 'Canales externos',
+        'entrega' => 'Entrega a NorthStar', 'correo' => 'Correo y secuencias', 'usuarios' => 'Usuarios', 'prospectos' => 'Prospectos', 'canales' => 'Canales externos', 'reglas' => 'Reglas',
     ];
     /** Pestañas cuyos formularios exigen confirmacion reciente. */
-    public const LOCKED_TABS = ['puntuacion', 'alertas', 'costos', 'horario', 'copias', 'entrega', 'correo', 'usuarios', 'prospectos', 'canales'];
+    public const LOCKED_TABS = ['puntuacion', 'alertas', 'costos', 'horario', 'copias', 'entrega', 'correo', 'usuarios', 'prospectos', 'canales', 'reglas'];
     public const TEST_LIMIT = 6;   // pruebas de integracion por minuto y usuario
 
     public static function route(?string $a, ?string $b): never
@@ -52,6 +52,9 @@ final class ConfigController extends Responder
         self::requireAdmin($user);
         if ($a === null) {
             self::index($user);
+        }
+        if ($a === 'rules') {
+            ReglasController::route($b, $user);   // Q5b: editor de reglas (formularios; los JSON van por /ajax/rules/*)
         }
         $key = $a . ($b !== null ? '/' . $b : '');
         match ($key) {
@@ -114,12 +117,12 @@ final class ConfigController extends Responder
     // --- Pagina ---------------------------------------------------------------------------------------------------------
 
     /** @param array $over variables que sustituyen a las de la pestaña (formularios con errores, vista previa…) */
-    private static function index(array $user, array $over = [], int $status = 200, ?string $forceTab = null): never
+    public static function index(array $user, array $over = [], int $status = 200, ?string $forceTab = null): never
     {
         $tab = $forceTab ?? self::tabOf($_GET['tab'] ?? null);
         $now = Clock::time();
         $vars = [
-            'title' => 'Configuración', 'css' => ['config', 'cfg-' . $tab], 'js' => ['config'], 'tab' => $tab, 'tabs' => self::TABS, 'locked' => in_array($tab, self::LOCKED_TABS, true) && !Reauth::fresh(),
+            'title' => 'Configuración', 'css' => ['config', 'cfg-' . $tab], 'js' => $tab === 'reglas' ? ['config', 'rules'] : ['config'], 'tab' => $tab, 'tabs' => self::TABS, 'locked' => in_array($tab, self::LOCKED_TABS, true) && !Reauth::fresh(),
             'needsUnlock' => in_array($tab, self::LOCKED_TABS, true), 'reauthLeft' => Reauth::remaining(), 'reauthTtl' => Reauth::ttl(), 'errors' => [], 'now' => $now,
         ];
         $vars += match ($tab) {
@@ -138,6 +141,7 @@ final class ConfigController extends Responder
             'usuarios'      => ['viewers' => Invites::viewers(), 'once' => self::takeOnce(), 'inviteForm' => ['name' => '', 'email' => '']],
             'canales'       => ['meta' => MetaLeads::config(), 'metaTargets' => MetaLeads::TARGETS, 'metaDefaults' => MetaLeads::DEFAULT_MAP, 'cal' => Appointments::config(), 'tw' => SmsInbound::config(), 'n8n' => N8nBridge::config(),
                 'steps' => N8nBridge::STEP_LABELS, 'profiles' => Catalog::PROFILES, 'urls' => ['meta' => Webhook::url('meta'), 'calcom' => Webhook::url('calcom'), 'twilio' => Webhook::url('twilio'), 'n8n' => Webhook::url('n8n')]],
+            'reglas'        => ReglasController::tabVars(),
             'prospectos'    => [
                 'pc' => ProspectConfig::get(), 'pRun' => ProspectImport::state(), 'pComplete' => ProspectImport::completeUntil(), 'pCron' => Settings::get('cron.prospects'),
                 'pSocrata' => Integrations::last('socrata'), 'pToken' => (new \Captacion\Services\SocrataClient())->hasToken(), 'pForm' => null,
@@ -178,6 +182,9 @@ final class ConfigController extends Responder
     {
         $tab = self::tabOf($_POST['tab'] ?? null);
         $back = ($_POST['tab'] ?? '') === 'actividad' ? '/actividad#retencion' : self::back($tab);
+        if ($tab === 'reglas' && isset($_POST['set']) && is_string($_POST['set']) && ctype_digit($_POST['set']) && strlen($_POST['set']) < 12) {
+            $back .= '&set=' . $_POST['set'];   // Q5b: se vuelve al conjunto que se estaba editando
+        }
         self::requirePost($back);
         $r = Reauth::attempt($user, is_string($_POST['password'] ?? null) ? $_POST['password'] : '', is_string($_POST['code'] ?? null) ? $_POST['code'] : '', self::ip());
         if ($r['status'] === 'blocked') {

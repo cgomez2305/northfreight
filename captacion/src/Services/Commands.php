@@ -26,7 +26,8 @@ final class Commands
         return [
             'screens' => $screens,
             'views' => $v,
-            'actions' => [['new_lead', 'Nuevo lead'], ['new_task', 'Nueva tarea'], ['theme_light', 'Tema claro'], ['theme_dark', 'Tema oscuro'], ['theme_auto', 'Tema automático'], ['keys', 'Atajos de teclado'], ['side', 'Contraer o expandir la barra lateral']],
+            'actions' => [['new_lead', 'Nuevo lead'], ['new_task', 'Nueva tarea'], ['theme_light', 'Tema claro'], ['theme_dark', 'Tema oscuro'], ['theme_auto', 'Tema automático'], ['keys', 'Atajos de teclado'], ['side', 'Contraer o expandir la barra lateral'],
+                ['rules_go', 'Ir a Reglas'], ['rules_new', 'Nueva regla'], ['rules_sim', 'Simular reglas']],
             'leadActions' => [['call', 'Registrar llamada'], ['note', 'Añadir nota'], ['task', 'Añadir tarea'], ['responded', 'Marcar respondió']],
         ];
     }
