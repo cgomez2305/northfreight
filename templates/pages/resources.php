@@ -30,6 +30,8 @@ $learn = [
     ['path' => '/blog/', 'chips' => ['Blog'], 'title' => 'All articles', 'dark' => true,
      'text' => 'Dispatch costs, detention, lumper fees and more from the desk.'],
 ];
+// Fase S: sin plantillas aprobadas (DOWNLOADS_APPROVED) en producción no hay ninguna fila live: la sección, el eyebrow y el lead de arriba no las nombran.
+$hasTemplates = array_filter($templates, static fn(array $t): bool => route_is_live($t['path'])) !== [];
 $rows = static function (array $list): void {
     foreach ($list as $rc) {
         if (!route_is_live($rc['path'])) {
@@ -56,8 +58,9 @@ $aside = ob_get_clean();
 partial('hero', [
     'route'   => $route,
     'h1'      => 'Free trucking resources {hl}from the desk{/hl}',
-    'eyebrow' => 'Tools · Templates · Guides',
-    'lead'    => 'The same calculators, templates and guides our dispatchers use every day. Free for owner-operators and small fleets, with no sign-up for the tools.',
+    'eyebrow' => $hasTemplates ? 'Tools · Templates · Guides' : 'Tools · Guides',
+    'lead'    => $hasTemplates ? 'The same calculators, templates and guides our dispatchers use every day. Free for owner-operators and small fleets, with no sign-up for the tools.'
+                               : 'The same calculators and guides our dispatchers use every day. Free for owner-operators and small fleets, with no sign-up for the tools.',
     'aside'   => $aside,
     'cls'     => 'co-hero co-res-hero',
 ]);
@@ -74,13 +77,15 @@ partial('hero', [
     <?php partial('minicalc', ['id' => 'res-rpm', 'cls' => 'mcalc--wide']); ?>
   </div>
 </section>
+<?php if ($hasTemplates): ?>
 <section class="section section--surface" aria-labelledby="res-templates">
   <div class="container stack">
     <?php partial('section-head', ['eyebrow' => 'Templates', 'title' => 'Paperwork, ready to use', 'id' => 'res-templates']); ?>
     <div class="rlist"><?php $rows($templates); ?></div>
   </div>
 </section>
-<section class="section" aria-labelledby="res-learn">
+<?php endif; ?>
+<section class="section<?= $hasTemplates ? '' : ' section--surface' ?>" aria-labelledby="res-learn">
   <div class="container stack">
     <?php partial('section-head', ['eyebrow' => 'Learn', 'title' => 'Guides written by dispatchers', 'id' => 'res-learn']); ?>
     <div class="rlist"><?php $rows($learn); ?></div>
