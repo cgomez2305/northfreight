@@ -1,4 +1,4 @@
-/* NorthStar Captación · dashboard (/): se carga solo ahí, tras panel.css, charts.css y viz.css (piezas compartidas con /resultados). Sin estilos en línea (CSP). Lo que solo anima o decora al pasar el ratón vive en dashlive.css (diferida). */
+/* NorthStar Captación · dashboard (/): tras panel, charts y viz. Lo que solo anima o decora vive en dashlive.css (diferida). */
 .live{display:flex;align-items:center;gap:7px;margin-top:8px;color:var(--ink-3)}
 .live__dot{width:6px;height:6px;border-radius:50%;background:var(--ok-dot);flex:none}
 .strip,.duo{display:grid;margin-top:14px;border:1px solid var(--line);border-radius:14px;background:var(--sunk)}

@@ -29,6 +29,7 @@
 .lc--d .lc__tip{min-width:170px;background:var(--pop);color:var(--pop-ink);border-color:var(--pop-2);border-radius:10px}
 .lc--d .lc__tip span{color:var(--pop-ink-2)}
 .lc--d .lc__tip strong{color:var(--pop-ink)}
+.lc--d .lc__tip .sw--ops{background:var(--pop-ink)}
 .lc--d .lc__tip em{display:block;margin-top:6px;padding-top:6px;border-top:1px solid var(--pop-2);font:500 11px var(--f-mono);font-style:normal;color:var(--pop-ink-2)}
 @media (prefers-reduced-motion:reduce){
   .live__dot::after,.sys .dot.is-ok::after,.is-flash::after,.is-loading .kpi::after,.acts__b.is-loading::after{animation:none}

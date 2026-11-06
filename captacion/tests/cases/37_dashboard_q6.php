@@ -120,7 +120,7 @@ return static function (array $ctx): void {
     T::ok(str_contains($b, 'data-peek="') && str_contains($b, 'id="peek"'), '  las filas abren el vistazo rápido');
     $js = (string) file_get_contents($ctx['root'] . '/public/assets/dashboard.js');
     T::ok(!str_contains($js, "setAttribute('style'") && !str_contains($js, 'cssText') && !str_contains($js, 'eval(') && !preg_match('/\.innerHTML\s*=\s*[^;]*(location|document\.cookie)/', $js), 'dashboard.js: ni setAttribute(style), ni cssText, ni eval');
-    T::ok(str_contains((string) file_get_contents($ctx['root'] . '/public/assets/dashlive.css'), 'prefers-reduced-motion') && str_contains($js, 'prefers-reduced-motion'), 'dashlive.css y dashboard.js respetan prefers-reduced-motion');
+    T::ok(str_contains((string) file_get_contents($ctx['root'] . '/public/assets/dashlive.css'), 'prefers-reduced-motion') && str_contains((string) file_get_contents($ctx['root'] . '/public/assets/dashfx.js'), 'prefers-reduced-motion'), 'dashlive.css y dashfx.js (el módulo visual que usa dashboard.js) respetan prefers-reduced-motion');
 
     $j = $s->json($s->ajax('/ajax/dashboard', ['p' => 'month']));
     T::ok(($j['ok'] ?? false) === true && $j['p'] === 'month' && isset($j['kpis'], $j['headline'], $j['actions'], $j['at'], $j['ts']), 'POST /ajax/dashboard: forma de la respuesta (kpis, headline, actions, at)');

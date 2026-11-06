@@ -1,7 +1,6 @@
-/* NorthStar Captación · piezas visuales compartidas del dashboard (/) y de /resultados (Q6, fase I): números protagonistas, tarjetas KPI, medidor de rayas, microlínea, subtítulo-conclusión, botón «i» y el gráfico anotado. Va tras charts.css. Sin estilos en línea (CSP). Lo que solo anima o decora al pasar el ratón vive en dashlive.css (diferida). */
+/* NorthStar Captación · piezas compartidas del dashboard y de /resultados (Q6-I): KPI, rayas, microlínea, subtítulo, «i» y gráfico anotado. Tras charts.css. */
 .info{position:relative;display:inline-grid;place-items:center;width:24px;height:24px;border:0;background:none;color:var(--ink-3);cursor:help;border-radius:50%;padding:0}
 .info .ic{width:15px;height:15px}
-@media (max-width:760px){.info{width:44px;height:44px;margin:-10px}}
 .spark{overflow:visible}
 .sub--n{max-width:78ch;font-size:15px;line-height:1.45;color:var(--ink-2)}
 .sub--n b{font-weight:600;color:var(--ink)}
@@ -32,14 +31,6 @@
 @media (max-width:1180px){
 .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
-@media (max-width:760px){
-.kpis{gap:10px}
-.kpi{padding:12px 14px}
-.kpi__v{font-size:38px}
-.kpi__v--t{font-size:30px}
-.kpi__c{display:none}
-.kpi__h .label{white-space:normal;line-height:1.3}
-}
 .lc--d{grid-template-columns:30px minmax(0,1fr) 96px;color:var(--c-ops)}
 .lc__ov{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
 .lc__ov text{font-family:var(--f-mono)}
@@ -59,6 +50,13 @@
 .lc__n2{font-size:10px;fill:var(--ink-3)}
 .lc__cross{position:absolute;top:0;bottom:0;left:0;width:0;border-left:1px dashed var(--ink-3);pointer-events:none}
 @media (max-width:760px){
+.info{width:44px;height:44px;margin:-10px}
+.kpis{gap:10px}
+.kpi{padding:12px 14px}
+.kpi__v{font-size:38px}
+.kpi__v--t{font-size:30px}
+.kpi__c{display:none}
+.kpi__h .label{white-space:normal;line-height:1.3}
 .lc--d{grid-template-columns:24px minmax(0,1fr) 80px}
 .lc__end{font-size:9.5px}
 }

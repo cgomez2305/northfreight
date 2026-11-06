@@ -66,7 +66,7 @@ return static function (array $ctx): void {
     Db::pdo()->exec('DELETE FROM lead_events');
     Db::pdo()->exec('DELETE FROM tasks');
     Db::pdo()->exec('DELETE FROM leads');
-    foreach (['/informes' => 'Todavía no hay informes', '/comunicaciones/inscripciones' => 'Nadie está inscrito', '/comunicaciones/envios' => 'Aún no se ha enviado ningún correo', '/config?tab=entrega' => 'Aún no se ha presentado ningún lead', '/resultados' => 'Sin leads recibidos', '/' => 'Aún no hay', '/leads' => 'empty', '/pipeline' => 'empty', '/tareas' => 'empty', '/actividad?q=zzzz-nada' => 'Nada coincide', '/config?tab=copias' => 'Aún no hay copias', '/prospectos' => 'Todavía no hay prospectos', '/referidos' => 'Todavía no hay códigos de referido', '/vacantes' => 'Todavía no hay vacantes'] as $route => $needle) {
+    foreach (['/informes' => 'Todavía no hay informes', '/comunicaciones/inscripciones' => 'Nadie está inscrito', '/comunicaciones/envios' => 'Aún no se ha enviado ningún correo', '/config?tab=entrega' => 'Aún no se ha presentado ningún lead', '/resultados' => 'Aún no hay leads en este rango', '/' => 'Aún no hay', '/leads' => 'empty', '/pipeline' => 'empty', '/tareas' => 'empty', '/actividad?q=zzzz-nada' => 'Nada coincide', '/config?tab=copias' => 'Aún no hay copias', '/prospectos' => 'Todavía no hay prospectos', '/referidos' => 'Todavía no hay códigos de referido', '/vacantes' => 'Todavía no hay vacantes'] as $route => $needle) {
         $r = $s->get($route);
         T::ok($r['status'] === 200 && str_contains($r['body'], $needle) && !str_contains($r['body'], 'Warning') && !str_contains($r['body'], 'Fatal error'), "estado vacio de {$route}: 200 con su aviso y sin errores de PHP");
     }
