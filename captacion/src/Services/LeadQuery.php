@@ -53,6 +53,15 @@ final class LeadQuery
         if ($s('ct') === 'none') {
             $f['ct'] = 'none';
         }
+        if ($s('nt') === '1') {
+            $f['nt'] = '1';   // Q5a: sin ninguna tarea abierta
+        }
+        if ($s('op') === '1') {
+            $f['op'] = '1';   // Q5a: solo leads abiertos (ni perdidos, ni firmados, ni descartados)
+        }
+        if ($s('hs') === 'wait') {
+            $f['hs'] = 'wait';   // Q5a: presentados a NorthStar que aun no responden
+        }
         if ($s('fl') === 'fmcsa_pending') {
             $f['fl'] = 'fmcsa_pending';
         }
@@ -81,6 +90,10 @@ final class LeadQuery
         $or = ["CONCAT_WS(' ', {$a}first_name, {$a}last_name) LIKE ?", "{$a}email LIKE ?"];
         $params = [self::like($q), self::like($q)];
         $digits = preg_replace('/\D+/', '', $q) ?? '';
+        if (preg_match('/^ld-?(\d{1,9})$/i', $q, $cm) === 1) {   // codigo corto del lead (LD-0142)
+            $or[] = "{$a}id = ?";
+            $params[] = (int) $cm[1];
+        }
         if (strlen($digits) >= 3 && preg_match('/^[\d\s().+\-]+$/', $q) === 1) {
             $or[] = "{$a}phone_e164 LIKE ?";
             $params[] = self::like($digits);
@@ -92,6 +105,13 @@ final class LeadQuery
             $params[] = $digits . '%';
         }
         return ['(' . implode(' OR ', $or) . ')', $params];
+    }
+
+    /** Cuenta los leads que cumplen los filtros (vistas fijadas de la barra lateral). */
+    public static function count(array $f): int
+    {
+        [$where, $params] = self::where($f);
+        return (int) Db::value("SELECT COUNT(*) FROM leads l WHERE $where", $params);
     }
 
     /** @return array{0:string,1:list<mixed>} WHERE (con alias l) y parametros; $skip omite una clave de filtro (para contar por temperatura). */
@@ -129,6 +149,15 @@ final class LeadQuery
         }
         if (isset($f['ct'])) {
             $w[] = "l.first_contact_at IS NULL AND l.stage = 'new'";
+        }
+        if (isset($f['nt'])) {
+            $w[] = 'NOT EXISTS (SELECT 1 FROM tasks tk WHERE tk.lead_id = l.id AND tk.done_at IS NULL AND tk.deleted_at IS NULL)';
+        }
+        if (isset($f['op'])) {
+            $w[] = "l.stage NOT IN ('lost','signed','hired') AND l.temperature <> 'disqualified'";
+        }
+        if (isset($f['hs'])) {
+            $w[] = "l.stage = 'presented' AND l.handoff_status = 'pending'";
         }
         return [implode(' AND ', $w), $p];
     }

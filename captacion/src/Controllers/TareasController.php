@@ -10,6 +10,7 @@ namespace Captacion\Controllers;
 
 use Captacion\Clock;
 use Captacion\Services\Tasks;
+use Captacion\Services\Undo;
 
 final class TareasController extends Responder
 {
@@ -65,7 +66,7 @@ final class TareasController extends Responder
             'edit'   => Tasks::update($id, $_POST['title'] ?? '', $_POST['due'] ?? '', $_POST['priority'] ?? 2, $_POST['lead_id'] ?? null, $uid),
             'delete' => Tasks::delete($id, $uid),
         };
-        self::flash($r['ok'], $r['msg']);
+        self::flash($r['ok'], $r['msg'], $r['ok'] && $action === 'done' ? Undo::task($uid, $id) : null);   // Q5a-G: «Deshacer» al completar
         self::redirect($back);
     }
 }

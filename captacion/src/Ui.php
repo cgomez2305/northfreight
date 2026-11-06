@@ -93,4 +93,34 @@ final class Ui
         $shown = array_slice($labels, 0, $max);
         return implode(', ', $shown) . (count($labels) > $max ? ' +' . (count($labels) - $max) : '');
     }
+
+    /** Barra de puntuacion de 4 segmentos (25 puntos cada uno), con el color de la temperatura. */
+    public static function scoreBar(int $score, string $temp): string
+    {
+        $on = max(0, min(4, (int) ceil($score / 25)));
+        $cls = $temp === 'disqualified' ? 'dq' : $temp;
+        $segs = '';
+        for ($i = 1; $i <= 4; $i++) {
+            $segs .= '<i' . ($i <= $on ? ' class="on"' : '') . '></i>';
+        }
+        return '<span class="sbar sbar--' . self::e($cls) . '" role="img" aria-label="Puntuación ' . $score . ' de 100">' . $segs . '</span>';
+    }
+
+    /** Etiquetas discretas del lead: perfil y equipo (hasta $max), cada una con su tono. */
+    public static function tags(array $lead, int $max = 2): string
+    {
+        $profile = (string) ($lead['profile'] ?? '');
+        $out = '<span class="tag tag--p-' . self::e($profile) . '"><i></i>' . self::e(Catalog::label(Catalog::PROFILES_SHORT, $profile)) . '</span>';
+        $eq = is_array($lead['equipment_types'] ?? null) ? $lead['equipment_types'] : [];
+        foreach (array_slice($eq, 0, $max) as $t) {
+            $out .= '<span class="tag tag--e-' . (crc32((string) $t) % 5) . '"><i></i>' . self::e(Catalog::label(Catalog::EQUIPMENT, (string) $t)) . '</span>';
+        }
+        return $out;
+    }
+
+    /** Icono de la etapa (encabezado de columna del tablero, lista de etapas). */
+    public static function stageIcon(string $stage): string
+    {
+        return self::icon(['new' => 'inbox', 'contacted' => 'phone', 'qualified' => 'check-circle', 'prequalified' => 'check-circle', 'call_booked' => 'calendar', 'presented' => 'send', 'signed' => 'shield', 'hired' => 'shield', 'lost' => 'x'][$stage] ?? 'layers', 'ic--st st-' . $stage);
+    }
 }

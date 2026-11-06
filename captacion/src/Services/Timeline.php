@@ -96,6 +96,9 @@ final class Timeline
                 if (!empty($p['auto'])) {
                     $bits[] = 'Automático';
                 }
+                if (!empty($p['undo'])) {
+                    $bits[] = 'Deshecho a petición';
+                }
                 $detail = implode(' · ', $bits);
                 break;
             case 'reopened_manual':

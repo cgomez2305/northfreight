@@ -17,7 +17,10 @@ use Captacion\Services\Handoff;
 use Captacion\Services\LeadActions;
 use Captacion\Services\LeadQuery;
 use Captacion\Services\Sequences;
+use Captacion\Services\Prefs;
+use Captacion\Services\SavedViews;
 use Captacion\Services\Timeline;
+use Captacion\Services\Undo;
 
 final class LeadsController extends Responder
 {
@@ -29,9 +32,27 @@ final class LeadsController extends Responder
         $list = LeadQuery::list($f, $paging);
         $counts = LeadQuery::tempCounts($f);
         $total = (int) Db::value('SELECT COUNT(*) FROM leads WHERE deleted_at IS NULL');
-        self::page('leads', $user, 'leads', [['Leads', null], ['Bandeja', null]], [
-            'title' => 'Leads', 'css' => ['leads'], 'f' => $f, 'paging' => $paging, 'list' => $list, 'counts' => $counts, 'facets' => LeadQuery::facets(), 'grandTotal' => $total,
+        $uid = (int) $user['id'];
+        $cur = $f;   // para detectar si una vista guardada fue modificada (solo cuentan los filtros)
+        self::page('leads', $user, 'leads', [['Leads', null], ['Lista', null]], [
+            'title' => 'Leads', 'css' => ['leads', 'peek'], 'js' => ['peek', 'views'], 'f' => $f, 'paging' => $paging, 'list' => $list, 'counts' => $counts, 'facets' => LeadQuery::facets(), 'grandTotal' => $total,
+            'activeView' => SavedViews::active($uid, $_GET, $cur), 'sysViews' => SavedViews::system(), 'myViews' => SavedViews::mine($uid), 'cols' => Prefs::columns($uid), 'peekId' => (int) ($_GET['peek'] ?? 0),
+            'nextTasks' => self::nextTasks($list['rows']),
         ]);
+    }
+
+    /** Fecha de la proxima tarea abierta por lead (columna opcional «Próxima tarea»). @return array<int,string> */
+    private static function nextTasks(array $rows): array
+    {
+        if (!$rows) {
+            return [];
+        }
+        $ids = array_map(static fn($r) => (int) $r['id'], $rows);
+        $out = [];
+        foreach (Db::all('SELECT lead_id, due_at FROM tasks WHERE lead_id IN (' . implode(',', array_fill(0, count($ids), '?')) . ') AND done_at IS NULL AND deleted_at IS NULL ORDER BY due_at IS NULL, due_at ASC', $ids) as $t) {
+            $out[(int) $t['lead_id']] ??= (string) ($t['due_at'] ?? '');
+        }
+        return $out;
     }
 
     public static function show(int $id): never
@@ -62,6 +83,7 @@ final class LeadsController extends Responder
             $dupes = Db::all('SELECT id, first_name, last_name, stage, created_at FROM leads WHERE deleted_at IS NULL AND id <> ? AND ((phone_e164 IS NOT NULL AND phone_e164 = ?) OR (email IS NOT NULL AND email = ?)) ORDER BY id DESC LIMIT 5', [$id, $lead['phone_e164'], $lead['email']]);
         }
         $name = Fmt::name($lead);
+        Prefs::touchRecent((int) $user['id'], $id);
         $stageOptions = LeadActions::stageOptions($lead);
         $needsOverride = [];
         foreach (array_keys($stageOptions) as $s) {
@@ -86,7 +108,7 @@ final class LeadsController extends Responder
             self::exportResponse($user, null, $ids, 'seleccion');
         }
         $r = LeadActions::bulkStage($ids, (string) ($_POST['stage'] ?? ''), ['reason' => (string) ($_POST['reason'] ?? ''), 'note' => (string) ($_POST['note'] ?? '')], (int) $user['id']);
-        self::flash($r['ok'], $r['msg']);
+        self::flash($r['ok'], $r['msg'], Undo::bulk((int) $user['id'], $r['changes'] ?? []));   // Q5a-G: «Deshacer» el cambio masivo
         self::redirect($back);
     }
 

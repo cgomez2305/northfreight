@@ -143,7 +143,7 @@ final class LeadActions
             Db::update('leads', $leadId, $u);
             self::event($leadId, 'stage_changed', array_filter([
                 'from' => $from, 'to' => $to, 'pipeline' => $pipeline, 'reason' => $reason, 'note' => $note !== '' ? $note : null,
-                'override' => $override && self::needsOverride($lead, $to) ? true : null, 'auto' => !empty($o['auto']) ? true : null,
+                'override' => $override && self::needsOverride($lead, $to) ? true : null, 'auto' => !empty($o['auto']) ? true : null, 'fc' => $firstContactSet ? true : null,
             ], static fn($v) => $v !== null), $userId);
             if ($firstContactSet || ($to !== 'new' && $lead['first_contact_at'] !== null) || $to === 'lost') {
                 self::cancelA3($leadId, (int) $lead['attempt'], $userId, 'el lead pasó a «' . $stages[$to] . '»');
@@ -169,7 +169,7 @@ final class LeadActions
 
     /**
      * Cambio masivo. $generic: 'contacted' | 'qualified' | 'lost' (qualified se traduce a prequalified en el pipeline B). Salta lo que no cumple las reglas.
-     * @return array{ok:bool,msg:string,changed:int,skipped:int}
+     * @return array{ok:bool,msg:string,changed:int,skipped:int,changes?:list<array{0:int,1:string,2:string}>}
      */
     public static function bulkStage(array $ids, string $generic, array $o, int $userId): array
     {
@@ -183,6 +183,7 @@ final class LeadActions
         $changed = 0;
         $skipped = 0;
         $firstError = '';
+        $changes = [];
         foreach ($ids as $id) {
             $lead = Lead::find($id);
             if ($lead === null) {
@@ -190,9 +191,11 @@ final class LeadActions
                 continue;
             }
             $to = $generic === 'qualified' && $lead['pipeline'] === 'B' ? 'prequalified' : $generic;
+            $from = (string) $lead['stage'];
             $r = self::setStage($id, $to, $o + ['note' => 'Cambio masivo'], $userId);
             if ($r['ok']) {
                 $changed++;
+                $changes[] = [$id, $from, $to];
             } else {
                 $skipped++;
                 $firstError = $firstError ?: $r['msg'];
@@ -200,7 +203,68 @@ final class LeadActions
         }
         ActivityLog::record('leads_bulk_stage', $userId, 'lead', null, ['stage' => $generic, 'changed' => $changed, 'skipped' => $skipped, 'ids' => count($ids)]);
         $msg = $changed . ' lead' . ($changed === 1 ? '' : 's') . ' actualizado' . ($changed === 1 ? '' : 's') . ($skipped > 0 ? ' · ' . $skipped . ' omitido' . ($skipped === 1 ? '' : 's') . ' (' . $firstError . ')' : '') . '.';
-        return ['ok' => $changed > 0, 'msg' => $msg, 'changed' => $changed, 'skipped' => $skipped];
+        return ['ok' => $changed > 0, 'msg' => $msg, 'changed' => $changed, 'skipped' => $skipped, 'changes' => $changes];
+    }
+
+    /** Etapas cuyo cambio genera efectos que no se pueden revertir (entrega a NorthStar, conversion): no se ofrece «Deshacer» con ellas. */
+    private const NO_UNDO = ['presented', 'signed', 'hired'];
+
+    /** ¿Se puede ofrecer «Deshacer» para este cambio de etapa? */
+    public static function undoable(string $from, string $to): bool
+    {
+        return $from !== $to && $from !== 'lost' && !in_array($from, self::NO_UNDO, true) && !in_array($to, self::NO_UNDO, true);
+    }
+
+    /**
+     * Revierte un cambio de etapa (Q5a-G): solo si el lead sigue en $to y el cambio es reversible (undoable). Devuelve el lead a $from, quita el motivo de perdida si lo hubo
+     * y el primer contacto si ese cambio lo fijo; deja el evento stage_changed con `undo`. No restaura la alerta A3 cancelada ni las secuencias pausadas (decision de Q5a).
+     */
+    public static function undoStage(int $leadId, string $from, string $to, int $userId): array
+    {
+        if (!self::undoable($from, $to)) {
+            return self::fail('Este cambio ya generó efectos (entrega a NorthStar) y no se puede deshacer.');
+        }
+        return Db::transaction(static function () use ($leadId, $from, $to, $userId): array {
+            $lead = Lead::find($leadId, true);
+            if ($lead === null) {
+                return self::fail('El lead no existe.');
+            }
+            $stages = Catalog::STAGES[(string) $lead['pipeline']] ?? Catalog::STAGES['A'];
+            if ((string) $lead['stage'] !== $to || !isset($stages[$from])) {
+                return self::fail('El lead ya cambió de etapa: no se puede deshacer.');
+            }
+            $ev = Db::one("SELECT id, payload, created_at FROM lead_events WHERE lead_id = ? AND type = 'stage_changed' ORDER BY id DESC LIMIT 1", [$leadId]);
+            $p = $ev !== null ? Db::decode($ev['payload']) : [];
+            if ($ev === null || ($p['from'] ?? null) !== $from || ($p['to'] ?? null) !== $to) {
+                return self::fail('El último cambio de etapa no coincide: no se puede deshacer.');
+            }
+            $prev = Db::value("SELECT MAX(created_at) FROM lead_events WHERE lead_id = ? AND id < ? AND type IN ('stage_changed','reopened_manual','reopened')", [$leadId, (int) $ev['id']]);
+            $u = ['stage' => $from, 'stage_changed_at' => $prev ?: $lead['created_at']];
+            if ($to === 'lost') {
+                $u += ['lost_reason' => null, 'lost_at' => null];
+            }
+            if (!empty($p['fc'])) {
+                $u['first_contact_at'] = null;
+            }
+            Db::update('leads', $leadId, $u);
+            self::event($leadId, 'stage_changed', ['from' => $to, 'to' => $from, 'pipeline' => (string) $lead['pipeline'], 'undo' => true], $userId);
+            ActivityLog::record('lead_stage_undo', $userId, 'lead', $leadId, ['from' => $to, 'to' => $from]);
+            return self::ok('Cambio deshecho: «' . ($stages[$from] ?? $from) . '».');
+        });
+    }
+
+    /** Restaura una nota eliminada (borrado logico). */
+    public static function restoreNote(int $leadId, int $noteId, int $userId): array
+    {
+        return Db::transaction(static function () use ($leadId, $noteId, $userId): array {
+            $n = Db::run('UPDATE lead_notes SET deleted_at = NULL WHERE id = ? AND lead_id = ? AND deleted_at IS NOT NULL', [$noteId, $leadId])->rowCount();
+            if ($n !== 1) {
+                return self::fail('La nota no existe o ya estaba restaurada.');
+            }
+            self::event($leadId, 'note_added', ['note_id' => $noteId, 'restored' => true], $userId);
+            ActivityLog::record('note_restore', $userId, 'lead', $leadId, ['note_id' => $noteId]);
+            return self::ok('Nota restaurada.');
+        });
     }
 
     public static function reopen(int $leadId, int $userId): array

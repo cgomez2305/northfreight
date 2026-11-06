@@ -1,7 +1,7 @@
 <?php
 /**
  * Front controller del panel (subdominio captacion.). Rutas: / (dashboard), /pipeline, /tareas, /config, /actividad, /leads, /leads/{id}, /leads/{id}/{accion}, /leads/bulk, /leads/export, /ajax/search, /ajax/notifications/read, /login, /login/2fa, /logout,
- * Q4a: /prospectos, /referidos, /vacantes (solo administradores). Q3: /reportes, /resultados, /informes, /comunicaciones; publicas con token: /c/{token}, /u/{token}, /invite/{token}. Autorizacion por rol DENEGADA POR DEFECTO en Responder::user().
+ * Q5a: /ajax/prefs, /ajax/peek, /ajax/lead/act, /ajax/lead/create, /ajax/undo, /ajax/counters, /undo, /vistas/*. Q4a: /prospectos, /referidos, /vacantes (solo administradores). Q3: /reportes, /resultados, /informes, /comunicaciones; publicas con token: /c/{token}, /u/{token}, /invite/{token}. Autorizacion por rol DENEGADA POR DEFECTO en Responder::user().
  * setup.php y api/lead.php son puntos de entrada propios. Cualquier otra ruta: 404.
  */
 
@@ -27,6 +27,7 @@ use Captacion\Controllers\ReportesController;
 use Captacion\Controllers\ResultadosController;
 use Captacion\Controllers\InformesController;
 use Captacion\Controllers\TareasController;
+use Captacion\Controllers\UxController;
 use Captacion\Services\Storage;
 
 error_reporting(E_ALL);
@@ -74,6 +75,22 @@ switch (true) {
         AjaxController::search();
     case $path === '/ajax/notifications/read':
         AjaxController::notificationsRead();
+    case $path === '/ajax/prefs':
+        UxController::prefs();
+    case $path === '/ajax/peek':
+        UxController::peek();
+    case $path === '/ajax/lead/act':
+        UxController::act();
+    case $path === '/ajax/lead/create':
+        UxController::create();
+    case $path === '/ajax/undo':
+        UxController::undo();
+    case $path === '/ajax/counters':
+        UxController::counters();
+    case $path === '/undo':
+        UxController::undoForm();
+    case preg_match('#^/vistas/(new|\d{1,12})(?:/(rename|pin|unpin|delete|update))?$#', $path, $m) === 1:
+        UxController::views($m[1], ($m[2] ?? '') !== '' ? $m[2] : null);
     case $path === '/pipeline':
         PipelineController::index();
     case $path === '/ajax/pipeline/cards':

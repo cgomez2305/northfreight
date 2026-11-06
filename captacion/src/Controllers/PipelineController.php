@@ -13,7 +13,10 @@ use Captacion\Models\Lead;
 use Captacion\Services\Kanban;
 use Captacion\Services\LeadActions;
 use Captacion\Services\LeadQuery;
+use Captacion\Services\Prefs;
 use Captacion\Services\RateLimiter;
+use Captacion\Services\SavedViews;
+use Captacion\Services\Undo;
 use Captacion\View;
 
 final class PipelineController extends Responder
@@ -44,8 +47,10 @@ final class PipelineController extends Responder
                 $columns[$st] = Kanban::cards($pl, $st, $f, 0, $counts[$st]);
             }
         }
-        self::page('pipeline', $user, 'pipeline', [['Pipeline', null]], [
-            'title' => 'Pipeline', 'css' => ['kanban'], 'js' => ['kanban'], 'pl' => $pl, 'f' => $f, 'stages' => $stages, 'counts' => $counts, 'columns' => $columns,
+        $uid = (int) $user['id'];
+        self::page('pipeline', $user, 'pipeline', [['Leads', '/leads'], ['Tablero', null]], [
+            'title' => 'Pipeline', 'css' => ['kanban', 'peek'], 'js' => ['kanban', 'peek', 'views'], 'pl' => $pl, 'activeView' => SavedViews::active($uid, $_GET, $f), 'sysViews' => SavedViews::system(), 'myViews' => SavedViews::mine($uid),
+            'density' => Prefs::get($uid, 'density'), 'peekId' => (int) ($_GET['peek'] ?? 0), 'f' => $f, 'stages' => $stages, 'counts' => $counts, 'columns' => $columns,
             'totals' => Kanban::pipelineTotals(), 'canWrite' => $canWrite, 'facets' => LeadQuery::facets(),
             'render' => static fn(array $cards): string => self::renderCards($cards, $canWrite),
         ]);
@@ -102,7 +107,7 @@ final class PipelineController extends Responder
         parse_str(is_string($b['qs'] ?? null) ? mb_substr($b['qs'], 0, 600) : '', $q);
         $card = Kanban::card($id);
         self::json([
-            'ok' => true, 'msg' => $r['msg'], 'lead_id' => $id, 'from' => (string) $lead['stage'], 'to' => $to,
+            'ok' => true, 'msg' => $r['msg'], 'lead_id' => $id, 'from' => (string) $lead['stage'], 'to' => $to, 'undo' => Undo::stage((int) $user['id'], $id, (string) $lead['stage'], $to),
             'card' => $card !== null ? self::renderCards([$card], true) : '', 'counts' => Kanban::counts((string) $lead['pipeline'], Kanban::filters($q)),
         ]);
     }

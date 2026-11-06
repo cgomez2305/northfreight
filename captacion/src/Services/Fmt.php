@@ -130,6 +130,12 @@ final class Fmt
         return $n !== '' ? $n : 'Sin nombre';
     }
 
+    /** Codigo corto del lead (LD-0142), el mismo que muestra la ficha. */
+    public static function code(int $id): string
+    {
+        return 'LD-' . str_pad((string) $id, 4, '0', STR_PAD_LEFT);
+    }
+
     public static function initials(string $name): string
     {
         $parts = preg_split('/\s+/u', trim($name)) ?: [];

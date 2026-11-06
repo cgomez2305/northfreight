@@ -8,7 +8,9 @@ namespace Captacion\Controllers;
 use Captacion\Db;
 use Captacion\Services\Handoff;
 use Captacion\Services\LeadActions;
+use Captacion\Models\Lead;
 use Captacion\Services\Sequences;
+use Captacion\Services\Undo;
 
 final class LeadActionsController extends Responder
 {
@@ -24,6 +26,7 @@ final class LeadActionsController extends Responder
         }
         self::requirePost($back);
         $uid = (int) $user['id'];
+        $from = $action === 'stage' ? (string) (Lead::find($id)['stage'] ?? '') : '';
         $r = match ($action) {
             'stage'       => LeadActions::setStage($id, (string) ($_POST['stage'] ?? ''), ['reason' => (string) ($_POST['reason'] ?? ''), 'note' => $_POST['note'] ?? '', 'override' => ($_POST['override'] ?? '') === '1'], $uid),
             'note'        => LeadActions::addNote($id, $_POST['body'] ?? '', $uid),
@@ -40,7 +43,17 @@ final class LeadActionsController extends Responder
             'seq-pause', 'seq-resume', 'seq-remove' => self::sequence($id, $action, $uid),
             'responded'        => Sequences::responded($id, $uid),
         };
-        self::flash($r['ok'], $r['msg']);
+        // Q5a-G: «Deshacer» para el cambio de etapa (si es reversible), completar una tarea y borrar una nota
+        $undo = null;
+        if ($r['ok']) {
+            $undo = match ($action) {
+                'stage' => Undo::stage($uid, $id, $from, (string) ($_POST['stage'] ?? '')),
+                'task-done' => Undo::task($uid, (int) ($_POST['task_id'] ?? 0)),
+                'note-delete' => Undo::note($uid, $id, (int) ($_POST['note_id'] ?? 0)),
+                default => null,
+            };
+        }
+        self::flash($r['ok'], $r['msg'], $undo);
         self::redirect($back . self::ANCHORS[$action]);
     }
 

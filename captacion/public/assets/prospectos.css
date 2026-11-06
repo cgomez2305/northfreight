@@ -3,7 +3,7 @@
 .steps li{display:flex;gap:14px;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--sunk)}
 .steps b{display:block;color:var(--ink)}
 .steps p{font-size:13.5px;max-width:none}
-.steps__n{width:28px;height:28px;border-radius:50%;background:var(--navy-2);color:var(--on-navy);display:grid;place-items:center;font:600 13px var(--f-mono);flex:none}
+.steps__n{width:28px;height:28px;border-radius:50%;background:var(--navy-2);color:var(--on-fill);display:grid;place-items:center;font:600 13px var(--f-mono);flex:none}
 .filters-toggle{display:none}
 .filters--p{grid-template-columns:minmax(0,2fr) repeat(3,minmax(0,1fr)) auto}
 .field--q{grid-column:auto}

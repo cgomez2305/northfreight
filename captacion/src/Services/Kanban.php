@@ -15,10 +15,10 @@ final class Kanban
 {
     public const PAGE = 25;
 
-    /** Filtros rapidos del kanban: temperatura, fuente y texto (los mismos parametros que la bandeja). @return array<string,string> */
+    /** Filtros del tablero: los mismos de la bandeja (comparten vistas y filtros), salvo `st` (la etapa son las columnas). @return array<string,string> */
     public static function filters(array $in): array
     {
-        return array_intersect_key(LeadQuery::filters($in), ['t' => 1, 'src' => 1, 'q' => 1]);
+        return array_diff_key(LeadQuery::filters($in), ['st' => 1]);
     }
 
     public static function pipeline(mixed $v): string
@@ -71,7 +71,7 @@ final class Kanban
         $order = $stage === 'lost' ? 'l.lost_at DESC, l.id DESC' : 'l.score DESC, l.id DESC';
         $rows = Db::all(
             "SELECT l.id, l.first_name, l.last_name, l.profile, l.pipeline, l.stage, l.state, l.equipment_types, l.truck_count, l.score, l.temperature, l.flags, l.lost_reason, l.lost_at,
-                    l.source, l.created_at, COALESCE(l.stage_changed_at, l.created_at) AS in_stage_since
+                    l.source, l.created_at, l.language, COALESCE(l.stage_changed_at, l.created_at) AS in_stage_since
                FROM leads l WHERE $base ORDER BY $order LIMIT " . (self::PAGE + 1) . ' OFFSET ' . max(0, $offset),
             $params
         );
@@ -139,6 +139,14 @@ final class Kanban
                 : '«' . $stages[$to] . '» solo se alcanza en orden (desde la etapa anterior). Confirma el salto si es lo que quieres.'];
         }
         return null;
+    }
+
+    /** Avance en el embudo (sin la salida): [posicion 1..n, n]; [0, n] si esta fuera del embudo (perdido). @return array{0:int,1:int} */
+    public static function progress(string $pipeline, string $stage): array
+    {
+        $flow = array_keys(array_diff_key(self::stages($pipeline), ['lost' => 1]));
+        $i = array_search($stage, $flow, true);
+        return [$i === false ? 0 : $i + 1, count($flow)];
     }
 
     /** Texto corto de antiguedad en la etapa: "hoy", "3 d", "5 h". */

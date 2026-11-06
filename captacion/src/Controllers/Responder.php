@@ -9,7 +9,10 @@ use Captacion\Clock;
 use Captacion\Db;
 use Captacion\Middleware\SecurityHeaders;
 use Captacion\Models\User;
+use Captacion\Services\Commands;
 use Captacion\Services\Notifications;
+use Captacion\Services\Prefs;
+use Captacion\Services\SavedViews;
 use Captacion\Services\Prospects;
 use Captacion\Services\Referrals;
 use Captacion\Services\Session;
@@ -83,9 +86,10 @@ abstract class Responder
         }
     }
 
-    protected static function flash(bool $ok, string $msg): void
+    /** $undo: token de Services\Undo; el aviso muestra «Deshacer» (formulario que funciona sin JS; con JS pasa a ser un aviso de 6 s). */
+    protected static function flash(bool $ok, string $msg, ?string $undo = null): void
     {
-        $_SESSION['flash'] = ['ok' => $ok, 'msg' => $msg];
+        $_SESSION['flash'] = ['ok' => $ok, 'msg' => $msg] + ($undo !== null ? ['undo' => $undo] : []);
     }
 
     protected static function takeFlash(): ?array
@@ -106,6 +110,8 @@ abstract class Responder
     protected static function page(string $view, array $user, string $active, array $crumbs, array $vars = [], int $status = 200): never
     {
         $viewer = ($user['role'] ?? '') === 'viewer';
+        $uid = (int) $user['id'];
+        $views = $viewer ? [] : SavedViews::sidebar($uid);
         // El lector de NorthStar no ve campana, atajos de leads, buscador ni contadores: nada que se parezca a un lead.
         $notes = $viewer ? [] : Notifications::all((int) $user['id']);
         $hot = $viewer ? 0 : (int) Db::value("SELECT COUNT(*) FROM leads WHERE deleted_at IS NULL AND temperature = 'hot' AND first_contact_at IS NULL AND stage = 'new'");
@@ -113,6 +119,7 @@ abstract class Responder
             'shell' => true, 'user' => $user, 'csrf' => Session::csrf(), 'active' => $active, 'crumbs' => $crumbs, 'bell' => $notes,
             'unread' => Notifications::unread($notes), 'hotBadge' => $hot, 'overdueBadge' => $viewer ? 0 : Tasks::overdueCount(), 'isAdmin' => ($user['role'] ?? '') === 'admin', 'isViewer' => $viewer, 'followBadge' => ($user['role'] ?? '') === 'admin' ? Prospects::followupsDue(Clock::time())['n'] : 0, 'bonusBadge' => ($user['role'] ?? '') === 'admin' ? Referrals::pendingApproval() : 0, 'flash' => self::takeFlash(),
             'sysOk' => !array_filter($notes, static fn($n) => in_array($n['kind'], ['bad', 'warn'], true)),
+            'prefs' => Prefs::all($uid), 'navViews' => $views, 'cmds' => $viewer ? [] : Commands::forUser($user, array_map(static fn($v) => $v + ['href' => SavedViews::href($v)], [...SavedViews::system(), ...SavedViews::mine($uid)])),
         ], $status);
     }
 
@@ -137,12 +144,12 @@ abstract class Responder
      * Endpoint JSON con escritura: POST, sesion, CSRF en X-CSRF-Token y cuerpo JSON de hasta 4 KB (o $max).
      * @return array{0:array,1:array} [usuario, cuerpo]
      */
-    protected static function jsonPost(int $max = 4096): array
+    protected static function jsonPost(int $max = 4096, bool $viewerOk = false): array
     {
         if (strtoupper((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET')) !== 'POST') {
             self::json(['ok' => false, 'error' => 'method'], 405, ['Allow: POST']);
         }
-        $user = self::userJson();
+        $user = self::userJson($viewerOk);
         if (!Session::checkCsrf($_SERVER['HTTP_X_CSRF_TOKEN'] ?? null)) {
             self::json(['ok' => false, 'error' => 'csrf'], 403);
         }
