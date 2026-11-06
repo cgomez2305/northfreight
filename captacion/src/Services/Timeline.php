@@ -29,6 +29,12 @@ final class Timeline
         return $out;
     }
 
+    /** Una entrada legible de un solo evento (cronologia global, Q5c-D). Sin texto de notas: el detalle de una nota no va en el resumen. @param array<string,mixed> $payload */
+    public static function entry(array $lead, string $type, array $payload, string $at, ?string $by = null): array
+    {
+        return self::describe($lead, $type, $payload, $at, [], $by);
+    }
+
     private static function describe(array $lead, string $type, array $p, string $at, array $notes, ?string $by): array
     {
         $pipeline = (string) ($lead['pipeline'] ?? 'A');
@@ -134,8 +140,9 @@ final class Timeline
                 $detail = (string) ($p['title'] ?? '');
                 break;
             case 'task_snoozed':
+            case 'task_rescheduled':
                 $icon = 'clock';
-                $detail = (string) ($p['title'] ?? '') . (!empty($p['to']) ? ' · nueva fecha ' . Fmt::dateTime((string) $p['to']) : '');
+                $detail = (string) ($p['title'] ?? '') . (!empty($p['to']) ? ' · nueva fecha ' . Fmt::dateTime((string) $p['to']) : '') . (!empty($p['undo']) ? ' · deshecho a petición' : '');
                 break;
             case 'handoff_created':
             case 'handoff_resent':

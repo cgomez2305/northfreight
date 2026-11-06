@@ -15,6 +15,8 @@ final class Fmt
     public const TZ = 'America/New_York';
     private const MONTHS = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
     private const DAYS = ['lun', 'mar', 'mié', 'jue', 'vie', 'sáb', 'dom'];
+    private const MONTHS_LONG = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+    private const DAYS_LONG = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo'];
 
     /** @var array<string,\DateTimeZone> */
     private static array $tzs = [];
@@ -68,6 +70,16 @@ final class Fmt
     public static function monthLabel(int $month): string
     {
         return self::MONTHS[$month - 1] ?? '';
+    }
+
+    public static function monthLong(int $month): string
+    {
+        return self::MONTHS_LONG[$month - 1] ?? '';
+    }
+
+    public static function weekdayLong(int $isoDay): string
+    {
+        return self::DAYS_LONG[$isoDay - 1] ?? '';
     }
 
     public static function weekdayShort(int $isoDay): string

@@ -94,6 +94,40 @@ final class Db
         return $v === false ? null : $v;
     }
 
+    /**
+     * Ejecuta $fn con un TOPE DE TIEMPO por sentencia (segundos): MariaDB `max_statement_time` o MySQL `max_execution_time`. Al terminar (o fallar) lo restablece. Si el motor corta una
+     * consulta lanza QueryTimeout (1969 en MariaDB, 3024 en MySQL); si el servidor no soporta ninguna de las dos variables corre sin tope (nunca falla por eso).
+     */
+    public static function withTimeout(int $seconds, callable $fn): mixed
+    {
+        $pdo = self::pdo();
+        $set = null;
+        foreach (['max_statement_time' => $seconds, 'max_execution_time' => $seconds * 1000] as $var => $val) {
+            try {
+                $pdo->exec("SET SESSION $var = " . (int) $val);
+                $set = $var;
+                break;
+            } catch (\Throwable) {
+            }
+        }
+        try {
+            return $fn();
+        } catch (\PDOException $e) {
+            $code = (int) ($e->errorInfo[1] ?? 0);
+            if ($code === 1969 || $code === 3024 || str_contains($e->getMessage(), 'max_statement_time') || str_contains($e->getMessage(), 'maximum statement execution time')) {
+                throw new QueryTimeout('La consulta tardó demasiado.', 0, $e);
+            }
+            throw $e;
+        } finally {
+            if ($set !== null) {
+                try {
+                    $pdo->exec("SET SESSION $set = 0");
+                } catch (\Throwable) {
+                }
+            }
+        }
+    }
+
     /** INSERT con un array columna => valor. Devuelve el id insertado. Los arrays se guardan como JSON. */
     public static function insert(string $table, array $data): int
     {

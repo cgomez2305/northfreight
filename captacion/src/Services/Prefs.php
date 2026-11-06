@@ -12,7 +12,9 @@ use Captacion\Db;
 
 final class Prefs
 {
-    public const DEFAULTS = ['theme' => 'auto', 'side' => 'open', 'density' => 'comfortable', 'cols' => 'prof,st,eq,pts,temp,stage,src,when'];
+    public const DEFAULTS = ['theme' => 'auto', 'side' => 'open', 'density' => 'comfortable', 'cols' => 'prof,st,eq,pts,temp,stage,src,when', 'lmode' => 'lista', 'tcols' => 'prof,st,eq,trucks,exp,pts,temp,stage,src,when,task', 'calm' => 'mes'];
+    /** Modo de vista de los leads que se recuerda por usuario (Q5c): cada uno es una pantalla con los mismos filtros (clave => ruta). */
+    public const MODES = ['lista' => '/leads', 'tablero' => '/pipeline', 'tabla' => '/tabla', 'calendario' => '/calendario', 'cronologia' => '/cronologia'];
     /** Columnas opcionales de la bandeja (clave => etiqueta). «Lead» y la casilla siempre se ven. */
     public const COLUMNS = ['prof' => 'Perfil', 'st' => 'Estado', 'eq' => 'Equipo', 'pts' => 'Puntos', 'temp' => 'Temperatura', 'stage' => 'Etapa', 'src' => 'Fuente', 'when' => 'Recibido', 'task' => 'Próxima tarea'];
     private const MAX_RECENT = 8;
@@ -57,6 +59,9 @@ final class Prefs
             'side' => in_array($v, ['open', 'collapsed'], true) ? $v : null,
             'density' => in_array($v, ['comfortable', 'compact'], true) ? $v : null,
             'cols' => self::validCols($v),
+            'lmode' => isset(self::MODES[$v]) ? $v : null,
+            'tcols' => self::validTableCols($v),
+            'calm' => in_array($v, ['mes', 'semana', 'dia'], true) ? $v : null,
             default => null,
         };
     }
@@ -68,6 +73,36 @@ final class Prefs
         }
         $keep = array_values(array_filter(array_keys(self::COLUMNS), static fn($c) => in_array($c, explode(',', $v), true)));
         return $keep ? implode(',', $keep) : null;
+    }
+
+    /** Columnas de la Tabla (Q5c): el ORDEN importa (es el que eligio la persona); solo claves conocidas, sin repetir y al menos una. */
+    private static function validTableCols(string $v): ?string
+    {
+        if ($v === '' || preg_match('/^[a-z,]{1,120}$/', $v) !== 1) {
+            return null;
+        }
+        $keep = array_values(array_unique(array_filter(explode(',', $v), static fn($c) => isset(LeadTable::COLUMNS[$c]))));
+        return $keep ? implode(',', $keep) : null;
+    }
+
+    /** @return list<string> columnas de la Tabla en el orden elegido */
+    public static function tableColumns(int $userId): array
+    {
+        return explode(',', self::get($userId, 'tcols'));
+    }
+
+    /** Recuerda el ultimo modo de vista usado (solo escribe si cambia). La barra lateral lleva a el. */
+    public static function remember(int $userId, string $mode): void
+    {
+        if (isset(self::MODES[$mode]) && self::get($userId, 'lmode') !== $mode) {
+            self::set($userId, 'lmode', $mode);
+        }
+    }
+
+    /** Ruta de «Leads» en la barra lateral: el modo que la persona uso por ultima vez. */
+    public static function home(string $mode): string
+    {
+        return self::MODES[$mode] ?? '/leads';
     }
 
     /** @return bool true si se guardo (clave y valor validos) */

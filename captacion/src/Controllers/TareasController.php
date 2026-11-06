@@ -33,7 +33,8 @@ final class TareasController extends Responder
     private static function backUrl(): string
     {
         $b = is_string($_POST['back'] ?? null) ? $_POST['back'] : '/tareas';
-        return preg_match('#^/tareas(\?[A-Za-z0-9_%=&.\-+]{0,80})?$#', $b) === 1 ? $b : '/tareas';
+        // Q5c: el calendario también usa estas acciones (completar, posponer, crear) y vuelve a su propia URL.
+        return preg_match('#^/tareas(\?[A-Za-z0-9_%=&.\-+]{0,80})?$#', $b) === 1 || preg_match('#^/calendario(\?[A-Za-z0-9_%=&.\-+]{0,500})?$#', $b) === 1 ? $b : '/tareas';
     }
 
     /** POST /tareas/new */

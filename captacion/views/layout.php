@@ -57,7 +57,7 @@ $ni = static function (string $href, string $icon, string $label, string $key, a
       <p class="side__group">Principal</p>
       <button class="nav-i nav-i--btn" type="button" data-inbox data-tip="Bandeja" aria-haspopup="dialog"><?= Ui::icon('inbox') ?><span class="nav-i__t">Bandeja</span><span class="badge badge--late" data-inbox-n<?= ($unread + $overdueBadge) > 0 ? '' : ' hidden' ?>><?= $e($unread + $overdueBadge) ?></span></button>
       <?= $ni('/', 'dashboard', 'Dashboard', 'dashboard') ?>
-      <?= $ni('/leads', 'users', 'Leads', 'leads') ?>
+      <?= $ni(\Captacion\Services\Prefs::home((string) ($prefs['lmode'] ?? 'lista')), 'users', 'Leads', 'leads') ?>
       <?= $ni('/pipeline', 'columns', 'Pipeline', 'pipeline') ?>
       <?= $ni('/tareas', 'list-check', 'Tareas', 'tareas', ['badge' => $overdueBadge, 'title' => 'Tareas vencidas', 'sr' => 'vencidas']) ?>
       <p class="side__group">Vistas</p>
@@ -161,7 +161,7 @@ $ni = static function (string $href, string $icon, string $label, string $key, a
   <a class="tab<?= $active === 'informes' ? ' is-on' : '' ?>" href="/informes"><?= Ui::icon('file') ?><span>Informes</span></a>
 <?php else: ?>
   <a class="tab<?= $active === 'dashboard' ? ' is-on' : '' ?>" href="/"><?= Ui::icon('dashboard') ?><span>Inicio</span></a>
-  <a class="tab<?= $active === 'leads' ? ' is-on' : '' ?>" href="/leads"><?= Ui::icon('users') ?><span>Leads</span></a>
+  <a class="tab<?= $active === 'leads' ? ' is-on' : '' ?>" href="<?= $e(\Captacion\Services\Prefs::home((string) ($prefs['lmode'] ?? 'lista'))) ?>"><?= Ui::icon('users') ?><span>Leads</span></a>
   <a class="tab<?= $active === 'pipeline' ? ' is-on' : '' ?>" href="/pipeline"><?= Ui::icon('columns') ?><span>Pipeline</span></a>
   <a class="tab<?= $active === 'tareas' ? ' is-on' : '' ?>" href="/tareas"><?= Ui::icon('list-check') ?><span>Tareas</span><?php if ($overdueBadge > 0): ?><i class="tab__n"><?= $e($overdueBadge) ?></i><?php endif; ?></a>
 <?php endif; ?>
@@ -186,8 +186,9 @@ $ni = static function (string $href, string $icon, string $label, string $key, a
   <div class="keys">
     <?php foreach ([
         'General' => [['/', 'Buscar leads'], ['Ctrl/⌘ K', 'Paleta de comandos'], ['?', 'Mostrar esta hoja'], ['Esc', 'Cerrar lo que esté abierto']],
-        'Ir a' => [['g d', 'Dashboard'], ['g l', 'Leads'], ['g p', 'Pipeline'], ['g t', 'Tareas']],
-        'Listas y tablero' => [['j / k', 'Siguiente / anterior'], ['Enter', 'Abrir el vistazo rápido'], ['Doble clic', 'Abrir la ficha completa']],
+        'Ir a' => [['g d', 'Dashboard'], ['g l', 'Leads'], ['g p', 'Pipeline'], ['g t', 'Tareas'], ['g b', 'Tabla'], ['g c', 'Calendario'], ['g r', 'Cronología']],
+        'Listas, tabla y tablero' => [['j / k', 'Siguiente / anterior'], ['Enter', 'Abrir el vistazo rápido'], ['Doble clic', 'Abrir la ficha completa']],
+        'Calendario' => [['← → ↑ ↓', 'Moverse entre días'], ['PgUp PgDn', 'Mes o semana anterior y siguiente'], ['Alt + flechas', 'Mover la tarea enfocada de día']],
         'Con un lead abierto' => [['n', 'Añadir nota'], ['c', 'Registrar llamada'], ['m', 'Mover de etapa']],
     ] as $grp => $rows): ?>
       <section><h3 class="label"><?= $e(strtoupper($grp)) ?></h3><dl><?php foreach ($rows as [$k, $d]): ?><div><dt><?php foreach (explode(' ', $k) as $i => $part): ?><?= $i ? ' ' : '' ?><kbd><?= $e($part) ?></kbd><?php endforeach; ?></dt><dd><?= $e($d) ?></dd></div><?php endforeach; ?></dl></section>

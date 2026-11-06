@@ -3,7 +3,7 @@
  * «Deshacer» (Q5a-G): avisos con un boton de 6 s para las acciones reversibles. El servidor emite un token firmado (HMAC con APP_KEY, atado al usuario y con caducidad de 10 min) que describe
  * QUE se deshace; el cliente solo lo devuelve. Al aplicarlo se vuelven a validar las condiciones actuales (el lead sigue en la etapa, la tarea sigue hecha, la nota sigue borrada),
  * con las mismas funciones que el resto del panel, y queda evento en el historial. Reversibles: cambio de etapa (individual, tablero y masivo; no el que genera una entrega a NorthStar),
- * completar una tarea y borrar una nota.
+ * completar una tarea, mover o posponer una tarea (calendario) y borrar una nota.
  */
 
 declare(strict_types=1);
@@ -49,6 +49,12 @@ final class Undo
     public static function task(int $userId, int $taskId): string
     {
         return self::sign('task', $userId, ['t' => $taskId]);
+    }
+
+    /** Tarea movida de dia o pospuesta (calendario): guarda la fecha anterior y la nueva (la nueva se comprueba al deshacer). */
+    public static function resched(int $userId, int $taskId, ?string $from, string $to): string
+    {
+        return self::sign('resched', $userId, ['t' => $taskId, 'f' => $from, 'x' => $to]);
     }
 
     public static function note(int $userId, int $leadId, int $noteId): string
@@ -101,6 +107,8 @@ final class Undo
                 return ['ok' => $ok > 0, 'msg' => $ok . ($ok === 1 ? ' cambio deshecho' : ' cambios deshechos') . ($skip > 0 ? ' · ' . $skip . ' no se pudieron deshacer (ya habían cambiado)' : '') . '.', 'lead_ids' => $ids];
             case 'task':
                 return Tasks::reopen((int) ($d['t'] ?? 0), $userId);
+            case 'resched':
+                return Tasks::restoreDue((int) ($d['t'] ?? 0), isset($d['f']) && is_string($d['f']) ? $d['f'] : null, isset($d['x']) && is_string($d['x']) ? $d['x'] : null, $userId);
             case 'note':
                 return LeadActions::restoreNote((int) ($d['l'] ?? 0), (int) ($d['n'] ?? 0), $userId);
         }

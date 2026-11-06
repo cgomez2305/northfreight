@@ -21,12 +21,20 @@ use Captacion\Services\Prefs;
 use Captacion\Services\SavedViews;
 use Captacion\Services\Timeline;
 use Captacion\Services\Undo;
+use Captacion\Ui;
 
 final class LeadsController extends Responder
 {
     public static function index(): never
     {
         $user = self::user();
+        // Q5c: `/leads?v=tabla|calendario|cronologia` abre ese modo (los demas valores de `v` son vistas guardadas).
+        if (is_string($_GET['v'] ?? null) && in_array($_GET['v'], ['tabla', 'calendario', 'cronologia'], true)) {
+            $q = $_GET;
+            unset($q['v']);
+            self::redirect('/' . $_GET['v'] . Ui::qs($q), 302);
+        }
+        Prefs::remember((int) $user['id'], 'lista');
         $f = LeadQuery::filters($_GET);
         $paging = LeadQuery::paging($_GET);
         $list = LeadQuery::list($f, $paging);
@@ -150,6 +158,6 @@ final class LeadsController extends Responder
     private static function backUrl(): string
     {
         $b = is_string($_POST['back'] ?? null) ? $_POST['back'] : '/leads';
-        return preg_match('#^/leads(\?[A-Za-z0-9_%=&.\-+]{0,600})?$#', $b) === 1 ? $b : '/leads';
+        return preg_match('#^/(leads|tabla)(\?[A-Za-z0-9_%=&.\-+]{0,600})?$#', $b) === 1 ? $b : '/leads';
     }
 }

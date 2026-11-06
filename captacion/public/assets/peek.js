@@ -50,7 +50,7 @@
   if (!isOpen()) return; req++; pk.classList.remove('is-open'); scrim.classList.remove('is-open'); D.body.style.overflow = '';
   setTimeout(function () { if (!pk.classList.contains('is-open')) { pk.hidden = true; scrim.hidden = true; } }, 230);
   $$('[data-peek].is-open').forEach(function (r) { r.classList.remove('is-open'); }); url(0); NS.ctx = NS.pageCtx; cur = 0;
-  if (back !== false) { var f = (sel && $('a.who, a.kc__n', sel)) || origin; if (f && f.focus) f.focus({ preventScroll: true }); }
+  if (back !== false) { var f = (sel && (sel.matches('[data-peek-link]') ? sel : $('a.who, a.kc__n, [data-peek-link]', sel))) || origin; if (f && f.focus) f.focus({ preventScroll: true }); }
  }
  NS.peek = { open: open, close: close };
  function step(d) {
@@ -67,7 +67,7 @@
  D.addEventListener('click', function (e) {
   var t = e.target; if (!t.closest || t.closest('#peek') || t.closest('dialog')) return;
   var row = t.closest('[data-peek]'); if (!row || t.closest(interactive)) return;
-  var a = t.closest('a'); if (a && !(a.classList.contains('who') || a.classList.contains('kc__n'))) return;
+  var a = t.closest('a'); if (a && !(a.classList.contains('who') || a.classList.contains('kc__n') || a.hasAttribute('data-peek-link'))) return;
   if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey || e.button) return;
   if (a && e.detail === 0) return;   // activación por teclado de un enlace: va a la ficha
   e.preventDefault(); open(idOf(row), row);

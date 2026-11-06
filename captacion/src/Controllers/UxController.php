@@ -19,6 +19,7 @@ use Captacion\Services\Kanban;
 use Captacion\Services\LeadActions;
 use Captacion\Services\LeadIngest;
 use Captacion\Services\LeadQuery;
+use Captacion\Services\LeadTable;
 use Captacion\Services\Notifications;
 use Captacion\Services\Prefs;
 use Captacion\Services\RateLimiter;
@@ -180,14 +181,18 @@ final class UxController extends Responder
         $back = self::backUrl('/leads');
         self::requirePost($back);
         parse_str(is_string($_POST['qs'] ?? null) ? mb_substr((string) $_POST['qs'], 0, 800) : '', $q);
-        $screen = is_string($_POST['screen'] ?? null) && $_POST['screen'] === 'pipeline' ? 'pipeline' : 'leads';
+        $screen = is_string($_POST['screen'] ?? null) && isset(SavedViews::SCREENS[$_POST['screen']]) ? $_POST['screen'] : 'leads';
+        $mode = SavedViews::modeOf($screen);   // Q5c: la vista recuerda el modo en que se guardo
         $filters = SavedViews::cleanFilters($q);
-        $sort = isset(LeadQuery::SORTS[(string) ($q['sort'] ?? '')]) ? (string) $q['sort'] : null;
+        $sort = in_array($screen, ['leads', 'tabla'], true) ? LeadTable::cleanSort(is_string($q['sort'] ?? null) ? $q['sort'] : null) : null;
+        if ($screen === 'leads' && $sort !== null && !isset(LeadQuery::SORTS[$sort])) {
+            $sort = null;
+        }
         $dir = ($q['dir'] ?? '') === 'asc' ? 'asc' : null;
         $pl = $screen === 'pipeline' && ($q['pl'] ?? '') === 'B' ? 'B' : null;
         $vid = $id !== null && ctype_digit($id) ? (int) $id : 0;
         if ($id === 'new') {
-            $r = SavedViews::create($uid, $_POST['name'] ?? '', $filters, $sort, $dir, $pl);
+            $r = SavedViews::create($uid, $_POST['name'] ?? '', $filters, $sort, $dir, $pl, $mode);
             if ($r['ok']) {
                 $v = SavedViews::find($uid, (string) $r['id']);
                 self::flash(true, $r['msg']);
@@ -199,11 +204,11 @@ final class UxController extends Responder
                 'pin' => SavedViews::pin($uid, $vid, true),
                 'unpin' => SavedViews::pin($uid, $vid, false),
                 'delete' => SavedViews::delete($uid, $vid),
-                'update' => SavedViews::update($uid, $vid, $filters, $sort, $dir, $pl),
+                'update' => SavedViews::update($uid, $vid, $filters, $sort, $dir, $pl, $mode),
                 default => ['ok' => false, 'msg' => 'Acción no válida.'],
             };
             if ($r['ok'] && $action === 'delete' && str_contains($back, 'v=' . $vid)) {
-                $back = $screen === 'pipeline' ? '/pipeline' : '/leads';
+                $back = SavedViews::SCREENS[$screen];
             }
         }
         self::flash($r['ok'], $r['msg']);

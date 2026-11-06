@@ -9,11 +9,6 @@ $base = $f;                                    // filtros vigentes (sin orden ni
 $sortBase = ['sort' => $paging['sort'] !== 'created' ? $paging['sort'] : null, 'dir' => $paging['dir'] !== 'desc' ? $paging['dir'] : null, 'per' => $paging['per'] !== 25 ? $paging['per'] : null];
 $qsAll = static fn(array $over = []): string => Ui::qs(array_merge($base, $sortBase, $over));
 $nFilters = count(array_diff_key($f, ['t' => 1]));
-$chipLabels = [
-    'pf' => static fn($v) => 'Perfil: ' . Catalog::label(Catalog::PROFILES, $v), 'src' => static fn($v) => 'Fuente: ' . Catalog::source($v), 'st' => static fn($v) => 'Etapa: ' . Catalog::stageAny($v),
-    'eq' => static fn($v) => 'Equipo: ' . Catalog::label(Catalog::EQUIPMENT, $v), 'us' => static fn($v) => 'Estado: ' . $v, 'lg' => static fn($v) => 'Idioma: ' . Catalog::label(Catalog::LANGS, $v),
-    'from' => static fn($v) => 'Desde: ' . $v, 'to' => static fn($v) => 'Hasta: ' . $v, 'q' => static fn($v) => 'Texto: «' . $v . '»', 'ct' => static fn() => 'Sin contactar', 'fl' => static fn($v) => $v === 'review_queue' ? 'Por revisar' : (str_starts_with((string) $v, 'tag:') ? 'Etiqueta: ' . substr((string) $v, 4) : 'FMCSA pendiente'), 'nt' => static fn() => 'Sin tarea abierta', 'op' => static fn() => 'Solo abiertos', 'hs' => static fn() => 'Presentados sin respuesta',
-];
 $sortLink = static function (string $key, string $label) use ($paging, $base, $e): string {
     $on = $paging['sort'] === $key;
     $dir = $on && $paging['dir'] === 'desc' ? 'asc' : 'desc';
@@ -61,31 +56,7 @@ $isEmptyDb = $grandTotal === 0;
   <?php endforeach; ?>
 </nav>
 
-<form class="filters<?= $nFilters > 0 ? ' is-open' : '' ?>" id="filters" method="get" action="/leads" aria-label="Filtros">
-  <?php if (isset($f['t'])): ?><input type="hidden" name="t" value="<?= $e($f['t']) ?>"><?php endif; ?>
-  <?php foreach (['nt', 'op', 'hs', 'fl'] as $hk): if (isset($f[$hk])): ?><input type="hidden" name="<?= $e($hk) ?>" value="<?= $e($f[$hk]) ?>"><?php endif; endforeach; ?>
-  <?php foreach (['sort', 'dir', 'per'] as $k): if ($sortBase[$k] !== null): ?><input type="hidden" name="<?= $e($k) ?>" value="<?= $e($sortBase[$k]) ?>"><?php endif; endforeach; ?>
-  <label class="field field--q"><span>Buscar</span><div class="inp"><?= Ui::icon('search') ?><input type="search" name="q" value="<?= $e($f['q'] ?? '') ?>" placeholder="Nombre, teléfono, correo o USDOT" maxlength="100"></div></label>
-  <label class="field"><span>Perfil</span><select name="pf"><option value="">Todos</option><?php foreach (Catalog::PROFILES as $k => $l): ?><option value="<?= $e($k) ?>"<?= ($f['pf'] ?? '') === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
-  <label class="field"><span>Etapa</span><select name="st"><option value="">Todas</option><?php foreach (Catalog::allStages() as $k => $l): ?><option value="<?= $e($k) ?>"<?= ($f['st'] ?? '') === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
-  <label class="field"><span>Fuente</span><select name="src"><option value="">Todas</option><?php foreach ($facets['sources'] as $k): ?><option value="<?= $e($k) ?>"<?= ($f['src'] ?? '') === $k ? ' selected' : '' ?>><?= $e(Catalog::source($k)) ?></option><?php endforeach; ?></select></label>
-  <label class="field"><span>Equipo</span><select name="eq"><option value="">Todos</option><?php foreach (Catalog::EQUIPMENT as $k => $l): ?><option value="<?= $e($k) ?>"<?= ($f['eq'] ?? '') === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
-  <label class="field"><span>Estado (EE. UU.)</span><select name="us"><option value="">Todos</option><?php foreach ($facets['states'] as $k): ?><option value="<?= $e($k) ?>"<?= ($f['us'] ?? '') === $k ? ' selected' : '' ?>><?= $e($k) ?> · <?= $e(UsStates::NAMES[$k] ?? '') ?></option><?php endforeach; ?></select></label>
-  <label class="field"><span>Idioma</span><select name="lg"><option value="">Todos</option><?php foreach (Catalog::LANGS as $k => $l): ?><option value="<?= $e($k) ?>"<?= ($f['lg'] ?? '') === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
-  <label class="field"><span>Desde (<?= $e(Fmt::zone()) ?>)</span><input type="date" name="from" value="<?= $e($f['from'] ?? '') ?>"></label>
-  <label class="field"><span>Hasta (<?= $e(Fmt::zone()) ?>)</span><input type="date" name="to" value="<?= $e($f['to'] ?? '') ?>"></label>
-  <label class="check check--f"><input type="checkbox" name="ct" value="none"<?= isset($f['ct']) ? ' checked' : '' ?>><span>Solo sin contactar</span></label>
-  <div class="filters__a"><button class="btn btn--primary btn--sm" type="submit"><span class="btn__t">Aplicar</span></button><?php if ($nFilters > 0 || isset($f['t'])): ?><a class="btn btn--ghost btn--sm" href="/leads">Limpiar</a><?php endif; ?></div>
-</form>
-
-<?php if ($nFilters > 0): ?>
-<ul class="chips" aria-label="Filtros activos">
-  <?php foreach (array_diff_key($f, ['t' => 1]) as $k => $v): ?>
-    <li><a class="fchip" href="/leads<?= $e(Ui::qs(array_merge(array_diff_key($base, [$k => 1]), $sortBase))) ?>" aria-label="Quitar filtro <?= $e($chipLabels[$k]($v)) ?>"><?= $e($chipLabels[$k]($v)) ?><?= Ui::icon('x') ?></a></li>
-  <?php endforeach; ?>
-  <li><a class="link" href="/leads<?= $e(Ui::qs(isset($f['t']) ? ['t' => $f['t']] : [])) ?>">Quitar todos</a></li>
-</ul>
-<?php endif; ?>
+<?php $fa = ['path' => '/leads', 'keep' => array_filter($sortBase, static fn($v) => $v !== null), 'temp' => false]; require __DIR__ . '/_lfilters.php'; ?>
 
 <form method="post" action="/leads/bulk" class="card card--table" id="bulk" data-bulk>
   <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="back" value="/leads<?= $e($qsAll(['page' => $list['page'] > 1 ? $list['page'] : null])) ?>">
@@ -127,18 +98,7 @@ $isEmptyDb = $grandTotal === 0;
     <label class="perpage"><span>Por página</span><select data-per aria-label="Leads por página"><?php foreach (\Captacion\Services\LeadQuery::PER as $n): ?><option value="<?= $e($n) ?>"<?= $paging['per'] === $n ? ' selected' : '' ?>><?= $e($n) ?></option><?php endforeach; ?></select></label>
   </footer>
 
-  <div class="bulk" data-bulkbar hidden role="region" aria-label="Acciones sobre la selección">
-    <p class="bulk__n"><b data-count>0</b> seleccionados</p>
-    <div class="bulk__a">
-      <label class="sr" for="bulk-stage">Cambiar etapa a</label>
-      <select id="bulk-stage" name="stage" data-bulk-stage><option value="contacted">Contactado</option><option value="qualified">Calificado / Precalificado</option><option value="lost">Perdido / Descartado</option></select>
-      <label class="sr" for="bulk-reason">Motivo</label>
-      <select id="bulk-reason" name="reason" data-bulk-reason hidden><option value="">Motivo…</option><?php foreach (Catalog::LOSS_REASONS as $k => $l): if ($k === 'other') { continue; } ?><option value="<?= $e($k) ?>"><?= $e($l) ?></option><?php endforeach; ?></select>
-      <button class="btn btn--primary btn--sm" type="submit" name="do" value="stage"><span class="btn__t">Cambiar etapa</span></button>
-      <button class="btn btn--secondary btn--sm" type="submit" name="do" value="export"><?= Ui::icon('download') ?>Exportar selección</button>
-      <button class="btn btn--ghost btn--sm" type="button" data-clear>Limpiar</button>
-    </div>
-  </div>
+  <?php require __DIR__ . '/_bulkbar.php'; ?>
   <?php endif; ?>
 </form>
 <?php endif; ?>

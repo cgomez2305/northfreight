@@ -5,16 +5,40 @@ use Captacion\Services\SavedViews;
 use Captacion\Ui;
 
 /**
- * Barra de vistas de /leads y /pipeline (Q5a-C): pestañas Lista / Tablero que comparten filtros, vistas del sistema y del usuario (guardar, renombrar, fijar, borrar),
- * densidad y columnas. Variables: $screen ('leads'|'pipeline'), $f (filtros), $paging (solo leads), $pl (solo tablero), $activeView, $sysViews, $myViews, $csrf, $prefs, $cols (solo leads).
+ * Barra de vistas de los leads (Q5a-C, ampliada en Q5c): pestañas Lista / Tablero / Tabla / Calendario / Cronología que comparten filtros, vistas del sistema y del usuario (guardar, renombrar, fijar, borrar),
+ * densidad y columnas. Variables: $screen ('leads'|'pipeline'|'tabla'|'calendario'|'cronologia'), $f (filtros), $paging (Lista y Tabla), $pl (solo tablero), $activeView, $sysViews, $myViews, $csrf, $prefs, $cols (solo Lista), $tcols (solo Tabla).
  */
 $isList = $screen === 'leads';
-$sortQ = $isList ? ['sort' => ($paging['sort'] ?? 'created') !== 'created' ? $paging['sort'] : null, 'dir' => ($paging['dir'] ?? 'desc') !== 'desc' ? $paging['dir'] : null] : [];
-$plQ = !$isList && ($pl ?? 'A') === 'B' ? ['pl' => 'B'] : [];
+$isTable = $screen === 'tabla';
+$hasSort = $isList || $isTable;
+$defSort = $isTable ? 'when' : 'created';
+$sortQ = $hasSort ? ['sort' => ($paging['sort'] ?? $defSort) !== $defSort ? $paging['sort'] : null, 'dir' => ($paging['dir'] ?? 'desc') !== 'desc' ? $paging['dir'] : null] : [];
+$plQ = $screen === 'pipeline' && ($pl ?? 'A') === 'B' ? ['pl' => 'B'] : [];
 $keepV = isset($activeView) && $activeView !== null ? ['v' => $activeView['view']['id']] : [];
-$leadsHref = '/leads' . Ui::qs($f + ($isList ? $sortQ : []) + $keepV);
-$boardHref = '/pipeline' . Ui::qs($f + (($f['pf'] ?? '') === 'company_driver' ? ['pl' => 'B'] : ($isList ? [] : $plQ)) + $keepV);
-$here = '/' . $screen . Ui::qs($f + $sortQ + $plQ + $keepV);
+// El orden viaja entre Lista y Tabla cuando existe en las dos (puntos, recibido, nombre, etapa); si no, se descarta.
+$toList = ['pts' => 'score', 'when' => 'created', 'name' => 'name', 'stage' => 'stage', 'score' => 'score', 'created' => 'created'];
+$sortFor = static function (string $target) use ($sortQ, $hasSort, $isTable, $toList): array {
+    if (!$hasSort) {
+        return [];
+    }
+    $sort = $sortQ['sort'];
+    if ($sort !== null && $target === 'leads' && $isTable) {
+        $sort = $toList[$sort] ?? null;
+        if ($sort === null) {
+            return [];
+        }
+        $sort = $sort === 'created' ? null : $sort;
+    }
+    return ['sort' => $sort, 'dir' => $sortQ['dir']];
+};
+$vtabs = [
+    'leads' => ['Lista', 'list', '/leads' . Ui::qs($f + $sortFor('leads') + $keepV)],
+    'pipeline' => ['Tablero', 'columns', '/pipeline' . Ui::qs($f + (($f['pf'] ?? '') === 'company_driver' ? ['pl' => 'B'] : $plQ) + $keepV)],
+    'tabla' => ['Tabla', 'table', '/tabla' . Ui::qs($f + $sortFor('tabla') + $keepV)],
+    'calendario' => ['Calendario', 'calendar', '/calendario' . Ui::qs($f + $keepV)],
+    'cronologia' => ['Cronología', 'history', '/cronologia' . Ui::qs($f + $keepV)],
+];
+$here = SavedViews::SCREENS[$screen] . Ui::qs($f + $sortQ + $plQ + $keepV);
 $qsSave = ltrim(Ui::qs($f + $sortQ + $plQ), '?');
 $av = $activeView['view'] ?? null;
 $dirty = !empty($activeView['dirty']);
@@ -26,8 +50,9 @@ $hasFilters = count($f) > 0 || $sortQ || $plQ;
 ?>
 <div class="vbar" data-vbar>
   <nav class="vtabs" aria-label="Vista de los leads">
-    <a class="vtab<?= $isList ? ' is-on' : '' ?>" href="<?= $e($leadsHref) ?>"<?= $isList ? ' aria-current="page"' : '' ?>><?= Ui::icon('list') ?>Lista</a>
-    <a class="vtab<?= !$isList ? ' is-on' : '' ?>" href="<?= $e($boardHref) ?>"<?= !$isList ? ' aria-current="page"' : '' ?>><?= Ui::icon('columns') ?>Tablero</a>
+    <?php foreach ($vtabs as $k => [$label, $ic, $href]): $on = $screen === $k; ?>
+      <a class="vtab<?= $on ? ' is-on' : '' ?>" href="<?= $e($href) ?>"<?= $on ? ' aria-current="page"' : '' ?>><?= Ui::icon($ic) ?><?= $e($label) ?></a>
+    <?php endforeach; ?>
   </nav>
   <div class="vbar__r">
     <div class="dd" data-dd>
@@ -63,6 +88,7 @@ $hasFilters = count($f) > 0 || $sortQ || $plQ;
       <button class="seg__i<?= $density === 'comfortable' ? ' is-on' : '' ?>" type="button" data-density-set="comfortable" aria-pressed="<?= $density === 'comfortable' ? 'true' : 'false' ?>" title="Cómoda"><?= Ui::icon('list') ?><span class="sr">Densidad cómoda</span></button>
       <button class="seg__i<?= $density === 'compact' ? ' is-on' : '' ?>" type="button" data-density-set="compact" aria-pressed="<?= $density === 'compact' ? 'true' : 'false' ?>" title="Compacta"><?= Ui::icon('sliders') ?><span class="sr">Densidad compacta</span></button>
     </div>
+    <?php if ($isTable): require __DIR__ . '/_tcols.php'; endif; ?>
     <?php if ($isList): ?>
     <div class="dd" data-dd>
       <button class="btn btn--secondary btn--sm" type="button" aria-expanded="false" aria-haspopup="true" aria-controls="cmenu"><?= Ui::icon('columns') ?>Columnas</button>

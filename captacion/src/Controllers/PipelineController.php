@@ -36,6 +36,7 @@ final class PipelineController extends Responder
     public static function index(): never
     {
         $user = self::user();
+        Prefs::remember((int) $user['id'], 'tablero');
         $pl = Kanban::pipeline($_GET['pl'] ?? 'A');
         $f = Kanban::filters($_GET);
         $stages = Kanban::stages($pl);

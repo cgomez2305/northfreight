@@ -27,7 +27,7 @@ final class ActivityView
         'config' => ['Cambios de configuración', ['settings_change', 'cost_save', 'scoring_recalc', 'integration_test', 'backup_run', 'activity_retention']],
         'stage'  => ['Cambios de etapa', ['lead_stage', 'leads_bulk_stage', 'lead_reopen']],
         'delete' => ['Borrados', ['note_delete', 'task_delete', 'cost_delete', 'backup_purge', 'activity_purge']],
-        'lead'   => ['Trabajo sobre leads', ['note_add', 'note_edit', 'task_add', 'task_done', 'task_reopen', 'task_edit', 'task_snooze', 'call_log', 'consent_revoke']],
+        'lead'   => ['Trabajo sobre leads', ['note_add', 'note_edit', 'task_add', 'task_done', 'task_reopen', 'task_edit', 'task_snooze', 'task_resched', 'call_log', 'consent_revoke']],
     ];
 
     public const LABELS = [
@@ -37,7 +37,7 @@ final class ActivityView
         'settings_change' => 'Ajuste cambiado', 'cost_save' => 'Costo guardado', 'scoring_recalc' => 'Recálculo de puntuación', 'integration_test' => 'Prueba de integración', 'backup_run' => 'Copia de seguridad', 'activity_retention' => 'Retención cambiada',
         'lead_stage' => 'Cambio de etapa', 'leads_bulk_stage' => 'Cambio de etapa masivo', 'lead_reopen' => 'Lead reabierto',
         'note_delete' => 'Nota eliminada', 'task_delete' => 'Tarea eliminada', 'cost_delete' => 'Costo eliminado', 'backup_purge' => 'Copias antiguas borradas', 'activity_purge' => 'Registro purgado',
-        'note_add' => 'Nota añadida', 'note_edit' => 'Nota editada', 'task_add' => 'Tarea creada', 'task_done' => 'Tarea completada', 'task_reopen' => 'Tarea reabierta', 'task_edit' => 'Tarea editada', 'task_snooze' => 'Tarea pospuesta',
+        'note_add' => 'Nota añadida', 'note_edit' => 'Nota editada', 'task_add' => 'Tarea creada', 'task_done' => 'Tarea completada', 'task_reopen' => 'Tarea reabierta', 'task_edit' => 'Tarea editada', 'task_snooze' => 'Tarea pospuesta', 'task_resched' => 'Tarea movida de día',
         'call_log' => 'Llamada registrada', 'consent_revoke' => 'Consentimiento revocado',
     ];
 

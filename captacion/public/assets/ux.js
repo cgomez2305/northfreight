@@ -205,9 +205,10 @@
  var ACT = {
   new_lead: function () { NS.openQC(); }, new_task: function () { location.href = '/tareas?new=1'; }, keys: function () { openKeys(); }, side: function () { NS.toggleSide(); },
   theme_light: themeAct('light'), theme_dark: themeAct('dark'), theme_auto: themeAct('auto'),
+  go_tabla: function () { location.href = '/tabla'; }, go_calendar: function () { location.href = '/calendario'; }, go_timeline: function () { location.href = '/cronologia'; },
   rules_go: function () { location.href = '/config?tab=reglas'; }, rules_new: function () { location.href = '/config?tab=reglas&nueva=1'; }, rules_sim: function () { location.href = '/config?tab=reglas&simular=1'; }
  };
- var ACT_ICON = { new_lead: 'user-plus', new_task: 'list-check', keys: 'keyboard', side: 'panel-left', theme_light: 'sun', theme_dark: 'moon', theme_auto: 'monitor', rules_go: 'sliders', rules_new: 'plus', rules_sim: 'flask', call: 'phone', note: 'note', task: 'calendar', responded: 'check-circle' };
+ var ACT_ICON = { new_lead: 'user-plus', new_task: 'list-check', keys: 'keyboard', side: 'panel-left', theme_light: 'sun', theme_dark: 'moon', theme_auto: 'monitor', go_tabla: 'table', go_calendar: 'calendar', go_timeline: 'history', rules_go: 'sliders', rules_new: 'plus', rules_sim: 'flask', call: 'phone', note: 'note', task: 'calendar', responded: 'check-circle' };
  function allItems(q) {
   var out = [], c = NS.ctx, nq = norm(q), toks = nq.split(/\s+/).filter(Boolean);
   var hit = function (t, k) { var h = norm(t + ' ' + (k || '')); return toks.every(function (x) { return h.indexOf(x) >= 0; }); };
@@ -281,7 +282,7 @@
   if (typing || e.ctrlKey || e.metaKey || e.altKey || D.querySelector('dialog[open]')) return;
   var k = e.key;
   if (gPending && Date.now() - gPending < 1300) {
-   gPending = 0; var to = { d: '/', l: '/leads', p: '/pipeline', t: '/tareas' }[k.toLowerCase()];
+   gPending = 0; var to = { d: '/', l: '/leads', p: '/pipeline', t: '/tareas', b: '/tabla', c: '/calendario', r: '/cronologia' }[k.toLowerCase()];
    if (to) { e.preventDefault(); location.href = to; return; }
   }
   if (k === '/') { e.preventDefault(); NS.palette(''); }

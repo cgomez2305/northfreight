@@ -19,6 +19,7 @@ use Captacion\Controllers\DashboardController;
 use Captacion\Controllers\InviteController;
 use Captacion\Controllers\LeadActionsController;
 use Captacion\Controllers\LeadsController;
+use Captacion\Controllers\ModosController;
 use Captacion\Controllers\PipelineController;
 use Captacion\Controllers\ProspectosController;
 use Captacion\Controllers\ReferidosController;
@@ -70,6 +71,22 @@ switch (true) {
         LeadsController::index();
     case $path === '/leads/bulk':
         LeadsController::bulk();
+    case $path === '/tabla':
+        ModosController::tabla();
+    case $path === '/tabla/export':
+        ModosController::tablaExport();
+    case $path === '/tabla/cols':
+        ModosController::tablaCols();
+    case $path === '/calendario':
+        ModosController::calendario();
+    case $path === '/calendario/move':
+        ModosController::calMoveForm();
+    case $path === '/ajax/calendar/move':
+        ModosController::calMove();
+    case $path === '/cronologia':
+        ModosController::cronologia();
+    case $path === '/ajax/timeline':
+        ModosController::cronoMore();
     case $path === '/leads/export':
         LeadsController::export();
     case $path === '/ajax/search':

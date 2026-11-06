@@ -17,7 +17,7 @@ final class Commands
         if (($user['role'] ?? '') !== 'admin') {
             return [];
         }
-        $screens = [['Dashboard', '/'], ['Leads · Lista', '/leads'], ['Pipeline · Tablero', '/pipeline'], ['Tareas', '/tareas'], ['Prospectos', '/prospectos'], ['Referidos', '/referidos'], ['Vacantes', '/vacantes'],
+        $screens = [['Dashboard', '/'], ['Leads · Lista', '/leads'], ['Pipeline · Tablero', '/pipeline'], ['Leads · Tabla', '/tabla'], ['Leads · Calendario', '/calendario'], ['Leads · Cronología', '/cronologia'], ['Tareas', '/tareas'], ['Prospectos', '/prospectos'], ['Referidos', '/referidos'], ['Vacantes', '/vacantes'],
             ['Reportes', '/reportes'], ['Informes', '/informes'], ['Comunicaciones', '/comunicaciones'], ['Configuración', '/config'], ['Actividad', '/actividad']];
         $v = [];
         foreach ($views as $x) {
@@ -27,7 +27,7 @@ final class Commands
             'screens' => $screens,
             'views' => $v,
             'actions' => [['new_lead', 'Nuevo lead'], ['new_task', 'Nueva tarea'], ['theme_light', 'Tema claro'], ['theme_dark', 'Tema oscuro'], ['theme_auto', 'Tema automático'], ['keys', 'Atajos de teclado'], ['side', 'Contraer o expandir la barra lateral'],
-                ['rules_go', 'Ir a Reglas'], ['rules_new', 'Nueva regla'], ['rules_sim', 'Simular reglas']],
+                ['go_tabla', 'Ir a Tabla'], ['go_calendar', 'Ir a Calendario'], ['go_timeline', 'Ir a Cronología'], ['rules_go', 'Ir a Reglas'], ['rules_new', 'Nueva regla'], ['rules_sim', 'Simular reglas']],
             'leadActions' => [['call', 'Registrar llamada'], ['note', 'Añadir nota'], ['task', 'Añadir tarea'], ['responded', 'Marcar respondió']],
         ];
     }

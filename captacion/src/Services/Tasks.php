@@ -157,7 +157,60 @@ final class Tasks
             Db::update('tasks', $taskId, ['due_at' => $new]);
             self::event($t['lead_id'] !== null ? (int) $t['lead_id'] : null, 'task_snoozed', ['task_id' => $taskId, 'title' => $t['title'], 'from' => $t['due_at'], 'to' => $new], $userId);
             ActivityLog::record('task_snooze', $userId, $t['lead_id'] !== null ? 'lead' : 'task', $t['lead_id'] ?? $taskId, ['task_id' => $taskId, 'from' => $t['due_at'], 'to' => $new]);
-            return self::ok('Tarea pospuesta al ' . Fmt::dateTime($new) . '.', ['due_at' => $new]);
+            return self::ok('Tarea pospuesta al ' . Fmt::dateTime($new) . '.', ['due_at' => $new, 'from' => $t['due_at']]);
+        });
+    }
+
+    /**
+     * Mueve una tarea ABIERTA a otro dia conservando su hora local (arrastrar en el calendario, o Alt + flechas). $ymd es 'AAAA-MM-DD' en la zona de visualizacion; la hora del
+     * dia se calcula en esa zona, asi que un cambio de horario de verano no corre la tarea una hora. Sin fecha previa toma la hora de inicio del horario comercial.
+     * @return array{ok:bool,msg:string,due_at?:string,from?:?string}
+     */
+    public static function reschedule(int $taskId, string $ymd, int $userId): array
+    {
+        if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $ymd) !== 1 || Fmt::fromEtInput($ymd) === null) {
+            return self::fail('El día elegido no es válido.');
+        }
+        $limit = 800 * 86400;
+        $dayTs = (int) Clock::parse((string) Fmt::fromEtInput($ymd));
+        if (abs($dayTs - Clock::time()) > $limit) {
+            return self::fail('El día elegido está demasiado lejos.');
+        }
+        return Db::transaction(static function () use ($taskId, $ymd, $userId): array {
+            $t = Db::one('SELECT id, title, lead_id, due_at FROM tasks WHERE id = ? AND deleted_at IS NULL AND done_at IS NULL FOR UPDATE', [$taskId]);
+            if ($t === null) {
+                return self::fail('La tarea no existe o ya está completada.');
+            }
+            $hm = $t['due_at'] !== null ? Fmt::et((string) $t['due_at'])->format('H:i') : Display::hours()['start'];
+            $new = Fmt::fromEtInput($ymd . 'T' . $hm);
+            if ($new === null) {
+                return self::fail('El día elegido no es válido.');
+            }
+            if ($new === $t['due_at']) {
+                return self::fail('La tarea ya está en ese día.');
+            }
+            Db::update('tasks', $taskId, ['due_at' => $new]);
+            self::event($t['lead_id'] !== null ? (int) $t['lead_id'] : null, 'task_rescheduled', ['task_id' => $taskId, 'title' => $t['title'], 'from' => $t['due_at'], 'to' => $new, 'via' => 'calendar'], $userId);
+            ActivityLog::record('task_resched', $userId, $t['lead_id'] !== null ? 'lead' : 'task', $t['lead_id'] ?? $taskId, ['task_id' => $taskId, 'from' => $t['due_at'], 'to' => $new]);
+            return self::ok('Tarea movida al ' . Fmt::dateTime($new) . '.', ['due_at' => $new, 'from' => $t['due_at']]);
+        });
+    }
+
+    /** «Deshacer» de reschedule/posponer: devuelve la fecha anterior SOLO si la tarea sigue abierta y con la fecha que se le puso ($expected); si cambio otra vez, no se toca. */
+    public static function restoreDue(int $taskId, ?string $from, ?string $expected, int $userId): array
+    {
+        return Db::transaction(static function () use ($taskId, $from, $expected, $userId): array {
+            $t = Db::one('SELECT id, title, lead_id, due_at FROM tasks WHERE id = ? AND deleted_at IS NULL AND done_at IS NULL FOR UPDATE', [$taskId]);
+            if ($t === null) {
+                return self::fail('La tarea ya no está abierta.');
+            }
+            if ($expected !== null && $t['due_at'] !== $expected) {
+                return self::fail('La tarea cambió de fecha otra vez: no se deshizo.');
+            }
+            Db::update('tasks', $taskId, ['due_at' => $from]);
+            self::event($t['lead_id'] !== null ? (int) $t['lead_id'] : null, 'task_rescheduled', ['task_id' => $taskId, 'title' => $t['title'], 'from' => $t['due_at'], 'to' => $from, 'undo' => true], $userId);
+            ActivityLog::record('task_resched', $userId, $t['lead_id'] !== null ? 'lead' : 'task', $t['lead_id'] ?? $taskId, ['task_id' => $taskId, 'from' => $t['due_at'], 'to' => $from, 'undo' => true]);
+            return self::ok('Fecha restaurada.', ['due_at' => $from]);
         });
     }
 
