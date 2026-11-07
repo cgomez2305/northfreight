@@ -37,7 +37,7 @@ $reasons = [
 <?php
 // Hero fotográfico (patrón A). Con video (o en staging): la fachada del video ES la foto del hero (marco `hero__pic`, play centrado) y el título, la meta y los 3 capítulos van en una tarjeta de vidrio abajo a la derecha.
 // Producción sin video real (DESK_VIDEO_URL vacío): solo la foto del hero, sin play, sin duración y sin capítulos.
-$deskPhoto = ['base' => 'nf-dispatch-room-maps', 'alt' => 'Dispatch room at night with monitors showing route maps and an empty chair'];
+$deskPhoto = ['base' => 'nf-dispatch-room-maps', 'alt' => 'An open road atlas with a blue route line, a rugged tablet, a headset, a mug and a notebook on a desk in warm morning light'];
 $deskSizes = '(min-width:1025px) 1160px, (min-width:761px) 100vw, (min-width:641px) calc(100vw - 72px), calc(80vw - 32px)';
 $bg = '';
 $aside = '';

@@ -17,7 +17,7 @@
 return [
     [
         'slug'     => 'how-much-does-truck-dispatch-cost',
-        'image'    => ['base' => 'nf-blog-cost', 'alt' => 'Desk calculator beside coins and a folded paper receipt next to a rain-streaked window'],
+        'image'    => ['base' => 'nf-blog-cost', 'alt' => 'A calculator, curled fuel receipts, a coffee mug and a ballpoint pen on a worn wooden kitchen table beside a window'],
         'path'     => '/blog/how-much-does-truck-dispatch-cost/',
         'title'    => 'How much does truck dispatch service cost?',
         'category' => 'Dispatch',
@@ -39,7 +39,7 @@ return [
     ],
     [
         'slug'     => 'amazon-relay-requirements',
-        'image'    => ['base' => 'nf-blog-relay-requirements', 'alt' => 'Clipboard with a blank checklist resting on a truck hood, with a trailer at a dock behind'],
+        'image'    => ['base' => 'nf-blog-relay-requirements', 'alt' => 'A white hard hat and a folded high-visibility vest beside an open folder of blank pages and a clipboard on a steel table at a loading dock'],
         'path'     => '/blog/amazon-relay-requirements/',
         'title'    => 'Amazon Relay requirements for carriers',
         'category' => 'Amazon Relay',
@@ -61,7 +61,7 @@ return [
     ],
     [
         'slug'     => 'amazon-relay-load-board',
-        'image'    => ['base' => 'nf-blog-relay-load-board', 'alt' => 'Rugged tablet mounted on a truck dashboard with a clipboard below and a trailer yard beyond the windshield'],
+        'image'    => ['base' => 'nf-blog-relay-load-board', 'alt' => 'An open laptop on the hood of a white truck in a freight yard at sunset, with a coiled blue air line in the foreground and rows of trailers behind'],
         'path'     => '/blog/amazon-relay-load-board/',
         'title'    => 'How the Amazon Relay load board works',
         'category' => 'Amazon Relay',
@@ -83,7 +83,7 @@ return [
     ],
     [
         'slug'     => 'lumper-fees-detention-pay',
-        'image'    => ['base' => 'nf-blog-lumper-detention', 'alt' => 'Loaded trailer at a loading dock at night, with a wall clock above the dock door and a clipboard on a ledge'],
+        'image'    => ['base' => 'nf-blog-lumper-detention', 'alt' => 'Stretch-wrapped pallets in a warehouse loading bay in late-afternoon sun, with a wall clock above an open dock door and a worker far in the background'],
         'path'     => '/blog/lumper-fees-detention-pay/',
         'title'    => 'Lumper fees and detention pay: how to get paid for both',
         'category' => 'Paperwork & pay',
@@ -105,7 +105,7 @@ return [
     ],
     [
         'slug'     => 'rate-per-mile',
-        'image'    => ['base' => 'nf-resource-rate-per-mile', 'alt' => 'Calculator and a folded paper road map on a truck dashboard, with the highway ahead'],
+        'image'    => ['base' => 'nf-resource-rate-per-mile', 'alt' => 'A calculator and a folded road map on the dashboard of a truck cab at sunset, with an empty highway ahead'],
         'path'     => '/resources/rate-per-mile-calculator/',
         'title'    => 'Rate per mile: know if a load pays',
         'category' => 'Dispatch',
@@ -118,7 +118,7 @@ return [
     ],
     [
         'slug'     => 'glossary',
-        'image'    => ['base' => 'nf-resource-glossary', 'alt' => 'Blank index cards, a worn notebook and a truck key fob on a desk beside a window'],
+        'image'    => ['base' => 'nf-resource-glossary', 'alt' => 'A fan of blank index cards, a worn leather notebook, reading glasses and a car key fob on a wooden desk by a window'],
         'path'     => '/resources/glossary/',
         'title'    => 'The trucking glossary for new owner-operators',
         'category' => 'Dispatch',
@@ -131,7 +131,7 @@ return [
     ],
     [
         'slug'     => 'fill-a-bol',
-        'image'    => ['base' => 'nf-resource-bol-template', 'alt' => 'Clipboard with a blank multi-part shipping form and a pen'],
+        'image'    => ['base' => 'nf-resource-bol-template', 'alt' => 'A clipboard with a blank multi-part shipping form and a pen on a steel dock plate, with a pallet and a warm sunset behind'],
         'path'     => '/resources/bol-template/',
         'title'    => 'How to fill a bill of lading',
         'category' => 'Paperwork & pay',

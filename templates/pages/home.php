@@ -195,7 +195,7 @@ $figures = [
 ]); ?>
 
 <!-- CORTINA: foto grande fijada que el panel de Amazon Relay (curtain-next) cubre al subir (≥1025px con JS); sin JS o en móvil, foto normal -->
-<?php partial('curtain', ['image' => ['base' => 'nf-blog-relay-load-board', 'alt' => 'Truck cab at night with a rugged tablet on the dashboard mount, a clipboard with a pen and a lit warehouse yard beyond the windshield', 'pos' => '50% 55%']]); ?>
+<?php partial('curtain', ['image' => ['base' => 'nf-blog-relay-load-board', 'alt' => 'An open laptop on the hood of a white truck in a freight yard at sunset, with a coiled blue air line in the foreground and rows of trailers behind', 'pos' => '50% 55%']]); ?>
 
 <!-- 03 AMAZON RELAY -->
 <section class="home-relay curtain-next" aria-labelledby="relay-title">
@@ -276,7 +276,7 @@ $teamCard = [
     'cls'     => 'home-team',
     'eyebrow' => '06 · The desk behind the load',
     'title'   => 'Built by dispatchers.{br}{hl}Run as a team.{/hl}',
-    'image'   => ['base' => 'nf-dispatch-room-wide-night', 'alt' => 'Dispatch room at night with rows of monitors showing glowing route maps, with a highway seen through the windows', 'pos' => '50% 50%'],
+    'image'   => ['base' => 'nf-dispatch-room-wide', 'alt' => 'A quiet dispatch desk by a large window at dusk, with two monitors, a headset, a notebook and a lamp, overlooking a freight yard with trailers', 'pos' => '50% 50%'],
 ];
 if ($videoReady) {
     ob_start();

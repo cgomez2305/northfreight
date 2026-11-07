@@ -50,7 +50,7 @@ partial('summary', summary_for($route));
     'eyebrow' => 'One team',
     'title'   => 'Dispatch and back office, one team',
     'lead'    => 'Because the same desk books and tracks the load, the back office already has every document it needs.',
-    'image'   => ['base' => 'nf-resource-agreement', 'alt' => 'Open folder with two blank contract pages, a pen and a desk lamp, with a truck parked in the window behind', 'pos' => '70% 60%'],
+    'image'   => ['base' => 'nf-resource-agreement', 'alt' => 'A two-page document with a pen on a wooden desk beside a lamp, a plant and a mug, with a hand resting on the desk', 'pos' => '70% 60%'],
     'chips'   => $flow,
     'chips_label' => 'From booking to payment',
     'chips_arrow' => true,

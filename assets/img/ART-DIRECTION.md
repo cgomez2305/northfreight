@@ -337,3 +337,5 @@ Estado tras la fase J (2026-11-04): la fotografía del sitio es el **set v2** (`
 | `og-default.jpg` | Imagen al compartir (recorte de `og-default` v2) |
 
 Sin usar: `hero-highway-poster` (el hero del home sigue con la foto v1 por el video), `hero-our-desk` (dos personas sentadas de espaldas, puede leerse como el equipo real), `desk-log-backdrop` (casi negra), `cta-night-truck-16x9`, `og-default-1200x630`.
+
+> **Actualización fase AB (2026-11-07):** las portadas de blog y recursos y las dos del escritorio del desk (`nf-dispatch-room-wide`, `nf-dispatch-room-maps`) también son v3 (`ART-DIRECTION-v3-faltantes.md`). Ya no queda nada de v1 ni v2 en uso.

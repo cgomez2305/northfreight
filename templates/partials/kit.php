@@ -296,8 +296,8 @@ function ns_thumb(string $path, array $exclude = [], array $alt = []): ?array
         '/how-it-works/'                     => ['nf-hero-how-it-works', 'Aerial view of white semi trucks on a highway interchange with looping ramps at sunset'],
         '/dry-van-dispatch/'                 => ['nf-hero-dry-van', 'Open dry van trailer at a loading dock with pallets of boxed cargo, a pallet jack and a worker in a safety vest in golden light'],
         '/blog/'                             => ['nf-faq-dock-light-wide', 'White trailer backed into a dock door on a warehouse wall, with yellow bollards and painted parking lines'],
-        '/resources/ifta-calculator/'        => ['nf-resource-ifta', 'Diesel fuel nozzle in the pump holster at a truck stop at night, with a white semi truck parked in the distance'],
-        '/resources/dispatcher-carrier-agreement/' => ['nf-resource-agreement', 'Open folder with two blank contract pages, a pen and a desk lamp, with a truck parked in the window behind'],
+        '/resources/ifta-calculator/'        => ['nf-resource-ifta', 'An open road atlas with a receipt, a pen and a calculator on a pale desk in soft window light'],
+        '/resources/dispatcher-carrier-agreement/' => ['nf-resource-agreement', 'A two-page document with a pen on a wooden desk beside a lamp, a plant and a mug, with a hand resting on the desk'],
     ];
     $found = null;
     foreach (data('posts') as $p) {

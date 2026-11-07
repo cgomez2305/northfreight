@@ -10,11 +10,11 @@ $manage = [
     ['A · Load board', 'Block & load booking', 'Monitoring the Relay load board and booking work that fits your lanes and equipment.',
      'truck', ['base' => 'nf-service-dispatch-booking', 'alt' => 'A worker in a safety vest walking toward the loading docks of a warehouse, with a white trailer parked alongside in warm evening light', 'pos' => '60% 50%']],
     ['B · Trips', 'Trip & arrival records', 'Schedules, arrivals and departures recorded for every run.',
-     'pin', ['base' => 'nf-blog-lumper-detention', 'alt' => 'Loaded trailer at a loading dock at night, with a wall clock above the dock door and a clipboard on a ledge', 'pos' => '50% 40%']],
+     'pin', ['base' => 'nf-blog-lumper-detention', 'alt' => 'Stretch-wrapped pallets in a warehouse loading bay in late-afternoon sun, with a wall clock above an open dock door and a worker far in the background', 'pos' => '50% 40%']],
     ['C · Performance', 'Scorecard follow-up', 'Performance tracked so problems are corrected before they cost you loads.',
-     'trend', ['base' => 'nf-blog-relay-load-board', 'alt' => 'Rugged tablet mounted on a truck dashboard with a clipboard below and a trailer yard beyond the windshield', 'pos' => '60% 50%']],
+     'trend', ['base' => 'nf-blog-relay-load-board', 'alt' => 'An open laptop on the hood of a white truck in a freight yard at sunset, with a coiled blue air line in the foreground and rows of trailers behind', 'pos' => '60% 50%']],
     ['D · Disputes', 'Disputes with evidence', 'Every claim filed with timestamps, photos and documents attached.',
-     'doc', ['base' => 'nf-blog-relay-requirements', 'alt' => 'Clipboard with a blank checklist resting on a truck hood, with a trailer at a dock behind', 'pos' => '70% 55%']],
+     'doc', ['base' => 'nf-blog-relay-requirements', 'alt' => 'A white hard hat and a folded high-visibility vest beside an open folder of blank pages and a clipboard on a steel table at a loading dock', 'pos' => '70% 55%']],
     ['E · Admin', 'Settlements & onboarding', 'Payments reconciled and new drivers set up in the account.',
      'calc', ['base' => 'nf-service-back-office', 'alt' => 'Desk by a window with a stack of printed forms, a hand holding a pen, a keyboard and a monitor', 'pos' => '55% 50%']],
 ];
@@ -65,7 +65,7 @@ partial('summary', summary_for($route));
     'exclude' => array_merge(array_map(static fn(array $m): string => $m[4]['base'], $manage), ['nf-hero-amazon-relay', 'nf-setup-amazon-relay']),
     'alt'     => [
         '/blog/amazon-relay-load-board/'   => ['nf-check-owner-approve', 'Hands holding a smartphone beside a white truck at a fuel station at sunset'],
-        '/blog/amazon-relay-requirements/' => ['nf-resource-bol-template', 'Clipboard with a blank multi-part shipping form and a pen'],
+        '/blog/amazon-relay-requirements/' => ['nf-resource-bol-template', 'A clipboard with a blank multi-part shipping form and a pen on a steel dock plate, with a pallet and a warm sunset behind'],
     ],
 ]); ?>
 <?php endif; ?>

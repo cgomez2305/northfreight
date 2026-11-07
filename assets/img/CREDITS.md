@@ -211,3 +211,16 @@ Mismo tratamiento y mecánica que las fases W y X (1280×720 a 1920×1080, crf 2
 - `onboarding-gate.mp4` (V09: un camión blanco sale por la puerta de un centro de distribución al amanecer y abandona el cuadro por la derecha, cámara fija; 1280×720, 8 s; recodificado a 1920×1080 crf 28, 1,30 MB). Dónde: paso 03 «We run the day-to-day» del onboarding del home (columna 4:5), solo ≥1025 px y sin texto sobre el video.
 - Póster de escritorio `nf-onboarding-run-tall-vid-{480,720,864}`: primer fotograma exacto, recorte 4:5 de 864×1080 desde x 866 (cabina entera); el `<video>` usa `object-position: 82% 50%` (el mismo recorte, `--vpos` fijo en `home.css`). En <1025 px sigue la foto v3. Origen 720p: en una columna de 360 px el recorte 4:5 parte de 576 px reales, así que aquí NO se amplía.
 - Videos integrados: hero, banda, CTA y onboarding del home, Owner, How, Relay y los dos de Dry van; faltan V10 a V14 y C01 a C09 de `ART-DIRECTION-VIDEO-v3.md`.
+
+## Set v3, segunda tanda: blog, recursos y escritorio del desk (fase AB, 2026-11-07)
+
+Con esta tanda ya no queda ninguna imagen v1 ni v2 en uso. Masters `<slot>-v3-a.jpg` de 3840 px (a 3840×2560 y la ancha a 3840×2160; prompts de `ART-DIRECTION-v3-faltantes.md`), variante **`-a` en los 11 espacios** (la `-b` queda como alternativa). Misma gradación SUAVE de la fase T (anti-banding hasta 65 %, sombras 18 % hacia navy, R −2 % / B +1 %, sat ×0,98, curva 10 %, grano 1,0 %), WebP calidad 80 en 640, 768, 1024, 1280, 1600, 2048 y 2560, JPG de respaldo a 1600, `unsharp` 0,6 / 40 %. Se borraron las variantes antiguas (el historial de git las conserva).
+
+| Slot | Master | Nota |
+|---|---|---|
+| `nf-blog-cost` · `nf-blog-relay-requirements` · `nf-blog-relay-load-board` · `nf-blog-lumper-detention` | `blog-*-v3-a` | portadas de los 4 artículos; `relay-load-board` también es la cortina del home y una fila de «What we manage» de Relay (contraste medido ≈ 11:1 en las 5 filas), `lumper-detention` y `relay-requirements` son filas de Relay |
+| `nf-resource-ifta` · `-rate-per-mile` · `-bol-template` · `-agreement` · `-glossary` | `resource-*-v3-a` | miniaturas de `/resources/`, tarjetas relacionadas y el panel de Back office (`agreement`) |
+| `nf-dispatch-room-wide` (antes `nf-dispatch-room-wide-night`) | `dispatch-room-wide-v3-a` (16:9) | fachada del video de «Meet the desk» del home; sin gente; tarjeta de vidrio medida a 5,4 a 5,6:1 |
+| `nf-dispatch-room-maps` (+ `-tall-{480,640,768,1024}`) | `dispatch-room-maps-v3-a` | Our desk y tarjeta 03 de «Why a desk»; `-tall` 4:5 de 2048×2560 desde x 704 |
+
+**Imágenes para redes (compuestas, no generadas):** `og/post-*.jpg` (4 artículos) y `og-default.jpg` se recompusieron a 1200×630 con las portadas nuevas (y, la de `og-default`, el primer fotograma del hero), con el mismo diseño de antes: degradado navy a la izquierda, isotipo, wordmark, título y barra cian. Aviso de honestidad: las dos imágenes del desk son AMBIENTALES (detalles de escritorio sin gente), no la oficina real; se sustituyen por fotos reales del equipo cuando existan. Los textos alternativos de las 11 piezas se reescribieron para describir lo que se ve.
