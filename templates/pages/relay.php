@@ -32,6 +32,7 @@ partial('hero', [
         ['label' => 'Ask about Relay dispatch', 'href' => wa($route['wa']), 'wa' => true, 'arrow' => true],
     ],
     'image' => ['base' => 'nf-hero-amazon-relay', 'alt' => 'Aerial view of a white semi truck with a dry van trailer driving toward a distribution warehouse with a row of loading docks at sunset', 'pos' => '70% 30%'],
+    'video' => 'relay-dock',   // fase X: video de Carlos (patio de muelles aéreo, 8 s, una pasada); póster de escritorio nf-hero-amazon-relay-vid
 ]);
 
 // Resumen "In short" (SEO/GEO): editable aquí. Solo información que ya está en el copy de esta página; sin cifras, tarifas ni promesas nuevas.

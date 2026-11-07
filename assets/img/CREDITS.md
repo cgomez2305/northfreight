@@ -181,3 +181,15 @@ Tres videos de Carlos, todos 1280×720, 24 fps, 8 s, sin audio, recodificados a 
 - Convención: el póster de un video es `<base de la imagen>-vid`; el partial lo usa solo en ≥1025 px (`art`), donde el video se monta (`[data-bgvideo]` en `main.js`: baja al acercarse, reproduce al verse ≥30 %, una pasada, se queda en el último fotograma). Con movimiento reducido, saveData o sin JS se ve el póster. Para activar un CTA con video en otra ruta: `cta_video` y los `-vid`.
 - Origen 720p: a 1440 px se amplía ×1,1 a ×1,2 y en retina ×2,2 o más (fuera de la regla de nitidez, provisional hasta que Carlos reexporte a 1080p o más). Hero Owner: `pos_d` `0% 100%` para que el cielo brillante no toque el titular.
 - Contraste medido sobre inicio, 4 s y final (1440, 1280, 1025): hero Owner texto grande cian 4,51 / 5,29 / 5,96 y pequeño ≥ 16,3; CTA del home grande 6,04 / 6,10 / 6,11 y pequeño ≥ 7,25; tarjeta de la banda 13,4 en todos. Peso total de los videos del home: 5,6 MB (hero 2,66 + banda 1,58 + CTA 1,38) frente a 6,6 MB antes, todos solo ≥1025 px y diferidos.
+
+### Videos v3, segunda tanda (fase X, 2026-11-07)
+
+Mismo tratamiento y mecánica que la fase W (1280×720 a 1920×1080, crf 28, póster `-vid` = primer fotograma exacto, solo ≥1025 px; <1025 px sigue la foto v3):
+
+| Video | Pesa | Dónde | Póster de escritorio |
+|---|---|---|---|
+| `how-interchange.mp4` (V05, intercambiador aéreo al anochecer con camiones por las rampas; el origen pesaba 6,6 MB; **aparece una cabina roja** en el puente: no afecta a la marca porque no hay logos, pero se puede pedir a Carlos que la evite si regenera) | 2,22 MB | hero de `/how-it-works/` | `nf-hero-how-it-works-vid-{640,1024,1280,1600,1920}` |
+| `relay-dock.mp4` (V06, patio de muelles aéreo al anochecer, tractor con tráiler que entra por la curva; sin marcas) | 1,79 MB | hero de `/amazon-relay-dispatch/` | `nf-hero-amazon-relay-vid-{640,1024,1280,1600,1920}` |
+
+- Contraste del texto del hero sobre inicio, 4 s y final (1440, 1280, 1025): How it works texto grande 5,46 / 5,59 / 6,35 y pequeño ≥ 10,8; Relay texto grande 5,28 / 5,99 / 5,47 y pequeño ≥ 14,8.
+- Mismo aviso de nitidez (origen 720p). Con esto los videos de Carlos ya integrados son: hero, banda, Owner, CTA del home, How it works y Relay; faltan V07 a V14 y C01 a C09 de `ART-DIRECTION-VIDEO-v3.md`.

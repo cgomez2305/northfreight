@@ -25,6 +25,7 @@ partial('hero', [
     'h1'    => 'How truck dispatching works {hl}with NorthStar{/hl}',
     'lead'  => 'Hiring a dispatch company should not mean losing control of your trucks. Here is exactly how we start and how we work with you every day.',
     'image' => ['base' => 'nf-hero-how-it-works', 'alt' => 'Aerial view of white semi trucks on a highway interchange with looping ramps at sunset', 'pos' => '72% 50%'],
+    'video' => 'how-interchange',   // fase X: video de Carlos (intercambiador aéreo, 8 s, una pasada); póster de escritorio nf-hero-how-it-works-vid
 ]);
 
 // Resumen "In short" (SEO/GEO): editable aquí. Solo información que ya está en el copy de esta página; sin cifras, tarifas ni promesas nuevas.
