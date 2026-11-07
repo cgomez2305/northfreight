@@ -70,7 +70,7 @@ $steps = [
     ['02', 'We define scope & contacts', 'Who approves loads, how we report, and which tasks the desk owns from day one.',
      ['base' => 'nf-onboarding-scope', 'alt' => 'A hand tracing a route in blue ink on an open road atlas, with a tablet showing a map, a coffee mug and a notebook on a wooden table']],
     ['03', 'We run the day-to-day', 'Booking, tracking and documenting every load, with updates where you already work: WhatsApp.',
-     ['base' => 'nf-onboarding-run', 'alt' => 'White semi truck with a sleeper cab at the gate of a logistics facility at sunrise']],
+     ['base' => 'nf-onboarding-run', 'alt' => 'White semi truck with a sleeper cab at the gate of a logistics facility at sunrise', 'video' => 'onboarding-gate']],   // fase Z: video de Carlos (V09, el camión sale por la puerta al amanecer, 8 s, una pasada); póster de escritorio nf-onboarding-run-tall-vid (4:5, primer fotograma)
     ['04', 'We review & improve', 'Regular reviews of lanes, rates and incidents to keep your trucks earning.',
      ['base' => 'nf-onboarding-review', 'alt' => 'A hand marking a printed spreadsheet at a desk, with a laptop showing a bar chart, a coffee mug and truck keys']],
 ];
@@ -246,11 +246,13 @@ $figures = [
   <div class="container stack">
     <?php partial('section-head', ['eyebrow' => '05 · Onboarding', 'title' => 'How we plug into your operation.', 'id' => 'onboarding-title']); ?>
     <ol class="home-steps">
-      <?php foreach ($steps as [$n, $title, $text, $photo]): ?>
+      <?php foreach ($steps as [$n, $title, $text, $photo]):
+          $sv = (string) ($photo['video'] ?? '');
+          $hasSv = preg_match('/^[a-z0-9-]+$/', $sv) === 1 && is_file(NS_ROOT . "/assets/video/$sv.mp4") && is_file(NS_ROOT . '/assets/img/' . $photo['base'] . '-tall-vid-480.webp'); ?>
       <li class="home-step">
         <span class="home-step__line" aria-hidden="true"><i></i></span>
-        <figure class="home-step__photo px"><?= ns_img($photo + ['sizes' => '(min-width:641px) 50vw, 65vw',
-            'art' => [['media' => '(min-width:1025px)', 'base' => $photo['base'] . '-tall', 'sizes' => '(min-width:1025px) 360px']]]) ?></figure>
+        <figure class="home-step__photo px"<?= $hasSv ? ' data-bgvideo data-mp4="' . e(asset("video/$sv.mp4")) . '"' : '' ?>><?= ns_img($photo + ['sizes' => '(min-width:641px) 50vw, 65vw',
+            'art' => [['media' => '(min-width:1025px)', 'base' => $photo['base'] . ($hasSv ? '-tall-vid' : '-tall'), 'sizes' => '(min-width:1025px) 360px']]]) ?><?php if ($hasSv): ?><video class="home-step__video" muted playsinline preload="none" aria-hidden="true" tabindex="-1"></video><?php endif; ?></figure>
         <span class="home-step__n" aria-hidden="true"><?= e($n) ?></span>
         <h3 class="head t-h3"><span class="sr-only">Step <?= e($n) ?>: </span><?= e($title) ?></h3>
         <p class="t-card"><?= e($text) ?></p>

@@ -205,3 +205,9 @@ Mismo tratamiento y mecánica que las fases W y X (1280×720 a 1920×1080, crf 2
 
 - Contraste del hero de Dry van sobre inicio, 4 s y final (1440, 1280, 1025): texto grande 5,62 / 5,74 / 5,99 y pequeño ≥ 15,3. El panel de texto del segundo video es una tarjeta `--panel` sólida fuera de la foto, sin texto sobre el video.
 - Con esto la página de Dry van tiene DOS videos (4,6 MB, ambos solo en escritorio y diferidos). Mismo aviso de nitidez (origen 720p). Videos integrados: hero y banda del home, CTA del home, Owner, How, Relay y los dos de Dry van; faltan V09 a V14 y C01 a C09 de `ART-DIRECTION-VIDEO-v3.md`.
+
+### Video v3 del onboarding (fase Z, 2026-11-07)
+
+- `onboarding-gate.mp4` (V09: un camión blanco sale por la puerta de un centro de distribución al amanecer y abandona el cuadro por la derecha, cámara fija; 1280×720, 8 s; recodificado a 1920×1080 crf 28, 1,30 MB). Dónde: paso 03 «We run the day-to-day» del onboarding del home (columna 4:5), solo ≥1025 px y sin texto sobre el video.
+- Póster de escritorio `nf-onboarding-run-tall-vid-{480,720,864}`: primer fotograma exacto, recorte 4:5 de 864×1080 desde x 866 (cabina entera); el `<video>` usa `object-position: 82% 50%` (el mismo recorte, `--vpos` fijo en `home.css`). En <1025 px sigue la foto v3. Origen 720p: en una columna de 360 px el recorte 4:5 parte de 576 px reales, así que aquí NO se amplía.
+- Videos integrados: hero, banda, CTA y onboarding del home, Owner, How, Relay y los dos de Dry van; faltan V10 a V14 y C01 a C09 de `ART-DIRECTION-VIDEO-v3.md`.
