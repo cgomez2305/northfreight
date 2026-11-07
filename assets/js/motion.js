@@ -395,6 +395,18 @@
     });
   }
 
+  /* ---- Móvil (fase AA): entrada de bloques. Cada cabecera, tarjeta, fila de foto, ítem de lista y panel que aún NO está en pantalla sube 32 px y aparece una sola vez al llegar al 90 % del alto
+     (0,7 s, power3.out; clearProps al terminar, sin will-change fijo). Los que ya se ven al cargar no se tocan (así nada parpadea) y los que están dentro de otro bloque animado no se animan por duplicado.
+     Solo transform y opacity, y solo cuando hay movimiento (con reduced-motion todo este archivo se desactiva). Las cifras y pasos de la home ya tienen su propia entrada (enterScene). ---- */
+  function revealScene() {
+    var list = $('.section-head, .card-wrap, .why__item, .rcard, .dfeat, .prow, .ngrid__item, .pcard__card, .tabp__card, .trio > li, .summary__box, .dlog, .fshow, .faq__main, .dblock__head, .home-relay__main, .stage, .crc')
+      .filter(function (el) { return sees(el) && !el.closest('.home-steps, .home-figures') && el.getBoundingClientRect().top > vh() * 0.92; });
+    list = list.filter(function (el) { return !list.some(function (o) { return o !== el && o.contains(el); }); });
+    list.forEach(function (el) {
+      g.from(el, { y: 32, opacity: 0, duration: 0.7, ease: 'power3.out', clearProps: 'opacity,transform', scrollTrigger: { trigger: el, start: 'top 90%', once: true } });
+    });
+  }
+
   /* ---- Onboarding (home): la línea cian de cada columna se rellena (scaleX 0 a 1, scrub) escalonada de izquierda a derecha; en móvil, una por paso ---- */
   function lineScene() {
     var ol = one('.home-steps');
@@ -446,6 +458,7 @@
       textScene();
     }
     enterScene();
+    if (!c.desk) revealScene();
     bandScene(!!c.desk, !!c.rail);
     return function () { undo.forEach(function (f) { f(); }); };
   }

@@ -54,7 +54,7 @@
   --gutter: clamp(20px, 4vw, 48px);
   --wrap: calc(var(--max) + 2 * var(--gutter));   /* ancho exterior: el contenido mide 1280px */
   --inset: clamp(12px, 1.2vw, 16px);              /* margen de los paneles grandes al borde de la ventana */
-  --section-y: clamp(72px, 10vw, 140px);
+  --section-y: clamp(56px, 10vw, 140px);
   --pre-cta-y: clamp(72px, 10vw, 140px);
   --head-gap: 40px;
   --card-gap: 14px;

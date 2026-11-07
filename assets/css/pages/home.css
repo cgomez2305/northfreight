@@ -122,7 +122,10 @@
   .home-step__photo { aspect-ratio: 16 / 10; }
 }
 @media (max-width: 640px) {
-  .home-steps { grid-template-columns: minmax(0, 1fr); gap: 48px; }
+  .home-steps { gap: 28px 14px; }   /* 2×2 también en móvil: son 4 pasos en secuencia y se leen de un vistazo */
+  .home-step { gap: 8px; }
+  .home-step__n { font-size: 56px; }
+  .home-step .t-h3 { margin-top: 2px; font-size: 24px; }
 }
 /* Cifras ya afirmadas en el sitio */
 .home-figures { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: clamp(24px, 4vw, 56px); }
@@ -131,10 +134,13 @@
 .home-figure + .home-figure { border-left: 1px solid var(--hairline); }
 .home-figure__n { font-family: var(--font-head); font-weight: 900; font-size: clamp(80px, 11vw, 150px); line-height: .85; letter-spacing: -.03em; color: var(--text); }
 .home-figure__t { font-size: 17px; line-height: 1.4; color: var(--text-2); max-width: 240px; }
-@media (max-width: 640px) {
-  .home-figures { grid-template-columns: minmax(0, 1fr); }
-  .home-figure, .home-figure + .home-figure { padding: 20px 0; border-left: 0; }
-  .home-figure + .home-figure { border-top: 1px solid var(--hairline); }
+@media (max-width: 640px) {   /* 4 / 1 / 0 en una sola fila de tres columnas */
+  .home-figures { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 20px; }
+  .home-figure, .home-figure + .home-figure { padding: 6px 10px; }
+  .home-figure:first-child { padding-left: 0; }
+  .home-figure + .home-figure { border-left: 1px solid var(--hairline); }
+  .home-figure__n { font-size: 56px; }
+  .home-figure__t { font-size: 13px; line-height: 1.35; }
 }
 
 /* ---- 04 Team + video ---- */
@@ -216,6 +222,13 @@
 .why__body .t-card { color: var(--text-2); }
 .why__link { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; margin-top: 4px; font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--cyan-light); text-decoration: none; transition: color var(--t-fast); }
 .why__link:hover { color: var(--text); }
+/* Móvil (fase AA): las 3 tarjetas de «Why a desk» en un carril; va aquí porque este archivo carga después de components.css y su display: grid ganaría */
+@media (max-width: 760px) {
+  .why__list { display: flex; flex-wrap: nowrap; align-items: stretch; gap: 14px; margin-inline: calc(var(--gutter) * -1); padding: 0 var(--gutter) 6px; scroll-padding-inline: var(--gutter); overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none; }
+  .why__item { flex: 0 0 min(80%, 320px); scroll-snap-align: start; }
+  .why__photo { aspect-ratio: 16 / 10; }
+  .why__body { padding: 18px 18px 22px; }
+}
 @media (max-width: 900px) { .why__list { grid-template-columns: minmax(0, 1fr); } }
 @media (min-width: 641px) and (max-width: 900px) { .why__photo { aspect-ratio: 16 / 9; } }
 

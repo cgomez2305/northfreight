@@ -680,3 +680,69 @@ a.prow__in:hover .prow__go { background: var(--cyan-light); }
 .rlist { display: flex; flex-direction: column; gap: 14px; }
 .section--surface .rcard:not(.rcard--dark) { background: transparent; }
 .section--surface .rcard:not(.rcard--dark) .rcard__go { background: transparent; }
+
+/* ======================================================================================================================
+   MÓVIL (fase AA): menos scroll, mismas cosas. Solo <=760 px (y <=640 donde se indica). Tres ideas:
+   1) CARRILES: los grupos de tarjetas con foto (servicios, why, relay, artículos; el onboarding queda en 2×2) pasan a una fila que se desliza
+      con scroll-snap (80 % del ancho: la siguiente tarjeta asoma, así se ve que hay más). Solo CSS: sin JS también funciona.
+   2) COMPACTAR: fotos 16:10 en vez de 4:3, tipografía y paddings de las filas de foto, tablas-tarjeta, listas numeradas y pie.
+   3) El resto de reglas móviles de cada componente siguen donde estaban; aquí solo se ajustan tamaños.
+   Los carriles se sangran al borde con margen negativo = --gutter y se rellenan con el mismo padding, para que el contenido siga alineado al texto.
+   ====================================================================================================================== */
+@media (max-width: 760px) {
+  .home-cards, .why__list, .home-relay__grid, .dblock__list {
+    display: flex; flex-wrap: nowrap; align-items: stretch; gap: 14px;
+    margin-inline: calc(var(--gutter) * -1); padding: 0 var(--gutter) 6px; scroll-padding-inline: var(--gutter);
+    overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none;
+  }
+  .home-cards::-webkit-scrollbar, .why__list::-webkit-scrollbar, .home-relay__grid::-webkit-scrollbar, .dblock__list::-webkit-scrollbar { display: none; }
+  .home-cards > *, .why__list > *, .home-relay__grid > *, .dblock__list > * { flex: 0 0 min(80%, 320px); min-width: 0; scroll-snap-align: start; }
+  .dblock__rows { display: contents; }
+  .dblock__rows > .rcard { flex: 0 0 min(80%, 320px); flex-direction: column; }
+  .dfeat__photo, .rcard__photo { aspect-ratio: 16 / 10; }
+  /* fotos y paddings más bajos */
+  .hero__pic { aspect-ratio: 16 / 10; }
+  .pcard__photo, .tabp__photo, .pband__photo { aspect-ratio: 16 / 10; }
+  .pcard__card, .tabp__card { padding: 22px 22px 24px; gap: 14px; }
+  .prow__photo { aspect-ratio: 16 / 10; }
+  .prow__body { padding: 18px 18px 22px; gap: 8px; }
+  .prow__title { font-size: clamp(28px, 7.4vw, 34px); }
+  .prow__text { font-size: 16px; line-height: 1.5; }
+  .prow__icon { top: 14px; left: 14px; width: 44px; height: 44px; }
+  .prow__go { right: 16px; bottom: 18px; width: 48px; height: 48px; }
+  .prows { gap: 12px; }
+  .rcard__body { gap: 8px; padding: 16px 70px 18px 18px; }
+  .rcard__title { font-size: 26px; }
+  .rcard__text { font-size: 15.5px; line-height: 1.45; }
+  .rcard__go { right: 14px; bottom: 14px; width: 44px; height: 44px; }
+  /* lista numerada (Owner y Back office): más junta, el círculo sigue siendo un blanco táctil de 44 px */
+  .ngrid { gap: 0; }
+  .ngrid__item { gap: 8px; padding: 16px 0 18px; }
+  .ngrid__title { font-size: 26px; }
+  .ngrid__text { font-size: 15.5px; line-height: 1.5; margin-bottom: 2px; }
+  .ngrid__go { width: 44px; height: 44px; }
+  /* "In short" */
+  .summary { padding-block: 40px 0; }
+  .summary__box { gap: 16px; }
+  .summary__text { font-size: 19px; line-height: 1.42; }
+  .summary--lead { padding-block: var(--section-y) 0; }
+  .summary--lead .summary__box { gap: 20px; }
+  .summary--lead .summary__text { font-size: clamp(26px, 7.2vw, 30px); line-height: 1.08; }
+  /* pie en dos columnas: marca y contacto a todo el ancho */
+  .footer__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px 16px; padding-block: 36px 28px; }
+  .footer__grid > .footer__brand, .footer__grid > .footer__col:last-child { grid-column: 1 / -1; }
+  nav.footer__col .foot__link { font-size: 11px; letter-spacing: .06em; }
+  .cta__bg { height: min(86vw, 360px); }
+}
+
+/* Móvil táctil (fase AA): respuesta visible al pulsar en tarjetas y filas (solo transform; el resto de transiciones de cada componente se conserva) */
+@media (hover: none) and (pointer: coarse) {
+  .rcard, .dfeat, a.prow__in, a.card, .why__item, .foot__contact { transition: transform .15s ease, border-color var(--t-fast), background-color var(--t-fast); }
+  .rcard:active, .dfeat:active, a.prow__in:active, a.card:active, .why__item:active, .foot__contact:active { transform: scale(.98); }
+}
+
+@media (max-width: 760px) {   /* fase AA, ronda 2: tarjetas con foto */
+  .card__photo, .cr-paths .card__photo { aspect-ratio: 16 / 10; }
+  .card--photo .card__title { font-size: 26px; }
+  .card--lg { padding: 22px; gap: 14px; }
+}

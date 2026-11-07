@@ -133,3 +133,10 @@
 .js-apply .ap__next.ap__js-only, .ap--js .ap__next.ap__js-only, .ap--js .ap__back.ap__js-only { display: inline-flex; }
 .js-apply .ap__submit { display: none; }
 @media (prefers-reduced-motion: reduce) { .ap__bar i { transition: none; } }
+
+/* Móvil (fase AA, ronda 2): tabla comparativa en tarjetas más bajas */
+@media (max-width: 760px) {
+  .crc__table tr { margin-bottom: 10px; }
+  .crc__table tbody th { padding: 16px 16px 2px; font-size: 22px; }
+  .crc__table td { padding: 8px 16px 12px; font-size: 15px; line-height: 1.45; }
+}

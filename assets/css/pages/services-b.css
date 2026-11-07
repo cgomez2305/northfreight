@@ -159,3 +159,11 @@ a.trio__in:focus-visible { outline-offset: 8px; border-radius: var(--r-card); }
   .prail__m { top: calc(var(--k) * (100% - 28px)); width: 28px; height: 28px; }
   .prail__m b { font-size: 10px; letter-spacing: .02em; }
 }
+
+/* Móvil (fase AA, ronda 2): las filas de la tabla «A load, stage by stage» se convierten en tarjetas más bajas */
+@media (max-width: 760px) {
+  .stage__table tbody tr { margin-bottom: 10px; padding: 18px 18px 4px; }
+  .stage__table tbody th, .stage__table td { padding-bottom: 12px; font-size: 15px; line-height: 1.45; }
+  .stage__name { font-size: 26px; }
+  .stage__n { margin-bottom: 4px; }
+}

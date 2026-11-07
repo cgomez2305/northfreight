@@ -96,3 +96,13 @@
   .tools-tile__val { font-size: 32px; }
   .tools-add { width: 100%; }
 }
+
+/* Móvil (fase AA, ronda 2): glosario más compacto (la letra queda arriba y los términos a todo el ancho) */
+@media (max-width: 760px) {
+  .tools-gloss__list { gap: 20px; }
+  .tools-letter { gap: 0 16px; }
+  .tools-letter__mark { min-width: 0; width: 100%; padding-top: 12px; font-size: 40px; }
+  .tools-term { gap: 6px; padding: 16px 0; }
+  .tools-term__name { font-size: 24px; }
+  .tools-term__def { font-size: 16px; line-height: 1.55; }
+}
