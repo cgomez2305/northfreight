@@ -94,7 +94,7 @@ $jsList = array_values(array_filter($jsList, static fn($j): bool => is_string($j
 <main id="main" tabindex="-1"<?= $ctaOn ? ' class="has-cta"' : '' ?>>
 <?= $content ?>
 </main>
-<?php if ($ctaOn): $ctaBase = array_key_exists('cta_image', $route) ? $route['cta_image'] : CTA_IMAGE; partial('cta', ['wa' => $wa, 'coverage' => !empty($route['cta_coverage']), 'image' => $ctaBase ? ['base' => (string) $ctaBase, 'alt' => ''] : null]); endif; ?>
+<?php if ($ctaOn): $ctaBase = array_key_exists('cta_image', $route) ? $route['cta_image'] : CTA_IMAGE; partial('cta', ['wa' => $wa, 'coverage' => !empty($route['cta_coverage']), 'image' => $ctaBase ? ['base' => (string) $ctaBase, 'alt' => ''] : null, 'video' => (string) ($route['cta_video'] ?? '')]); endif; ?>
 <?php partial('footer', ['wa' => $wa]); ?>
 <?php partial('mbar', ['wa' => $wa]); ?>
 <?php partial('wa-float', ['wa' => $wa]); ?>

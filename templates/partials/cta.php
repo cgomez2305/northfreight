@@ -5,12 +5,16 @@
  * Params: wa(string|null clave/mensaje), title(string con marcas), text(string),
  *         image(array|null, opcional: ['base'=>'nf-cta-night-truck','alt'=>''] foto de fondo DECORATIVA, oscurecida con --cta-veil (desde la izquierda; en móvil la foto va arriba, recorte <base>-m si existe);
  *         con foto el texto va a la izquierda. Sin image queda el panel liso de siempre),
- *         coverage(bool, fase S: añade al texto COVERAGE_TEXT e idiomas de LANGUAGES_TEXT; solo lo activa /our-desk/ con 'cta_coverage' => true en su ruta; con ambas constantes vacías no añade nada).
+ *         video(string, opcional, con image: assets/video/<video>.mp4, una sola pasada sin bucle, solo >=1025 px, montado por main.js [data-bgvideo]; el póster de escritorio es `<image.base>-vid`, el primer fotograma exacto del video),
+         coverage(bool, fase S: añade al texto COVERAGE_TEXT e idiomas de LANGUAGES_TEXT; solo lo activa /our-desk/ con 'cta_coverage' => true en su ruta; con ambas constantes vacías no añade nada).
  */
 require_once __DIR__ . '/kit.php';
 $wa = $wa ?? null;
 $email = (string) cfg('email');
 $image = !empty($image['base']) ? $image : null;
+$video = (string) ($video ?? '');
+$hasVideo = $image !== null && preg_match('/^[a-z0-9-]+$/', $video) === 1 && is_file(NS_ROOT . "/assets/video/$video.mp4");
+$vidPoster = $hasVideo && is_file(NS_ROOT . '/assets/img/' . $image['base'] . '-vid-640.webp') ? (string) $image['base'] . '-vid' : '';
 $note = [];
 if (!empty($coverage)) {
     if ((string) cfg('coverage_text') !== '') { $note[] = (string) cfg('coverage_text') . '.'; }
@@ -18,8 +22,8 @@ if (!empty($coverage)) {
 }
 ?>
 <section class="cta on-dark<?= $image ? ' cta--photo' : '' ?>" aria-labelledby="cta-title">
-  <?php if ($image): $ctaM = (string) $image['base'] . '-m'; ?><div class="cta__bg" aria-hidden="true"><?= ns_img(['base' => (string) $image['base'], 'alt' => '', 'sizes' => '(min-width:761px) 100vw, 65vw',
-      'art' => is_file(NS_ROOT . '/assets/img/' . $ctaM . '-640.webp') ? [['media' => '(max-width:760px)', 'base' => $ctaM, 'sizes' => '(min-width:641px) 100vw, 65vw']] : []]) ?></div><?php endif; ?>
+  <?php if ($image): $ctaM = (string) $image['base'] . '-m'; ?><div class="cta__bg" aria-hidden="true"<?= $hasVideo ? ' data-bgvideo data-mp4="' . e(asset("video/$video.mp4")) . '"' : '' ?>><?= ns_img(['base' => (string) $image['base'], 'alt' => '', 'sizes' => '(min-width:761px) 100vw, 65vw',
+      'art' => array_merge($vidPoster !== '' ? [['media' => '(min-width:1025px)', 'base' => $vidPoster, 'sizes' => '100vw']] : [], is_file(NS_ROOT . '/assets/img/' . $ctaM . '-640.webp') ? [['media' => '(max-width:760px)', 'base' => $ctaM, 'sizes' => '(min-width:641px) 100vw, 65vw']] : [])]) ?><?php if ($hasVideo): ?><video class="cta__video" muted playsinline preload="none" aria-hidden="true" tabindex="-1"></video><?php endif; ?></div><?php endif; ?>
   <div class="container cta__in">
     <div class="cta__main">
       <img class="cta__mark" src="<?= e(asset('img/isotype-white.svg')) ?>" alt="" width="56" height="56">

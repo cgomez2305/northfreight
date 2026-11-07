@@ -35,6 +35,7 @@ $routes = [
     '/' => [
         'template'   => 'home',
         'motion'     => true,
+        'cta_video'  => 'cta-night-truck',   // fase W: el CTA final del home lleva video (póster de escritorio nf-cta-night-truck-vid); las demás páginas siguen con la foto
         'title'      => 'Truck Dispatch Services | Remote Dispatch Desk | NorthStar',
         'meta'       => 'Truck dispatch services from a remote dispatch company: Amazon Relay and dry van booking, load tracking and back office. Message a dispatcher on WhatsApp.',
         'h1'         => 'Truck dispatch services for owner-operators & small fleets',

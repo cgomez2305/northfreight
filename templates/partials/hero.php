@@ -15,6 +15,9 @@
  *  ctas    array   [['label','href','variant'=>'primary|ghost','icon'=>'arrow|whatsapp|null','arrow'=>bool (→ de texto, solo en ghost: los primarios ya llevan la celda de flecha ↗ por CSS)],…]
  *  image   array   ['base'=>'nf-hero-owner-operators','alt'=>'…','pos'=>'70% 50%' (object-position), 'sizes'=>'…' (ancho útil del cover: max(ancho del marco, alto de la foto ≈ 704 px × proporción); las fotos 16:9 o más anchas necesitan sizes mayor y, en móvil, el marco 4:3 manda por el alto)] PATRÓN A (hero fotográfico): la foto es el marco del hero (ancho del contenedor, radio 32), anclada a la derecha
  *                  del panel con `.px`; el texto va abajo a la izquierda sobre degradado (--photo-fade-*) y las migas arriba como chip. En <1025px la foto va arriba y el texto debajo, sin superponer.
+ *  image.pos_d  string  (opcional) object-position solo de >=1025 px (foto y video de escritorio); sin él vale `pos`
+ *  video   string  (opcional, con image) nombre de assets/video/<video>.mp4: video de fondo de una sola pasada, sin bucle, solo >=1025 px (main.js lo monta tras load + idle, con fundido sobre la foto; ver [data-bgvideo]).
+ *                  El póster de escritorio es `<image.base>-vid` (primer fotograma EXACTO del video, 640 a 1920); <1025 px y sin video se ve la foto de siempre. Sin el mp4 no se emite <video>.
  *  aside   string  HTML ya renderizado. Con `image` es una tarjeta de vidrio abajo a la derecha (solo copy ya afirmado: ficha de equipo, puntos del resumen); sin `image`, columna derecha como siempre (Desk log, vista previa de documento)
  *  bg      string  HTML ya renderizado que sustituye a la foto (la fachada del video en Our desk: el marco ya lleva su <picture> y el botón de play)
  *  stack   bool    true => sin columna derecha, H1 hasta 980px
@@ -31,10 +34,14 @@ $bg = (string) ($bg ?? '');
 $photo = !empty($image['base']) || $bg !== '';
 $stack = !$photo && (!empty($stack) || $aside === '');
 $ctas = $ctas ?? [];
+$video = (string) ($video ?? '');
+$hasVideo = $photo && !empty($image['base']) && preg_match('/^[a-z0-9-]+$/', $video) === 1 && is_file(NS_ROOT . "/assets/video/$video.mp4");
+$vidPoster = $hasVideo && is_file(NS_ROOT . '/assets/img/' . $image['base'] . '-vid-640.webp') ? (string) $image['base'] . '-vid' : '';
 ?>
 <section class="hero hero--int on-dark<?= $photo ? ' hero--photo' : '' ?><?= $stack ? ' hero--stack' : '' ?><?= !empty($cls) ? ' ' . e($cls) : '' ?>">
   <?php if ($bg !== ''): ?><?= $bg ?>
-  <?php elseif ($photo): ?><div class="hero__pic px"<?= !empty($image['pos']) ? ' style="--pos:' . e($image['pos']) . '"' : '' ?>><?= ns_img(['base' => $image['base'], 'alt' => $image['alt'] ?? '', 'eager' => true, 'sizes' => $image['sizes'] ?? '(min-width:1025px) 1160px, (min-width:761px) 100vw, (min-width:641px) calc(100vw - 72px), 65vw']) ?></div><?php endif; ?>
+  <?php elseif ($photo): ?><div class="hero__pic px"<?php $st = (!empty($image['pos']) ? '--pos:' . $image['pos'] . ';' : '') . (!empty($image['pos_d']) ? '--pos-d:' . $image['pos_d'] . ';' : ''); ?><?= $st !== '' ? ' style="' . e($st) . '"' : '' ?><?= $hasVideo ? ' data-bgvideo data-mp4="' . e(asset("video/$video.mp4")) . '"' : '' ?>><?= ns_img(['base' => $image['base'], 'alt' => $image['alt'] ?? '', 'eager' => true, 'sizes' => $image['sizes'] ?? '(min-width:1025px) 1160px, (min-width:761px) 100vw, (min-width:641px) calc(100vw - 72px), 65vw',
+      'art' => $vidPoster !== '' ? [['media' => '(min-width:1025px)', 'base' => $vidPoster, 'sizes' => '1252px']] : []]) ?><?php if ($hasVideo): ?><video class="hero__video" muted playsinline preload="none" aria-hidden="true" tabindex="-1"></video><?php endif; ?></div><?php endif; ?>
   <div class="container hero__in">
     <?php if ($photo): ?><div class="hero__crumbs"><?php if (isset($crumbs)): partial('breadcrumbs', ['crumbs' => $crumbs]); elseif (isset($route)): partial('breadcrumbs', ['route' => $route]); endif; ?></div><?php endif; ?>
     <div class="hero__main">

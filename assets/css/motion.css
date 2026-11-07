@@ -10,7 +10,7 @@
    obliga a ampliar la foto y a pedir una variante mayor) y arranca centrada (-4,55 % de su alto).
    La geometría es la misma con y sin JS a propósito: así la foto no "salta" cuando motion.js empieza a moverla. ---- */
 .px { overflow: hidden; }
-.px img { height: 110%; max-height: none; transform: translateY(-4.55%); will-change: transform; }
+.px img, .px video { height: 110%; max-height: none; transform: translateY(-4.55%); will-change: transform; }
 
 /* ---- Cortina fotográfica (partial curtain): sin JS o en móvil, foto normal. Con js-motion, >=1025px y >=700px de alto el wrapper mide foto + una ventana, la foto va sticky y .curtain-next sube con margen negativo (= alto de la foto) y la tapa.
    --cur-o: distancia al borde superior; --cur-p: alto de la foto ---- */

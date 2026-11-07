@@ -318,7 +318,7 @@ Estado tras la fase J (2026-11-04): la fotografía del sitio es el **set v2** (`
 | `nf-onboarding-learn` · `-scope` · `-run` · `-review` | Home: onboarding (3:2 y `-tall`); How it works: filas apiladas de los 4 pasos |
 | `nf-setup-owner-operator` · `nf-setup-small-fleet` · `nf-setup-amazon-relay` | Home: pestañas "Choose your setup"; Owner: pestañas Small fleet y Amazon Relay; Relay: foto de "Why Relay needs a dedicated desk"; drafts de Hotshot, Flatbed y Power only |
 | `nf-dispatch-room-wide-night` (v1) | Home: fachada del video "Meet the desk" |
-| `nf-freight-dock` | Home: póster de la banda de video (primer fotograma gradado de `assets/video/freight-dock.mp4`, v2) |
+| `nf-freight-dock` | Home: póster de la banda de video (primer fotograma de `assets/video/freight-dock.mp4`, v3, fase W) |
 | `nf-faq-dock-light-4x5` | Home: foto del FAQ (4:5 nativo) |
 | `nf-faq-dock-light-wide` | Miniatura de `/blog/` en Resources y foto provisional de Box truck (draft) |
 | `nf-hero-owner-operators` | Hero fotográfico de Owner-operators |

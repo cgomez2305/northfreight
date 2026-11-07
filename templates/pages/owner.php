@@ -35,7 +35,8 @@ partial('hero', [
         ['label' => 'Talk to a dispatcher', 'href' => wa($route['wa']), 'wa' => true, 'arrow' => true],
         ['label' => 'How we onboard', 'href' => url('/how-it-works/'), 'variant' => 'ghost'],
     ],
-    'image'   => ['base' => 'nf-hero-owner-operators', 'alt' => 'Inside a truck cab at sunrise, with a phone mounted on the dashboard and an empty highway ahead', 'pos' => '62% 100%'],
+    'image'   => ['base' => 'nf-hero-owner-operators', 'alt' => 'Inside a truck cab at sunset, with a hand on the steering wheel and an empty highway ahead', 'pos' => '62% 100%', 'pos_d' => '0% 100%'],
+    'video'   => 'owner-cab',   // fase W: video de Carlos (cabina al atardecer, 8 s, una pasada); póster de escritorio nf-hero-owner-operators-vid
 ]);
 
 // Resumen "In short" (SEO/GEO): editable aquí. Solo información que ya está en el copy de esta página; sin cifras, tarifas ni promesas nuevas.

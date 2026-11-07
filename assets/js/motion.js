@@ -171,7 +171,7 @@
   /* ---- Escena 3: parallax de fotos. La imagen (110 % del alto del marco) se desplaza mientras el marco cruza la ventana ---- */
   function photoScene(rail) {
     $('.px').forEach(function (px) {
-      var img = $('img', px);   // un marco puede llevar varias fotos apiladas (FAQ por tema): se mueven juntas con un solo trigger
+      var img = $('img, video', px);   // un marco puede llevar varias fotos apiladas (FAQ por tema): se mueven juntas con un solo trigger
       if (!img.length || (rail && px.closest('.home-cards')) || !sees(px)) return; // las del carril se mueven en horizontal (escena 2); las ocultas (foto del FAQ en <1025px) no necesitan trigger
       g.fromTo(img, { y: 0, yPercent: -0.3 }, {
         yPercent: -8.8, ease: 'none',

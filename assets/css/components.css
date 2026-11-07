@@ -216,6 +216,7 @@ a.btn--primary:is(:hover, :focus-visible)::after, a.btn--navy:is(:hover, :focus-
 .hero__pic picture { display: block; width: 100%; height: 100%; }
 .hero__pic img { width: 100%; height: 100%; object-fit: cover; object-position: var(--pos, 50% 50%); display: block; }
 .hero__pic::after { content: ""; position: absolute; inset: 0; background: var(--hero-fade-top), var(--hero-fade-m); pointer-events: none; }
+.hero__video { display: none; }   /* solo >=1025 px (ver abajo y [data-bgvideo] en main.js) */
 .hero--photo .hero__in { gap: 0; padding-top: 0; margin-top: -44px; padding-bottom: clamp(36px, 6vw, 56px); align-items: flex-start; }
 .hero--photo .hero__crumbs { flex: 1 1 100%; margin-bottom: 20px; }
 .hero--photo .hero__main { flex: 1 1 100%; gap: 20px; }
@@ -227,7 +228,10 @@ a.btn--primary:is(:hover, :focus-visible)::after, a.btn--navy:is(:hover, :focus-
 @media (min-width: 1025px) {
   .hero--photo { min-height: clamp(520px, 74vh, 640px); display: flex; }   /* ≤640: la foto (110 % del alto por el parallax) no pasa de ~704 px de alto y los masters de 3840 px dan margen de sobra en retina */
   .hero__pic { position: absolute; top: 0; right: 0; bottom: 0; width: 90%; aspect-ratio: auto; }
-  .hero__pic picture { -webkit-mask-image: var(--photo-mask); mask-image: var(--photo-mask); }   /* la máscara va en el <picture> (no en .hero__pic) para no crear un contexto de apilamiento que dejaría el botón de play del video bajo el degradado */
+  .hero__pic picture, .hero__video { -webkit-mask-image: var(--photo-mask); mask-image: var(--photo-mask); }
+  .hero__video { display: block; position: absolute; left: 0; top: 0; width: 100%; height: 100%; object-fit: cover; object-position: var(--pos-d, var(--pos, 50% 50%)); opacity: 0; transition: opacity .6s ease; }   /* misma geometría y máscara que la foto; 110 % y parallax vienen de .px en motion.css */
+  .hero__pic.has-video .hero__video { opacity: 1; }
+  .hero__pic img { object-position: var(--pos-d, var(--pos, 50% 50%)); }   /* la máscara va en el <picture> (no en .hero__pic) para no crear un contexto de apilamiento que dejaría el botón de play del video bajo el degradado */
   .hero__pic::after { content: none; }
   .hero--photo::after { content: ""; position: absolute; inset: 0; z-index: 0; background: var(--hero-fade-top), var(--photo-fade-bottom), var(--photo-fade-left); pointer-events: none; }
   .hero--photo .hero__in { flex: 1 1 auto; max-width: none; display: grid; grid-template-columns: minmax(0, 1fr) 380px; grid-template-rows: auto 1fr; align-items: end; gap: 0 40px; margin-top: 0; padding-top: 84px; padding-bottom: 44px; }
@@ -354,6 +358,11 @@ a.card:hover .card__icon, .card--hover:hover .card__icon { background: var(--cya
 .cta__bg { position: absolute; inset: 0; z-index: 0; overflow: hidden; }
 .cta__bg picture { display: block; width: 100%; height: 100%; }
 .cta__bg img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; }   /* sin .px: sin escala extra sobre la foto */
+.cta__video { display: none; }
+@media (min-width: 1025px) {
+  .cta__video { display: block; position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 50%; opacity: 0; transition: opacity .6s ease; }
+  .cta__bg.has-video .cta__video { opacity: 1; }
+}
 .cta__bg::after { content: ""; position: absolute; inset: 0; background: var(--cta-veil); }
 .cta--photo .cta__in { z-index: 1; flex-direction: column; align-items: flex-start; justify-content: center; gap: 32px; text-align: left; padding-block: clamp(48px, 5vw, 72px); }
 .cta--photo .cta__main { flex: none; max-width: 640px; align-items: flex-start; }

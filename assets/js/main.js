@@ -159,8 +159,8 @@
      al ser visible (y empieza a bajar el archivo cuando se acerca a la pantalla). Ambos se pausan al salir de ella y se reanudan donde iban si aún no terminaron.
      Si falla o no carga, queda la foto / el póster. Fundido de opacidad vía .has-video. ---- */
   (function () {
-    var hero = d.querySelector('[data-hero-video]'), band = d.querySelector('[data-vband]');
-    if ((!hero && !band) || !window.matchMedia) return;
+    var hero = d.querySelector('[data-hero-video]'), band = d.querySelector('[data-vband]'), bgs = d.querySelectorAll('[data-bgvideo]');   // [data-bgvideo]: hero interno con video (Owner) y CTA con video; como la banda: baja al acercarse, reproduce al verse y se queda en el último fotograma
+    if ((!hero && !band && !bgs.length) || !window.matchMedia) return;
     function allowed() {
       var conn = navigator.connection || {};
       return !(conn.saveData || window.matchMedia('(prefers-reduced-motion: reduce)').matches || !window.matchMedia('(min-width: 1025px)').matches);
@@ -191,6 +191,7 @@
       if (!allowed()) return;
       if (hero) mount(hero, hero.querySelector('video'), hero.getAttribute('data-mp4'), hero.getAttribute('data-webm'), false);
       if (band) mount(band.parentNode, band.querySelector('video'), band.getAttribute('data-mp4'), '', true);
+      Array.prototype.forEach.call(bgs, function (el) { mount(el, el.querySelector('video'), el.getAttribute('data-mp4'), '', true); });
     }
     function later() { if (window.requestIdleCallback) window.requestIdleCallback(start, { timeout: 2500 }); else setTimeout(start, 400); }
     if (d.readyState === 'complete') later(); else window.addEventListener('load', later);

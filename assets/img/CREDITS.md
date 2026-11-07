@@ -50,7 +50,7 @@ Videos generados con IA por Carlos a partir de las fotos v2 (image-to-video, ori
 | Archivo | Origen en el Drive de Carlos | Peso | Uso |
 |---|---|---|---|
 | `assets/video/hero.mp4` | video v3 de Carlos (generado a partir de una imagen de la carpeta v3; **1280×720, 24 fps, 8,0 s, sin audio**; el generador NO conservó `hero-highway-poster-v3-a` como primer fotograma: composición distinta, camión a la derecha y sol bajo a la izquierda) | 2,66 MB | Hero del home (≥1025 px, una pasada sin bucle). Recodificado a 1920×1080 H.264 high crf 27, `+faststart`, sin audio, con unsharp 0,45, balance de sombras +3,5 % azul / medios R −1 % B +0,8 %, saturación ×0,98, contraste ×1,02 y grano temporal σ≈3. La foto `nf-hero-highway-poster` es SU PRIMER FOTOGRAMA exacto (extraído del mp4 ya codificado, sin salto al arrancar). Último fotograma: el camión mucho más lejos por el carril derecho. |
-| `assets/video/freight-dock.mp4` | `jzLjaq0L_2x_upscaled.mp4` (de `setup-amazon-relay`, patio de noche con camión en el muelle) | 3,2 MB | Banda del home (≥1025 px). Póster: `nf-freight-dock` (primer fotograma, 2688×1536). |
+| `assets/video/freight-dock.mp4` | video v3 de Carlos (V02, muelle de distribución en hora dorada, operario con chaleco que camina; **1280×720**, 8 s, sin audio; no conservó `service-dispatch-booking-v3-a` como primer fotograma) | 1,58 MB | Banda del home (≥1025 px, una pasada sin bucle). Recodificado a 1920×1080 H.264 crf 27 con el mismo tratamiento que el hero (ver «Videos v3»). El póster `nf-freight-dock` es su primer fotograma exacto. Sustituye al video v2 de la fase K. |
 | (no está en el repo) | `8CAdhlyz_2x_upscaled.mp4` (de `hero-our-desk`, oficina del desk) | 7,2 MB | No usado: Our desk sigue con `nf-dispatch-room-maps`. Queda codificado fuera del repo por si se usa después. |
 
 Procesado de los videos (script fuera del repo, fotograma a fotograma): reescalado a 1920×1080 (lanczos), la MISMA gradación de marca de la fase J (parámetros de arriba) con los radios del anti-banding a la mitad (el video va a 1920, no a 3840) y grano gaussiano más suave (σ 0,8 % en lugar de 1,2 %, semilla distinta en cada fotograma); H.264 high, 24 fps, `preset slow`, crf 23, `yuv420p`, sin audio (los originales de autopista y oficina traían pista AAC: se descartó), `+faststart`. Sin fundido de costura. Los 364 fotogramas se codifican desde un intermedio sin pérdida.
@@ -68,7 +68,7 @@ El código solo pide el video en ≥1025 px, sin `prefers-reduced-motion` ni `sa
 | Archivo | Master | Procesado | Uso |
 |---|---|---|---|
 | `nf-hero-highway-poster-{640,1024,1280,1600,1920}` + `.jpg` (1600) | primer fotograma de `hero.mp4` | WebP 83, `method=6`, sin gradación extra (la del video ya está aplicada) | Hero del home (LCP). Máximo 1920 de ancho: no hay master mayor |
-| `nf-freight-dock-{640,1024,1280,1600,2048,2560}` + `.jpg` (1600) | primer fotograma de `dock.mp4` (2688×1536), sin LUT | misma gradación (anti-banding con radios al 70 %) | Póster de la banda de video |
+| `nf-freight-dock-{640,1024,1280,1600,1920}` | primer fotograma de `freight-dock.mp4` (v3) | WebP 82, `method=6`, sin gradación extra; sin JPG de respaldo (nunca se emitía) | Póster de la banda de video del home |
 
 
 ## Recortes del FAQ por tema (fase L2)
@@ -129,7 +129,7 @@ Exportación: WebP en 640, 768, 1024, 1280, 1600, 2048, 2560 (más 3200 en los h
 
 ### Lo que NO se tocó
 
-- `nf-freight-dock` (primer fotograma de `freight-dock.mp4`) sigue en v2: cambiar la foto sin cambiar el video daría un salto al arrancar. `service-dispatch-booking-v3` espera su video v3. **El hero del home ya es v3** (video de Carlos del 2026-11-07, ver «Hero del home v3»; `hero-highway-poster-v3-a/b` quedan sin usar porque el video no parte de ellas). Los masters descargados están fuera del repo.
+- Con la fase W los tres videos del home y de Owner son v3; solo `service-dispatch-booking-v3` (la imagen) sigue sin uso como póster porque ningún video parte de ella. Los masters descargados están fuera del repo.
 - `hero-our-desk-v3-*` y `why-desk-team-v3-*`: salas vacías generadas que podrían leerse como la oficina real de NorthStar. Our desk sigue con `nf-dispatch-room-maps` (v1) y el ítem 3 de Why a desk también.
 - `nf-resource-*`, `nf-blog-*`, `nf-dispatch-room-*`, `og-default.jpg` y los `OG` de artículos: no tienen v3.
 
@@ -166,3 +166,18 @@ A 834 y 390 px los heros y las filas llevan el texto bajo la foto sobre `--bg` (
 - Origen: `hero-v3-raw.mp4`, 1280×720. **Limitación de nitidez (§14):** a 1440 px de ancho el hero se muestra con `cover` por alto (~872 px): ×1,21 respecto de los píxeles reales a 1x y ×2,4 en retina. Incumple la regla del sitio; es provisional hasta que Carlos reexporte el video a 1080p o más (con el generador, "upscale" o resolución alta) y se repita este paso.
 - Contraste del texto del hero sobre el video (peor de tres fotogramas: inicio, 4 s y final; texto grande = «Documented.» cian): 1440 5,04 grande / 9,54 pequeño; 1280 5,10 / 9,02; 1025 5,12 / 6,92; 1024 5,99 / 10,1; 834 5,93 / 9,98; 768 5,93 / 9,67; 390 6,67 / 8,29. Botones: navy sobre cian 6,48. De 761 a 1024 px se añadió el token `--hero-fade-tablet` (sin él el párrafo medía 3,35:1 sobre el cielo y el camión claros). El texto de escritorio queda sobre el degradado de siempre (`--hero-fade-left`): el sol bajo queda atenuado por el degradado a la izquierda.
 - El `object-position` (90 % 50 %) deja el camión (x 68 a 95 % del cuadro) a la derecha, bajo el widget y fuera del titular.
+
+
+## Videos v3 (fase W, 2026-11-07)
+
+Tres videos de Carlos, todos 1280×720, 24 fps, 8 s, sin audio, recodificados a 1920×1080 con el mismo tratamiento que el hero (Lanczos, unsharp 0,45, balance sombras +3,5 % azul / medios R −1 % B +0,8 %, saturación ×0,98, contraste ×1,02, grano temporal σ≈3, H.264 high crf 27, `+faststart`, sin audio). Ninguno conservó el fotograma inicial de su imagen v3, así que el póster de escritorio es SU primer fotograma exacto (extraído del mp4 ya codificado):
+
+| Video | Pesa | Dónde | Póster de escritorio | Foto en <1025 px |
+|---|---|---|---|---|
+| `owner-cab.mp4` (V03, cabina al atardecer, brazo en el volante) | 1,75 MB | hero de `/dispatch-for-owner-operators/` (`video` del partial `hero`) | `nf-hero-owner-operators-vid-{640,1024,1280,1600,1920}` | `nf-hero-owner-operators` v3-a (3840 px) |
+| `freight-dock.mp4` (V02, muelle) | 1,58 MB | banda de video del home | `nf-freight-dock-*` (reemplaza el slot) | el mismo póster |
+| `cta-night-truck.mp4` (V04, tráiler al anochecer que se acerca) | 1,38 MB | CTA final SOLO en el home (`'cta_video' => 'cta-night-truck'` en la ruta; las demás páginas siguen con la foto) | `nf-cta-night-truck-vid-{640,1024,1280,1600,1920}` | `nf-cta-night-truck` v3-a y `-m` |
+
+- Convención: el póster de un video es `<base de la imagen>-vid`; el partial lo usa solo en ≥1025 px (`art`), donde el video se monta (`[data-bgvideo]` en `main.js`: baja al acercarse, reproduce al verse ≥30 %, una pasada, se queda en el último fotograma). Con movimiento reducido, saveData o sin JS se ve el póster. Para activar un CTA con video en otra ruta: `cta_video` y los `-vid`.
+- Origen 720p: a 1440 px se amplía ×1,1 a ×1,2 y en retina ×2,2 o más (fuera de la regla de nitidez, provisional hasta que Carlos reexporte a 1080p o más). Hero Owner: `pos_d` `0% 100%` para que el cielo brillante no toque el titular.
+- Contraste medido sobre inicio, 4 s y final (1440, 1280, 1025): hero Owner texto grande cian 4,51 / 5,29 / 5,96 y pequeño ≥ 16,3; CTA del home grande 6,04 / 6,10 / 6,11 y pequeño ≥ 7,25; tarjeta de la banda 13,4 en todos. Peso total de los videos del home: 5,6 MB (hero 2,66 + banda 1,58 + CTA 1,38) frente a 6,6 MB antes, todos solo ≥1025 px y diferidos.
