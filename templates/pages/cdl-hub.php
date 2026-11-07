@@ -14,7 +14,7 @@ partial('hero', [
     'h1'      => 'CDL-A company driver {hl}jobs{/hl}',
     'lead'    => $jobs ? 'These are the open company driver positions at NorthStar Freight Solutions. Each page says what the job involves and how to apply.' : 'No openings listed right now. We only publish real positions.',
     'ctas'    => $jobs ? [] : [['label' => 'Owner-operator partnership', 'href' => url('/careers/owner-operators/'), 'variant' => 'ghost', 'arrow' => true]],
-    'image'   => ['base' => 'nf-hero-how-it-works', 'alt' => 'White semi truck crossing a highway overpass at night, with light trails on the ramps below', 'pos' => '72% 50%'],
+    'image'   => ['base' => 'nf-hero-how-it-works', 'alt' => 'Aerial view of white semi trucks on a highway interchange with looping ramps at sunset', 'pos' => '72% 50%'],
 ]);
 ?>
 <section class="section pre-cta" aria-labelledby="cd-open">

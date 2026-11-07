@@ -21,7 +21,7 @@ partial('hero', [
         ['label' => 'Apply as an owner-operator', 'href' => $apply, 'arrow' => true],
         ['label' => 'How the partnership works', 'href' => url('/careers/owner-operators/'), 'variant' => 'ghost', 'arrow' => true],
     ],
-    'image'   => ['base' => 'nf-hero-dry-van', 'alt' => 'White semi truck pulling a dry van trailer along a highway under an overcast dusk sky', 'pos' => '70% 50%'],
+    'image'   => ['base' => 'nf-hero-dry-van', 'alt' => 'Open dry van trailer at a loading dock with pallets of boxed cargo, a pallet jack and a worker in a safety vest in golden light', 'pos' => '70% 50%'],
 ]);
 
 // Resumen "In short" (SEO/GEO): solo información ya afirmada en el sitio; sin cifras, tarifas ni promesas nuevas.
@@ -41,10 +41,10 @@ $driverCard = $jobs
           'variant' => 'link', 'href' => url('/careers/owner-operators/'), 'tag' => 'Owner-operators', 'title' => 'Partner with a dispatcher',
           'text' => 'Keep running your own truck. The desk finds and books your loads, deals with brokers, tracks every trip and keeps the paperwork that gets you paid.',
           'cta' => 'Owner operator jobs, explained',
-          'image' => ['base' => 'nf-setup-owner-operator', 'alt' => 'White semi truck parked alone in an empty lot at dusk, with bare trees behind', 'sizes' => '(min-width:1025px) 540px, (min-width:641px) 46vw, calc(100vw - 40px)'],
+          'image' => ['base' => 'nf-setup-owner-operator', 'alt' => 'White long-hood semi truck with a dry van trailer parked in a rest area at sunrise, with a person standing beside the cab', 'sizes' => '(min-width:1025px) 540px, (min-width:641px) 46vw, calc(100vw - 40px)'],
       ]); ?>
       <?php partial('card', $driverCard + [
-          'image' => ['base' => 'nf-setup-small-fleet', 'alt' => 'Several white semi trucks parked in a row in a depot lot at dusk', 'sizes' => '(min-width:1025px) 540px, (min-width:641px) 46vw, calc(100vw - 40px)'],
+          'image' => ['base' => 'nf-setup-small-fleet', 'alt' => 'Several white semi trucks and a white pickup parked in a row in a depot lot at sunset', 'sizes' => '(min-width:1025px) 540px, (min-width:641px) 46vw, calc(100vw - 40px)'],
           'cls' => $jobs ? '' : 'cr-card--note',
       ]); ?>
     </div>

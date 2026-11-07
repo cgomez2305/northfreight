@@ -27,7 +27,7 @@ partial('hero', [
         ['label' => 'Start your application', 'href' => $applyUrl . '?type=owner-operator', 'arrow' => true],
         ['label' => 'Talk to a dispatcher', 'href' => wa($route['wa']), 'variant' => 'ghost', 'wa' => true, 'arrow' => true],
     ],
-    'image'   => ['base' => 'nf-setup-owner-operator', 'alt' => 'White semi truck parked alone in an empty lot at dusk, with bare trees behind', 'pos' => '66% 50%'],
+    'image'   => ['base' => 'nf-setup-owner-operator', 'alt' => 'White long-hood semi truck with a dry van trailer parked in a rest area at sunrise, with a person standing beside the cab', 'pos' => '66% 50%'],
 ]);
 
 partial('summary', summary_for($route));
@@ -48,7 +48,7 @@ partial('summary', summary_for($route));
     'eyebrow' => 'Who decides',
     'title'   => 'Your truck, your decision.',
     'lead'    => 'You approve every load. We tell you what we booked and why, and you can message the desk on WhatsApp.',
-    'image'   => ['base' => 'nf-check-owner-approve', 'alt' => 'A hand holding a phone with a check mark on the screen inside a truck cab at dusk', 'pos' => '60% 100%'],
+    'image'   => ['base' => 'nf-check-owner-approve', 'alt' => 'Hands holding a smartphone beside a white truck at a fuel station at sunset', 'pos' => '60% 100%'],
     'extra'   => ns_checks(['Every load approved by you', 'Updates on WhatsApp, where you already work', 'A team, not one dispatcher who disappears'], 'What staying in control means'),
 ]); ?>
 

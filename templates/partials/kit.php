@@ -289,13 +289,13 @@ function ns_menu(): array
 function ns_thumb(string $path, array $exclude = [], array $alt = []): ?array
 {
     static $svc = [
-        '/amazon-relay-dispatch/'            => ['nf-hero-amazon-relay', 'White semi truck with a dry van trailer parked beside a warehouse dock on a wet night yard'],
-        '/dispatch-for-owner-operators/'     => ['nf-hero-owner-operators', 'Truck cab at dusk with a phone mounted on the dashboard, a clipboard and a rest area beyond the windshield'],
-        '/trucking-back-office/'             => ['nf-hero-back-office', 'Desk with a lamp, a stamp, a stack of blank forms and a laptop beside a rain-covered window at night'],
-        '/load-tracking/'                    => ['nf-check-tracking-mirror', 'Truck side mirror at dusk showing the trailer and the highway behind it'],
-        '/how-it-works/'                     => ['nf-hero-how-it-works', 'White semi truck crossing a highway overpass at night, with light trails on the ramps below'],
-        '/dry-van-dispatch/'                 => ['nf-hero-dry-van', 'White semi truck pulling a dry van trailer along a highway under an overcast dusk sky'],
-        '/blog/'                             => ['nf-faq-dock-light-wide', 'Open loading dock door under a warm wall light at dusk, with yellow bollards'],
+        '/amazon-relay-dispatch/'            => ['nf-hero-amazon-relay', 'Aerial view of a white semi truck with a dry van trailer driving toward a distribution warehouse with a row of loading docks at sunset'],
+        '/dispatch-for-owner-operators/'     => ['nf-hero-owner-operators', 'Inside a truck cab at sunrise, with a phone mounted on the dashboard and an empty highway ahead'],
+        '/trucking-back-office/'             => ['nf-hero-back-office', 'Wooden desk in warm window light with an open binder of papers, reading glasses, a pen, a mug and a closed laptop, and a hand resting on the page'],
+        '/load-tracking/'                    => ['nf-check-tracking-mirror', 'Truck side mirror at sunset reflecting a white trailer and the highway behind it'],
+        '/how-it-works/'                     => ['nf-hero-how-it-works', 'Aerial view of white semi trucks on a highway interchange with looping ramps at sunset'],
+        '/dry-van-dispatch/'                 => ['nf-hero-dry-van', 'Open dry van trailer at a loading dock with pallets of boxed cargo, a pallet jack and a worker in a safety vest in golden light'],
+        '/blog/'                             => ['nf-faq-dock-light-wide', 'White trailer backed into a dock door on a warehouse wall, with yellow bollards and painted parking lines'],
         '/resources/ifta-calculator/'        => ['nf-resource-ifta', 'Diesel fuel nozzle in the pump holster at a truck stop at night, with a white semi truck parked in the distance'],
         '/resources/dispatcher-carrier-agreement/' => ['nf-resource-agreement', 'Open folder with two blank contract pages, a pen and a desk lamp, with a truck parked in the window behind'],
     ];

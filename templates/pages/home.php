@@ -35,15 +35,15 @@ $services = [
     ['num' => '01', 'title' => 'Dispatch & load booking',
      'text' => 'We search, negotiate and book freight on Amazon Relay and dry van lanes, plan routes around hours of service and coordinate every pickup with your drivers.',
      'href' => url('/dispatch-for-owner-operators/'), 'cta' => 'Dispatch for owner-operators',
-     'image' => ['base' => 'nf-service-dispatch-booking', 'alt' => 'White dry van trailer backed into a warehouse loading dock at dusk', 'sizes' => $railSizes]],
+     'image' => ['base' => 'nf-service-dispatch-booking', 'alt' => 'A worker in a safety vest walking toward the loading docks of a warehouse, with a white trailer parked alongside in warm evening light', 'sizes' => $railSizes]],
     ['num' => '02', 'title' => 'Load tracking & check calls',
      'text' => 'Every trip followed from pickup to POD: ETAs, arrivals and departures logged, incidents documented and brokers kept informed, so you are not on the phone.',
      'href' => url('/load-tracking/'), 'cta' => 'Load tracking',
-     'image' => ['base' => 'nf-service-load-tracking', 'alt' => 'A hand holding a phone inside a truck cab at dusk, with a trailer parked beyond the windshield', 'sizes' => $railSizes]],
+     'image' => ['base' => 'nf-service-load-tracking', 'alt' => 'View from a truck cab at sunset, with a hand on a phone mounted on the dashboard and a trailer ahead on the highway', 'sizes' => $railSizes]],
     ['num' => '03', 'title' => 'Trucking back office',
      'text' => 'Paperwork organized, settlements prepared and disputes followed with evidence. We also help onboard new drivers so they are set up in your accounts.',
      'href' => url('/trucking-back-office/'), 'cta' => 'Back office services',
-     'image' => ['base' => 'nf-service-back-office', 'alt' => 'Desk with a stack of paper forms, a pen, a binder clip, a closed laptop and a tablet', 'sizes' => $railSizes]],
+     'image' => ['base' => 'nf-service-back-office', 'alt' => 'Desk by a window with a stack of printed forms, a hand holding a pen, a keyboard and a monitor', 'sizes' => $railSizes]],
 ];
 
 $relay = [
@@ -66,13 +66,13 @@ $why = [
 // 04 Onboarding: foto decorativa por paso (alt descriptivo corto)
 $steps = [
     ['01', 'We learn your operation', 'Trucks, equipment, lanes, drivers and the accounts you already run, including Amazon Relay.',
-     ['base' => 'nf-onboarding-learn', 'alt' => 'Hands over a paper road map on a worn table, with a pen, truck keys and a notebook']],
+     ['base' => 'nf-onboarding-learn', 'alt' => 'Diner booth table by a window with two coffee mugs, a notebook with a pen and a phone, and a truck stop outside at sunrise']],
     ['02', 'We define scope & contacts', 'Who approves loads, how we report, and which tasks the desk owns from day one.',
-     ['base' => 'nf-onboarding-scope', 'alt' => 'Hand signing a form on a clipboard, with a trailer parked out of focus behind']],
+     ['base' => 'nf-onboarding-scope', 'alt' => 'A hand tracing a route in blue ink on an open road atlas, with a tablet showing a map, a coffee mug and a notebook on a wooden table']],
     ['03', 'We run the day-to-day', 'Booking, tracking and documenting every load, with updates where you already work: WhatsApp.',
-     ['base' => 'nf-onboarding-run', 'alt' => 'White semi truck with a dry van trailer driving past at dusk, with the background blurred by motion']],
+     ['base' => 'nf-onboarding-run', 'alt' => 'White semi truck with a sleeper cab at the gate of a logistics facility at sunrise']],
     ['04', 'We review & improve', 'Regular reviews of lanes, rates and incidents to keep your trucks earning.',
-     ['base' => 'nf-onboarding-review', 'alt' => 'Rows of white trailers parked in a truck yard beside a warehouse at dusk, with a tractor pulling through']],
+     ['base' => 'nf-onboarding-review', 'alt' => 'A hand marking a printed spreadsheet at a desk, with a laptop showing a bar chart, a coffee mug and truck keys']],
 ];
 
 $chapters = [
@@ -181,15 +181,15 @@ $figures = [
     'items'   => [
         ['label' => 'Owner-operator', 'title' => 'Owner-operator', 'wa' => 'owner',
          'points' => ['You approve every load', 'Updates on WhatsApp, where you already work', 'Arrival timestamps and photos kept on file'],
-         'image' => ['base' => 'nf-setup-owner-operator', 'alt' => 'White semi truck parked alone in an empty lot at dusk, with bare trees behind', 'pos' => '60% 100%'],
+         'image' => ['base' => 'nf-setup-owner-operator', 'alt' => 'White long-hood semi truck with a dry van trailer parked in a rest area at sunrise, with a person standing beside the cab', 'pos' => '60% 100%'],
          'link' => ['label' => 'Dispatch for owner-operators', 'href' => url('/dispatch-for-owner-operators/')]],
         ['label' => 'Small fleet', 'title' => 'Small fleet', 'wa' => "Hi, I run a small fleet and I'd like to talk about dispatch with NorthStar.",
          'points' => ['A team, not a single dispatcher', 'New drivers set up in your accounts', 'Who approves loads, how we report and which tasks the desk owns'],
-         'image' => ['base' => 'nf-setup-small-fleet', 'alt' => 'Several white semi trucks parked in a row in a depot lot at dusk', 'pos' => '50% 70%'],
+         'image' => ['base' => 'nf-setup-small-fleet', 'alt' => 'Several white semi trucks and a white pickup parked in a row in a depot lot at sunset', 'pos' => '50% 70%'],
          'link' => ['label' => 'See how we onboard', 'href' => url('/how-it-works/')]],
         ['label' => 'Amazon Relay carrier', 'title' => 'Amazon Relay carrier', 'wa' => 'relay',
          'points' => ['Block and load booking', 'Trip and arrival records', 'Scorecard follow-up and disputes filed with evidence'],
-         'image' => ['base' => 'nf-setup-amazon-relay', 'alt' => 'White semi truck at a warehouse dock wall at night under tall floodlights', 'pos' => '50% 55%'],
+         'image' => ['base' => 'nf-setup-amazon-relay', 'alt' => 'White semi truck with a dry van trailer driving past a long distribution warehouse with lit loading docks at dusk', 'pos' => '50% 55%'],
          'link' => ['label' => 'Amazon Relay dispatch', 'href' => url('/amazon-relay-dispatch/')]],
     ],
 ]); ?>
@@ -365,9 +365,9 @@ partial('photo-card', $teamCard); ?>
 <!-- 09 FAQ -->
 <?php partial('faq', ['items' => route_faq_items($route), 'eyebrow' => '09 · FAQ', 'title' => 'Truck dispatch questions carriers ask us.', 'pre_cta' => true,
     // Foto del FAQ por tema (cada pregunta de app/data/faq.php lleva 'topic'): 0 costo, arranque y contrato · 1 Amazon Relay · 2 alcance · 3 con quién trabajamos. El tema 0 es la foto de siempre (4:5 nativo).
-    'image' => ['base' => 'nf-faq-dock-light-4x5', 'alt' => 'Open loading dock door under a warm wall light at dusk, with yellow bollards', 'sizes' => '(min-width:1025px) 500px, 0px', 'topics' => [
-        ['base' => 'nf-faq-dock-light-4x5', 'alt' => 'Open loading dock door under a warm wall light at dusk, with yellow bollards'],
-        ['base' => 'nf-check-tracking-mirror-tall', 'alt' => 'Rain-streaked truck side mirror reflecting a white trailer on a wet highway at dusk'],
-        ['base' => 'nf-hero-back-office-tall', 'alt' => 'Office desk at night under a lamp, with forms in a tray, a stack of paper, a pen and an inked stamp'],
-        ['base' => 'nf-check-owner-approve-tall', 'alt' => 'A driver’s hand holding a phone with a check mark inside a truck cab at dusk'],
+    'image' => ['base' => 'nf-faq-dock-light-4x5', 'alt' => 'White trailer backed into a dock door on a warehouse wall, with yellow bollards and painted parking lines', 'sizes' => '(min-width:1025px) 500px, 0px', 'topics' => [
+        ['base' => 'nf-faq-dock-light-4x5', 'alt' => 'White trailer backed into a dock door on a warehouse wall, with yellow bollards and painted parking lines'],
+        ['base' => 'nf-check-tracking-mirror-tall', 'alt' => 'Truck side mirror at sunset reflecting a white trailer and the highway behind it'],
+        ['base' => 'nf-hero-back-office-tall', 'alt' => 'Wooden desk in warm window light with an open binder of papers, reading glasses, a pen, a mug and a closed laptop, and a hand resting on the page'],
+        ['base' => 'nf-check-owner-approve-tall', 'alt' => 'Hands holding a smartphone beside a white truck at a fuel station at sunset'],
     ]]]); ?>

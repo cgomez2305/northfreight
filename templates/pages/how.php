@@ -8,13 +8,13 @@ require_once NS_ROOT . '/templates/partials/kit.php';
 $rowSizes = '(min-width:1025px) 1000px, (min-width:761px) 100vw, (min-width:641px) calc(100vw - 40px), 65vw';   // la fila mide ~1089 px: a 1x basta la variante de 1024 (x1,06)
 $steps = [
     ['We learn your operation', 'Trucks, equipment, lanes, drivers, home time and the accounts you already run, including Amazon Relay.', 'pin',
-     ['base' => 'nf-onboarding-learn', 'alt' => 'Hands over a paper road map on a worn table, with a pen, truck keys and a notebook', 'pos' => '55% 50%', 'sizes' => $rowSizes]],
+     ['base' => 'nf-onboarding-learn', 'alt' => 'Diner booth table by a window with two coffee mugs, a notebook with a pen and a phone, and a truck stop outside at sunrise', 'pos' => '55% 50%', 'sizes' => $rowSizes]],
     ['We define scope & contacts', 'Who approves loads, how and when we report, and which tasks the desk owns from day one.', 'doc',
-     ['base' => 'nf-onboarding-scope', 'alt' => 'Hand signing a form on a clipboard, with a trailer parked out of focus behind', 'pos' => '60% 45%', 'sizes' => $rowSizes]],
+     ['base' => 'nf-onboarding-scope', 'alt' => 'A hand tracing a route in blue ink on an open road atlas, with a tablet showing a map, a coffee mug and a notebook on a wooden table', 'pos' => '60% 45%', 'sizes' => $rowSizes]],
     ['We run the day-to-day', 'Booking, tracking and documenting every load. You get updates on WhatsApp, where you already work.', 'truck',
-     ['base' => 'nf-onboarding-run', 'alt' => 'White semi truck with a dry van trailer driving past at dusk, with the background blurred by motion', 'pos' => '65% 55%', 'sizes' => $rowSizes]],
+     ['base' => 'nf-onboarding-run', 'alt' => 'White semi truck with a sleeper cab at the gate of a logistics facility at sunrise', 'pos' => '65% 55%', 'sizes' => $rowSizes]],
     ['We review & improve', 'Regular reviews of lanes, rates and incidents to keep your trucks earning.', 'trend',
-     ['base' => 'nf-onboarding-review', 'alt' => 'Rows of white trailers parked in a truck yard beside a warehouse at dusk, with a tractor pulling through', 'pos' => '55% 50%', 'sizes' => $rowSizes]],
+     ['base' => 'nf-onboarding-review', 'alt' => 'A hand marking a printed spreadsheet at a desk, with a laptop showing a bar chart, a coffee mug and truck keys', 'pos' => '55% 50%', 'sizes' => $rowSizes]],
 ];
 $expect = ['One channel for every update', 'A record of every load', 'A team, not a single dispatcher'];
 
@@ -24,7 +24,7 @@ partial('hero', [
     'eyebrow' => 'How we plug into your operation',
     'h1'    => 'How truck dispatching works {hl}with NorthStar{/hl}',
     'lead'  => 'Hiring a dispatch company should not mean losing control of your trucks. Here is exactly how we start and how we work with you every day.',
-    'image' => ['base' => 'nf-hero-how-it-works', 'alt' => 'White semi truck crossing a highway overpass at night, with light trails on the ramps below', 'pos' => '72% 50%'],
+    'image' => ['base' => 'nf-hero-how-it-works', 'alt' => 'Aerial view of white semi trucks on a highway interchange with looping ramps at sunset', 'pos' => '72% 50%'],
 ]);
 
 // Resumen "In short" (SEO/GEO): editable aquí. Solo información que ya está en el copy de esta página; sin cifras, tarifas ni promesas nuevas.
@@ -47,7 +47,7 @@ partial('trio', ['label' => 'Booked, tracked, documented', 'items' => [
 <?php partial('stage-table', ['eyebrow' => 'From booking to settlement', 'title' => 'A load, stage by stage', 'id' => 'hw-stages', 'count' => count(data('stages'))]); ?>
 
 <!-- CORTINA: foto grande fijada que el panel "What you can expect" (curtain-next) cubre al subir (≥1025px con JS); sin JS o en móvil, foto normal -->
-<?php partial('curtain', ['image' => ['base' => 'nf-check-tracking-mirror', 'alt' => 'Rain-streaked truck side mirror reflecting a white trailer on a wet highway at dusk', 'pos' => '70% 50%'], 'short' => true]); ?>
+<?php partial('curtain', ['image' => ['base' => 'nf-check-tracking-mirror', 'alt' => 'Truck side mirror at sunset reflecting a white trailer and the highway behind it', 'pos' => '70% 50%'], 'short' => true]); ?>
 
 <section class="section section--surface curtain-next" aria-labelledby="hw-expect">
   <div class="container stack sb-gap-32">

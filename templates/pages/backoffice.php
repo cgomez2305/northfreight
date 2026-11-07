@@ -30,7 +30,7 @@ partial('hero', [
     'tagline' => 'The work behind the load, done right.',
     'lead'    => 'Paperwork organized, settlements prepared and disputes followed until they close, according to the scope we agree with you.',
     'ctas'    => [['label' => 'Talk to the desk', 'href' => wa($route['wa']), 'wa' => true, 'arrow' => true]],
-    'image'   => ['base' => 'nf-hero-back-office', 'alt' => 'Desk with a lamp, a stamp, a stack of blank forms and a laptop beside a rain-covered window at night', 'pos' => '60% 50%'],
+    'image'   => ['base' => 'nf-hero-back-office', 'alt' => 'Wooden desk in warm window light with an open binder of papers, reading glasses, a pen, a mug and a closed laptop, and a hand resting on the page', 'pos' => '60% 50%'],
 ]);
 
 // Resumen "In short" (SEO/GEO): editable aquí. Solo información que ya está en el copy de esta página; sin cifras, tarifas ni promesas nuevas.

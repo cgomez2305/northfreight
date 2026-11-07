@@ -57,7 +57,7 @@ partial('summary', summary_for($route));
     'eyebrow' => 'Proof, not promises',
     'title'   => 'Incidents are handled with evidence',
     'lead'    => 'When a broker questions a late arrival or detention, the record is already there: time, place and photos. Your claim starts with proof, not with a phone call.',
-    'image'   => ['base' => 'nf-check-tracking-mirror', 'alt' => 'Truck side mirror at dusk showing the trailer and the highway behind it', 'pos' => '70% 50%'],
+    'image'   => ['base' => 'nf-check-tracking-mirror', 'alt' => 'Truck side mirror at sunset reflecting a white trailer and the highway behind it', 'pos' => '70% 50%'],
     'extra'   => ns_checks(['Rate confirmation filed with the load', 'Evidence on file for detention and disputes', 'Updates on WhatsApp, where you already work', 'A record of every load'], 'What the desk keeps on file'),
     'link'    => route_is_live('/trucking-back-office/') ? ['label' => 'How our back office uses this evidence', 'href' => url('/trucking-back-office/')] : null,
 ]); ?>

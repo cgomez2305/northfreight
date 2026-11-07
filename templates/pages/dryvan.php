@@ -22,7 +22,7 @@ partial('hero', [
     'ctas'  => [
         ['label' => 'Talk to a dispatcher', 'href' => wa($route['wa']), 'wa' => true, 'arrow' => true],
     ],
-    'image' => ['base' => 'nf-hero-dry-van', 'alt' => 'White semi truck pulling a dry van trailer along a highway under an overcast dusk sky', 'pos' => '70% 50%'],
+    'image' => ['base' => 'nf-hero-dry-van', 'alt' => 'Open dry van trailer at a loading dock with pallets of boxed cargo, a pallet jack and a worker in a safety vest in golden light', 'pos' => '70% 50%'],
 ]);
 
 // Resumen "In short" (SEO/GEO): editable aquí. Solo información que ya está en el copy de esta página; sin cifras, tarifas ni promesas nuevas.
@@ -45,7 +45,7 @@ partial('summary', summary_for($route));
     'eyebrow' => 'How we work',
     'title'   => 'One desk behind every dry van load',
     'lead'    => 'The same desk books, tracks and documents every load, as one team.',
-    'image'   => ['base' => 'nf-check-dry-van-interior', 'alt' => 'Inside an empty dry van trailer, with cargo rails along the walls and a worn wooden floor', 'pos' => '50% 55%'],
+    'image'   => ['base' => 'nf-check-dry-van-interior', 'alt' => 'Inside an empty dry van trailer, looking out through the open rear doors toward a warehouse with loading docks', 'pos' => '50% 55%'],
     'extra'   => ns_checks(['You approve every load', 'Updates on WhatsApp, where you already work', 'A record of every load', 'A team, not a single dispatcher'], 'What working with the desk means'),
 ]); ?>
 

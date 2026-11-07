@@ -9,7 +9,7 @@
 return [
     'box' => [
         'path'    => '/box-truck-dispatch/',
-        'image'   => ['base' => 'nf-faq-dock-light-wide', 'alt' => 'Open loading dock door under a warm wall light at dusk, with yellow bollards'],   // foto ambiental provisional (páginas en draft)
+        'image'   => ['base' => 'nf-faq-dock-light-wide', 'alt' => 'White trailer backed into a dock door on a warehouse wall, with yellow bollards and painted parking lines'],   // foto ambiental provisional (páginas en draft)
         'name'    => 'Box truck',
         'h1'      => 'Box truck dispatch services',
         'tagline' => 'Loads that fit a straight truck',
@@ -44,7 +44,7 @@ return [
     ],
     'hotshot' => [
         'path'    => '/hotshot-dispatch/',
-        'image'   => ['base' => 'nf-setup-owner-operator', 'alt' => 'White semi truck parked alone in an empty lot at dusk, with bare trees behind'],   // foto ambiental provisional (páginas en draft)
+        'image'   => ['base' => 'nf-setup-owner-operator', 'alt' => 'White long-hood semi truck with a dry van trailer parked in a rest area at sunrise, with a person standing beside the cab'],   // foto ambiental provisional (páginas en draft)
         'name'    => 'Hotshot',
         'h1'      => 'Hotshot dispatch services',
         'tagline' => 'Fast loads, secured right',
@@ -79,7 +79,7 @@ return [
     ],
     'flatbed' => [
         'path'    => '/flatbed-dispatch/',
-        'image'   => ['base' => 'nf-setup-small-fleet', 'alt' => 'Several white semi trucks parked in a row in a depot lot at dusk'],   // foto ambiental provisional (páginas en draft)
+        'image'   => ['base' => 'nf-setup-small-fleet', 'alt' => 'Several white semi trucks and a white pickup parked in a row in a depot lot at sunset'],   // foto ambiental provisional (páginas en draft)
         'name'    => 'Flatbed',
         'h1'      => 'Flatbed dispatch services',
         'tagline' => 'Open deck, no surprises',
@@ -114,7 +114,7 @@ return [
     ],
     'power-only' => [
         'path'    => '/power-only-dispatch/',
-        'image'   => ['base' => 'nf-setup-amazon-relay', 'alt' => 'White semi truck at a warehouse dock wall at night under tall floodlights'],   // foto ambiental de marca (no muestra al equipo real)
+        'image'   => ['base' => 'nf-setup-amazon-relay', 'alt' => 'White semi truck with a dry van trailer driving past a long distribution warehouse with lit loading docks at dusk'],   // foto ambiental de marca (no muestra al equipo real)
         'name'    => 'Power only',
         'h1'      => 'Power only dispatch services',
         'tagline' => 'Your tractor, their trailer',
@@ -148,7 +148,7 @@ return [
     ],
     'reefer' => [
         'path'    => '/reefer-dispatch/',
-        'image'   => ['base' => 'nf-onboarding-run', 'alt' => 'White semi truck with a dry van trailer driving past at dusk, with the background blurred by motion'],   // foto ambiental provisional (páginas en draft)
+        'image'   => ['base' => 'nf-onboarding-run', 'alt' => 'White semi truck with a sleeper cab at the gate of a logistics facility at sunrise'],   // foto ambiental provisional (páginas en draft)
         'name'    => 'Reefer',
         'h1'      => 'Reefer dispatch services',
         'tagline' => 'Temperature on record, every load',
