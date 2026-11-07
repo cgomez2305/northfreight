@@ -8,6 +8,7 @@
  *  link    array|null  ['label','href'] botón pill de vidrio dentro de la foto (solo si la sección ya tiene ese enlace)
  *  flip    bool   tarjeta a la derecha (cuando el sujeto de la foto está a la izquierda)
  *  video   array|null  ['id','title','meta'] la foto es la fachada de un video: se imprime con el partial video (botón de play) y el pie (título + meta) queda como tarjeta de vidrio dentro de la foto
+ *  bgvideo string  (opcional, sin `video`) nombre de assets/video/<bgvideo>.mp4: video de fondo de la foto, una pasada sin bucle, solo >=1025 px (main.js [data-bgvideo]); el póster de escritorio es `<image.base>-vid` (primer fotograma exacto)
  *  extra   string HTML ya renderizado que va al final de la tarjeta  ·  after string HTML ya renderizado que va DEBAJO de la composición (p. ej. los capítulos del video, en 3 columnas)
  *  cls     string clase extra en <section>
  */
@@ -16,14 +17,17 @@ $image = is_array($image ?? null) ? $image : [];
 $link = is_array($link ?? null) && !empty($link['href']) ? $link : null;
 $video = is_array($video ?? null) ? $video : null;
 $sizes = $image['sizes'] ?? '(min-width:1025px) 1152px, (min-width:641px) 100vw, 65vw';
+$bgv = (string) ($bgvideo ?? '');
+$hasBgv = !$video && !empty($image['base']) && preg_match('/^[a-z0-9-]+$/', $bgv) === 1 && is_file(NS_ROOT . "/assets/video/$bgv.mp4");
+$bgvPoster = $hasBgv && is_file(NS_ROOT . '/assets/img/' . $image['base'] . '-vid-640.webp') ? (string) $image['base'] . '-vid' : '';
 ?>
 <section class="section pcard<?= !empty($cls) ? ' ' . e($cls) : '' ?>"<?= !empty($id) ? ' aria-labelledby="' . e($id) . '"' : '' ?>>
   <div class="container">
     <div class="pcard__in<?= !empty($flip) ? ' pcard--flip' : '' ?>">
       <?php if ($video): partial('video', ['part' => 'player', 'id' => $video['id'], 'image' => ['base' => $image['base'], 'alt' => $image['alt'] ?? ''], 'title' => $video['title'], 'meta' => $video['meta'] ?? '', 'cls' => 'pcard__photo', 'src' => $video['src'] ?? ns_video_src(), 'sizes' => $sizes, 'pos' => $image['pos'] ?? '']);
       else: ?>
-      <figure class="pcard__photo px"<?= !empty($image['pos']) ? ' style="--pos:' . e($image['pos']) . '"' : '' ?>>
-        <?= ns_img(['base' => (string) $image['base'], 'alt' => (string) ($image['alt'] ?? ''), 'sizes' => $sizes]) ?>
+      <figure class="pcard__photo px"<?= !empty($image['pos']) ? ' style="--pos:' . e($image['pos']) . '"' : '' ?><?= $hasBgv ? ' data-bgvideo data-mp4="' . e(asset("video/$bgv.mp4")) . '"' : '' ?>>
+        <?= ns_img(['base' => (string) $image['base'], 'alt' => (string) ($image['alt'] ?? ''), 'sizes' => $sizes, 'art' => $bgvPoster !== '' ? [['media' => '(min-width:1025px)', 'base' => $bgvPoster, 'sizes' => '1152px']] : []]) ?><?php if ($hasBgv): ?><video class="pcard__video" muted playsinline preload="none" aria-hidden="true" tabindex="-1"></video><?php endif; ?>
         <?php if ($link): ?><a class="pcard__pill" href="<?= e($link['href']) ?>"><?= e($link['label']) ?> <span class="arrow" aria-hidden="true">→</span></a><?php endif; ?>
       </figure>
       <?php endif; ?>

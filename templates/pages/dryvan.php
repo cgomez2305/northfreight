@@ -23,6 +23,7 @@ partial('hero', [
         ['label' => 'Talk to a dispatcher', 'href' => wa($route['wa']), 'wa' => true, 'arrow' => true],
     ],
     'image' => ['base' => 'nf-hero-dry-van', 'alt' => 'Open dry van trailer at a loading dock with pallets of boxed cargo, a pallet jack and a worker in a safety vest in golden light', 'pos' => '70% 50%'],
+    'video' => 'dryvan-rear-doors',   // fase Y: video de Carlos (V07, avance hacia el interior del tráiler, 8 s, una pasada); póster de escritorio nf-hero-dry-van-vid
 ]);
 
 // Resumen "In short" (SEO/GEO): editable aquí. Solo información que ya está en el copy de esta página; sin cifras, tarifas ni promesas nuevas.
@@ -46,6 +47,7 @@ partial('summary', summary_for($route));
     'title'   => 'One desk behind every dry van load',
     'lead'    => 'The same desk books, tracks and documents every load, as one team.',
     'image'   => ['base' => 'nf-check-dry-van-interior', 'alt' => 'Inside an empty dry van trailer, looking out through the open rear doors toward a warehouse with loading docks', 'pos' => '50% 55%'],
+    'bgvideo' => 'dryvan-interior',   // fase Y: video de Carlos (V08, interior vacío del tráiler, 8 s, una pasada); póster de escritorio nf-check-dry-van-interior-vid
     'extra'   => ns_checks(['You approve every load', 'Updates on WhatsApp, where you already work', 'A record of every load', 'A team, not a single dispatcher'], 'What working with the desk means'),
 ]); ?>
 

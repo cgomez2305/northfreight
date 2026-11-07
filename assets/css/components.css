@@ -477,6 +477,11 @@ body:has(.mobile-menu:not([hidden])) .wa-float, body.menu-open .wa-float { displ
 .pcard__photo img, .tabp__photo img { width: 100%; height: 100%; object-fit: cover; object-position: var(--pos, 50% 50%); display: block; }
 .pcard__card, .tabp__card { position: relative; z-index: 2; display: flex; flex-direction: column; gap: 18px; margin: -56px 12px 0; padding: clamp(24px, 3vw, 40px); background: var(--panel); border: 1px solid var(--hairline-strong); border-radius: var(--r-card); }
 .pcard__card .section-head { gap: 16px; }
+.pcard__video { display: none; }   /* solo >=1025 px; misma geometría que la foto (.px: 110 % y parallax en motion.css) */
+@media (min-width: 1025px) {
+  .pcard__video { display: block; position: absolute; left: 0; top: 0; width: 100%; object-fit: cover; object-position: var(--pos, 50% 50%); opacity: 0; transition: opacity .6s ease; }
+  .pcard__photo.has-video .pcard__video { opacity: 1; }
+}
 .pcard__card .t-h2, .tabp__title { font-size: clamp(34px, 8vw, 46px); }
 .pcard__pill { position: absolute; right: 20px; bottom: 20px; z-index: 1; display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 0 22px; background: var(--glass-strong); border: 1px solid var(--hairline-strong); border-radius: var(--r-pill); color: var(--text); font-weight: 600; font-size: 15px; text-decoration: none; transition: background-color var(--t-fast), border-color var(--t-fast); }
 .pcard__pill:hover { background: var(--panel-2); border-color: var(--cyan-line); color: var(--text); }

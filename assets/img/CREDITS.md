@@ -193,3 +193,15 @@ Mismo tratamiento y mecánica que la fase W (1280×720 a 1920×1080, crf 28, pó
 
 - Contraste del texto del hero sobre inicio, 4 s y final (1440, 1280, 1025): How it works texto grande 5,46 / 5,59 / 6,35 y pequeño ≥ 10,8; Relay texto grande 5,28 / 5,99 / 5,47 y pequeño ≥ 14,8.
 - Mismo aviso de nitidez (origen 720p). Con esto los videos de Carlos ya integrados son: hero, banda, Owner, CTA del home, How it works y Relay; faltan V07 a V14 y C01 a C09 de `ART-DIRECTION-VIDEO-v3.md`.
+
+### Videos v3, tercera tanda (fase Y, 2026-11-07)
+
+Mismo tratamiento y mecánica que las fases W y X (1280×720 a 1920×1080, crf 28, póster `-vid` = primer fotograma exacto, solo ≥1025 px, foto v3 en <1025 px):
+
+| Video | Pesa | Dónde | Póster de escritorio |
+|---|---|---|---|
+| `dryvan-rear-doors.mp4` (V07, avance hacia el interior de un tráiler en un muelle, operario con chaleco que camina hacia el fondo; el origen pesaba 5,3 MB) | 2,21 MB | hero de `/dry-van-dispatch/` | `nf-hero-dry-van-vid-{640,1024,1280,1600,1920}` |
+| `dryvan-interior.mp4` (V08, interior vacío del tráiler con la cámara avanzando hacia las puertas abiertas; el origen pesaba 6,1 MB) | 2,39 MB | panel «One desk behind every dry van load» de `/dry-van-dispatch/` (partial `photo-card`, parámetro nuevo `bgvideo`) | `nf-check-dry-van-interior-vid-{640,1024,1280,1600,1920}` |
+
+- Contraste del hero de Dry van sobre inicio, 4 s y final (1440, 1280, 1025): texto grande 5,62 / 5,74 / 5,99 y pequeño ≥ 15,3. El panel de texto del segundo video es una tarjeta `--panel` sólida fuera de la foto, sin texto sobre el video.
+- Con esto la página de Dry van tiene DOS videos (4,6 MB, ambos solo en escritorio y diferidos). Mismo aviso de nitidez (origen 720p). Videos integrados: hero y banda del home, CTA del home, Owner, How, Relay y los dos de Dry van; faltan V09 a V14 y C01 a C09 de `ART-DIRECTION-VIDEO-v3.md`.
