@@ -57,6 +57,10 @@
   .hero-pre .hero--home { margin-bottom: var(--pin-h, 100vh); }
 }
 
+@media (min-width: 761px) and (max-width: 1024px) {
+  .hero__bg::after { background: var(--hero-fade-top), var(--hero-fade-bottom), var(--hero-fade-tablet); }
+}
+
 /* Móvil: la foto va arriba, entera, y se funde con el fondo; el texto debajo */
 @media (max-width: 760px) {
   .hero--home { min-height: 0; display: block; }

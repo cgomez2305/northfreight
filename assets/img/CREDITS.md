@@ -36,8 +36,8 @@ Hoja antes y después de las 4 pruebas (exterior nocturno, cielo nublado claro, 
 | `nf-{why-one-channel,why-record-every-load}-tall-{480,640,1024,1280}` | 3840×2560 | 4:5, 2048×2560: 973,0 a 3021,2560 y 1088,0 a 3136,2560 | Sticky "Why a desk" (≥1025 px) |
 | `nf-onboarding-{learn,scope,run,review}-tall-{480,640,1024,1280}` | 3840×2560 | 4:5, 2048×2560: x0 896, 1088, 1664 y 1357 | Onboarding del home (≥1025 px) |
 | `nf-hero-amazon-relay-pill-320`, `nf-hero-dry-van-pill-320` | 3840×2880 | 2,125:1 a todo el ancho: 0,681 a 3840,2488 y 0,536 a 3840,2343, reducido a 320 px | Pastillas del H2 "Three fronts" |
-| `nf-hero-highway-poster-m-{480,640,1024,1280,1600}` | `hero-highway-poster` 3840×2160 | 4:5, 1728×2160: 1901,0 a 3629,2160 (camión entero, x 71 a 85 % de la foto) | Hero del home en ≤760 px |
-| `nf-hero-highway-poster-sq-{640,1024,1280,1600,2048}` | `hero-highway-poster` 3840×2160 | 1:1, 2160×2160: 1454,0 a 3614,2160 | Hero del home de 761 a 1024 px |
+| `nf-hero-highway-poster-m-{480,640,864}` | primer fotograma de `hero.mp4` (1920×1080, reescalado de 1280×720) | 4:5, 864×1080: x 1056 a 1920 (camión entero) | Hero del home en ≤760 px |
+| `nf-hero-highway-poster-sq-{640,1024,1080}` | primer fotograma de `hero.mp4` | 1:1, 1080×1080: x 840 a 1920 | Hero del home de 761 a 1024 px |
 | `og-default.jpg` | `og-default` v2 (2400×1256) | 2392×1256 (x 8 a 2400) reducido a 1200×630, con velo, isotipo, "NORTHSTAR" y la frase de siempre | Imagen al compartir |
 
 No se usan: `hero-our-desk` (muestra a dos personas sentadas de espaldas: Carlos decide), `desk-log-backdrop` (casi negra), `cta-night-truck-16x9` y `og-default-1200x630` (apoyo).
@@ -49,7 +49,7 @@ Videos generados con IA por Carlos a partir de las fotos v2 (image-to-video, ori
 
 | Archivo | Origen en el Drive de Carlos | Peso | Uso |
 |---|---|---|---|
-| `assets/video/hero.mp4` | `vkSk4c32_2x_upscaled.mp4` (de `hero-highway-poster`, autopista al amanecer) | 3,4 MB | Hero del home (≥1025 px). La foto `nf-hero-highway-poster` es el póster y el LCP. Último fotograma: autopista vacía con un camión lejano en la niebla. |
+| `assets/video/hero.mp4` | video v3 de Carlos (generado a partir de una imagen de la carpeta v3; **1280×720, 24 fps, 8,0 s, sin audio**; el generador NO conservó `hero-highway-poster-v3-a` como primer fotograma: composición distinta, camión a la derecha y sol bajo a la izquierda) | 2,66 MB | Hero del home (≥1025 px, una pasada sin bucle). Recodificado a 1920×1080 H.264 high crf 27, `+faststart`, sin audio, con unsharp 0,45, balance de sombras +3,5 % azul / medios R −1 % B +0,8 %, saturación ×0,98, contraste ×1,02 y grano temporal σ≈3. La foto `nf-hero-highway-poster` es SU PRIMER FOTOGRAMA exacto (extraído del mp4 ya codificado, sin salto al arrancar). Último fotograma: el camión mucho más lejos por el carril derecho. |
 | `assets/video/freight-dock.mp4` | `jzLjaq0L_2x_upscaled.mp4` (de `setup-amazon-relay`, patio de noche con camión en el muelle) | 3,2 MB | Banda del home (≥1025 px). Póster: `nf-freight-dock` (primer fotograma, 2688×1536). |
 | (no está en el repo) | `8CAdhlyz_2x_upscaled.mp4` (de `hero-our-desk`, oficina del desk) | 7,2 MB | No usado: Our desk sigue con `nf-dispatch-room-maps`. Queda codificado fuera del repo por si se usa después. |
 
@@ -67,7 +67,7 @@ El código solo pide el video en ≥1025 px, sin `prefers-reduced-motion` ni `sa
 
 | Archivo | Master | Procesado | Uso |
 |---|---|---|---|
-| `nf-hero-highway-poster-{640,1024,1280,1600,2048,2560,3200}` + `.jpg` (1600) | `hero-highway-poster` 3840×2160 | gradación de la fase J (grano 1,2 %), WebP 83, `method=6`, unsharp suave | Hero del home (LCP) |
+| `nf-hero-highway-poster-{640,1024,1280,1600,1920}` + `.jpg` (1600) | primer fotograma de `hero.mp4` | WebP 83, `method=6`, sin gradación extra (la del video ya está aplicada) | Hero del home (LCP). Máximo 1920 de ancho: no hay master mayor |
 | `nf-freight-dock-{640,1024,1280,1600,2048,2560}` + `.jpg` (1600) | primer fotograma de `dock.mp4` (2688×1536), sin LUT | misma gradación (anti-banding con radios al 70 %) | Póster de la banda de video |
 
 
@@ -86,7 +86,7 @@ Entre 640 y 1024 había un salto grande: para una necesidad de ~700 px el navega
 - Con 768: `nf-{service-dispatch-booking,service-load-tracking,service-back-office,blog-cost,blog-relay-requirements,blog-relay-load-board,blog-lumper-detention,resource-ifta,resource-rate-per-mile,resource-bol-template,resource-agreement,resource-glossary,setup-owner-operator,setup-small-fleet,setup-amazon-relay,check-owner-approve,check-tracking-mirror,check-dry-van-interior,faq-dock-light-wide,faq-dock-light-4x5,why-one-channel,why-record-every-load,onboarding-learn,onboarding-scope,onboarding-run,onboarding-review,cta-night-truck,hero-owner-operators,hero-how-it-works,hero-amazon-relay,hero-dry-van,hero-back-office}-768.webp`.
 - Recortes con 768: `nf-{why-one-channel,why-record-every-load,onboarding-learn,onboarding-scope,onboarding-run,onboarding-review,check-tracking-mirror,hero-back-office,check-owner-approve}-tall-768.webp` (4:5, mismas coordenadas que sus `-480/640/1024/1280`) y `nf-cta-night-truck-m-768.webp` (4:5, 2390,0 a 3715,1656).
 - Sin master v2 (piezas v1 y póster): `nf-dispatch-room-maps-768` y `nf-dispatch-room-wide-night-768` se reducen desde su variante mayor (1536 y 1448, sin unsharp extra); `nf-freight-dock-768` sale del fotograma gradado de la fase K.
-- Sin 768 (a propósito): `nf-hero-highway-poster*` (hero del home, sin tocar), `nf-mega-relay` (solo ≥1025 px), `nf-dispatch-room-maps-tall` (máx. 819), los `-pill-320` y `og-default`.
+- Sin 768 (a propósito): `nf-hero-highway-poster*` (hero del home), `nf-mega-relay` (solo ≥1025 px), `nf-dispatch-room-maps-tall` (máx. 819), los `-pill-320` y `og-default`.
 - 480 para las fotos no recortadas: medido y descartado. A 390 con DPR 2 la variante de 640 ya amplía x1,34 a x1,49 (el recorte cover lo manda el alto del marco), así que una de 480 pasaría del límite de x1,6.
 - `sizes`: móvil (≤640 px) `65vw`; escritorio, el ancho útil del marco; `ns_sizes_retina()` (templates/partials/kit.php) añade la rama retina con el 65 %. Ver el comentario de `ns_img()`.
 
@@ -129,7 +129,7 @@ Exportación: WebP en 640, 768, 1024, 1280, 1600, 2048, 2560 (más 3200 en los h
 
 ### Lo que NO se tocó
 
-- `nf-hero-highway-poster` y `nf-freight-dock` (primeros fotogramas de `hero.mp4` y `freight-dock.mp4`): cambiar la foto sin cambiar el video daría un salto al arrancar. **`hero-highway-poster-v3-a/b` esperan su video v3** (y `service-dispatch-booking-v3` el suyo, según `ART-DIRECTION-VIDEO-v3.md`); cuando lleguen, se gradan igual y se sustituyen foto y video a la vez. Los masters ya descargados están fuera del repo.
+- `nf-freight-dock` (primer fotograma de `freight-dock.mp4`) sigue en v2: cambiar la foto sin cambiar el video daría un salto al arrancar. `service-dispatch-booking-v3` espera su video v3. **El hero del home ya es v3** (video de Carlos del 2026-11-07, ver «Hero del home v3»; `hero-highway-poster-v3-a/b` quedan sin usar porque el video no parte de ellas). Los masters descargados están fuera del repo.
 - `hero-our-desk-v3-*` y `why-desk-team-v3-*`: salas vacías generadas que podrían leerse como la oficina real de NorthStar. Our desk sigue con `nf-dispatch-room-maps` (v1) y el ítem 3 de Why a desk también.
 - `nf-resource-*`, `nf-blog-*`, `nf-dispatch-room-*`, `og-default.jpg` y los `OG` de artículos: no tienen v3.
 
@@ -159,3 +159,10 @@ A 834 y 390 px los heros y las filas llevan el texto bajo la foto sobre `--bg` (
 
 **Qué se ajustó**, siempre en CSS compartido (tokens de `tokens.css`) y sin tocar el brillo de la foto: `--photo-fade-left` (heros A y bandas D) con el tramo oscuro más largo (stops .93 al 40 %, .85 al 53 %, .56 al 65 %, .25 al 76 %, .07 al 86 %, 0 al 94 %; antes .92/.78/.42/.12/0 hasta el 88 %); `--cta-veil` igual de largo (.92 al 42 %, .80 al 54 %, .46 al 66 %, .16 al 76 %, 0 al 86 %); `--card-fade` (carril del home) .93 al 40 % y .6 al 62 % (antes .92 al 36 % y .5 al 60 %); `--glass-strong` de .88 a .92 (tarjetas de vidrio sobre foto). En recortes: `pos` `62% 100%` en el hero de Owner (el titular cae sobre el salpicadero y no sobre la ventanilla clara), `70% 30%` en el de Relay (el titular queda bajo el cielo azul y no sobre el resplandor), y la tarjeta «Why Relay needs a dedicated desk» pierde `flip` para no tapar el camión.
 
+
+
+## Hero del home v3 (video de Carlos, 2026-11-07)
+
+- Origen: `hero-v3-raw.mp4`, 1280×720. **Limitación de nitidez (§14):** a 1440 px de ancho el hero se muestra con `cover` por alto (~872 px): ×1,21 respecto de los píxeles reales a 1x y ×2,4 en retina. Incumple la regla del sitio; es provisional hasta que Carlos reexporte el video a 1080p o más (con el generador, "upscale" o resolución alta) y se repita este paso.
+- Contraste del texto del hero sobre el video (peor de tres fotogramas: inicio, 4 s y final; texto grande = «Documented.» cian): 1440 5,04 grande / 9,54 pequeño; 1280 5,10 / 9,02; 1025 5,12 / 6,92; 1024 5,99 / 10,1; 834 5,93 / 9,98; 768 5,93 / 9,67; 390 6,67 / 8,29. Botones: navy sobre cian 6,48. De 761 a 1024 px se añadió el token `--hero-fade-tablet` (sin él el párrafo medía 3,35:1 sobre el cielo y el camión claros). El texto de escritorio queda sobre el degradado de siempre (`--hero-fade-left`): el sol bajo queda atenuado por el degradado a la izquierda.
+- El `object-position` (90 % 50 %) deja el camión (x 68 a 95 % del cuadro) a la derecha, bajo el widget y fuera del titular.

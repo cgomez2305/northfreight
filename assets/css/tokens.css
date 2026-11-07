@@ -26,6 +26,7 @@
   --glass-blur: 16px;
   /* Degradados solo sobre fotos (garantizan contraste AA del texto). Hero de la home: velo desde la izquierda y desde abajo; el resto de la foto queda a la vista. */
   --hero-fade-left: linear-gradient(90deg, rgba(4, 16, 31, .93) 0%, rgba(4, 16, 31, .9) 40%, rgba(4, 16, 31, .74) 54%, rgba(4, 16, 31, .45) 66%, rgba(4, 16, 31, .18) 76%, rgba(4, 16, 31, 0) 86%);
+  --hero-fade-tablet: linear-gradient(90deg, rgba(4, 16, 31, .93) 0%, rgba(4, 16, 31, .92) 60%, rgba(4, 16, 31, .84) 76%, rgba(4, 16, 31, .62) 90%, rgba(4, 16, 31, .5) 100%);   /* hero del home de 761 a 1024 px: el texto llega a ~77 % del ancho sobre el cielo claro del video v3 */
   --hero-fade-bottom: linear-gradient(0deg, rgba(4, 16, 31, .75) 0%, rgba(4, 16, 31, .3) 22%, rgba(4, 16, 31, 0) 44%);
   --hero-fade-top: linear-gradient(180deg, rgba(4, 16, 31, .5) 0%, rgba(4, 16, 31, 0) 22%);   /* detrás de la píldora del menú */
   --hero-fade-m: linear-gradient(180deg, rgba(4, 16, 31, 0) 52%, var(--bg) 100%);            /* móvil: la foto se funde con el fondo */

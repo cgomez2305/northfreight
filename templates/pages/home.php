@@ -100,13 +100,13 @@ $figures = [
     ['0', 'forms before you talk to us'],
 ];
 ?>
-<!-- HERO: foto protagonista (v2: nf-hero-highway-poster, master 3840×2160 con la gradación de marca; degradado solo desde la izquierda y abajo) + titular + widget de WhatsApp. Recortes reales: -m (4:5, ≤760 px) y -sq (cuadrado, 761 a 1024 px); en escritorio la foto 16:9 completa con srcset 640 a 3200.
+<!-- HERO: foto protagonista (v3: nf-hero-highway-poster = primer fotograma de hero.mp4 a 1920×1080, sin master mayor porque el video de origen es 1280×720; degradado solo desde la izquierda y abajo) + titular + widget de WhatsApp. Recortes reales: -m (4:5, ≤760 px) y -sq (cuadrado, 761 a 1024 px); en escritorio la foto 16:9 completa con srcset 640 a 1920.
      Slot de video: si existe assets/video/hero.mp4 (o .webm) $heroVideo lo activa: el <video> va vacío (preload none, sin src) y main.js le pone la fuente tras load + idle en >=1025px, con fundido sobre la foto (que sigue siendo el LCP). Sin archivos no se emite nada y no hay peticiones. -->
 <script>(function(w,d){var r=d.documentElement;r.classList.add('js-wa');if(w.matchMedia&&w.matchMedia('(min-width:1025px)').matches&&!w.matchMedia('(prefers-reduced-motion: reduce)').matches){r.style.setProperty('--pin-h',w.innerHeight+'px');r.classList.add('hero-pre');w.addEventListener('load',function(){setTimeout(function(){if(!r.classList.contains('js-motion'))r.classList.remove('hero-pre')},7000)})}})(window,document)</script>
 <section class="hero hero--home" id="top">
-  <div class="hero__bg"<?= $heroVideo ? ' data-hero-video data-mp4="' . e($heroVideo['mp4'] ?? '') . '" data-webm="' . e($heroVideo['webm'] ?? '') . '"' : '' ?>><?= ns_img(['base' => 'nf-hero-highway-poster', 'widths' => [640, 1024, 1280, 1600, 2048, 2560, 3200], 'alt' => 'White semi truck driving along a highway through dark hills under a heavy gray sky at dawn', 'eager' => true, 'sizes' => '100vw',
+  <div class="hero__bg"<?= $heroVideo ? ' data-hero-video data-mp4="' . e($heroVideo['mp4'] ?? '') . '" data-webm="' . e($heroVideo['webm'] ?? '') . '"' : '' ?>><?= ns_img(['base' => 'nf-hero-highway-poster', 'widths' => [640, 1024, 1280, 1600, 1920], 'alt' => 'White semi truck driving away along an empty highway at golden hour, with the sun low over the plains', 'eager' => true, 'sizes' => '100vw',
         'art' => [
-            ['media' => '(max-width:760px)', 'base' => 'nf-hero-highway-poster-m', 'sizes' => '100vw'],   // móvil: recorte 4:5 real desde el master (1728×2160), camión entero
+            ['media' => '(max-width:760px)', 'base' => 'nf-hero-highway-poster-m', 'sizes' => '100vw'],   // móvil: recorte 4:5 real (864×1080) del primer fotograma del video, camión entero
             ['media' => '(max-width:1024px)', 'base' => 'nf-hero-highway-poster-sq', 'sizes' => '100vw']]]) ?><?php if ($heroVideo): ?><video class="hero__video" muted playsinline preload="none" aria-hidden="true" tabindex="-1"></video><?php endif; ?></div>
   <div class="container hero__in">
     <div class="hero__main">
