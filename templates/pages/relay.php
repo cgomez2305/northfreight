@@ -46,7 +46,6 @@ partial('summary', summary_for($route));
 
 <?php partial('photo-card', [
     'id'    => 'relay-why',
-    'flip'  => true,
     'eyebrow' => 'Why it matters',
     'title' => 'Why Relay needs a dedicated desk',
     'lead'  => 'Relay moves fast: good blocks can go quickly and a weak scorecard limits what you can book. A desk that watches the board and fixes issues early keeps your trucks earning.',
