@@ -35,7 +35,7 @@ partial('hero', [
         ['label' => 'Talk to a dispatcher', 'href' => wa($route['wa']), 'wa' => true, 'arrow' => true],
         ['label' => 'How we onboard', 'href' => url('/how-it-works/'), 'variant' => 'ghost'],
     ],
-    'image'   => ['base' => 'nf-hero-owner-operators', 'alt' => 'Inside a truck cab at sunrise, with a phone mounted on the dashboard and an empty highway ahead', 'pos' => '62% 50%'],
+    'image'   => ['base' => 'nf-hero-owner-operators', 'alt' => 'Inside a truck cab at sunrise, with a phone mounted on the dashboard and an empty highway ahead', 'pos' => '62% 100%'],
 ]);
 
 // Resumen "In short" (SEO/GEO): editable aquí. Solo información que ya está en el copy de esta página; sin cifras, tarifas ni promesas nuevas.
