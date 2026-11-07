@@ -304,6 +304,8 @@ Nombra los archivos exactamente como en la tabla (por ejemplo `hero-highway-post
 
 ## 8. Entregadas
 
+> **Actualización fase T (2026-11-07):** los slots de esta tabla ahora llevan la fotografía del set v3 «Premium Documentary» (`ART-DIRECTION-v3.md`, variantes `-a`), con el mismo nombre de archivo `nf-<slot>`. Se quedan con la v2 o la v1: `nf-hero-highway-poster` y `nf-freight-dock` (esperan el video v3), `nf-dispatch-room-maps` y `nf-dispatch-room-wide-night`, y todas las de blog, recursos y OG. Detalle, recortes, gradación y tabla de contraste en `CREDITS.md`.
+
 Estado tras la fase J (2026-11-04): la fotografía del sitio es el **set v2** (`ART-DIRECTION-v2.md`, masters de 3840 px fuera del repo, gradados a la marca; ver `CREDITS.md`). Fase K: el hero y la banda de video del home pasaron a la v2 junto con sus videos (se reproducen una vez y se quedan en el último fotograma). Del set v1 solo siguen en uso las 2 que no tienen sustituto (`nf-dispatch-room-maps` y `nf-dispatch-room-wide-night`). Ninguna foto se repite dentro de una misma página.
 
 | Archivo | Slot |

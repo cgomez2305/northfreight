@@ -1,6 +1,8 @@
 # Créditos de imágenes
 
-Toda la fotografía del sitio es de Carlos (generada con IA). Hay dos generaciones:
+Toda la fotografía del sitio es de Carlos (generada con IA). Hay tres generaciones (la v3 de la fase T sustituye a la v2 en 24 slots; ver «Set v3» más abajo):
+
+- **Set v3 "Premium Documentary" (fase T, 2026-11-07):** 27 slots con variantes `-a`/`-b` (JPG de 3840 px; FAQ y CTA móviles de 3072×3840), prompts de `ART-DIRECTION-v3.md`. **Los masters están fuera del repositorio.**
 
 - **Set v2 "fotografía documental" (fase J, 2026-11-04):** 33 masters JPG de 3840 px de ancho (el CTA, de 3864 px; el OG, de 2400 px; FAQ 4:5 de 3072×3840) generados con los prompts de `ART-DIRECTION-v2.md`. **Los masters están fuera del repositorio.** Nombre de archivo: `nf-<nombre-v2>` (p. ej. `nf-service-dispatch-booking`).
 - **Set v1 "Night Freight" (fases E a G):** solo quedan 2 piezas en uso: `nf-dispatch-room-maps` (+ `-tall`) y `nf-dispatch-room-wide-night`. El hero del home y la banda de video pasaron a la v2 en la fase K (fotos `nf-hero-highway-poster` y `nf-freight-dock`, primeros fotogramas de los videos nuevos); `nf-highway-dusk-white-trucks` y `nf-freight-dock-loop` se borraron.
@@ -87,3 +89,73 @@ Entre 640 y 1024 había un salto grande: para una necesidad de ~700 px el navega
 - Sin 768 (a propósito): `nf-hero-highway-poster*` (hero del home, sin tocar), `nf-mega-relay` (solo ≥1025 px), `nf-dispatch-room-maps-tall` (máx. 819), los `-pill-320` y `og-default`.
 - 480 para las fotos no recortadas: medido y descartado. A 390 con DPR 2 la variante de 640 ya amplía x1,34 a x1,49 (el recorte cover lo manda el alto del marco), así que una de 480 pasaría del límite de x1,6.
 - `sizes`: móvil (≤640 px) `65vw`; escritorio, el ancho útil del marco; `ns_sizes_retina()` (templates/partials/kit.php) añade la rama retina con el 65 %. Ver el comentario de `ns_img()`.
+
+## Set v3 «Premium Documentary» (fase T, 2026-11-07)
+
+Luminosa y cálida a propósito (cielos despejados, luz dorada, equipo limpio). Los nombres de slot (`nf-<slot>`) NO cambian; se borraron del repo las variantes v2 de los slots reemplazados (el historial de git las conserva). Todo sale de los masters `<slot>-v3-a.jpg` (3840 px; script de gradación y exportación fuera del repo). Variante usada: **`-a` en todos los slots** (la `-b` queda como alternativa por si Carlos prefiere otro encuadre; ninguna página repite foto, así que no hizo falta).
+
+### Gradación de marca SUAVE (sustituye a la de la fase J para la v3)
+
+Mismo orden que la v2 pero más ligera: la foto conserva su luminosidad y sus tonos cálidos.
+
+1. **Anti-banding:** en zonas planas (|Y − Y_desenfocada σ 7| < 0,012) mezcla de hasta el 65 % con la versión desenfocada (la v2 llegaba al 100 % con umbral 0,02: con cielos claros borraba los rayos del sol); los bordes no se tocan.
+2. **Sombras hacia navy:** 18 % de `#04101F` en luminancia 0, lineal hasta 0 % en luminancia 0,30 (v2: 30 % hasta 0,35).
+3. **Medios tonos:** rojo −2 % y azul +1 %, ponderados por 4·Y·(1−Y) (v2: −3 % y +2 %).
+4. **Saturación** ×0,98 (v2: ×0,97).
+5. **Curva** con 10 % de `smoothstep` (v2: 22 %).
+6. **Grano** gaussiano σ 1,0 % a 3840 px antes de reducir (v2: 1,2 %).
+
+Exportación: WebP en 640, 768, 1024, 1280, 1600, 2048, 2560 (más 3200 en los heros A y el CTA; `-tall` y `-m` en 480, 640, 768, 1024, 1280 y 1325 en `-m` del CTA), LANCZOS, `unsharp` suave (radio 0,6, 40 %) en todas las reducciones, `method=6`; calidad **83 en `nf-hero-*` y CTA, 80 en el resto**; JPG de respaldo a 1600 (calidad 85, progresivo).
+
+### Slots reemplazados
+
+| Slot | Master | Recorte o nota |
+|---|---|---|
+| `nf-hero-owner-operators` | `hero-owner-operators-v3-a` | `pos` de la página `62% 100%` (lleva el salpicadero oscuro bajo el titular) |
+| `nf-hero-amazon-relay` (+ `-pill-320`) | `hero-amazon-relay-v3-a` | pastilla: 2,125:1, 0,882 a 3840,2689; `pos` de la página `70% 30%` |
+| `nf-hero-dry-van` (+ `-pill-320`) | `hero-dry-van-v3-a` | pastilla: 2,125:1, 0,536 a 3840,2343 |
+| `nf-hero-how-it-works` | `hero-how-it-works-v3-a` | |
+| `nf-hero-back-office` (+ `-tall`) | `hero-back-office-v3-a` | `-tall` 4:5, 1152,0 a 3456,2880 |
+| `nf-cta-night-truck` | `cta-night-truck-v3-a` (3864×1656) | |
+| `nf-cta-night-truck-m` | `cta-night-truck-v3-mobile-a` (3072×3840, 4:5 nativo) | el CTA móvil ya no es un recorte: es la versión móvil de Carlos |
+| `nf-service-dispatch-booking` · `-load-tracking` · `-back-office` | `service-*-v3-a` | `service-dispatch-booking-v3` también espera su video v3 (ver abajo); la foto del slot sí se reemplazó |
+| `nf-why-one-channel` · `-record-every-load` (+ `-tall`) | `why-*-v3-a` | `-tall` 4:5, 1587,0 a 3635,2560 y 1357,0 a 3405,2560 |
+| `nf-onboarding-learn` · `-scope` · `-run` · `-review` (+ `-tall`) | `onboarding-*-v3-a` | `-tall` 4:5: 1472,0 / 1280,0 / 1741,0 / 1587,0 hasta +2048,2560 |
+| `nf-faq-dock-light-wide` | `faq-dock-light-v3-a` (3840×2560) | 3:2; miniatura de `/blog/` y foto provisional de Box truck |
+| `nf-faq-dock-light-4x5` | `faq-dock-light-v3-mobile-a` (3072×3840, 4:5 nativo) | FAQ del home |
+| `nf-setup-owner-operator` · `-small-fleet` · `-amazon-relay` | `setup-*-v3-a` | |
+| `nf-check-owner-approve` · `-tracking-mirror` (+ `-tall`) · `-dry-van-interior` | `check-*-v3-a` | `-tall` 4:5, 1536,0 a 3840,2880 (owner y mirror) |
+| `nf-mega-relay` | `setup-amazon-relay-v3-b` | 3:2, 0,320 a 3840,2880 (la `-b` evita repetir el encuadre de la foto de Relay) |
+
+### Lo que NO se tocó
+
+- `nf-hero-highway-poster` y `nf-freight-dock` (primeros fotogramas de `hero.mp4` y `freight-dock.mp4`): cambiar la foto sin cambiar el video daría un salto al arrancar. **`hero-highway-poster-v3-a/b` esperan su video v3** (y `service-dispatch-booking-v3` el suyo, según `ART-DIRECTION-VIDEO-v3.md`); cuando lleguen, se gradan igual y se sustituyen foto y video a la vez. Los masters ya descargados están fuera del repo.
+- `hero-our-desk-v3-*` y `why-desk-team-v3-*`: salas vacías generadas que podrían leerse como la oficina real de NorthStar. Our desk sigue con `nf-dispatch-room-maps` (v1) y el ítem 3 de Why a desk también.
+- `nf-resource-*`, `nf-blog-*`, `nf-dispatch-room-*`, `og-default.jpg` y los `OG` de artículos: no tienen v3.
+
+### Contraste con las fotos luminosas (medido, 1440 px salvo indicación)
+
+Método: captura con el texto transparente y, por cada texto, contraste del color real del texto contra el píxel de fondo MÁS cercano en luminancia (peor caso; entre paréntesis el percentil 99). Mínimo por ubicación sobre todas las líneas de texto. Antes = sitio con la v2; ahora = v3 con los degradados reforzados.
+
+| Ubicación | Antes | Con v3 sin ajustar | Ahora |
+|---|---|---|---|
+| Hero Owner (titular cian) | 5,48 | 3,73 | **5,27** (p99 6,11); 1280: 5,64; 1025: 5,99 |
+| Hero Relay | 5,68 | 4,81 | **5,38**; 1280: 5,63; 1025: 5,60 |
+| Hero Dry van | 5,89 | 5,14 | **5,67**; 1280: 5,67; 1025: 5,68 |
+| Hero How it works | 6,07 | 5,87 | **6,17**; 1025: 6,27 |
+| Hero Back office | 5,88 | 5,62 | **5,94**; 1025: 5,99 |
+| Hero Box truck (draft, foto de FAQ muy clara) | 5,66 | 4,69 | **5,17** |
+| CTA final (1440 / 1920 / 1025) | 6,47 / 6,47 / 6,48 | 5,78 / 5,16 / 5,84 | **5,98 / 5,90 / 6,04** |
+| CTA final a 834 px (párrafo) | 6,46 | 3,59 | **5,40** |
+| Filas C Relay (5) y How (4) | 11,0 a 11,1 | 10,9 a 11,1 | 10,9 a 11,1 |
+| Banda D Back office (foto sin cambios) | 6,48 | 6,48 | 6,48 |
+| Tarjetas B (owner, relay, dry van) | 9,96 | 9,96 | 9,96 |
+| Tarjeta B Load tracking (píldora) | 4,81 | 8,24 | 8,48 |
+| Pestañas del home | 6,48 | 6,48 | 6,48 |
+| Carril de servicios del home (1440 / 1280) | 7,9 a 9,3 / 6,9 a 10 | 7,96 a 8,74 / 5,11 | 9,5 a 9,9 / 6,56 a 10 |
+| Hero Our desk (video, panel de vidrio) | 4,48 | 4,48 | 5,04 |
+
+A 834 y 390 px los heros y las filas llevan el texto bajo la foto sobre `--bg` (≥6,2 en el hero; el CTA a 390 queda en 5,08, igual que antes). El mínimo de `hero-owner-390` (2,56) y el de `rail-1280-0` (1,66) son artefactos de la captura (botón bajo la `mbar` y un píxel suelto durante el pin) y valen igual antes y después.
+
+**Qué se ajustó**, siempre en CSS compartido (tokens de `tokens.css`) y sin tocar el brillo de la foto: `--photo-fade-left` (heros A y bandas D) con el tramo oscuro más largo (stops .93 al 40 %, .85 al 53 %, .56 al 65 %, .25 al 76 %, .07 al 86 %, 0 al 94 %; antes .92/.78/.42/.12/0 hasta el 88 %); `--cta-veil` igual de largo (.92 al 42 %, .80 al 54 %, .46 al 66 %, .16 al 76 %, 0 al 86 %); `--card-fade` (carril del home) .93 al 40 % y .6 al 62 % (antes .92 al 36 % y .5 al 60 %); `--glass-strong` de .88 a .92 (tarjetas de vidrio sobre foto). En recortes: `pos` `62% 100%` en el hero de Owner (el titular cae sobre el salpicadero y no sobre la ventanilla clara), `70% 30%` en el de Relay (el titular queda bajo el cielo azul y no sobre el resplandor), y la tarjeta «Why Relay needs a dedicated desk» pierde `flip` para no tapar el camión.
+
