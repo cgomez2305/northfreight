@@ -182,6 +182,7 @@ $figures = [
         ['label' => 'Owner-operator', 'title' => 'Owner-operator', 'wa' => 'owner',
          'points' => ['You approve every load', 'Updates on WhatsApp, where you already work', 'Arrival timestamps and photos kept on file'],
          'image' => ['base' => 'nf-setup-owner-operator', 'alt' => 'White long-hood semi truck with a dry van trailer parked in a rest area at sunrise, with a person standing beside the cab', 'pos' => '60% 100%'],
+         'video' => 'owner-rest-area',
          'link' => ['label' => 'Dispatch for owner-operators', 'href' => url('/dispatch-for-owner-operators/')]],
         ['label' => 'Small fleet', 'title' => 'Small fleet', 'wa' => "Hi, I run a small fleet and I'd like to talk about dispatch with NorthStar.",
          'points' => ['A team, not a single dispatcher', 'New drivers set up in your accounts', 'Who approves loads, how we report and which tasks the desk owns'],

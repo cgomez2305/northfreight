@@ -13,7 +13,7 @@ Complementa a `ART-DIRECTION-VIDEO-v3.md`. Ya están en el sitio los primeros 12
 | **V13** cabina con el teléfono | `V13-cab-phone-dash.jpg` | Hero de `/load-tracking/` | HECHO (fase AC): el hero no tenía foto; ahora lleva foto + video |
 | **V14** espejo al atardecer | `V14-truck-mirror-sunset.jpg` | Panel «Proof, not promises» de `/load-tracking/` | HECHO (fase AC) |
 | **V12** patio de Relay al anochecer | `V12-relay-yard-dusk.jpg` | Pestaña «Amazon Relay» de «Choose your setup» (home y Owner) | HECHO (fase AC): el partial `tabs` admite `video` por ítem |
-| **V10** área de descanso | `V10-owner-operator-rest-area.jpg` | Pestaña «Owner-operator» | Igual que V12 |
+| **V10** área de descanso | `V10-owner-operator-rest-area.jpg` | Pestaña «Owner-operator» | HECHO (fase AC) |
 | **V11** patio de flota | `V11-small-fleet-yard.jpg` | Pestaña «Small fleet» | Igual que V12 |
 | **C04** carpeta junto a la ventana | `C04-desk-folder-window.jpg` | Hero de `/trucking-back-office/` | Nada: el hero ya admite video |
 | **C01, C02, C09** | `C01-diner-booth.jpg`, `C02-road-atlas.jpg`, `C09-desk-review.jpg` | Pasos 01, 02 y 04 del onboarding del home (el 03 ya tiene el suyo) | Nada: ya admiten video |
