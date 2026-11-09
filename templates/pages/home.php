@@ -68,7 +68,7 @@ $steps = [
     ['01', 'We learn your operation', 'Trucks, equipment, lanes, drivers and the accounts you already run, including Amazon Relay.',
      ['base' => 'nf-onboarding-learn', 'alt' => 'Diner booth table by a window with two coffee mugs, a notebook with a pen and a phone, and a truck stop outside at sunrise', 'video' => 'onboarding-diner', 'vpos' => '100% 50%']],   // fase AC: video de Carlos (C01, 8 s, una pasada); recorte 4:5 desde x 1056 (derecha)
     ['02', 'We define scope & contacts', 'Who approves loads, how we report, and which tasks the desk owns from day one.',
-     ['base' => 'nf-onboarding-scope', 'alt' => 'A hand tracing a route in blue ink on an open road atlas, with a tablet showing a map, a coffee mug and a notebook on a wooden table']],
+     ['base' => 'nf-onboarding-scope', 'alt' => 'A hand tracing a route in blue ink on an open road atlas, with a tablet showing a map, a coffee mug and a notebook on a wooden table', 'video' => 'onboarding-atlas', 'vpos' => '100% 50%']],   // fase AC: video de Carlos (C02, 8 s, una pasada); recorte 4:5 desde el borde derecho
     ['03', 'We run the day-to-day', 'Booking, tracking and documenting every load, with updates where you already work: WhatsApp.',
      ['base' => 'nf-onboarding-run', 'alt' => 'White semi truck with a sleeper cab at the gate of a logistics facility at sunrise', 'video' => 'onboarding-gate']],   // fase Z: video de Carlos (V09, el camión sale por la puerta al amanecer, 8 s, una pasada); póster de escritorio nf-onboarding-run-tall-vid (4:5, primer fotograma)
     ['04', 'We review & improve', 'Regular reviews of lanes, rates and incidents to keep your trucks earning.',

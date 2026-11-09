@@ -16,7 +16,7 @@ Complementa a `ART-DIRECTION-VIDEO-v3.md`. Ya están en el sitio los primeros 12
 | **V10** área de descanso | `V10-owner-operator-rest-area.jpg` | Pestaña «Owner-operator» | HECHO (fase AC) |
 | **V11** patio de flota | `V11-small-fleet-yard.jpg` | Pestaña «Small fleet» | HECHO (fase AC) |
 | **C04** carpeta junto a la ventana | `C04-desk-folder-window.jpg` | Hero de `/trucking-back-office/` | Nada: el hero ya admite video |
-| **C01, C02, C09** | `C01-diner-booth.jpg`, `C02-road-atlas.jpg`, `C09-desk-review.jpg` | Pasos 01, 02 y 04 del onboarding del home (el 03 ya tiene el suyo) | C01 HECHO (fase AC); C02 y C09 admiten video con el dato `video` del paso |
+| **C01, C02, C09** | `C01-diner-booth.jpg`, `C02-road-atlas.jpg`, `C09-desk-review.jpg` | Pasos 01, 02 y 04 del onboarding del home (el 03 ya tiene el suyo) | C01 y C02 HECHOS (fase AC); C09 admite video con el dato `video` del paso |
 | **C03** escritorio, mano que escribe | `C03-desk-hand-writing.jpg` | Tarjeta «Trucking back office» del home | Montar video en las tarjetas |
 | **C05, C06, C07, C08** | ver §4 | Tarjetas de «Why a desk», FAQ y checks | Montar video en cada contenedor (pequeño) |
 
