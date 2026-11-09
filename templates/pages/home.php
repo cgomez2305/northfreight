@@ -187,6 +187,7 @@ $figures = [
         ['label' => 'Small fleet', 'title' => 'Small fleet', 'wa' => "Hi, I run a small fleet and I'd like to talk about dispatch with NorthStar.",
          'points' => ['A team, not a single dispatcher', 'New drivers set up in your accounts', 'Who approves loads, how we report and which tasks the desk owns'],
          'image' => ['base' => 'nf-setup-small-fleet', 'alt' => 'Several white semi trucks and a white pickup parked in a row in a depot lot at sunset', 'pos' => '50% 70%'],
+         'video' => 'small-fleet-yard',
          'link' => ['label' => 'See how we onboard', 'href' => url('/how-it-works/')]],
         ['label' => 'Amazon Relay carrier', 'title' => 'Amazon Relay carrier', 'wa' => 'relay',
          'points' => ['Block and load booking', 'Trip and arrival records', 'Scorecard follow-up and disputes filed with evidence'],
