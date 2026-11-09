@@ -72,7 +72,7 @@ $steps = [
     ['03', 'We run the day-to-day', 'Booking, tracking and documenting every load, with updates where you already work: WhatsApp.',
      ['base' => 'nf-onboarding-run', 'alt' => 'White semi truck with a sleeper cab at the gate of a logistics facility at sunrise', 'video' => 'onboarding-gate']],   // fase Z: video de Carlos (V09, el camión sale por la puerta al amanecer, 8 s, una pasada); póster de escritorio nf-onboarding-run-tall-vid (4:5, primer fotograma)
     ['04', 'We review & improve', 'Regular reviews of lanes, rates and incidents to keep your trucks earning.',
-     ['base' => 'nf-onboarding-review', 'alt' => 'A hand marking a printed spreadsheet at a desk, with a laptop showing a bar chart, a coffee mug and truck keys']],
+     ['base' => 'nf-onboarding-review', 'alt' => 'A hand marking a printed spreadsheet at a desk, with a laptop showing a bar chart, a coffee mug and truck keys', 'video' => 'onboarding-review', 'vpos' => '100% 50%']],   // fase AC: video de Carlos (C09, 8 s, una pasada); recorte 4:5 desde el borde derecho
 ];
 
 $chapters = [
