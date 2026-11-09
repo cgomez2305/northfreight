@@ -6,6 +6,7 @@
 /* ---- Tracking ---- */
 .sb-tr-hero .hero__lead { max-width: 560px; }
 .sb-tr-card { padding: clamp(20px, 3vw, 32px); gap: 16px; }
+.hero--photo .sb-tr-card { background: var(--glass-strong); }   /* sobre la foto (fase AC) la tarjeta necesita fondo: transparente medía 1,4:1 */
 .sb-tr-card .data-card__label { letter-spacing: .1em; }
 .sb-tr-card .data-card__dot { width: 7px; height: 7px; }
 .sb-tr-card .log { gap: 14px; padding-left: 16px; }

@@ -10,7 +10,7 @@ Complementa a `ART-DIRECTION-VIDEO-v3.md`. Ya están en el sitio los primeros 12
 
 | Pendiente | Primer fotograma (archivo del paquete `primeros-fotogramas-16x9.zip`) | Dónde caería en el sitio | Qué hace falta de mi lado |
 |---|---|---|---|
-| **V13** cabina con el teléfono | `V13-cab-phone-dash.jpg` | Hero de `/load-tracking/` | Nada: el hero ya admite video |
+| **V13** cabina con el teléfono | `V13-cab-phone-dash.jpg` | Hero de `/load-tracking/` | HECHO (fase AC): el hero no tenía foto; ahora lleva foto + video |
 | **V14** espejo al atardecer | `V14-truck-mirror-sunset.jpg` | Panel «Proof, not promises» de `/load-tracking/` | Nada: el panel ya admite video |
 | **V12** patio de Relay al anochecer | `V12-relay-yard-dusk.jpg` | Pestaña «Amazon Relay» de «Choose your setup» (home y Owner) | Montar video dentro de las pestañas |
 | **V10** área de descanso | `V10-owner-operator-rest-area.jpg` | Pestaña «Owner-operator» | Igual que V12 |

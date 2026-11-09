@@ -34,6 +34,8 @@ partial('hero', [
     'h1'    => 'Load tracking and check calls {hl}for your trucks{/hl}',
     'lead'  => 'Every trip followed from pickup to POD. ETAs, arrivals and departures logged, incidents documented and brokers kept informed, so you are not on the phone.',
     'ctas'  => [['label' => 'Talk to a dispatcher', 'href' => wa($route['wa']), 'wa' => true, 'arrow' => true]],
+    'image' => ['base' => 'nf-service-load-tracking', 'alt' => 'Over-the-shoulder view from inside a truck cab at sunset, with a hand on the steering wheel, a phone in the dash mount and the highway ahead', 'pos' => '55% 60%'],
+    'video' => 'tracking-cab',   // fase AC: video de Carlos (V13, cabina con el teléfono en el soporte, 7,6 s, una pasada); póster de escritorio nf-service-load-tracking-vid
     'aside' => $aside,
 ]);
 

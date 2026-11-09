@@ -189,8 +189,8 @@
         },
         "services-b-motion": {
             "file": "css/dist/services-b-motion.css",
-            "hash": "b0f92fc972",
-            "bytes": 84203,
+            "hash": "40e655cbe5",
+            "bytes": 84259,
             "sources": [
                 {
                     "path": "css/fonts.css",
@@ -214,8 +214,8 @@
                 },
                 {
                     "path": "css/pages/services-b.css",
-                    "size": 14165,
-                    "crc32": "8675538a"
+                    "size": 14312,
+                    "crc32": "5b2755c6"
                 },
                 {
                     "path": "css/motion.css",

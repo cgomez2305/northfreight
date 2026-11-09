@@ -224,3 +224,10 @@ Con esta tanda ya no queda ninguna imagen v1 ni v2 en uso. Masters `<slot>-v3-a.
 | `nf-dispatch-room-maps` (+ `-tall-{480,640,768,1024}`) | `dispatch-room-maps-v3-a` | Our desk y tarjeta 03 de «Why a desk»; `-tall` 4:5 de 2048×2560 desde x 704 |
 
 **Imágenes para redes (compuestas, no generadas):** `og/post-*.jpg` (4 artículos) y `og-default.jpg` se recompusieron a 1200×630 con las portadas nuevas (y, la de `og-default`, el primer fotograma del hero), con el mismo diseño de antes: degradado navy a la izquierda, isotipo, wordmark, título y barra cian. Aviso de honestidad: las dos imágenes del desk son AMBIENTALES (detalles de escritorio sin gente), no la oficina real; se sustituyen por fotos reales del equipo cuando existan. Los textos alternativos de las 11 piezas se reescribieron para describir lo que se ve.
+
+## Fase AC · V13 (hero de /load-tracking/)
+
+- `tracking-cab.mp4` (V13: cabina vista desde el asiento al atardecer, mano sobre el teléfono del soporte, autopista y tráiler delante; origen 1280×720, 8 s recortado a 7,6 s porque los últimos fotogramas muestran la mano a medio gesto; recodificado a 1920×1080 crf 27, 1,21 MB). Dónde: hero de `/load-tracking/` (antes sin foto), solo ≥1025 px.
+- Póster `nf-service-load-tracking-vid-{640,1024,1280,1600,1920}.webp` = primer fotograma exacto; en <1025 px el hero usa la foto v3 `nf-service-load-tracking` (pos `55% 60%`).
+- Contraste medido (p99 sobre el texto, fotogramas inicio/mitad/final): «for your trucks» 6,46 / 6,52 / 6,46 (1440 / 1280 / 1025), lead ≥ 16,1, tarjeta «Desk log» 5,42 a 5,62 con `--glass-strong` (sin fondo medía 1,4).
+
