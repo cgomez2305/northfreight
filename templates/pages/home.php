@@ -66,7 +66,7 @@ $why = [
 // 04 Onboarding: foto decorativa por paso (alt descriptivo corto)
 $steps = [
     ['01', 'We learn your operation', 'Trucks, equipment, lanes, drivers and the accounts you already run, including Amazon Relay.',
-     ['base' => 'nf-onboarding-learn', 'alt' => 'Diner booth table by a window with two coffee mugs, a notebook with a pen and a phone, and a truck stop outside at sunrise']],
+     ['base' => 'nf-onboarding-learn', 'alt' => 'Diner booth table by a window with two coffee mugs, a notebook with a pen and a phone, and a truck stop outside at sunrise', 'video' => 'onboarding-diner', 'vpos' => '100% 50%']],   // fase AC: video de Carlos (C01, 8 s, una pasada); recorte 4:5 desde x 1056 (derecha)
     ['02', 'We define scope & contacts', 'Who approves loads, how we report, and which tasks the desk owns from day one.',
      ['base' => 'nf-onboarding-scope', 'alt' => 'A hand tracing a route in blue ink on an open road atlas, with a tablet showing a map, a coffee mug and a notebook on a wooden table']],
     ['03', 'We run the day-to-day', 'Booking, tracking and documenting every load, with updates where you already work: WhatsApp.',
@@ -255,7 +255,7 @@ $figures = [
       <li class="home-step">
         <span class="home-step__line" aria-hidden="true"><i></i></span>
         <figure class="home-step__photo px"<?= $hasSv ? ' data-bgvideo data-mp4="' . e(asset("video/$sv.mp4")) . '"' : '' ?>><?= ns_img($photo + ['sizes' => '(min-width:641px) 50vw, 65vw',
-            'art' => [['media' => '(min-width:1025px)', 'base' => $photo['base'] . ($hasSv ? '-tall-vid' : '-tall'), 'sizes' => '(min-width:1025px) 360px']]]) ?><?php if ($hasSv): ?><video class="home-step__video" muted playsinline preload="none" aria-hidden="true" tabindex="-1"></video><?php endif; ?></figure>
+            'art' => [['media' => '(min-width:1025px)', 'base' => $photo['base'] . ($hasSv ? '-tall-vid' : '-tall'), 'sizes' => '(min-width:1025px) 360px']]]) ?><?php if ($hasSv): ?><video class="home-step__video"<?= !empty($photo['vpos']) ?' style="object-position:' . e((string) $photo['vpos']) . '"' : '' ?> muted playsinline preload="none" aria-hidden="true" tabindex="-1"></video><?php endif; ?></figure>
         <span class="home-step__n" aria-hidden="true"><?= e($n) ?></span>
         <h3 class="head t-h3"><span class="sr-only">Step <?= e($n) ?>: </span><?= e($title) ?></h3>
         <p class="t-card"><?= e($text) ?></p>
