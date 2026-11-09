@@ -7,7 +7,7 @@
  * CSS: components.css (.tabs*, .tabp*).
  * Params:
  *  id, eyebrow, title, lead   cabecera de sección (H2 con id; único en la página)
- *  items  array  [['key'=>'owner','label'=>'Owner-operator','title'=>'Owner-operator' (H3 del panel),'points'=>[3 textos],'image'=>['base','alt','pos'?],'link'=>['label','href']|null,'wa'=>'owner' (clave o mensaje de wa())], …]
+ *  items  array  [['key'=>'owner','label'=>'Owner-operator','title'=>'Owner-operator' (H3 del panel),'points'=>[3 textos],'image'=>['base','alt','pos'?],'video'=>'nombre' (opcional: assets/video/<nombre>.mp4, una pasada sin bucle, solo >=1025 px, montado por main.js [data-bgvideo] cuando el panel se hace visible; póster de escritorio `<image.base>-vid`),'link'=>['label','href']|null,'wa'=>'owner' (clave o mensaje de wa())], …]
  *  label  string aria-label de la lista de pestañas      cls string clase extra en <section>
  */
 require_once __DIR__ . '/kit.php';
@@ -29,7 +29,8 @@ $uid = 'tabs-' . preg_replace('/[^a-z0-9-]/', '', strtolower((string) ($id ?? 'x
       </div>
       <?php foreach ($items as $i => $it): $img = $it['image'] ?? []; $link = is_array($it['link'] ?? null) && !empty($it['link']['href']) ? $it['link'] : null; ?>
       <div class="tabs__panel tabp<?= $i === 0 ? ' is-on' : '' ?>" role="tabpanel" id="<?= e($uid . '-p' . $i) ?>" aria-labelledby="<?= e($uid . '-t' . $i) ?>">
-        <figure class="tabp__photo"<?= !empty($img['pos']) ? ' style="--pos:' . e($img['pos']) . '"' : '' ?>><?= ns_img(['base' => (string) $img['base'], 'alt' => (string) ($img['alt'] ?? ''), 'sizes' => '(min-width:1025px) 1152px, (min-width:761px) 100vw, (min-width:641px) calc(100vw - 72px), 65vw']) ?></figure>
+        <?php $tv = (string) ($it['video'] ?? ''); $hasTv = preg_match('/^[a-z0-9-]+$/', $tv) === 1 && is_file(NS_ROOT . "/assets/video/$tv.mp4"); $tvPoster = $hasTv && is_file(NS_ROOT . '/assets/img/' . $img['base'] . '-vid-640.webp') ? (string) $img['base'] . '-vid' : ''; ?>
+        <figure class="tabp__photo"<?= !empty($img['pos']) ? ' style="--pos:' . e($img['pos']) . '"' : '' ?><?= $hasTv ? ' data-bgvideo data-mp4="' . e(asset("video/$tv.mp4")) . '"' : '' ?>><?= ns_img(['base' => (string) $img['base'], 'alt' => (string) ($img['alt'] ?? ''), 'sizes' => '(min-width:1025px) 1152px, (min-width:761px) 100vw, (min-width:641px) calc(100vw - 72px), 65vw', 'art' => $tvPoster !== '' ? [['media' => '(min-width:1025px)', 'base' => $tvPoster, 'sizes' => '1152px']] : []]) ?><?php if ($hasTv): ?><video class="pcard__video" muted playsinline preload="none" aria-hidden="true" tabindex="-1"></video><?php endif; ?></figure>
         <div class="tabp__card">
           <h3 class="head t-h3 tabp__title"><?= e((string) ($it['title'] ?? $it['label'])) ?></h3>
           <?= ns_checks((array) $it['points']) ?>

@@ -72,6 +72,7 @@ partial('summary', summary_for($route));
         ['label' => 'Amazon Relay carrier', 'title' => 'Amazon Relay carrier', 'wa' => 'relay',
          'points' => ['Block and load booking', 'Trip and arrival records', 'Scorecard follow-up and disputes filed with evidence'],
          'image' => ['base' => 'nf-setup-amazon-relay', 'alt' => 'White semi truck with a dry van trailer driving past a long distribution warehouse with lit loading docks at dusk', 'pos' => '50% 55%'],
+         'video' => 'relay-yard-dusk',
          'link' => ['label' => 'Amazon Relay dispatch', 'href' => url('/amazon-relay-dispatch/')]],
     ],
 ]); ?>

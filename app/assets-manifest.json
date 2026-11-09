@@ -4,8 +4,8 @@
     "css": {
         "blog-motion": {
             "file": "css/dist/blog-motion.css",
-            "hash": "8532047f28",
-            "bytes": 82571,
+            "hash": "85074d02d0",
+            "bytes": 82647,
             "sources": [
                 {
                     "path": "css/fonts.css",
@@ -24,8 +24,8 @@
                 },
                 {
                     "path": "css/components.css",
-                    "size": 72001,
-                    "crc32": "3b79cb10"
+                    "size": 72086,
+                    "crc32": "a117d612"
                 },
                 {
                     "path": "css/pages/blog.css",
@@ -41,8 +41,8 @@
         },
         "careers-motion": {
             "file": "css/dist/careers-motion.css",
-            "hash": "ee37db4430",
-            "bytes": 83363,
+            "hash": "51a376b5bf",
+            "bytes": 83439,
             "sources": [
                 {
                     "path": "css/fonts.css",
@@ -61,8 +61,8 @@
                 },
                 {
                     "path": "css/components.css",
-                    "size": 72001,
-                    "crc32": "3b79cb10"
+                    "size": 72086,
+                    "crc32": "a117d612"
                 },
                 {
                     "path": "css/pages/careers.css",
@@ -78,8 +78,8 @@
         },
         "company-motion": {
             "file": "css/dist/company-motion.css",
-            "hash": "bc4556832c",
-            "bytes": 82561,
+            "hash": "e7b5844538",
+            "bytes": 82637,
             "sources": [
                 {
                     "path": "css/fonts.css",
@@ -98,8 +98,8 @@
                 },
                 {
                     "path": "css/components.css",
-                    "size": 72001,
-                    "crc32": "3b79cb10"
+                    "size": 72086,
+                    "crc32": "a117d612"
                 },
                 {
                     "path": "css/pages/company.css",
@@ -115,8 +115,8 @@
         },
         "home-motion": {
             "file": "css/dist/home-motion.css",
-            "hash": "07a148f93f",
-            "bytes": 91335,
+            "hash": "5c9a0d2344",
+            "bytes": 91411,
             "sources": [
                 {
                     "path": "css/fonts.css",
@@ -135,8 +135,8 @@
                 },
                 {
                     "path": "css/components.css",
-                    "size": 72001,
-                    "crc32": "3b79cb10"
+                    "size": 72086,
+                    "crc32": "a117d612"
                 },
                 {
                     "path": "css/pages/home.css",
@@ -152,8 +152,8 @@
         },
         "services-a-motion": {
             "file": "css/dist/services-a-motion.css",
-            "hash": "2d864f02b2",
-            "bytes": 75849,
+            "hash": "503a676ec6",
+            "bytes": 75925,
             "sources": [
                 {
                     "path": "css/fonts.css",
@@ -172,8 +172,8 @@
                 },
                 {
                     "path": "css/components.css",
-                    "size": 72001,
-                    "crc32": "3b79cb10"
+                    "size": 72086,
+                    "crc32": "a117d612"
                 },
                 {
                     "path": "css/pages/services-a.css",
@@ -189,8 +189,8 @@
         },
         "services-b-motion": {
             "file": "css/dist/services-b-motion.css",
-            "hash": "40e655cbe5",
-            "bytes": 84259,
+            "hash": "02505972ef",
+            "bytes": 84335,
             "sources": [
                 {
                     "path": "css/fonts.css",
@@ -209,8 +209,8 @@
                 },
                 {
                     "path": "css/components.css",
-                    "size": 72001,
-                    "crc32": "3b79cb10"
+                    "size": 72086,
+                    "crc32": "a117d612"
                 },
                 {
                     "path": "css/pages/services-b.css",
@@ -226,8 +226,8 @@
         },
         "tools-motion": {
             "file": "css/dist/tools-motion.css",
-            "hash": "bfc946af62",
-            "bytes": 80708,
+            "hash": "741fa1df8b",
+            "bytes": 80784,
             "sources": [
                 {
                     "path": "css/fonts.css",
@@ -246,8 +246,8 @@
                 },
                 {
                     "path": "css/components.css",
-                    "size": 72001,
-                    "crc32": "3b79cb10"
+                    "size": 72086,
+                    "crc32": "a117d612"
                 },
                 {
                     "path": "css/pages/tools.css",
