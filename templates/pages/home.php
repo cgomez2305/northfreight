@@ -7,7 +7,7 @@
 require_once NS_ROOT . '/templates/partials/kit.php';
 
 $variantA = ($cfg['hero_variant'] ?? 'B') === 'A';
-$headline = (string) ($cfg['hero_headline'] ?? 'Booked. Tracked. Documented.');
+$headline = (string) ($cfg['hero_headline'] ?? 'We follow every load until it is documented.');
 $tags = $variantA
     ? ['Coordinated loads', 'Organized information', 'Constant follow-up']
     : ['Amazon Relay', 'Dry Van', 'Load Tracking', 'Back Office'];
@@ -32,25 +32,25 @@ $heroVideo = ns_hero_video('hero');
 $railSizes = '(min-width:1025px) 700px, (min-width:641px) 42vw, calc(80vw - 32px)';   // escritorio: la tarjeta mide ~806 px, así que a 1x basta la variante de 768 (x1,05); en retina ns_sizes_retina() pide 455 px y elige 1024 (x1,57)
 
 $services = [
-    ['num' => '01', 'title' => 'Dispatch & load booking',
+    ['title' => 'Dispatch & load booking',
      'text' => 'We search, negotiate and book freight on Amazon Relay and dry van lanes, plan routes around hours of service and coordinate every pickup with your drivers.',
      'href' => url('/dispatch-for-owner-operators/'), 'cta' => 'Dispatch for owner-operators',
      'image' => ['base' => 'nf-service-dispatch-booking', 'alt' => 'A worker in a safety vest walking toward the loading docks of a warehouse, with a white trailer parked alongside in warm evening light', 'sizes' => $railSizes]],
-    ['num' => '02', 'title' => 'Load tracking & check calls',
+    ['title' => 'Load tracking & check calls',
      'text' => 'Every trip followed from pickup to POD: ETAs, arrivals and departures logged, incidents documented and brokers kept informed, so you are not on the phone.',
      'href' => url('/load-tracking/'), 'cta' => 'Load tracking',
      'image' => ['base' => 'nf-service-load-tracking', 'alt' => 'View from a truck cab at sunset, with a hand on a phone mounted on the dashboard and a trailer ahead on the highway', 'sizes' => $railSizes]],
-    ['num' => '03', 'title' => 'Trucking back office',
+    ['title' => 'Trucking back office',
      'text' => 'Paperwork organized, settlements prepared and disputes followed with evidence. We also help onboard new drivers so they are set up in your accounts.',
      'href' => url('/trucking-back-office/'), 'cta' => 'Back office services',
      'image' => ['base' => 'nf-service-back-office', 'alt' => 'Desk by a window with a stack of printed forms, a hand holding a pen, a keyboard and a monitor', 'sizes' => $railSizes]],
 ];
 
 $relay = [
-    ['A · Load board', 'Block & load booking', 'Monitoring the Relay load board and booking work that fits your lanes and equipment.'],
-    ['B · Trips', 'Trip & arrival records', 'Schedules, arrivals and departures kept on record for every run.'],
-    ['C · Performance', 'Scorecard follow-up', 'Performance tracked so issues are corrected before they cost you loads.'],
-    ['D · Disputes', 'Disputes with evidence', 'Every claim filed with timestamps, photos and documents attached.'],
+    ['Load board', 'Block & load booking', 'Monitoring the Relay load board and booking work that fits your lanes and equipment.'],
+    ['Trips', 'Trip & arrival records', 'Schedules, arrivals and departures kept on record for every run.'],
+    ['Performance', 'Scorecard follow-up', 'Performance tracked so issues are corrected before they cost you loads.'],
+    ['Disputes', 'Disputes with evidence', 'Every claim filed with timestamps, photos and documents attached.'],
 ];
 
 // 03 Why a desk: tres razones ya afirmadas en el sitio (How it works, Our desk, Evidence). Cada una enlaza a la página donde se explica (son los elementos enfocables del sticky).
@@ -65,13 +65,13 @@ $why = [
 
 // 04 Onboarding: foto decorativa por paso (alt descriptivo corto)
 $steps = [
-    ['01', 'We learn your operation', 'Trucks, equipment, lanes, drivers and the accounts you already run, including Amazon Relay.',
+    ['We learn your operation', 'Trucks, equipment, lanes, drivers and the accounts you already run, including Amazon Relay.', 'a first conversation on WhatsApp, with no forms before it.',
      ['base' => 'nf-onboarding-learn', 'alt' => 'Diner booth table by a window with two coffee mugs, a notebook with a pen and a phone, and a truck stop outside at sunrise', 'video' => 'onboarding-diner', 'vpos' => '100% 50%']],   // fase AC: video de Carlos (C01, 8 s, una pasada); recorte 4:5 desde x 1056 (derecha)
-    ['02', 'We define scope & contacts', 'Who approves loads, how we report, and which tasks the desk owns from day one.',
+    ['We define scope & contacts', 'Who approves loads, how we report, and which tasks the desk owns from day one.', 'a clear line between what you approve and what the desk handles.',
      ['base' => 'nf-onboarding-scope', 'alt' => 'A hand tracing a route in blue ink on an open road atlas, with a tablet showing a map, a coffee mug and a notebook on a wooden table', 'video' => 'onboarding-atlas', 'vpos' => '100% 50%']],   // fase AC: video de Carlos (C02, 8 s, una pasada); recorte 4:5 desde el borde derecho
-    ['03', 'We run the day-to-day', 'Booking, tracking and documenting every load, with updates where you already work: WhatsApp.',
+    ['We run the day-to-day', 'Booking, tracking and documenting every load, with updates where you already work: WhatsApp.', 'updates on WhatsApp and the paperwork of every load on file.',
      ['base' => 'nf-onboarding-run', 'alt' => 'White semi truck with a sleeper cab at the gate of a logistics facility at sunrise', 'video' => 'onboarding-gate']],   // fase Z: video de Carlos (V09, el camión sale por la puerta al amanecer, 8 s, una pasada); póster de escritorio nf-onboarding-run-tall-vid (4:5, primer fotograma)
-    ['04', 'We review & improve', 'Regular reviews of lanes, rates and incidents to keep your trucks earning.',
+    ['We review & improve', 'Regular reviews of lanes, rates and incidents to keep your trucks earning.', 'a regular look at your lanes, rates and incidents.',
      ['base' => 'nf-onboarding-review', 'alt' => 'A hand marking a printed spreadsheet at a desk, with a laptop showing a bar chart, a coffee mug and truck keys', 'video' => 'onboarding-review', 'vpos' => '100% 50%']],   // fase AC: video de Carlos (C09, 8 s, una pasada); recorte 4:5 desde el borde derecho
 ];
 
@@ -114,7 +114,7 @@ $figures = [
       <?php if ($variantA): ?>
       <p class="t-display home-hero__title home-hero__title--a"><?= e($headline) ?></p>
       <?php else: ?>
-      <p class="t-display home-hero__title"><span class="home-hero__l1">Booked. Tracked.</span> <span class="home-hero__l2 hl">Documented.</span></p>
+      <p class="t-display home-hero__title"><span class="home-hero__l1">We follow every load</span> <span class="home-hero__l2 hl">until it is documented.</span></p>
       <?php endif; ?>
       <p class="hero__lead t-lead">NorthStar is your remote dispatch and back-office desk. We book Amazon Relay and dry van freight, follow every load to delivery, and keep the paperwork that protects your pay. That is how incidents get handled with evidence and operations run as a team.</p>
       <div class="hero__ctas">
@@ -154,7 +154,7 @@ $figures = [
 <section class="section home-services" id="services" aria-labelledby="services-title">
   <div class="home-services__pin">
     <div class="container">
-      <?php partial('section-head', ['eyebrow' => '01 · What we manage', 'title' => 'Three fronts.{pill:nf-hero-amazon-relay}{br}One dispatch desk.{pill:nf-hero-dry-van}', 'id' => 'services-title', 'split' => true,
+      <?php partial('section-head', ['eyebrow' => 'What we manage', 'title' => 'Three fronts.{pill:nf-hero-amazon-relay}{br}One dispatch desk.{pill:nf-hero-dry-van}', 'id' => 'services-title', 'split' => true,
           'lead' => 'We stay on the load until it is documented and settled. The same team that books it tracks it and closes it out.']); ?>
     </div>
     <div class="container home-rail">
@@ -174,7 +174,7 @@ $figures = [
 <!-- 02 CHOOSE YOUR SETUP: pestañas (Owner-operator · Small fleet · Amazon Relay carrier). Cada panel = foto 16:9 con tarjeta solapada, 3 puntos ya afirmados en la página de destino, enlace y WhatsApp con el mensaje de esa variante. -->
 <?php partial('tabs', [
     'id'      => 'setup-title',
-    'eyebrow' => '02 · Your setup',
+    'eyebrow' => 'Your setup',
     'title'   => 'Choose your setup',
     'lead'    => 'Pick the one that looks like your operation. Each opens WhatsApp with a ready message.',
     'label'   => 'Choose your setup',
@@ -204,7 +204,7 @@ $figures = [
 <section class="home-relay curtain-next" aria-labelledby="relay-title">
   <div class="container home-relay__in">
     <div class="home-relay__main">
-      <span class="t-eyebrow">03 · Specialty</span>
+      <span class="t-eyebrow">Specialty</span>
       <h2 class="t-h2" id="relay-title">Amazon Relay dispatch for <span class="hl">carriers who move fast.</span></h2>
       <p class="t-body home-relay__lead">Relay rewards carriers who move fast and keep clean records. Our desk watches the load board for you, books the blocks that fit your trucks and follows performance and disputes inside your account.</p>
       <a class="btn btn--primary home-relay__btn" href="<?= e(url('/amazon-relay-dispatch/')) ?>"><span class="btn__t">Amazon Relay dispatch</span></a>
@@ -220,7 +220,7 @@ $figures = [
 <section class="section home-why" aria-labelledby="why-title">
   <div class="why__pin">
     <div class="container">
-      <?php partial('section-head', ['eyebrow' => '04 · Why a desk', 'title' => 'A team, not a single dispatcher', 'id' => 'why-title']); ?>
+      <?php partial('section-head', ['eyebrow' => 'Why a desk', 'title' => 'A team, not a single dispatcher', 'id' => 'why-title']); ?>
     </div>
     <div class="container why">
       <div class="why__nums" aria-hidden="true">
@@ -232,7 +232,6 @@ $figures = [
           <figure class="why__photo"><?= ns_img(['base' => $photo, 'alt' => '', 'sizes' => '(min-width:901px) 33vw, (min-width:641px) 100vw, 65vw',
             'art' => [['media' => '(min-width:1025px)', 'base' => $photo . '-tall', 'sizes' => '(min-width:1025px) 440px']]]) ?></figure>
           <div class="why__body">
-            <span class="why__n t-meta" aria-hidden="true"><?= e($n) ?></span>
             <h3 class="head t-h3"><?= e($title) ?></h3>
             <p class="t-card"><?= e($text) ?></p>
             <?php if (route_is_live($path)): ?><a class="why__link" href="<?= e(url($path)) ?>"><?= e($linkLabel) ?> <span class="arrow" aria-hidden="true">→</span></a><?php endif; ?>
@@ -247,18 +246,19 @@ $figures = [
 <!-- 04 ONBOARDING: columnas con foto, línea fina arriba y línea cian que se rellena con el scroll (motion.js); desfase vertical escalonado en escritorio -->
 <section class="section home-onboarding" aria-labelledby="onboarding-title">
   <div class="container stack">
-    <?php partial('section-head', ['eyebrow' => '05 · Onboarding', 'title' => 'How we plug into your operation.', 'id' => 'onboarding-title']); ?>
+    <?php partial('section-head', ['eyebrow' => 'Onboarding', 'title' => 'How we plug into your operation.', 'id' => 'onboarding-title']); ?>
     <ol class="home-steps">
-      <?php foreach ($steps as [$n, $title, $text, $photo]):
+      <?php foreach ($steps as $si => [$title, $text, $gets, $photo]):
           $sv = (string) ($photo['video'] ?? '');
           $hasSv = preg_match('/^[a-z0-9-]+$/', $sv) === 1 && is_file(NS_ROOT . "/assets/video/$sv.mp4") && is_file(NS_ROOT . '/assets/img/' . $photo['base'] . '-tall-vid-480.webp'); ?>
       <li class="home-step">
-        <span class="home-step__line" aria-hidden="true"><i></i></span>
         <figure class="home-step__photo px"<?= $hasSv ? ' data-bgvideo data-mp4="' . e(asset("video/$sv.mp4")) . '"' : '' ?>><?= ns_img($photo + ['sizes' => '(min-width:641px) 50vw, 65vw',
             'art' => [['media' => '(min-width:1025px)', 'base' => $photo['base'] . ($hasSv ? '-tall-vid' : '-tall'), 'sizes' => '(min-width:1025px) 360px']]]) ?><?php if ($hasSv): ?><video class="home-step__video"<?= !empty($photo['vpos']) ?' style="object-position:' . e((string) $photo['vpos']) . '"' : '' ?> muted playsinline preload="none" aria-hidden="true" tabindex="-1"></video><?php endif; ?></figure>
-        <span class="home-step__n" aria-hidden="true"><?= e($n) ?></span>
-        <h3 class="head t-h3"><span class="sr-only">Step <?= e($n) ?>: </span><?= e($title) ?></h3>
-        <p class="t-card"><?= e($text) ?></p>
+        <div class="home-step__body">
+          <h3 class="head t-h3"><span class="sr-only">Step <?= $si + 1 ?>: </span><?= e($title) ?></h3>
+          <p class="t-card"><?= e($text) ?></p>
+          <p class="t-card home-step__gets"><b>You get</b> <?= e($gets) ?></p>
+        </div>
       </li>
       <?php endforeach; ?>
     </ol>
@@ -277,7 +277,7 @@ $videoReady = ns_video_ready();
 $teamCard = [
     'id'      => 'team-title',
     'cls'     => 'home-team',
-    'eyebrow' => '06 · The desk behind the load',
+    'eyebrow' => 'The desk behind the load',
     'title'   => 'Built by dispatchers.{br}{hl}Run as a team.{/hl}',
     'image'   => ['base' => 'nf-dispatch-room-wide', 'alt' => 'A quiet dispatch desk by a large window at dusk, with two monitors, a headset, a notebook and a lamp, overlooking a freight yard with trailers', 'pos' => '50% 50%'],
 ];
@@ -302,7 +302,7 @@ partial('photo-card', $teamCard); ?>
 <section class="section" aria-labelledby="evidence-title">
   <div class="container split home-evidence">
     <div class="home-evidence__text">
-      <?php partial('section-head', ['eyebrow' => '07 · Proof, not promises', 'title' => 'Incidents are handled with evidence.', 'id' => 'evidence-title',
+      <?php partial('section-head', ['eyebrow' => 'Proof, not promises', 'title' => 'Incidents are handled with evidence.', 'id' => 'evidence-title',
           'lead' => 'When a broker questions detention, a lumper fee or a late arrival, the answer is already on file. Here is what our desk keeps for every load.']); ?>
       <ul class="home-docs" aria-label="Documents the desk keeps for every load">
         <?php foreach ($docs as $i => $d): ?>
@@ -360,7 +360,7 @@ partial('photo-card', $teamCard); ?>
 <!-- 08 FROM THE DESK: artículo destacado + 2 filas (datos de app/data/posts.php; sin fechas mientras `published` esté vacío) -->
 <?php partial('desk-block', [
     'id'      => 'desk-guides',
-    'eyebrow' => '08 · From the desk',
+    'eyebrow' => 'From the desk',
     'title'   => 'Guides from the desk',
     'lead'    => 'Practical guides on what dispatch costs, how Amazon Relay works and how to get paid for every hour at the dock.',
     'btn'     => ['label' => 'All articles', 'href' => url('/blog/')],
@@ -368,7 +368,7 @@ partial('photo-card', $teamCard); ?>
 ]); ?>
 
 <!-- 09 FAQ -->
-<?php partial('faq', ['items' => route_faq_items($route), 'eyebrow' => '09 · FAQ', 'title' => 'Truck dispatch questions carriers ask us.', 'pre_cta' => true,
+<?php partial('faq', ['items' => route_faq_items($route), 'eyebrow' => 'FAQ', 'title' => 'Truck dispatch questions carriers ask us.', 'pre_cta' => true,
     // Foto del FAQ por tema (cada pregunta de app/data/faq.php lleva 'topic'): 0 costo, arranque y contrato · 1 Amazon Relay · 2 alcance · 3 con quién trabajamos. El tema 0 es la foto de siempre (4:5 nativo).
     'image' => ['base' => 'nf-faq-dock-light-4x5', 'alt' => 'White trailer backed into a dock door on a warehouse wall, with yellow bollards and painted parking lines', 'sizes' => '(min-width:1025px) 500px, 0px', 'topics' => [
         ['base' => 'nf-faq-dock-light-4x5', 'alt' => 'White trailer backed into a dock door on a warehouse wall, with yellow bollards and painted parking lines'],

@@ -9,7 +9,7 @@
 .hero--home .hero__in { width: 100%; padding-top: 180px; padding-bottom: clamp(32px, 4.5vw, 64px); align-items: flex-end; justify-content: space-between; gap: 32px 48px; }
 .hero--home .hero__main { flex: 1 1 560px; max-width: 980px; gap: 22px; }
 .home-kicker { font-size: 12px; line-height: 1.5; color: var(--cyan-light); }
-.hero--home .t-display { font-size: clamp(56px, 8.4vw, 120px); }
+.hero--home .t-display { font-size: clamp(52px, 7.4vw, 104px); }
 .home-hero__title--a { font-size: clamp(48px, 7vw, 104px); line-height: .92; }
 .hero--home .hero__lead { max-width: 600px; color: var(--text); }
 .hero--home .tags { justify-content: flex-start; color: var(--text); }
@@ -93,39 +93,34 @@
 .home-rcard--accent .card__tag, .home-rcard--accent .card__title, .home-rcard--accent .card__text { color: var(--navy-deep); }
 @media (min-width: 641px) { .home-relay__grid > :nth-child(even) { margin-top: 36px; } }
 
-/* ---- 04 Onboarding: columnas con foto 4:5 (radio 24, .px), línea fina arriba con la línea cian que se rellena con el scroll (motion.js, scaleX 0 a 1 escalonado) y desfase vertical 0/20/40/60 px en escritorio ---- */
+/* ---- Onboarding (fase AD): etapas en filas que alternan lado, sin números, sin líneas de progreso y sin cajas iguales. Cada etapa cuenta qué hace el desk y qué recibe el cliente.
+   Media 4:5 (radio 16): el póster de escritorio `-tall-vid` es el mismo recorte que el video (object-position por paso con `vpos`); 110 % y parallax vienen de .px ---- */
 .home-onboarding { --head-gap: 64px; }
-.home-steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 40px clamp(20px, 2.2vw, 32px); align-items: start; }
-.home-step { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
-.home-step__line { position: relative; display: block; height: 1px; margin-bottom: 8px; background: var(--hairline-strong); }
-.home-step__line i { position: absolute; left: 0; top: -1px; width: 100%; height: 3px; border-radius: var(--r-pill); background: var(--cyan); transform-origin: 0 50%; }   /* visible por defecto (sin JS); motion.js la parte de scaleX(0) */
-/* Paso con video (V09): el <video> va encima de la foto solo >=1025 px; encuadre 4:5 con --vpos (el póster `-tall-vid` es el mismo recorte); 110 % y parallax vienen de .px */
+.home-steps { display: flex; flex-direction: column; gap: clamp(40px, 5vw, 72px); margin: 0; padding: 0; list-style: none; }
+.home-step { display: grid; grid-template-columns: minmax(0, 320px) minmax(0, 1fr); gap: clamp(28px, 6vw, 96px); align-items: center; min-width: 0; }
+.home-step:nth-child(even) { grid-template-columns: minmax(0, 1fr) minmax(0, 320px); }
+.home-step:nth-child(even) .home-step__photo { order: 2; }
+.home-step__body { display: flex; flex-direction: column; gap: 14px; min-width: 0; max-width: 56ch; }
+.home-step__photo { margin: 0; aspect-ratio: 4 / 5; border-radius: var(--r-panel); background: var(--panel); }
+.home-step__photo picture { display: block; width: 100%; height: 100%; }
+.home-step__photo img { display: block; width: 100%; object-fit: cover; }
 .home-step__video { display: none; }
 @media (min-width: 1025px) {
   .home-step__photo[data-bgvideo] { position: relative; }
   .home-step__video { display: block; position: absolute; left: 0; top: 0; width: 100%; object-fit: cover; object-position: 82% 50%; opacity: 0; transition: opacity .6s ease; }
   .home-step__photo.has-video .home-step__video { opacity: 1; }
 }
-.home-step__photo { margin: 0 0 8px; aspect-ratio: 4 / 5; border-radius: var(--r-card); background: var(--panel); }
-.home-step__photo picture { display: block; width: 100%; height: 100%; }
-.home-step__photo img { display: block; width: 100%; object-fit: cover; }
-.home-step__n { font-family: var(--font-head); font-weight: 900; font-size: clamp(72px, 8vw, 104px); line-height: .85; letter-spacing: -.03em; color: var(--cyan); }
-.home-step .t-h3 { margin-top: 8px; line-height: 1.02; color: var(--text); }
-.home-step .t-card { color: var(--text-2); }
-@media (min-width: 1025px) {
-  .home-step:nth-child(2) { margin-top: 20px; }
-  .home-step:nth-child(3) { margin-top: 40px; }
-  .home-step:nth-child(4) { margin-top: 60px; }
-}
-@media (max-width: 1024px) {
-  .home-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .home-step__photo { aspect-ratio: 16 / 10; }
-}
-@media (max-width: 640px) {
-  .home-steps { gap: 28px 14px; }   /* 2×2 también en móvil: son 4 pasos en secuencia y se leen de un vistazo */
-  .home-step { gap: 8px; }
-  .home-step__n { font-size: 56px; }
-  .home-step .t-h3 { margin-top: 2px; font-size: 24px; }
+.home-step .t-h3 { font-size: clamp(32px, 3.4vw, 48px); line-height: 1; color: var(--text); }
+.home-step .t-card { font-size: 18px; line-height: 1.55; color: var(--text-2); }
+.home-step__gets { color: var(--text); }
+.home-step__gets b { font-weight: 600; }
+@media (max-width: 760px) {
+  .home-step, .home-step:nth-child(even) { grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  .home-step:nth-child(even) .home-step__photo { order: 0; }
+  .home-step__photo { aspect-ratio: 16 / 9; }
+  .home-steps { gap: 36px; }
+  .home-step .t-h3 { font-size: 28px; }
+  .home-step .t-card { font-size: 16px; }
 }
 /* Cifras ya afirmadas en el sitio */
 .home-figures { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: clamp(24px, 4vw, 56px); }
@@ -149,7 +144,7 @@
 .home-evidence { align-items: flex-start; gap: 56px clamp(40px, 6vw, 96px); }
 .split > .home-evidence__text { flex-basis: 460px; display: flex; flex-direction: column; gap: 36px; }
 .home-docs { display: flex; flex-wrap: wrap; gap: 8px; }
-.home-doc { display: inline-flex; align-items: center; min-height: 44px; padding: 0 20px; border: 1px solid var(--hairline-strong); border-radius: var(--r-pill); font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--text-2); }
+.home-doc { display: inline-flex; align-items: center; min-height: 44px; padding: 0 20px; border: 1px solid var(--hairline-strong); border-radius: var(--r-tile); font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--text-2); }
 .home-doc--on { background: var(--cyan); border-color: var(--cyan); color: var(--navy-deep); }
 /* Desk log como panel de control: barra de ventana (3 puntos), filas mono etiqueta/valor, línea de tiempo con 3 hitos, píldora de estado y chips de documentos */
 .split > .dlog { flex: 1 1 420px; max-width: 560px; margin: 0; }
@@ -158,7 +153,7 @@
 .dlog__dots { display: inline-flex; gap: 7px; }
 .dlog__dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--hairline-strong); }
 .dlog__title { margin-right: auto; color: var(--text-2); }
-.dlog__pill { display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px; border: 1px solid var(--cyan-line); border-radius: var(--r-pill); background: var(--cyan-tint); color: var(--cyan-light); white-space: nowrap; }
+.dlog__pill { display: inline-flex; align-items: center; gap: 8px; padding: 5px 12px; border: 1px solid var(--cyan-line); border-radius: var(--r-tile); background: var(--cyan-tint); color: var(--cyan-light); white-space: nowrap; }
 .dlog__pdot { width: 6px; height: 6px; border-radius: 50%; background: var(--cyan); }
 .dlog__rows { margin: 0; padding: 6px 22px 0; }
 .dlog__row { display: flex; justify-content: space-between; gap: 16px; padding: 13px 0; border-bottom: 1px solid var(--hairline); font-family: var(--font-mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; }
@@ -174,7 +169,7 @@
 .dlog__step--on .dlog__time { color: var(--cyan); }
 .dlog__step--on .dlog__text { font-weight: 600; color: var(--text); }
 .dlog__docs { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 0; padding: 18px 22px 22px; border-top: 1px solid var(--hairline); }
-.dlog__docs li { display: inline-flex; align-items: center; gap: 7px; padding: 6px 13px; border: 1px solid var(--hairline-strong); border-radius: var(--r-pill); font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--text-2); }
+.dlog__docs li { display: inline-flex; align-items: center; gap: 7px; padding: 6px 13px; border: 1px solid var(--hairline-strong); border-radius: var(--r-tile); font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--text-2); }
 .dlog__docs .icon { color: var(--cyan); stroke-width: 2.6; }
 
 /* ---- Pila de documentos que se archiva (.fshow): panel con tres hojas de formulario abstractas (sin texto ni cifras) y una bandeja "Kept on file" que tapa su parte baja.
@@ -217,7 +212,6 @@
 .why__photo picture { display: block; width: 100%; height: 100%; }
 .why__photo img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .why__body { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding: 24px 24px 28px; }
-.why__n { color: var(--cyan-light); }
 .why__body .t-h3 { line-height: 1.02; color: var(--text); }
 .why__body .t-card { color: var(--text-2); }
 .why__link { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; margin-top: 4px; font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--cyan-light); text-decoration: none; transition: color var(--t-fast); }
@@ -258,9 +252,8 @@
 .faq__main { display: flex; flex-direction: column; gap: 40px; min-width: 0; }
 .faq__main > * { flex: none; }
 .faq__media { display: none; }
-.faq__n { order: 2; flex: none; min-width: 34px; font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: .1em; color: var(--cyan); }
 .faq--photo .faq__q > :first-child { order: 3; }
-.faq--photo .faq__a { margin-left: 104px; }
+.faq--photo .faq__a { margin-left: 54px; }
 @media (min-width: 1025px) {
   .faq--photo { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 40px clamp(48px, 6vw, 96px); align-items: start; }
   .faq__media { display: block; position: sticky; top: calc(var(--header-h) + 24px); }

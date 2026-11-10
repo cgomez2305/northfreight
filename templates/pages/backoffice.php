@@ -18,7 +18,7 @@ $jobs = [
 $flow = ['Book', 'Track', 'Document', 'Get paid'];
 // Cada círculo abre WhatsApp con un mensaje propio de ese trabajo (el contacto principal del sitio es WhatsApp, sin formulario previo).
 $jobItems = array_map(static fn(array $j, int $i): array => [
-    'n' => sprintf('%02d', $i + 1), 'title' => $j[0], 'text' => $j[1],
+    'title' => $j[0], 'text' => $j[1],
     'href' => wa("Hi, I'd like help with " . strtolower($j[0]) . ' in my trucking back office.'),
     'label' => 'Ask the desk about ' . strtolower($j[0]) . ' on WhatsApp',
 ], $jobs, array_keys($jobs));

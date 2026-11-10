@@ -15,7 +15,7 @@ $gets = [
 ];
 // Cada círculo abre WhatsApp con un mensaje propio de esa línea (el contacto principal del sitio es WhatsApp, sin formulario previo).
 $getItems = array_map(static fn(array $g): array => [
-    'n' => $g[0], 'title' => $g[1], 'text' => $g[2],
+    'title' => $g[1], 'text' => $g[2],
     'href' => wa("Hi, I'm an owner-operator and I'd like to talk about " . strtolower($g[1]) . ' with NorthStar.'),
     'label' => 'Ask the desk about ' . strtolower($g[1]) . ' on WhatsApp',
 ], $gets);

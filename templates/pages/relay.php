@@ -7,13 +7,13 @@
 require_once NS_ROOT . '/templates/partials/kit.php';
 
 $manage = [
-    ['A · Load board', 'Block & load booking', 'Monitoring the Relay load board and booking work that fits your lanes and equipment.',
+    ['Load board', 'Block & load booking', 'Monitoring the Relay load board and booking work that fits your lanes and equipment.',
      'truck', ['base' => 'nf-service-dispatch-booking', 'alt' => 'A worker in a safety vest walking toward the loading docks of a warehouse, with a white trailer parked alongside in warm evening light', 'pos' => '60% 50%']],
-    ['B · Trips', 'Trip & arrival records', 'Schedules, arrivals and departures recorded for every run.',
+    ['Trips', 'Trip & arrival records', 'Schedules, arrivals and departures recorded for every run.',
      'pin', ['base' => 'nf-blog-lumper-detention', 'alt' => 'Stretch-wrapped pallets in a warehouse loading bay in late-afternoon sun, with a wall clock above an open dock door and a worker far in the background', 'pos' => '50% 40%']],
-    ['C · Performance', 'Scorecard follow-up', 'Performance tracked so problems are corrected before they cost you loads.',
+    ['Performance', 'Scorecard follow-up', 'Performance tracked so problems are corrected before they cost you loads.',
      'trend', ['base' => 'nf-blog-relay-load-board', 'alt' => 'An open laptop on the hood of a white truck in a freight yard at sunset, with a coiled blue air line in the foreground and rows of trailers behind', 'pos' => '60% 50%']],
-    ['D · Disputes', 'Disputes with evidence', 'Every claim filed with timestamps, photos and documents attached.',
+    ['Disputes', 'Disputes with evidence', 'Every claim filed with timestamps, photos and documents attached.',
      'doc', ['base' => 'nf-blog-relay-requirements', 'alt' => 'A white hard hat and a folded high-visibility vest beside an open folder of blank pages and a clipboard on a steel table at a loading dock', 'pos' => '70% 55%']],
     ['E · Admin', 'Settlements & onboarding', 'Payments reconciled and new drivers set up in the account.',
      'calc', ['base' => 'nf-service-back-office', 'alt' => 'Desk by a window with a stack of printed forms, a hand holding a pen, a keyboard and a monitor', 'pos' => '55% 50%']],

@@ -30,7 +30,7 @@
 .tools-step__t { font-size: 16px; line-height: 1.55; color: var(--text); }
 /* ---- Recursos relacionados ---- */
 .tools-related .card { min-height: 200px; }
-.tools-related .card:not(.card--dark) .card__code { color: var(--cyan); }
+.tools-related .card:not(.card--dark) .card__code { color: var(--cyan-light); }
 .tools-related .card__code { font-weight: 600; letter-spacing: .06em; }
 /* ---- Calculadora RPM ---- */
 .tools-calc { background: var(--panel); color: var(--text); display: flex; flex-wrap: wrap; border: 1px solid var(--hairline); border-radius: var(--r-card); overflow: hidden; }

@@ -33,7 +33,7 @@ $rail = !empty($rail) && count($items) > 1;
       <figure class="prow__photo"<?= !empty($img['pos']) ? ' style="--pos:' . e($img['pos']) . '"' : '' ?>><?= ns_img(['base' => (string) $img['base'], 'alt' => (string) ($img['alt'] ?? ''), 'sizes' => $img['sizes'] ?? '(min-width:1025px) 1152px, (min-width:761px) 100vw, (min-width:641px) calc(100vw - 40px), 65vw']) ?></figure>
       <?php if (!empty($it['icon'])): ?><span class="prow__icon" aria-hidden="true"><?= ns_icon((string) $it['icon'], 26) ?></span><?php endif; ?>
       <div class="prow__body">
-        <span class="prow__n t-meta"><?= e((string) ($it['tag'] ?? ($it['n'] ?? ''))) ?></span>
+        <?php $lbl = (string) ($it['tag'] ?? ($it['n'] ?? '')); if ($lbl !== ''): ?><span class="prow__n t-meta"><?= e($lbl) ?></span><?php endif; ?>
         <<?= $tag ?> class="prow__title head"><?= e((string) $it['title']) ?></<?= $tag ?>>
         <?php if (!empty($it['text'])): ?><p class="prow__text"><?= e((string) $it['text']) ?></p><?php endif; ?>
       </div>

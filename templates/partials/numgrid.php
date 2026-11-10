@@ -18,7 +18,7 @@ if (!$items) {
 <ol class="ngrid g3<?= !empty($cls) ? ' ' . e($cls) : '' ?>"<?= !empty($label) ? ' aria-label="' . e($label) . '"' : '' ?>>
   <?php foreach ($items as $i => $it): ?>
   <li class="ngrid__item">
-    <span class="ngrid__n" aria-hidden="true"><?= e((string) ($it['n'] ?? sprintf('%02d', $i + 1))) ?></span>
+    <?php if (!empty($it['n'])): ?><span class="ngrid__n" aria-hidden="true"><?= e((string) $it['n']) ?></span><?php endif; ?>
     <h3 class="head ngrid__title"><?= e((string) $it['title']) ?></h3>
     <?php if (!empty($it['text'])): ?><p class="ngrid__text"><?= e((string) $it['text']) ?></p><?php endif; ?>
     <?php if (!empty($it['href'])): ?><a class="ngrid__go" href="<?= e((string) $it['href']) ?>" rel="noopener" aria-label="<?= e((string) ($it['label'] ?? $it['title'])) ?>"><span class="arrow" aria-hidden="true">→</span></a><?php endif; ?>
@@ -26,7 +26,6 @@ if (!$items) {
   <?php endforeach; ?>
   <?php if ($cta): ?>
   <li class="ngrid__item ngrid__item--cta">
-    <span class="ngrid__n" aria-hidden="true">+</span>
     <h3 class="head ngrid__title"><?= e((string) $cta['title']) ?></h3>
     <?php if (!empty($cta['text'])): ?><p class="ngrid__text"><?= e((string) $cta['text']) ?></p><?php endif; ?>
     <a class="ngrid__go" href="<?= e((string) $cta['href']) ?>" rel="noopener" aria-label="<?= e((string) ($cta['label'] ?? $cta['title'])) ?>"><span class="arrow" aria-hidden="true">→</span></a>

@@ -107,7 +107,6 @@ partial('hero', [
     <ol class="g3 sb-dk-rulelist">
       <?php foreach ($rules as $i => [$title, $text]): ?>
       <li class="sb-dk-rule<?= $i === 0 ? ' sb-dk-rule--on' : '' ?>">
-        <span class="sb-dk-rule__n t-meta">Rule <?= sprintf('%02d', $i + 1) ?></span>
         <h3 class="head sb-dk-rule__title"><?= e($title) ?></h3>
         <p class="sb-dk-rule__text"><?= e($text) ?></p>
       </li>
@@ -134,6 +133,6 @@ partial('hero', [
 <section class="section sb-dk-why pre-cta" aria-labelledby="dk-why">
   <div class="container stack sb-dk-stack">
     <?php partial('section-head', ['eyebrow' => 'Working with the desk', 'title' => 'What you can count on', 'id' => 'dk-why', 'count' => count($reasons)]); ?>
-    <?php partial('index-list', ['label' => 'What you can count on', 'items' => array_map(static fn(array $r, int $i): array => ['n' => 'W/' . sprintf('%02d', $i + 1), 'title' => $r[0], 'text' => $r[1], 'href' => route_is_live($r[2]) ? url($r[2]) : '', 'image' => $r[3]], $reasons, array_keys($reasons))]); ?>
+    <?php partial('index-list', ['label' => 'What you can count on', 'items' => array_map(static fn(array $r, int $i): array => ['title' => $r[0], 'text' => $r[1], 'href' => route_is_live($r[2]) ? url($r[2]) : '', 'image' => $r[3]], $reasons, array_keys($reasons))]); ?>
   </div>
 </section>

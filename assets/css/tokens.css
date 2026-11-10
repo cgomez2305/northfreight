@@ -13,7 +13,7 @@
   /* Texto (todos pasan AA ≥ 4.5:1 sobre --bg, --panel y --panel-2) */
   --text: #EEF3F8;
   --text-2: #B9C8D8;
-  --text-3: #8FA3B8;
+  --text-3: #A6BACF;
 
   /* Líneas y alfas */
   --hairline: rgba(255, 255, 255, .10);
@@ -67,9 +67,10 @@
   --header-h: 80px;            /* sticky top (12) + isla (56) + 12: offsets de anclas y bloques sticky (≤1024px: 72) */
 
   /* Formas */
-  --r-card: 24px;
-  --r-tile: 16px;
-  --r-panel: 32px;
+  /* Radios con jerarquía (fase AD): paneles y marcos de foto grandes 16, cajas de texto (tarjetas) 8, etiquetas y chips informativos 4, controles (botones, pestañas, navegación) píldora */
+  --r-card: 8px;
+  --r-tile: 4px;
+  --r-panel: 16px;
   --r-pill: 9999px;
 
   /* Transiciones (150-250 ms, solo color/fondo/borde y transform ≤ 2 px) */

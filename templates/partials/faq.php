@@ -60,7 +60,7 @@ $faqLink = static function (array $it): ?array {
   <div class="faq__list">
     <?php foreach ($items as $n => $it): $link = $faqLink($it); ?>
     <details class="faq__item"<?= $openFirst && $n === 0 ? ' open' : '' ?><?= $topics ? ' data-topic="' . $topicOf($it) . '"' : '' ?>>
-      <summary class="faq__q"><span><?= phtext($it['q']) ?></span><?php if ($image): ?><span class="faq__n" aria-hidden="true">Q/<?= sprintf('%02d', $n + 1) ?></span><?php endif; ?><span class="faq__icon" aria-hidden="true"><?= ns_icon('plus', 16) ?></span></summary>
+      <summary class="faq__q"><span><?= phtext($it['q']) ?></span><span class="faq__icon" aria-hidden="true"><?= ns_icon('plus', 16) ?></span></summary>
       <p class="faq__a t-body"><?= phtext($it['a']) ?><?php if ($link !== null && route_is_live($link[1])): ?> <a href="<?= e(url($link[1])) ?>"><?= e($link[0]) ?> <span class="arrow" aria-hidden="true">→</span></a><?php endif; ?></p>
     </details>
     <?php endforeach; ?>

@@ -75,7 +75,7 @@ partial('hero', [
     <?php partial('section-head', ['id' => 'eq-handles', 'eyebrow' => 'What the desk handles', 'title' => $eq['handles_title']]); ?>
     <div class="g4">
       <?php $last = count($eq['handles']) - 1; foreach ($eq['handles'] as $i => $h): ?>
-        <?php partial('card', ['variant' => $i === $last ? 'dark' : 'light', 'cls' => 'sa-n30', 'min_title' => true, 'num' => sprintf('%02d', $i + 1), 'title' => $h[0], 'text' => $h[1]]); ?>
+        <?php partial('card', ['variant' => $i === $last ? 'dark' : 'light', 'cls' => 'sa-n30', 'min_title' => true, 'title' => $h[0], 'text' => $h[1]]); ?>
       <?php endforeach; ?>
     </div>
   </div>

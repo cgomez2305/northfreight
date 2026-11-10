@@ -88,12 +88,12 @@ ns_default('CONSENT_VERSION', 'v1');
 ns_default('CONSENT_TEXT_V1', 'I agree that NorthStar Freight Solutions LLC may contact me about my application and its services at the phone number and email I provided, by phone call, text message (SMS) and email, including messages sent with an automated system. Message and data rates may apply. Consent is not a condition of applying or of buying any service. I can opt out at any time by replying STOP or by telling the dispatch desk.');
 
 // --- Flags de contenido (§10) -------------------------------------------
-// Hero del home: 'B' = "Booked. Tracked. Documented." (actual)
+// Hero del home: 'B' = "We follow every load until it is documented." (actual)
 //                'A' = "Incidents are handled with evidence. And operations, as a team." (PDF)
 ns_default('HERO_VARIANT', 'B');
 ns_default('HERO_HEADLINES', [
     'A' => 'Incidents are handled with evidence. And operations, as a team.',
-    'B' => 'Booked. Tracked. Documented.',
+    'B' => 'We follow every load until it is documented.',
 ]);
 // Foto de fondo del CTA final (assets/img/<base>-{640,1024,1280}.webp + .jpg). '' = panel liso. Una ruta puede anularla con 'cta_image' => 'base' | '' | false.
 ns_default('CTA_IMAGE', 'nf-cta-night-truck');

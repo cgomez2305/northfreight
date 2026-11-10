@@ -17,7 +17,7 @@ $sizes = (string) ($sizes ?? '(min-width:1025px) 880px, 0px');
     <?php foreach ($items as $i => $it): $href = (string) ($it['href'] ?? ''); $tag = $href !== '' ? 'a href="' . e($href) . '"' : 'div'; ?>
     <li class="idx__item<?= $i === 0 ? ' is-on' : '' ?>">
       <<?= $tag ?> class="idx__row">
-        <span class="idx__n t-meta"><?= e((string) ($it['n'] ?? sprintf('%02d', $i + 1))) ?></span>
+        <?php if (!empty($it['n'])): ?><span class="idx__n t-meta"><?= e((string) $it['n']) ?></span><?php endif; ?>
         <span class="head idx__title"><?= e((string) $it['title']) ?></span>
         <span class="idx__text"><?= e((string) ($it['text'] ?? '')) ?></span>
         <span class="idx__go" aria-hidden="true"><span class="arrow">→</span></span>

@@ -31,11 +31,11 @@ partial('hero', [
 // Resumen "In short" (SEO/GEO): editable aquí. Solo información que ya está en el copy de esta página; sin cifras, tarifas ni promesas nuevas.
 partial('summary', summary_for($route));
 
-// Triada bajo el hero: las tres palabras del titular del home con el copy que ya describe cada una (servicios del home y del resumen). Sin H2 nuevos: los títulos son <p>.
-partial('trio', ['label' => 'Booked, tracked, documented', 'items' => [
-    ['icon' => 'route',      'title' => 'Booked',     'text' => 'We search, negotiate and book freight on Amazon Relay and dry van lanes.'],
-    ['icon' => 'locate',     'title' => 'Tracked',    'text' => 'Every trip followed from pickup to POD, with ETAs, arrivals and departures logged.'],
-    ['icon' => 'file-check', 'title' => 'Documented', 'text' => 'Paperwork organized and kept on file, so settlements and disputes start with evidence.'],
+// Triada bajo el hero: qué hace el desk en cada carga, con el copy que ya describe cada una (servicios del home y del resumen). Sin H2 nuevos: los títulos son <p>.
+partial('trio', ['label' => 'What the desk does on every load', 'items' => [
+    ['icon' => 'route',      'title' => 'We book the freight',     'text' => 'We search, negotiate and book freight on Amazon Relay and dry van lanes.'],
+    ['icon' => 'locate',     'title' => 'We follow every trip',    'text' => 'Every trip followed from pickup to POD, with ETAs, arrivals and departures logged.'],
+    ['icon' => 'file-check', 'title' => 'We keep the paperwork', 'text' => 'Paperwork organized and kept on file, so settlements and disputes start with evidence.'],
 ]]);
 ?>
 

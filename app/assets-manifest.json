@@ -4,8 +4,8 @@
     "css": {
         "blog-motion": {
             "file": "css/dist/blog-motion.css",
-            "hash": "85074d02d0",
-            "bytes": 82647,
+            "hash": "54edd0d0d2",
+            "bytes": 82269,
             "sources": [
                 {
                     "path": "css/fonts.css",
@@ -14,35 +14,35 @@
                 },
                 {
                     "path": "css/tokens.css",
-                    "size": 6376,
-                    "crc32": "fd94a863"
+                    "size": 6568,
+                    "crc32": "3097eac8"
                 },
                 {
                     "path": "css/base.css",
-                    "size": 7264,
-                    "crc32": "e4cc6a6b"
+                    "size": 7270,
+                    "crc32": "7c6d994b"
                 },
                 {
                     "path": "css/components.css",
-                    "size": 72086,
-                    "crc32": "a117d612"
+                    "size": 71809,
+                    "crc32": "c6427087"
                 },
                 {
                     "path": "css/pages/blog.css",
-                    "size": 11779,
-                    "crc32": "510ef50f"
+                    "size": 11815,
+                    "crc32": "c8646a63"
                 },
                 {
                     "path": "css/motion.css",
-                    "size": 9784,
-                    "crc32": "57583dd5"
+                    "size": 9679,
+                    "crc32": "4d7848af"
                 }
             ]
         },
         "careers-motion": {
             "file": "css/dist/careers-motion.css",
-            "hash": "51a376b5bf",
-            "bytes": 83439,
+            "hash": "a3692e4c68",
+            "bytes": 83043,
             "sources": [
                 {
                     "path": "css/fonts.css",
@@ -51,35 +51,35 @@
                 },
                 {
                     "path": "css/tokens.css",
-                    "size": 6376,
-                    "crc32": "fd94a863"
+                    "size": 6568,
+                    "crc32": "3097eac8"
                 },
                 {
                     "path": "css/base.css",
-                    "size": 7264,
-                    "crc32": "e4cc6a6b"
+                    "size": 7270,
+                    "crc32": "7c6d994b"
                 },
                 {
                     "path": "css/components.css",
-                    "size": 72086,
-                    "crc32": "a117d612"
+                    "size": 71809,
+                    "crc32": "c6427087"
                 },
                 {
                     "path": "css/pages/careers.css",
-                    "size": 13054,
-                    "crc32": "1c00c687"
+                    "size": 13072,
+                    "crc32": "643ebaa6"
                 },
                 {
                     "path": "css/motion.css",
-                    "size": 9784,
-                    "crc32": "57583dd5"
+                    "size": 9679,
+                    "crc32": "4d7848af"
                 }
             ]
         },
         "company-motion": {
             "file": "css/dist/company-motion.css",
-            "hash": "e7b5844538",
-            "bytes": 82637,
+            "hash": "c69c62ff25",
+            "bytes": 82253,
             "sources": [
                 {
                     "path": "css/fonts.css",
@@ -88,35 +88,35 @@
                 },
                 {
                     "path": "css/tokens.css",
-                    "size": 6376,
-                    "crc32": "fd94a863"
+                    "size": 6568,
+                    "crc32": "3097eac8"
                 },
                 {
                     "path": "css/base.css",
-                    "size": 7264,
-                    "crc32": "e4cc6a6b"
+                    "size": 7270,
+                    "crc32": "7c6d994b"
                 },
                 {
                     "path": "css/components.css",
-                    "size": 72086,
-                    "crc32": "a117d612"
+                    "size": 71809,
+                    "crc32": "c6427087"
                 },
                 {
                     "path": "css/pages/company.css",
-                    "size": 11726,
-                    "crc32": "8afaf4fb"
+                    "size": 11756,
+                    "crc32": "d0710f08"
                 },
                 {
                     "path": "css/motion.css",
-                    "size": 9784,
-                    "crc32": "57583dd5"
+                    "size": 9679,
+                    "crc32": "4d7848af"
                 }
             ]
         },
         "home-motion": {
             "file": "css/dist/home-motion.css",
-            "hash": "5c9a0d2344",
-            "bytes": 91411,
+            "hash": "8dba35da37",
+            "bytes": 90669,
             "sources": [
                 {
                     "path": "css/fonts.css",
@@ -125,35 +125,35 @@
                 },
                 {
                     "path": "css/tokens.css",
-                    "size": 6376,
-                    "crc32": "fd94a863"
+                    "size": 6568,
+                    "crc32": "3097eac8"
                 },
                 {
                     "path": "css/base.css",
-                    "size": 7264,
-                    "crc32": "e4cc6a6b"
+                    "size": 7270,
+                    "crc32": "7c6d994b"
                 },
                 {
                     "path": "css/components.css",
-                    "size": 72086,
-                    "crc32": "a117d612"
+                    "size": 71809,
+                    "crc32": "c6427087"
                 },
                 {
                     "path": "css/pages/home.css",
-                    "size": 25552,
-                    "crc32": "8f51e220"
+                    "size": 24977,
+                    "crc32": "0a8e95ab"
                 },
                 {
                     "path": "css/motion.css",
-                    "size": 9784,
-                    "crc32": "57583dd5"
+                    "size": 9679,
+                    "crc32": "4d7848af"
                 }
             ]
         },
         "services-a-motion": {
             "file": "css/dist/services-a-motion.css",
-            "hash": "503a676ec6",
-            "bytes": 75925,
+            "hash": "c9c71cdf1e",
+            "bytes": 75517,
             "sources": [
                 {
                     "path": "css/fonts.css",
@@ -162,35 +162,35 @@
                 },
                 {
                     "path": "css/tokens.css",
-                    "size": 6376,
-                    "crc32": "fd94a863"
+                    "size": 6568,
+                    "crc32": "3097eac8"
                 },
                 {
                     "path": "css/base.css",
-                    "size": 7264,
-                    "crc32": "e4cc6a6b"
+                    "size": 7270,
+                    "crc32": "7c6d994b"
                 },
                 {
                     "path": "css/components.css",
-                    "size": 72086,
-                    "crc32": "a117d612"
+                    "size": 71809,
+                    "crc32": "c6427087"
                 },
                 {
                     "path": "css/pages/services-a.css",
-                    "size": 3392,
-                    "crc32": "5a7d6db8"
+                    "size": 3398,
+                    "crc32": "ea4e6067"
                 },
                 {
                     "path": "css/motion.css",
-                    "size": 9784,
-                    "crc32": "57583dd5"
+                    "size": 9679,
+                    "crc32": "4d7848af"
                 }
             ]
         },
         "services-b-motion": {
             "file": "css/dist/services-b-motion.css",
-            "hash": "02505972ef",
-            "bytes": 84335,
+            "hash": "628bc37111",
+            "bytes": 83831,
             "sources": [
                 {
                     "path": "css/fonts.css",
@@ -199,35 +199,35 @@
                 },
                 {
                     "path": "css/tokens.css",
-                    "size": 6376,
-                    "crc32": "fd94a863"
+                    "size": 6568,
+                    "crc32": "3097eac8"
                 },
                 {
                     "path": "css/base.css",
-                    "size": 7264,
-                    "crc32": "e4cc6a6b"
+                    "size": 7270,
+                    "crc32": "7c6d994b"
                 },
                 {
                     "path": "css/components.css",
-                    "size": 72086,
-                    "crc32": "a117d612"
+                    "size": 71809,
+                    "crc32": "c6427087"
                 },
                 {
                     "path": "css/pages/services-b.css",
-                    "size": 14312,
-                    "crc32": "5b2755c6"
+                    "size": 14200,
+                    "crc32": "1f896503"
                 },
                 {
                     "path": "css/motion.css",
-                    "size": 9784,
-                    "crc32": "57583dd5"
+                    "size": 9679,
+                    "crc32": "4d7848af"
                 }
             ]
         },
         "tools-motion": {
             "file": "css/dist/tools-motion.css",
-            "hash": "741fa1df8b",
-            "bytes": 80784,
+            "hash": "f318a61916",
+            "bytes": 80376,
             "sources": [
                 {
                     "path": "css/fonts.css",
@@ -236,28 +236,28 @@
                 },
                 {
                     "path": "css/tokens.css",
-                    "size": 6376,
-                    "crc32": "fd94a863"
+                    "size": 6568,
+                    "crc32": "3097eac8"
                 },
                 {
                     "path": "css/base.css",
-                    "size": 7264,
-                    "crc32": "e4cc6a6b"
+                    "size": 7270,
+                    "crc32": "7c6d994b"
                 },
                 {
                     "path": "css/components.css",
-                    "size": 72086,
-                    "crc32": "a117d612"
+                    "size": 71809,
+                    "crc32": "c6427087"
                 },
                 {
                     "path": "css/pages/tools.css",
-                    "size": 9105,
-                    "crc32": "a9784d23"
+                    "size": 9111,
+                    "crc32": "387360aa"
                 },
                 {
                     "path": "css/motion.css",
-                    "size": 9784,
-                    "crc32": "57583dd5"
+                    "size": 9679,
+                    "crc32": "4d7848af"
                 }
             ]
         }
@@ -319,12 +319,12 @@
             },
             "motion": {
                 "file": "js/dist/motion.min.js",
-                "hash": "a2e41562c3",
-                "bytes": 14844,
+                "hash": "94c12d74dd",
+                "bytes": 10656,
                 "source": {
                     "path": "js/motion.js",
-                    "size": 32136,
-                    "crc32": "4e2e138f"
+                    "size": 24063,
+                    "crc32": "15ff708f"
                 }
             },
             "video": {

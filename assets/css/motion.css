@@ -30,7 +30,7 @@
 }
 
 /* ---- Relleno de texto (data-textfill, >=1025px): cada palabra parte de opacidad .5 (AA medido) y motion.js la sube a 1 ---- */
-@media (min-width: 1025px) { .js-motion [data-textfill] .w { opacity: .5; } }
+@media (min-width: 1025px) { .js-motion [data-textfill] .w { opacity: .65; } }
 
 /* ---- Escena 1: hero de la home. El contenedor de la foto se encoge y revela el fondo; necesita el radio fijo y el recorte ---- */
 @media (min-width: 1025px) {
@@ -81,11 +81,9 @@
   .js-motion .why__nums span { position: absolute; inset: 0; display: flex; align-items: center; font-family: var(--font-head); font-weight: 900; font-size: clamp(110px, 12.5vw, 180px); line-height: .8; letter-spacing: -.03em; color: var(--cyan); }
   .js-motion .why__nums span:not(:first-child), .js-motion .why__item:not(:first-child) .why__photo { opacity: 0; }   /* estado inicial del timeline */
   .js-motion .why__list { grid-column: 3; display: flex; flex-direction: column; gap: 28px; }
-  .js-motion .why__item { display: block; overflow: visible; background: transparent; border: 0; border-left: 2px solid var(--hairline-strong); border-radius: 0; padding-left: 28px; transition: border-color var(--t-fast); }
-  .js-motion .why__item.is-on { border-left-color: var(--cyan); }
+  .js-motion .why__item { display: block; overflow: visible; background: transparent; border: 0; border-radius: 0; padding-left: 0; }   /* el ítem activo se distingue por opacidad y tamaño de texto, sin franja de color */
   .js-motion .why__photo { position: absolute; top: 0; left: calc(var(--c1) + var(--gap)); width: var(--c2); height: 100%; aspect-ratio: auto; border-radius: var(--r-card); will-change: opacity; }
   .js-motion .why__body { padding: 0; gap: 8px; }
-  .js-motion .why__n { display: none; }
   .js-motion .why__body .t-h3 { font-size: clamp(28px, 2.6vw, 36px); }
 }
 @media (min-width: 1025px) and (min-height: 700px) and (max-height: 800px) {

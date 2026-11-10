@@ -24,10 +24,10 @@
   .blog-feat__body { position: absolute; left: 0; bottom: 0; width: min(580px, 48%); margin: 0; }
 }
 .blog-feat__meta { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
-.blog-feat__badge { padding: 6px 12px; background: var(--cyan); border-radius: var(--r-pill); color: var(--navy-deep); letter-spacing: .1em; }
-.blog-feat__cat { color: var(--cyan); letter-spacing: .1em; }
+.blog-feat__badge { padding: 6px 12px; background: var(--cyan); border-radius: var(--r-tile); color: var(--navy-deep); letter-spacing: .1em; }
+.blog-feat__cat { color: var(--cyan-light); letter-spacing: .1em; }
 .blog-feat__min { font-size: 11px; color: var(--text-2); }
-.blog-feat__link { font-weight: 600; font-size: 17px; color: var(--cyan); }
+.blog-feat__link { font-weight: 600; font-size: 17px; color: var(--cyan-light); }
 .blog-feat:hover .blog-feat__link { color: var(--cyan-light); }
 /* ---- Índice: filtro y rejilla ---- */
 .blog-head { display: flex; flex-wrap: wrap; gap: 20px; justify-content: space-between; align-items: flex-end; }
@@ -59,7 +59,7 @@
 .blog-post__in { display: flex; flex-wrap: wrap; gap: clamp(32px, 5vw, 72px); align-items: flex-start; }
 .blog-aside { flex: 0 0 260px; position: sticky; top: calc(var(--header-h) + 24px); display: flex; flex-direction: column; gap: 24px; }
 .blog-aside__toc { display: flex; flex-direction: column; }
-.blog-toc__label { color: var(--cyan); letter-spacing: .1em; padding-bottom: 12px; }
+.blog-toc__label { color: var(--cyan-light); letter-spacing: .1em; padding-bottom: 12px; }
 .blog-toc { display: flex; flex-direction: column; }
 .blog-toc a { display: flex; align-items: center; min-height: 44px; padding: 9px 0 9px 14px; border-left: 2px solid var(--hairline); color: var(--text-2); text-decoration: none; font-size: 14px; line-height: 1.4; }
 .blog-toc a:hover { border-left-color: var(--cyan); color: var(--text); }
@@ -67,7 +67,7 @@
 .blog-aside__card:hover { background: var(--panel-2); }
 .blog-aside__card:focus-visible { outline-offset: 3px; }
 .blog-aside__title { font-size: 24px; line-height: 1.05; color: var(--text); }
-.blog-aside__link { font-size: 15px; font-weight: 600; color: var(--cyan); }
+.blog-aside__link { font-size: 15px; font-weight: 600; color: var(--cyan-light); }
 .blog-aside__card:hover .blog-aside__link { color: var(--cyan-light); }
 .blog-tocm { display: none; border: 1px solid var(--hairline); border-radius: var(--r-tile); background: var(--panel); padding: 0 18px; margin-bottom: 28px; }
 .blog-tocm__sum { min-height: 52px; display: flex; align-items: center; justify-content: space-between; font-weight: 600; color: var(--text); cursor: pointer; list-style: none; }
@@ -90,7 +90,7 @@ details[open] > summary > .blog-plus { transform: rotate(45deg); }
 .blog-prose strong { color: var(--text); }
 .blog-prose p a, .blog-prose li a { font-weight: 500; }
 .blog-takeaways { border: 1px solid var(--hairline); border-radius: var(--r-card); background: var(--panel); padding: clamp(20px, 3vw, 30px); }
-.blog-takeaways__label { display: block; color: var(--cyan); letter-spacing: .1em; margin-bottom: 14px; }
+.blog-takeaways__label { display: block; color: var(--cyan-light); letter-spacing: .1em; margin-bottom: 14px; }
 .blog-prose .blog-takeaways ul { margin: 0; }
 /* Cifras de ejemplo (artículo de costes) */
 .blog-stats { background: var(--bg); color: var(--text); padding: 24px; margin: 8px 0 24px; border: 1px solid var(--hairline); border-radius: var(--r-card); display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 16px; }
@@ -105,7 +105,7 @@ details[open] > summary > .blog-plus { transform: rotate(45deg); }
 .blog-prose .blog-callout__title { margin: 0; font-size: 34px; line-height: 1; color: var(--text); }
 /* Related */
 .blog-related .card { min-height: 200px; box-sizing: border-box; gap: 14px; }
-.blog-related .card__code { letter-spacing: .06em; color: var(--cyan); }
+.blog-related .card__code { letter-spacing: .06em; color: var(--cyan-light); }
 .blog-related .card--dark .card__code { color: var(--cyan-light); }
 .blog-related .card__text { flex: 1; }
 
