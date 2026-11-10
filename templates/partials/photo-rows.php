@@ -23,7 +23,7 @@ $rail = !empty($rail) && count($items) > 1;
 <?php if ($rail): ?><div class="prows-wrap" data-prail>
   <div class="prail" aria-hidden="true">
     <span class="prail__line"><i class="prail__fill"></i></span>
-    <?php foreach ($items as $i => $it): ?><span class="prail__m" style="--k:<?= round($i / (count($items) - 1), 4) ?>"><b><?= e((string) ($it['n'] ?? $i + 1)) ?></b><b class="prail__on"><?= e((string) ($it['n'] ?? $i + 1)) ?></b></span><?php endforeach; ?>
+    <?php foreach ($items as $i => $it): ?><span class="prail__m" style="--k:<?= round($i / (count($items) - 1), 4) ?>"><b></b><b class="prail__on"></b></span><?php endforeach; ?>
   </div>
 <?php endif; ?>
 <ol class="prows"<?= !empty($label) ? ' aria-label="' . e($label) . '"' : '' ?>>

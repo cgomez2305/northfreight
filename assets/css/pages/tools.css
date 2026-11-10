@@ -24,10 +24,9 @@
 .tools-term__def { margin: 0; color: var(--text-2); line-height: 1.7; }
 .tools-term:target .tools-term__name { color: var(--cyan); }
 /* ---- Pasos ---- */
-.tools-steps { margin: 0; padding: 0; list-style: none; }
-.tools-step { background: var(--panel); border: 1px solid var(--hairline); border-radius: var(--r-tile); padding: var(--tile-pad); display: flex; flex-direction: column; gap: 10px; }
-.tools-step__n { font-size: 12px; font-weight: 500; color: var(--cyan); }
-.tools-step__t { font-size: 16px; line-height: 1.55; color: var(--text); }
+.tools-steps { display: flex; flex-direction: column; gap: 14px; max-width: 64ch; margin: 0; padding: 0 0 0 1.6em; list-style: decimal; color: var(--text); }
+.tools-step { padding-left: 6px; font-size: 17px; line-height: 1.55; color: var(--text); }
+.tools-step::marker { color: var(--text-2); font-weight: 600; }
 /* ---- Recursos relacionados ---- */
 .tools-related .card { min-height: 200px; }
 .tools-related .card:not(.card--dark) .card__code { color: var(--cyan-light); }

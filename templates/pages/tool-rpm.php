@@ -80,9 +80,9 @@ partial('hero', [
 <section class="section" aria-labelledby="rpm-steps-title">
   <div class="container stack">
     <?php partial('section-head', ['eyebrow' => 'How to use it', 'title' => 'How to calculate rate per mile in three steps', 'id' => 'rpm-steps-title']); ?>
-    <ol class="g3 tools-steps">
+    <ol class="tools-steps">
       <?php foreach ($steps as $n => $text): ?>
-      <li class="tools-step"><span class="tools-step__n mono">STEP <?= sprintf('%02d', $n + 1) ?></span><span class="tools-step__t"><?= e($text) ?></span></li>
+      <li class="tools-step"><?= e($text) ?></li>
       <?php endforeach; ?>
     </ol>
   </div>

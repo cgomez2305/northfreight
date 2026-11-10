@@ -205,7 +205,6 @@
 .home-why { --head-gap: 48px; }
 .why__pin { display: flex; flex-direction: column; gap: var(--head-gap); }
 .why { display: block; }
-.why__nums { display: none; }
 .why__list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(16px, 2vw, 24px); margin: 0; padding: 0; list-style: none; }
 .why__item { display: flex; flex-direction: column; min-width: 0; overflow: hidden; background: var(--panel); border: 1px solid var(--hairline); border-radius: var(--r-card); }
 .why__photo { margin: 0; aspect-ratio: 4 / 3; overflow: hidden; background: var(--panel-2); }

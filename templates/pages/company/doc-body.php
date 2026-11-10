@@ -56,9 +56,9 @@ $csrf = function_exists('csrf_token') ? (string) csrf_token() : '';
 <section class="section section--surface" aria-labelledby="doc-steps">
   <div class="container stack">
     <?php partial('section-head', ['eyebrow' => 'How to use it', 'title' => $doc['steps_title'], 'id' => 'doc-steps']); ?>
-    <ol class="g4 co-steps">
+    <ol class="co-steps">
       <?php foreach ($doc['steps'] as $n => $st): ?>
-      <li><span class="co-step__n head" aria-hidden="true"><?= sprintf('%02d', $n + 1) ?></span><strong class="co-step__t"><?= e($st[0]) ?></strong><span class="co-step__x"><?= e($st[1]) ?></span></li>
+      <li><strong class="co-step__t"><?= e($st[0]) ?></strong><span class="co-step__x"><?= e($st[1]) ?></span></li>
       <?php endforeach; ?>
     </ol>
   </div>

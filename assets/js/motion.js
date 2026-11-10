@@ -125,9 +125,9 @@
      el numeral grande, la foto fija (crossfade: solo opacity y transform) y el ítem resaltado (el resto queda a opacidad .65: el texto sigue pasando AA, ver motion.css) ---- */
   var DIM = 0.8;
   function whyScene() {
-    var pin = one('.why__pin'), items = pin ? $('.why__item', pin) : [], nums = pin ? $('.why__nums > span', pin) : [];
+    var pin = one('.why__pin'), items = pin ? $('.why__item', pin) : [];
     var n = items.length;
-    if (!pin || n < 2 || nums.length !== n) return;
+    if (!pin || n < 2) return;
     var photos = items.map(function (it) { return one('.why__photo', it); }), imgs = photos.map(function (f) { return f && one('img', f); });
     if (photos.some(function (f) { return !f; })) return;
     var total = n - 0.25, cur = -1;   // cada estado dura ~.5 de "tiempo" y la transición .5 centrada en cada frontera; el último estado se sostiene hasta el final
@@ -145,8 +145,6 @@
       var t = i - 0.25;
       tl.fromTo(photos[i], { opacity: 0 }, { opacity: 1, duration: 0.5 }, t);    // la foto nueva entra por encima de la anterior
       if (imgs[i]) tl.fromTo(imgs[i], { scale: 1.03 }, { scale: 1, duration: 0.5 }, t);
-      tl.fromTo(nums[i], { opacity: 0, yPercent: 24 }, { opacity: 1, yPercent: 0, duration: 0.5 }, t);
-      tl.to(nums[i - 1], { opacity: 0, yPercent: -24, duration: 0.5 }, t);
       tl.to(items[i - 1], { opacity: DIM, duration: 0.5 }, t);
       tl.fromTo(items[i], { opacity: DIM }, { opacity: 1, duration: 0.5 }, t);
     }

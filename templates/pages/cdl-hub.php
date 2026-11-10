@@ -19,7 +19,7 @@ partial('hero', [
 ?>
 <section class="section pre-cta" aria-labelledby="cd-open">
   <div class="container stack">
-    <?php partial('section-head', ['id' => 'cd-open', 'eyebrow' => 'Open positions', 'title' => $jobs ? 'Open positions' : 'No openings right now', 'count' => $jobs ? count($jobs) : 0]); ?>
+    <?php partial('section-head', ['id' => 'cd-open', 'eyebrow' => 'Open positions', 'title' => $jobs ? 'Open positions' : 'No openings right now']); ?>
     <?php if ($jobs): ?>
     <div class="cr-rows">
       <?php foreach ($jobs as $slug => $j):

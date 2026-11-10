@@ -55,11 +55,11 @@ $relay = [
 
 // 03 Why a desk: tres razones ya afirmadas en el sitio (How it works, Our desk, Evidence). Cada una enlaza a la página donde se explica (son los elementos enfocables del sticky).
 $why = [
-    ['01', 'One channel for every update', 'Updates you can follow, in one channel: WhatsApp, where you already work.',
+    ['One channel for every update', 'Updates you can follow, in one channel: WhatsApp, where you already work.',
      'nf-why-one-channel', '/load-tracking/', 'Load tracking'],
-    ['02', 'A record of every load', 'Arrival timestamps and photos kept on file, with the BOL and POD filed per load.',
+    ['A record of every load', 'Arrival timestamps and photos kept on file, with the BOL and POD filed per load.',
      'nf-why-record-every-load', '/trucking-back-office/', 'Trucking back office'],
-    ['03', 'A team behind every load', 'The same desk books, tracks and documents every load, as one team.',
+    ['A team behind every load', 'The same desk books, tracks and documents every load, as one team.',
      'nf-dispatch-room-maps', '/how-it-works/', 'How it works'],
 ];
 
@@ -223,11 +223,8 @@ $figures = [
       <?php partial('section-head', ['eyebrow' => 'Why a desk', 'title' => 'A team, not a single dispatcher', 'id' => 'why-title']); ?>
     </div>
     <div class="container why">
-      <div class="why__nums" aria-hidden="true">
-        <?php foreach ($why as [$n]): ?><span><?= e($n) ?></span><?php endforeach; ?>
-      </div>
       <ol class="why__list">
-        <?php foreach ($why as $i => [$n, $title, $text, $photo, $path, $linkLabel]): ?>
+        <?php foreach ($why as $i => [$title, $text, $photo, $path, $linkLabel]): ?>
         <li class="why__item<?= $i === 0 ? ' is-on' : '' ?>">
           <figure class="why__photo"><?= ns_img(['base' => $photo, 'alt' => '', 'sizes' => '(min-width:901px) 33vw, (min-width:641px) 100vw, 65vw',
             'art' => [['media' => '(min-width:1025px)', 'base' => $photo . '-tall', 'sizes' => '(min-width:1025px) 440px']]]) ?></figure>

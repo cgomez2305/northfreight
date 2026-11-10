@@ -16,7 +16,7 @@ $id = $id ?? 'stage-title';
 $section = $section ?? true;
 ?>
 <?php if ($section): ?><section class="section<?= !empty($pre_cta) ? ' pre-cta' : '' ?>" aria-labelledby="<?= e($id) ?>"><div class="container stack"><?php endif; ?>
-<?php partial('section-head', ['eyebrow' => $eyebrow ?? null, 'title' => $title ?? 'A load, stage by stage', 'lead' => $lead ?? null, 'id' => $id, 'count' => $count ?? null]); ?>
+<?php partial('section-head', ['eyebrow' => $eyebrow ?? null, 'title' => $title ?? 'A load, stage by stage', 'lead' => $lead ?? null, 'id' => $id]); ?>
 <div class="stage">
   <table class="stage__table">
     <caption class="sr-only">What the dispatch desk does at each stage of a load, what you get and what is kept on file</caption>
@@ -26,7 +26,7 @@ $section = $section ?? true;
     <tbody>
       <?php foreach ($rows as $i => [$stage, $does, $gets, $file]): ?>
       <tr>
-        <th scope="row" class="stage__stage"><span class="stage__n" aria-hidden="true"><?= sprintf('%02d', $i + 1) ?></span><span class="stage__name"><?= phtext($stage) ?></span></th>
+        <th scope="row" class="stage__stage"><span class="stage__name"><?= phtext($stage) ?></span></th>
         <td data-label="What the desk does"><?= phtext($does) ?></td>
         <td data-label="What you get"><?= phtext($gets) ?></td>
         <td data-label="Kept on file"><span class="stage__file"><?= ns_icon('check', 14) ?><span><?= phtext($file) ?></span></span></td>

@@ -103,7 +103,7 @@ partial('hero', [
 
 <section class="section sb-dk-rules" aria-labelledby="dk-rules">
   <div class="container stack sb-dk-stack">
-    <?php partial('section-head', ['eyebrow' => 'How the desk behaves', 'title' => 'Three rules we work by', 'id' => 'dk-rules', 'count' => count($rules)]); ?>
+    <?php partial('section-head', ['eyebrow' => 'How the desk behaves', 'title' => 'Three rules we work by', 'id' => 'dk-rules']); ?>
     <ol class="g3 sb-dk-rulelist">
       <?php foreach ($rules as $i => [$title, $text]): ?>
       <li class="sb-dk-rule<?= $i === 0 ? ' sb-dk-rule--on' : '' ?>">
@@ -132,7 +132,7 @@ partial('hero', [
 
 <section class="section sb-dk-why pre-cta" aria-labelledby="dk-why">
   <div class="container stack sb-dk-stack">
-    <?php partial('section-head', ['eyebrow' => 'Working with the desk', 'title' => 'What you can count on', 'id' => 'dk-why', 'count' => count($reasons)]); ?>
+    <?php partial('section-head', ['eyebrow' => 'Working with the desk', 'title' => 'What you can count on', 'id' => 'dk-why']); ?>
     <?php partial('index-list', ['label' => 'What you can count on', 'items' => array_map(static fn(array $r, int $i): array => ['title' => $r[0], 'text' => $r[1], 'href' => route_is_live($r[2]) ? url($r[2]) : '', 'image' => $r[3]], $reasons, array_keys($reasons))]); ?>
   </div>
 </section>

@@ -109,8 +109,11 @@ a.card.card--dark.co-res:hover .card__code { color: var(--cyan-light); }
 .co-flash:empty { display: none; }
 .co-flash--error { border-left-color: var(--text); font-weight: 600; }
 /* "How to use it" */
-.co-steps li { background: var(--panel); border: 1px solid var(--hairline); padding: 22px; display: flex; flex-direction: column; gap: 10px; border-radius: var(--r-tile); }
-.co-step__n { font-size: 28px; line-height: 1; color: var(--cyan); }
+.co-steps { display: flex; flex-direction: column; gap: 18px; max-width: 64ch; margin: 0; padding: 0 0 0 1.6em; list-style: decimal; }
+.co-steps li { display: list-item; padding-left: 6px; }
+.co-step__t, .co-step__x { display: block; }
+.co-step__t { margin-bottom: 4px; }
+.co-steps li::marker { color: var(--text-2); font-weight: 600; }
 .co-step__t { font-family: var(--font-head); font-weight: 700; font-size: 24px; line-height: 1.05; color: var(--text); }
 .co-step__x { font-size: 15px; line-height: 1.6; color: var(--text-2); }
 /* FAQ en líneas (estilo de las plantillas de documento) */

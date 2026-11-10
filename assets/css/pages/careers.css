@@ -32,7 +32,6 @@
 /* ---- Pasos numerados (partial steps) ---- */
 .crs { display: grid; gap: 28px; margin: 0; padding: 0; list-style: none; }
 .crs__item { display: flex; flex-direction: column; gap: 12px; min-width: 0; padding-top: 22px; border-top: 1px solid var(--hairline-strong); }
-.crs__n { font-family: var(--font-head); font-weight: 900; font-size: clamp(44px, 6vw, 72px); line-height: .9; letter-spacing: -.02em; color: var(--cyan); }
 .crs__title { font-size: clamp(26px, 2.4vw, 32px); line-height: 1; color: var(--text); }
 .crs__text { color: var(--text-2); max-width: 36ch; }
 @media (min-width: 641px) { .crs--n4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
@@ -100,7 +99,7 @@
 .ap__err::before { content: "!"; flex: none; display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; margin-top: 1px; border: 2px solid var(--text); border-radius: 50%; font-size: 11px; font-weight: 700; line-height: 1; }
 .ap .input[aria-invalid="true"] { border: 2px solid var(--text); }
 .ap__group:has(.ap__err) .ap__opt { border-color: var(--text-3); }
-.ap__alert { margin-bottom: 20px; padding: 18px 22px; background: var(--panel-2); border: 1px solid var(--hairline-strong); border-left: 6px solid var(--text); border-radius: var(--r-tile); color: var(--text); }
+.ap__alert { margin-bottom: 20px; padding: 18px 22px; background: var(--panel-2); border: 1px solid var(--text); border-radius: var(--r-tile); color: var(--text); }
 .ap__alert:focus { outline: none; }
 .ap__alert:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
 .ap__alert-title { font-weight: 600; font-size: 17px; }

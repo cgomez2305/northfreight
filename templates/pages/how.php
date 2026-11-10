@@ -41,11 +41,11 @@ partial('trio', ['label' => 'What the desk does on every load', 'items' => [
 
 <section class="section" aria-label="The four steps">
   <div class="container">
-    <?php partial('photo-rows', ['tag' => 'h2', 'rail' => true, 'label' => 'How we start and work with you', 'items' => array_map(static fn(array $st, int $i): array => ['n' => sprintf('%02d', $i + 1), 'title' => $st[0], 'text' => $st[1], 'icon' => $st[2], 'image' => $st[3]], $steps, array_keys($steps))]); ?>
+    <?php partial('photo-rows', ['tag' => 'h2', 'rail' => true, 'label' => 'How we start and work with you', 'items' => array_map(static fn(array $st, int $i): array => ['title' => $st[0], 'text' => $st[1], 'icon' => $st[2], 'image' => $st[3]], $steps, array_keys($steps))]); ?>
   </div>
 </section>
 
-<?php partial('stage-table', ['eyebrow' => 'From booking to settlement', 'title' => 'A load, stage by stage', 'id' => 'hw-stages', 'count' => count(data('stages'))]); ?>
+<?php partial('stage-table', ['eyebrow' => 'From booking to settlement', 'title' => 'A load, stage by stage', 'id' => 'hw-stages']); ?>
 
 <!-- CORTINA: foto grande fijada que el panel "What you can expect" (curtain-next) cubre al subir (≥1025px con JS); sin JS o en móvil, foto normal -->
 <?php partial('curtain', ['image' => ['base' => 'nf-check-tracking-mirror', 'alt' => 'Truck side mirror at sunset reflecting a white trailer and the highway behind it', 'pos' => '70% 50%'], 'short' => true]); ?>

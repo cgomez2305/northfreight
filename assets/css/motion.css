@@ -74,15 +74,13 @@
   .js-motion .home-why { padding-block: 0; }
   .js-motion .why__pin { min-height: 100vh; min-height: 100svh; justify-content: center; padding-top: calc(var(--header-h) + 4px); padding-bottom: 32px; gap: 40px; }
   .js-motion .home-why .t-h2 { font-size: clamp(38px, 4.2vw, 56px); }
-  .js-motion .why { --c1: clamp(120px, 14vw, 220px); --c2: clamp(300px, 32vw, 440px); --gap: clamp(32px, 3.6vw, 56px);
-    position: relative; display: grid; grid-template-columns: var(--c1) var(--c2) minmax(0, 1fr); column-gap: var(--gap); align-items: center;
+  .js-motion .why { --c2: clamp(300px, 32vw, 440px); --gap: clamp(32px, 3.6vw, 56px);
+    position: relative; display: grid; grid-template-columns: var(--c2) minmax(0, 1fr); column-gap: var(--gap); align-items: center;
     height: clamp(380px, calc(100vh - 360px), 580px); height: clamp(380px, calc(100svh - 360px), 580px); }
-  .js-motion .why__nums { display: block; position: relative; grid-column: 1; height: 100%; }
-  .js-motion .why__nums span { position: absolute; inset: 0; display: flex; align-items: center; font-family: var(--font-head); font-weight: 900; font-size: clamp(110px, 12.5vw, 180px); line-height: .8; letter-spacing: -.03em; color: var(--cyan); }
-  .js-motion .why__nums span:not(:first-child), .js-motion .why__item:not(:first-child) .why__photo { opacity: 0; }   /* estado inicial del timeline */
-  .js-motion .why__list { grid-column: 3; display: flex; flex-direction: column; gap: 28px; }
+  .js-motion .why__item:not(:first-child) .why__photo { opacity: 0; }   /* estado inicial del timeline */
+  .js-motion .why__list { grid-column: 2; display: flex; flex-direction: column; gap: 28px; }
   .js-motion .why__item { display: block; overflow: visible; background: transparent; border: 0; border-radius: 0; padding-left: 0; }   /* el ítem activo se distingue por opacidad y tamaño de texto, sin franja de color */
-  .js-motion .why__photo { position: absolute; top: 0; left: calc(var(--c1) + var(--gap)); width: var(--c2); height: 100%; aspect-ratio: auto; border-radius: var(--r-card); will-change: opacity; }
+  .js-motion .why__photo { position: absolute; top: 0; left: 0; width: var(--c2); height: 100%; aspect-ratio: auto; border-radius: var(--r-card); will-change: opacity; }
   .js-motion .why__body { padding: 0; gap: 8px; }
   .js-motion .why__body .t-h3 { font-size: clamp(28px, 2.6vw, 36px); }
 }

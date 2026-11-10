@@ -87,7 +87,7 @@ partial('hero', [
       <?php partial('section-head', ['id' => 'eq-checks', 'theme' => 'dark', 'eyebrow' => 'Before we book', 'title' => 'What we check on every load']); ?>
       <ol class="sa-checks">
         <?php foreach ($eq['checks'] as $i => $c): ?>
-        <li><span class="mono sa-checks__n"><?= sprintf('%02d', $i + 1) ?></span><span><?= e($c) ?></span></li>
+        <li><span><?= e($c) ?></span></li>
         <?php endforeach; ?>
       </ol>
     </div>

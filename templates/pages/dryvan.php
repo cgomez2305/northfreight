@@ -34,7 +34,7 @@ partial('summary', summary_for($route));
     <?php partial('section-head', ['id' => 'dv-steps', 'eyebrow' => 'Included', 'title' => 'Every step of the dry van load']); ?>
     <ol class="g3 sa-ol">
       <?php foreach ($steps as $i => $s): ?>
-        <li><?php partial('card', ['variant' => $i === 5 ? 'dark' : 'light', 'cls' => 'sa-step', 'num' => sprintf('%02d', $i + 1), 'title' => $s]); ?></li>
+        <li><?php partial('card', ['variant' => $i === 5 ? 'dark' : 'light', 'cls' => 'sa-step', 'title' => $s]); ?></li>
       <?php endforeach; ?>
     </ol>
   </div>
