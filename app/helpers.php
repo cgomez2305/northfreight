@@ -14,6 +14,7 @@ if (!defined('NS_ROOT')) {
     define('NS_ROOT', dirname(__DIR__));
 }
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/i18n.php';     // fase AE: inglés y español (rutas /es/, diccionario, hreflang)
 require_once __DIR__ . '/assets.php';   // CSS por ruta y archivos dist del build (con respaldo a los sueltos)
 
 // ---------------------------------------------------------------------
@@ -35,6 +36,7 @@ function routes(): array
         foreach ($routes as $key => $r) {
             $routes[$key]['path'] = $key === '404' ? '/404/' : $key;
         }
+        $routes = ns_add_es_routes($routes);   // fase AE: clones en español (/es/…) y marca es_path en las inglesas
     }
     return $routes;
 }
@@ -123,6 +125,9 @@ function url(string $path = '/'): string
     if (!str_ends_with($path, '/') && !preg_match('/\.[A-Za-z0-9]{1,6}$/', $path)) {
         $path .= '/';
     }
+    if (ns_lang() === 'es') {
+        $path = ns_es_path_of($path) ?? $path;   // en una página española los enlaces internos van a la versión española si existe
+    }
     return $path . $suffix;
 }
 
@@ -156,7 +161,7 @@ function wa(?string $keyOrMsg = null): string
     $messages = WA_MESSAGES;
     $key = $keyOrMsg ?? 'default';
     $msg = $messages[$key] ?? ($keyOrMsg ?? $messages['default']);
-    return WA_BASE . '?text=' . rawurlencode($msg);
+    return WA_BASE . '?text=' . rawurlencode(ns_t($msg));   // en español sale el mensaje traducido (diccionario)
 }
 
 /** Teléfono para href: tel() => 'tel:+18636513322'; tel(false) => '+18636513322'. */
@@ -564,7 +569,7 @@ function service_schema(array $route): array
 /** Bloque "In short" de una ruta (app/data/summaries.php): ['text' => …, 'points' => […]] o [] si la ruta no tiene. Fuente única de las plantillas y de /llms-full.txt. */
 function summary_for(array $route): array
 {
-    $s = data('summaries')[(string) ($route['path'] ?? '')] ?? [];
+    $s = data('summaries')[ns_en_key($route)] ?? [];
     return is_array($s) ? $s : [];
 }
 
@@ -888,13 +893,23 @@ function ns_send_html(string $html): void
  */
 function render_route(array $route): void
 {
+    $html = render_route_html($route);
+    if ($html !== null) {
+        ns_send_html($html);
+    }
+}
+
+/** HTML final de una ruta (plantilla + layout + traducción si la ruta es española) o null si falla la plantilla. Lo usan render_route() y bin/i18n.php. */
+function render_route_html(array $route): ?string
+{
+    ns_set_lang((string) ($route['lang'] ?? 'en'));
     $template = (string) ($route['template'] ?? '');
     $page = NS_ROOT . '/templates/pages/' . $template . '.php';
     if (!preg_match('/^[a-z0-9-]+$/', $template) || !is_file($page)) {
         http_response_code(500);
         error_log("Plantilla no encontrada: $template");
         echo 'Template error.';
-        return;
+        return null;
     }
     $cfg = cfg();
     $content = (static function (string $__page, array $route, array $cfg): string {
@@ -912,5 +927,6 @@ function render_route(array $route): void
     (static function (array $route, array $cfg, string $content): void {
         include NS_ROOT . '/templates/layout.php';
     })($route, $cfg, $content);
-    ns_send_html((string) ob_get_clean());
+    $html = (string) ob_get_clean();
+    return (ns_is_es() ? ns_translate_html($html, $GLOBALS['__ns_i18n_missing']) : $html);
 }

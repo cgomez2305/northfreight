@@ -39,7 +39,7 @@ $jsByTemplate = ['tool-rpm' => 'calc-rpm.js', 'tool-ifta' => 'calc-ifta.js', 'bl
 $jsList = isset($route['js']) ? (array) $route['js'] : (isset($jsByTemplate[$template]) ? [$jsByTemplate[$template]] : []);
 $jsList = array_values(array_filter($jsList, static fn($j): bool => is_string($j) && preg_match('/^[a-z0-9-]+\.js$/', $j) === 1 && $jsFile($j)));
 ?><!doctype html>
-<html lang="en-US">
+<html lang="<?= ($route['lang'] ?? 'en') === 'es' ? 'es-US' : 'en-US' ?>">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -47,13 +47,19 @@ $jsList = array_values(array_filter($jsList, static fn($j): bool => is_string($j
 <meta name="description" content="<?= e($desc) ?>">
 <?php if (!$isError): ?>
 <link rel="canonical" href="<?= e(canonical($route)) ?>">
-<?php endif; ?>
+<?php foreach (ns_hreflang_links($route) as $alt): ?>
+<link rel="alternate" hreflang="<?= e($alt['hreflang']) ?>" href="<?= e($alt['href']) ?>">
+<?php endforeach; endif; ?>
 <?php if (noindex($route)): ?>
 <meta name="robots" content="<?= is_production() && ($route['status'] ?? 'live') === 'live' && ($route['gate'] ?? '') === '' ? 'noindex, follow' : 'noindex, nofollow' ?>">
 <?php endif; ?>
 <meta property="og:type" content="<?= $template === 'post' ? 'article' : 'website' ?>">
 <meta property="og:site_name" content="<?= e(cfg('brand')) ?>">
-<meta property="og:locale" content="en_US">
+<?php $isEsPage = ($route['lang'] ?? 'en') === 'es'; ?>
+<meta property="og:locale" content="<?= $isEsPage ? 'es_US' : 'en_US' ?>">
+<?php if (ns_hreflang_links($route) !== []): ?>
+<meta property="og:locale:alternate" content="<?= $isEsPage ? 'en_US' : 'es_US' ?>">
+<?php endif; ?>
 <meta property="og:title" content="<?= e($title) ?>">
 <meta property="og:description" content="<?= e($desc) ?>">
 <?php if (!$isError): ?>
@@ -88,16 +94,19 @@ $jsList = array_values(array_filter($jsList, static fn($j): bool => is_string($j
 <?php partial('nav', ['route' => $route, 'wa' => $wa]); ?>
 <?php partial('mega-services'); ?>
 <?php partial('mega-resources'); ?>
-<?php partial('mobile-menu', ['wa' => $wa]); ?>
+<?php partial('mobile-menu', ['wa' => $wa, 'route' => $route]); ?>
 </header>
 </div>
 <main id="main" tabindex="-1"<?= $ctaOn ? ' class="has-cta"' : '' ?>>
 <?= $content ?>
 </main>
 <?php if ($ctaOn): $ctaBase = array_key_exists('cta_image', $route) ? $route['cta_image'] : CTA_IMAGE; partial('cta', ['wa' => $wa, 'coverage' => !empty($route['cta_coverage']), 'image' => $ctaBase ? ['base' => (string) $ctaBase, 'alt' => ''] : null, 'video' => (string) ($route['cta_video'] ?? '')]); endif; ?>
-<?php partial('footer', ['wa' => $wa]); ?>
+<?php partial('footer', ['wa' => $wa, 'route' => $route]); ?>
 <?php partial('mbar', ['wa' => $wa]); ?>
 <?php partial('wa-float', ['wa' => $wa]); ?>
+<?php if (($route['lang'] ?? 'en') === 'es'): ?>
+<script>window.NS_I18N=<?= json_encode((array) require NS_ROOT . '/app/i18n/js.es.php', JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG) ?>;</script>
+<?php endif; ?>
 <?php if ($jsFile('main.js')): ?>
 <script src="<?= e($jsUrl('main.js')) ?>" defer></script>
 <?php endif; ?>

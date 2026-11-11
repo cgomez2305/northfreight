@@ -404,7 +404,8 @@ function ns_render_page(array $route, ?array $flash = null, int $status = 200): 
     (static function (array $route, array $cfg, string $content, array $flash): void {
         include NS_ROOT . '/templates/layout.php';
     })($route, $cfg, $content, $flash);
-    ns_send_html((string) ob_get_clean());
+    $html = (string) ob_get_clean();
+    ns_send_html(ns_is_es() ? ns_translate_html($html) : $html);
     exit;
 }
 

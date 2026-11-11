@@ -298,7 +298,7 @@ function ns_lead_mail_body(array $l, array $opt): string
     }
     if (!ns_lead_store($lead) && !$crm['ok']) {   // solo es un error si NINGUN destino lo guardo
         ns_log_error('lead-store failed', 'no se pudo escribir storage/leads/');
-        ns_render_page($route, ns_flash_error($form, [], $old, 'We could not save your application right now. Please message us on WhatsApp or email ' . ns_mail_to() . '.'), 503);
+        ns_render_page($route, ns_flash_error($form, [], $old, ns_t('We could not save your application right now. Please message us on WhatsApp or email') . ' ' . ns_mail_to() . '.'), 503);
     }
 
     // Respuesta al usuario primero; el aviso por correo y el webhook van despues y nunca la rompen.

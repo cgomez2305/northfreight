@@ -8,6 +8,7 @@
     mq.addEventListener('change', fn);
   };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || d).querySelectorAll(s)); };
+  var t = function (s) { var i = window.NS_I18N; return (i && i[s]) || s; };
 
   /* ---- Reloj del chip del header (span[data-t="et"]; si hubiera más zonas con data-t, también las rellena) ---- */
   (function () {
@@ -111,8 +112,8 @@
     function text() {
       var who = (tabs.filter(function (t) { return t.getAttribute('aria-selected') === 'true'; })[0] || tabs[0]).getAttribute('data-who');
       var svc = chips.filter(function (c) { return c.getAttribute('aria-pressed') === 'true'; }).map(function (c) { return c.getAttribute('data-svc'); });
-      var list = svc.length > 1 ? svc.slice(0, -1).join(', ') + ' and ' + svc[svc.length - 1] : (svc[0] || '');
-      return 'Hi, ' + who + " and I'd like " + (list ? 'help with ' + list : 'to talk about dispatch') + ' with NorthStar.';
+      var list = svc.length > 1 ? svc.slice(0, -1).join(', ') + t(' and ') + svc[svc.length - 1] : (svc[0] || '');
+      return t('Hi, ') + who + t(" and I'd like ") + (list ? t('help with ') + list : t('to talk about dispatch')) + t(' with NorthStar.');
     }
     function sync() {
       var t = text();
@@ -352,7 +353,7 @@
       menu.hidden = false;
       body.classList.add('menu-open');
       burger.setAttribute('aria-expanded', 'true');
-      burger.setAttribute('aria-label', 'Close menu');
+      burger.setAttribute('aria-label', t('Close menu'));
       if (backdrop) backdrop.tabIndex = -1;
       (closeBtn || focusables()[0] || menu).focus();
     }
@@ -362,7 +363,7 @@
       menu.hidden = true;
       body.classList.remove('menu-open');
       burger.setAttribute('aria-expanded', 'false');
-      burger.setAttribute('aria-label', 'Open menu');
+      burger.setAttribute('aria-label', t('Open menu'));
       unlock();
       var back = lastFocus && lastFocus.focus ? lastFocus : burger;
       if (!skipFocus && back.getClientRects().length) back.focus({ preventScroll: true });

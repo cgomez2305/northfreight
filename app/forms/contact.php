@@ -74,7 +74,7 @@ declare(strict_types=1);
     ns_rate_hit();
     $replyTo = $contactKind === 'email' ? [$v['contact'], $v['name']] : null;
     if (!ns_send_mail('New dispatch inquiry: ' . $v['name'], $body, $replyTo)) {
-        ns_render_page($route, ns_flash_error($form, [], $v, 'We could not send your message right now. Please message us on WhatsApp at ' . (string) $cfg['phone'] . ' or email ' . ns_mail_to() . '.'), 503);
+        ns_render_page($route, ns_flash_error($form, [], $v, ns_t('We could not send your message right now. Please message us on WhatsApp at') . ' ' . (string) $cfg['phone'] . ' ' . ns_t('or email') . ' ' . ns_mail_to() . '.'), 503);
     }
 
     header('Location: ' . url((string) $route['path'] . '?sent=1'), true, 303);

@@ -9,7 +9,8 @@
 
   var MAX = 1e9;
   var nf = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  var INVALID = 'Enter a number, 0 or higher.';
+  var t = function (s) { var i = window.NS_I18N; return (i && i[s]) || s; };
+  var INVALID = t('Enter a number, 0 or higher.');
 
   function safe(x) { return isFinite(x) ? x : 0; }
 
@@ -72,7 +73,7 @@
         flag(k, r[k].bad, r[k].bad ? INVALID : '');
       });
       if (fields.mpg && !r.mpg.bad && mpg === 0 && total > 0) {
-        flag('mpg', false, 'Add your MPG to include fuel cost.');
+        flag('mpg', false, t('Add your MPG to include fuel cost.'));
       }
     }
 

@@ -12,14 +12,20 @@
 function sitemap_xml(): string
 {
     $out = '<?xml version="1.0" encoding="UTF-8"?>' . "\n"
-         . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+         . '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">' . "\n";
     foreach (routes() as $key => $r) {
-        if ($key === '404' || ($r['status'] ?? '') !== 'live' || empty($r['sitemap'])) {
+        if (in_array($key, ['404', '404es'], true) || ($r['status'] ?? '') !== 'live' || empty($r['sitemap'])) {
             continue;
         }
         $lastmod = trim((string) ($r['lastmod'] ?? ''));
+        // Fase AE: cada URL con versión en el otro idioma declara sus alternates (en-us, es-us y x-default), también la propia (requisito de Google).
+        $alts = '';
+        foreach (ns_hreflang_links($r) as $alt) {
+            $alts .= '    <xhtml:link rel="alternate" hreflang="' . $alt['hreflang'] . '" href="' . htmlspecialchars($alt['href'], ENT_XML1 | ENT_QUOTES, 'UTF-8') . "\"/>\n";
+        }
         $out .= "  <url>\n"
               . '    <loc>' . htmlspecialchars(abs_url($key), ENT_XML1 | ENT_QUOTES, 'UTF-8') . "</loc>\n"
+              . $alts
               . (iso_date_ok($lastmod) ? '    <lastmod>' . $lastmod . "</lastmod>\n" : '')
               . '    <priority>' . number_format((float) ($r['priority'] ?? 0.5), 1, '.', '') . "</priority>\n"
               . "  </url>\n";

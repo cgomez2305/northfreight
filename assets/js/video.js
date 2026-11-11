@@ -38,7 +38,7 @@
       var note = d.createElement('span');
       note.className = 'sr-only';
       note.id = (box.id || 'video') + '-soon';
-      note.textContent = 'Video coming soon';
+      note.textContent = (window.NS_I18N && window.NS_I18N['Video coming soon']) || 'Video coming soon';
       frame.appendChild(note);
       btn.setAttribute('aria-disabled', 'true');
       btn.setAttribute('aria-describedby', note.id);

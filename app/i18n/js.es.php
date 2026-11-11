@@ -1,0 +1,28 @@
+<?php
+/** Cadenas del JavaScript (main.js, apply.js, calc-*.js, video.js) en español. Claves = literal exacto del JS. El layout las emite como window.NS_I18N en las páginas /es/. */
+return [
+    'Open menu' => 'Abrir menú',
+    'Close menu' => 'Cerrar menú',
+    'Hi, ' => 'Hola, ',
+    " and I'd like " => ' y me gustaría ',
+    'help with ' => 'recibir ayuda con ',
+    'to talk about dispatch' => 'hablar de dispatch',
+    ' with NorthStar.' => ' con NorthStar.',
+    ' and ' => ' y ',
+    'Who you are' => 'Quién eres',
+    'Your truck and experience' => 'Tu camión y tu experiencia',
+    'Eligibility' => 'Requisitos',
+    'How to reach you' => 'Cómo contactarte',
+    'Step ' => 'Paso ',
+    ' of ' => ' de ',
+    'Please check this answer.' => 'Revisa esta respuesta.',
+    'Please check the highlighted answers.' => 'Revisa las respuestas marcadas.',
+    'Enter a number, 0 or higher.' => 'Ingresa un número, 0 o mayor.',
+    'Add your MPG to include fuel cost.' => 'Agrega tu MPG para incluir el costo de combustible.',
+    'Add rates' => 'Agrega tasas',
+    'State row added. ' => 'Fila de estado agregada. ',
+    'State row removed. ' => 'Fila de estado eliminada. ',
+    ' rows.' => ' filas.',
+    ' row.' => ' fila.',
+    'Video coming soon' => 'Video próximamente',
+];

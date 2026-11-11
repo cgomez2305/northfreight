@@ -36,8 +36,8 @@ function llms_sections(): array
     $groups = ['home' => [], 'services' => [], 'resources' => [], 'blog' => [], 'company' => [], 'optional' => []];
     $serviceTemplates = ['owner', 'relay', 'dryvan', 'tracking', 'backoffice', 'equipment'];
     foreach (routes() as $key => $r) {
-        if ($key === '404' || ($r['status'] ?? '') !== 'live' || empty($r['sitemap'])) {
-            continue;
+        if ($key === '404' || ($r['lang'] ?? 'en') === 'es' || ($r['status'] ?? '') !== 'live' || empty($r['sitemap'])) {
+            continue;   // las páginas españolas van en su propia sección (llms_es_lines)
         }
         $tpl = (string) ($r['template'] ?? '');
         $g = match (true) {
@@ -79,7 +79,7 @@ function llms_summary(): string
 function llms_contact_lines(): array
 {
     $lines = [
-        'Contact: WhatsApp ' . PHONE . ' (' . WA_BASE . ') · Email ' . EMAIL . ' · Site language: English (US).',
+        'Contact: WhatsApp ' . PHONE . ' (' . WA_BASE . ') · Email ' . EMAIL . ' · Site languages: English (US) and Spanish (US, under /es/; the team speaks both).',
     ];
     $a = org_address();
     if ($a) {
@@ -103,6 +103,23 @@ function llms_head(): array
         $out[] = '';
     }
     return $out;
+}
+
+/** Sección «Español» de llms.txt: las páginas /es/ live con su H1 y su meta (texto ya publicado). */
+function llms_es_lines(): array
+{
+    $lines = [];
+    foreach (routes() as $key => $r) {
+        if (($r['lang'] ?? 'en') !== 'es' || $key === '404es' || ($r['status'] ?? '') !== 'live' || empty($r['sitemap'])) {
+            continue;
+        }
+        $title = llms_clean((string) ($r['h1'] ?? ''));
+        $desc = llms_clean((string) ($r['meta'] ?? ''));
+        if ($title !== '') {
+            $lines[] = '- [' . $title . '](' . abs_url($key) . ')' . ($desc !== '' ? ': ' . $desc : '');
+        }
+    }
+    return $lines;
 }
 
 /** /llms.txt: índice en markdown con enlaces absolutos y la meta de cada ruta. */
@@ -129,6 +146,12 @@ function llms_txt(): string
             array_push($out, ...$lines);
             $out[] = '';
         }
+    }
+    if ($es = llms_es_lines()) {
+        $out[] = '## Español';
+        $out[] = '';
+        array_push($out, ...$es);
+        $out[] = '';
     }
     return rtrim(implode("\n", $out)) . "\n";
 }

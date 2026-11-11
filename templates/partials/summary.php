@@ -17,6 +17,9 @@ $label = (string) ($label ?? 'In short');
 $id = preg_match('/^[a-z0-9-]+$/', (string) ($id ?? 'in-short')) === 1 ? (string) ($id ?? 'in-short') : 'in-short';
 $lead = ($variant ?? 'default') === 'lead';
 $fill = !empty($textfill);
+if ($fill) {
+    $text = ns_t($text);   // español: se traduce la frase entera ANTES de partirla en palabras (ns_words)
+}
 $points = array_slice(array_values(array_filter(array_map('strval', (array) ($points ?? [])), static fn(string $p): bool => trim($p) !== '')), 0, 3);
 ?>
 <section class="summary<?= $lead ? ' summary--lead' : '' ?>" aria-labelledby="<?= e($id) ?>">

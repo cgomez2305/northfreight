@@ -220,9 +220,10 @@ if ($route === null) {
     if (!is_production()) {
         header('X-Robots-Tag: noindex, nofollow');
     }
-    render_route(routes()['404']);
+    render_route(str_starts_with($candidate, '/es/') && isset(routes()['404es']) ? routes()['404es'] : routes()['404']);   // 404 en el idioma de la sección
     exit;
 }
+ns_set_lang((string) ($route['lang'] ?? 'en'));   // idioma de la petición: url(), wa() y los formularios (redirecciones) lo usan antes del render
 
 // --- Cabeceras comunes ---
 $isDraft = ($route['status'] ?? 'live') !== 'live';
@@ -255,7 +256,7 @@ $formByPath = [
     '/resources/bol-template/'                 => 'download',
     '/resources/dispatcher-carrier-agreement/' => 'download',
 ];
-$form = $route['form'] ?? ($formByPath[$candidate] ?? null);
+$form = $route['form'] ?? ($formByPath[ns_en_key($route)] ?? null);
 if (!is_string($form) || !in_array($form, $formHandlers, true) || !is_file(NS_ROOT . '/app/forms/' . $form . '.php')) {
     $form = null;
 }
@@ -285,7 +286,7 @@ if ($method === 'POST') {
         require NS_ROOT . '/app/forms/' . $form . '.php';   // recibe $route y $cfg; responde por si mismo y termina
     } catch (Throwable $t) {
         ns_log_error('form-' . $form . ' ' . get_class($t), $t->getMessage() . ' @' . basename($t->getFile()) . ':' . $t->getLine());
-        ns_render_page($route, ns_flash_error($form, [], [], 'Something went wrong on our side. Please message us on WhatsApp or email ' . ns_mail_to() . '.'), 500);
+        ns_render_page($route, ns_flash_error($form, [], [], ns_t('Something went wrong on our side. Please message us on WhatsApp or email') . ' ' . ns_mail_to() . '.'), 500);
     }
     exit;
 }

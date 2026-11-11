@@ -744,3 +744,19 @@ a.prow__in:hover .prow__go { background: var(--cyan-light); }
   .card--photo .card__title { font-size: 26px; }
   .card--lg { padding: 22px; gap: 14px; }
 }
+
+/* ---- Selector de idioma EN / ES (fase AE): en la isla de acciones (solo >=1025px), en el menú móvil y en el pie ---- */
+.lang-switch { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 12px; font-family: var(--font-mono); font-size: 12px; font-weight: 500; letter-spacing: .1em; color: var(--text-2); text-decoration: none; border-radius: var(--r-tile); transition: color var(--t-fast); }
+.lang-switch:hover, .lang-switch:focus-visible { color: var(--text); }
+.lang-switch__name { display: none; }
+.lang-switch--nav { display: none; }
+@media (min-width: 1025px) { .lang-switch--nav { display: inline-flex; margin-right: 2px; } }
+.lang-switch--menu { align-self: flex-start; gap: 10px; padding: 0 16px; border: 1px solid var(--hairline-strong); }
+.lang-switch--menu .lang-switch__name, .lang-switch--foot .lang-switch__name { display: inline; margin-left: 8px; font-family: var(--font-body); font-size: 14px; letter-spacing: 0; }
+.lang-switch--foot { min-height: 44px; padding: 0 4px; }
+
+/* Español (fase AE): las etiquetas son más largas. Se compactan la píldora y la isla de acciones para que las tres islas del header no se pisen (medido de 1025 a 1920 px). */
+html[lang="es-US"] .nav__link, html[lang="es-US"] .nav__trigger { padding: 0 11px; font-size: 15px; }
+html[lang="es-US"] .nav__link--xl { display: none; }
+@media (min-width: 1600px) { html[lang="es-US"] .nav__link--xl { display: inline-flex; } }
+html[lang="es-US"] .lang-switch--nav { padding: 0 8px; }

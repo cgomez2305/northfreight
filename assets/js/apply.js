@@ -6,11 +6,12 @@
   var d = document;
   var form = d.querySelector('[data-apply]');
   if (!form) return;
+  var t = function (s) { var i = window.NS_I18N; return (i && i[s]) || s; };
   var $ = function (s, r) { return (r || form).querySelector(s); };
   var $$ = function (s, r) { return Array.prototype.slice.call((r || form).querySelectorAll(s)); };
   var steps = $$('[data-ap-step]');
   var total = steps.length;
-  var names = ['Who you are', 'Your truck and experience', 'Eligibility', 'How to reach you'];
+  var names = [t('Who you are'), t('Your truck and experience'), t('Eligibility'), t('How to reach you')];
   var prog = $('[data-ap-prog]'), count = $('[data-ap-count]'), bar = $('[data-ap-bar]'), live = $('[data-ap-live]');
   var back = $('[data-ap-back]'), next = $('[data-ap-next]'), submit = $('[data-ap-submit]');
   var cur = 1;
@@ -60,7 +61,7 @@
       if (ctl.closest('[data-ap-only][hidden]')) return;
       var group = ctl.classList.contains('ap__group');
       var name = group ? ctl.getAttribute('data-ap-group') : ctl.name;
-      var msg = ctl.getAttribute('data-msg') || 'Please check this answer.';
+      var msg = ctl.getAttribute('data-msg') || t('Please check this answer.');
       var bad = false;
       if (group) {
         bad = !ctl.querySelector('input:checked');
@@ -85,7 +86,7 @@
     opts = opts || {};
     cur = Math.max(1, Math.min(total, n));
     steps.forEach(function (s, i) { s.hidden = i !== cur - 1; });
-    count.textContent = 'Step ' + cur + ' of ' + total + ': ' + names[cur - 1];
+    count.textContent = t('Step ') + cur + t(' of ') + total + ': ' + names[cur - 1];
     bar.style.transform = 'scaleX(' + (cur / total) + ')';
     $$('[data-ap-dot]').forEach(function (li) {
       var k = Number(li.getAttribute('data-ap-dot'));
@@ -109,7 +110,7 @@
     if (n > cur) {
       var bad = validate(cur);
       if (bad) {
-        live.textContent = 'Please check the highlighted answers.';
+        live.textContent = t('Please check the highlighted answers.');
         bad.focus();
         return;
       }
@@ -149,7 +150,7 @@
       if (bad) {
         e.preventDefault();
         show(n, { focus: false });
-        live.textContent = 'Please check the highlighted answers.';
+        live.textContent = t('Please check the highlighted answers.');
         bad.focus();
         return;
       }

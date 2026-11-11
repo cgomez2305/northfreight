@@ -9,6 +9,7 @@
  */
 require_once __DIR__ . '/kit.php';
 $wa = $wa ?? null;
+$route = $route ?? null;
 $m = ns_menu();
 $services = array_merge($m['dispatch'], $m['ops']);
 $resources = array_merge($m['tools'], $m['templates'], $m['learn']);
@@ -42,6 +43,7 @@ $showRes = cfg('show_resources') && $resources;
       <?php foreach ($m['main'] as $i): ?><a class="mm-main" href="<?= e(url($i[2])) ?>"><?= e($i[0]) ?></a><?php endforeach; ?>
     </nav>
     <div class="mobile-menu__foot">
+      <?php partial('lang-switch', ['route' => $route ?? null, 'variant' => 'menu']); ?>
       <span class="t-meta mobile-menu__label">Talk to the desk</span>
       <a class="btn btn--primary btn--between" href="<?= e(wa($wa)) ?>" rel="noopener"><span class="btn__t">WhatsApp a dispatcher</span></a>
       <a class="btn btn--ghost btn--card btn--between" href="<?= e(tel()) ?>">Call <?= e(cfg('phone')) ?></a>

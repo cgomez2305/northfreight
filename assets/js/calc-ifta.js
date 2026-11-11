@@ -4,6 +4,7 @@
 (function () {
   'use strict';
 
+  var t = function (s) { var i = window.NS_I18N; return (i && i[s]) || s; };
   var root = document.querySelector('[data-calc="ifta"]');
   if (!root) { return; }
 
@@ -84,7 +85,7 @@
     outs.totalMiles.textContent = nf0.format(totalMiles);
     outs.totalGal.textContent = nf0.format(totalGal);
     outs.mpg.textContent = mpg > 0 ? nf2.format(mpg) : '—';
-    outs.totalDue.textContent = anyRate ? signed(due, nf2, '$') : 'Add rates';
+    outs.totalDue.textContent = anyRate ? signed(due, nf2, '$') : t('Add rates');
   }
 
   function announce(text) {
@@ -104,7 +105,7 @@
     calc();
     var first = q(row, '[data-f="st"]');
     if (first) { first.focus(); }
-    announce('State row added. ' + rows().length + ' rows.');
+    announce(t('State row added. ') + rows().length + t(' rows.'));
   }
 
   function removeRow(row) {
@@ -116,7 +117,7 @@
     var next = rest[Math.min(idx, rest.length - 1)];
     var target = next ? q(next, '[data-f="st"]') : addBtn;
     if (target) { target.focus(); }
-    announce('State row removed. ' + rest.length + (rest.length === 1 ? ' row.' : ' rows.'));
+    announce(t('State row removed. ') + rest.length + (rest.length === 1 ? t(' row.') : t(' rows.')));
   }
 
   body.addEventListener('input', function (e) {
