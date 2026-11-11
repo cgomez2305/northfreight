@@ -490,7 +490,7 @@ Del cuestionario al cliente (las respuestas desbloquean la publicación):
 Decisiones de diseño/estrategia por cerrar:
 1. **Mensaje del hero:** A) "Incidents are handled with evidence. And operations, as a team." (PDF) · B) "Booked. Tracked. Documented." (actual).
 2. ~~**Estructura de la v1**~~ **Resuelto por Carlos: completa, tal cual la maqueta (con Resources y Blog).**
-3. ~~**Selector ES / EN**~~ Hecho en la fase AE (`partials/lang-switch.php`: «EN»/«ES» en la isla de acciones desde 1025 px, «English»/«Español» en el pop-up y el footer; lleva a la misma página del otro idioma o a la home).
+3. ~~**Selector ES / EN**~~ Hecho en la fase AE (`partials/lang-switch.php`). Variante `nav`: píldora con globo y «EN | ES» con el idioma actual resaltado en cian, SIEMPRE visible en el header (isla de acciones en escritorio, isla del menú en móvil; sin globo de 1025 a 1279 y ≤400 px); en el pop-up y el footer, «EN English». Lleva a la misma página del otro idioma o a la home. Con la píldora más ancha se compactaron los paddings de la navegación de 1025 a 1179 px (medido sin solape de 1025 a 1920 en los dos idiomas).
 4. **Porcentajes:** el artículo de costos menciona un rango de mercado (5–10%); el PDF pide no usar porcentajes ajenos. Decidir si se quita.
 5. **Hero del home bajo el PDF:** cambiar los chips por "Coordinated loads · Organized information · Constant follow-up" si se elige la opción A.
 

@@ -57,6 +57,7 @@ function ns_icon(string $name, int $size = 18, string $class = ''): string
 {
     static $paths = [
         'arrow'    => '<path d="M5 12h14M13 6l6 6-6 6"/>',
+        'globe'    => '<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/>',
         'whatsapp' => '<path d="M3 21l1.7-4.6A8.5 8.5 0 1 1 8 19.6L3 21z"/>',
         'phone'    => '<path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/>',
         'chevron'  => '<path d="M6 9l6 6 6-6"/>',
