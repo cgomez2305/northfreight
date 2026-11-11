@@ -58,6 +58,7 @@ function ns_icon(string $name, int $size = 18, string $class = ''): string
         'truck'    => '<path d="M2 7h11v9H2zM13 10h4l3 3v3h-7"/><circle cx="6" cy="17.5" r="1.8"/><circle cx="16.5" cy="17.5" r="1.8"/>',
         'pin'      => '<path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
         'plus'     => '<path d="M12 5v14M5 12h14"/>',
+        'heart'    => '<path d="M12 20.5s-7.5-4.7-9.4-9.6A5.2 5.2 0 0 1 12 6.4a5.2 5.2 0 0 1 9.4 4.5c-1.9 4.9-9.4 9.6-9.4 9.6z"/>',
         'book'     => '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5M8 7h7"/>',
         'route'      => '<circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M8 19h6.5a3.5 3.5 0 0 0 0-7h-5a3.5 3.5 0 0 1 0-7H16"/>',
         'locate'     => '<circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>',

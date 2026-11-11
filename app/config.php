@@ -52,6 +52,7 @@ ns_default('DOMAIN', 'northstarfreight.example');
 // --- Entidad / SEO (todas OPCIONALES: vacías hasta que el cliente las confirme) -----------------------------------
 // Solo se emiten en JSON-LD (Organization) y en el footer cuando están definidas. Ver app/config.local.example.php.
 ns_default('LEGAL_NAME', 'NorthStar Freight Solutions LLC');   // nombre legal (confirmado por el cliente, fase S). Llega a JSON-LD legalName. No es secreto.
+ns_default('CREDIT_URL', 'https://clikrank.com/');   // crédito del footer «Developed by ClikRank ♥» (enlace nofollow). Vacío = sin crédito. Confirmar la URL con Carlos.
 ns_default('ADDRESS', []);         // OMITIDA a propósito (decisión del cliente, fase S: no se publica dirección). ['street'=>'', 'city'=>'', 'region'=>'', 'postal'=>'', 'country'=>'US']
 ns_default('SAME_AS', []);         // URLs de perfiles oficiales (LinkedIn, Facebook, YouTube…)
 ns_default('FOUNDING_DATE', '');   // PENDIENTE (fecha exacta). 'YYYY' o 'YYYY-MM-DD'. Solo se sabe que opera desde el 1 de junio de 2026: no se publica sin confirmar.
@@ -153,6 +154,7 @@ function cfg(?string $key = null): mixed
             'email'                => EMAIL,
             'domain'               => DOMAIN,
             'legal_name'           => LEGAL_NAME,
+            'credit_url'           => CREDIT_URL,
             'address'              => ADDRESS,
             'same_as'              => SAME_AS,
             'founding_date'        => FOUNDING_DATE,

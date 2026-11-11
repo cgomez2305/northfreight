@@ -15,4 +15,7 @@ return [
     'Keep the driving.' => 'Tú sigue manejando.',
     'One truck, a small fleet or a Relay account.' => 'Un camión, una flota pequeña o una cuenta de Relay.',
     'Partner with the desk' => 'Trabaja con el equipo',
+    'Developed by' => 'Desarrollado por',
+    '(opens in a new tab)' => '(se abre en una pestaña nueva)',
+    'ClikRank' => 'ClikRank',
 ];

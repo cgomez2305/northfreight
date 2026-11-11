@@ -403,6 +403,10 @@ nav.footer__col .foot__link { font-family: var(--font-mono); font-size: 12px; te
 .foot__addr { display: flex; flex-direction: column; margin-top: 4px; font-style: normal; line-height: 1.6; color: var(--text-2); }
 .footer__bar { max-width: var(--wrap); margin: 0 auto; padding: 22px var(--gutter) 28px; border-top: 1px solid var(--hairline); display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; font-family: var(--font-mono); font-size: 12px; letter-spacing: .04em; }
 .footer__bar .foot__link { font-size: 12px; }
+.footer__copy { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 18px; }
+.footer__credit { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-2); }
+.footer__credit .foot__link { gap: 5px; color: var(--text); font-weight: 600; }
+.footer__heart { color: var(--cyan-light); }
 .footer__legal { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; }
 @media (min-width: 761px) { .footer__bar { padding-right: max(var(--gutter), 76px); } }   /* deja libre el botón flotante de WhatsApp */
 @media (pointer: coarse) { .foot__link { display: inline-flex; align-items: center; min-height: 44px; } .footer__col { gap: 0; } }
