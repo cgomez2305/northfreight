@@ -18,7 +18,17 @@ Fuente: DataForSEO Labs (Google EE. UU., inglés, datos de oct 2026) y los sitem
 - **Segmento descuidado:** su contenido para owner-operators (`truck-dispatching-services-for-owner-operators`, `how-much-do-dry-van-owner-operators-make`, `dispatch-service-cost`) tiene última modificación entre 2021 y 2022. El hueco para NorthStar es owner-operators y flotas pequeñas.
 - **Ritmo:** unas 14 entradas en 2026, casi todas opinión de mercado (aranceles, petróleo, ciclo del flete), de poco valor de búsqueda.
 - **Páginas de confianza que sí tiene:** `pricing`, `why-ninja`, `dashboard` (visibilidad para el cliente), `our-team`, `faq`, `careers`. Idea aprovechable: una página propia del «Desk log» (visibilidad del cliente) si Carlos lo aprueba; la de precio solo con respaldo del cliente (§8.2).
-- **No verificado:** el contenido de su página de precio (el HTML está tras Cloudflare); revisarla a mano en un navegador.
+- **Precio (verificado con el HTML del home):** publican **$30 por hora cubierta** y «sin contrato largo»; también va en su schema (`priceRange`).
+
+## 1c. Home de Ninja Dispatch (HTML recibido de Carlos, 2026-11-11)
+
+**Metadatos:** title «Managed Night Dispatch Service | After-Hours Coverage» (52), meta de 155, robots `follow, index, max-snippet:-1, max-video-preview:-1, max-image-preview:large` (igual que el que añadimos), canonical, OG y Twitter, sin hreflang. WordPress + Flatsome + Rank Math + WP Rocket + GA4 + Cloudflare.
+
+**Secciones en orden:** hero (H1 eslogan «Your Office Closes. Your Freight Doesn't. Neither Do We.», línea «No hiring. No training. No overnight management.», un solo CTA a Calendly, franja de pruebas Google 5★ / since 2018 / FreightWaves / BBB, 4 beneficios) → problema con 4 «soluciones de siempre» (personal de día, contratar un nocturno, contestadora, agencia) → cómo funciona (dispatcher dedicado + equipo detrás, «tú mantienes el control») → testimonio con nombre y empresa + «100+ operaciones desde 2018» → 6 tareas y 6 enlaces por tipo de operación → sistemas (McLeod, Samsara, Motive) y portal `/dashboard/` → video de 43 min con capítulos → precio ($30 por hora, onboarding en 4 pasos, «2 a 3 semanas») → CTA final y FAQ.
+
+**Debilidades técnicas aprovechables:** H1 sin la keyword; `VideoObject` con fecha 2016 y descripción genérica de YouTube; `openingHours` 09:00–17:00 en un servicio nocturno; dirección solo con código postal; `sameAs` solo con Facebook; sin FAQPage en el home; «#1 por FreightWaves» en schema y pie pero «Listed in…» en la página (afirmación inconsistente); sin español; sin WhatsApp; sin enlaces al blog desde el home.
+
+**Qué adaptar (con las reglas de §8.2):** esquema problema → alternativas habituales → nuestro modelo (redacción neutra, sin atacar a nadie); línea de negaciones más prominente; franja de pruebas **solo con datos del cliente** (fundación, BBB, reseñas de Google); capítulos de video con `VideoObject`/`Clip` correctos cuando exista el video real; página propia del «Desk log» como equivalente a su portal. **No copiar:** páginas por estado, McLeod/Samsara, «#1», plazos de onboarding sin respaldo.
 
 ## 2. Qué copiamos, qué mejoramos y qué descartamos
 
