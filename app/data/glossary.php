@@ -12,10 +12,31 @@ return [
         'def'  => 'Any charge on top of the line haul, such as detention, lumper, layover, TONU or extra stops. Agree on them in the rate confirmation.',
     ],
     [
+        'id'   => 'amazon-relay',
+        'term' => 'Amazon Relay',
+        'def'  => 'Amazon’s load board and app for carriers, where loads, trips and blocks are booked and followed.',
+        'link' => ['label' => 'Amazon Relay dispatch', 'path' => '/amazon-relay-dispatch/'],
+    ],
+    [
+        'id'   => 'backhaul',
+        'term' => 'Backhaul',
+        'def'  => 'A load that brings the truck back toward its home area after a delivery, so it does not return empty.',
+    ],
+    [
         'id'   => 'bill',
         'term' => 'Bill of lading (BOL)',
         'def'  => 'The document that travels with the freight: what was loaded, by whom, for whom. Signed at pickup and delivery.',
         'link' => ['label' => 'Free template', 'path' => '/resources/bol-template/'],
+    ],
+    [
+        'id'   => 'block',
+        'term' => 'Block (Amazon Relay)',
+        'def'  => 'A group of Amazon Relay trips booked together as one assignment.',
+    ],
+    [
+        'id'   => 'bobtail',
+        'term' => 'Bobtail',
+        'def'  => 'Driving the tractor without a trailer attached.',
     ],
     [
         'id'   => 'broker',
@@ -42,6 +63,23 @@ return [
         'term' => 'Detention',
         'def'  => 'Pay for waiting at a facility beyond the free time in the rate confirmation.',
         'link' => ['label' => 'How to get it paid', 'path' => '/blog/lumper-fees-detention-pay/'],
+    ],
+    [
+        'id'   => 'dispatch-fee',
+        'term' => 'Dispatch fee',
+        'def'  => 'What a dispatch service charges for finding and booking your loads and handling the work around them: a percentage of each load, a flat weekly fee or a fixed fee per load.',
+        'link' => ['label' => 'How dispatch fees work', 'path' => '/blog/how-much-does-truck-dispatch-cost/'],
+    ],
+    [
+        'id'   => 'dispatcher',
+        'term' => 'Dispatcher',
+        'def'  => 'The person or team that finds and books loads, deals with brokers, tracks every trip and keeps the paperwork that gets you paid.',
+        'link' => ['label' => 'How dispatching works', 'path' => '/how-it-works/'],
+    ],
+    [
+        'id'   => 'drop-hook',
+        'term' => 'Drop and hook',
+        'def'  => 'Dropping a trailer at the facility and hooking another one, so the driver does not wait for loading or unloading.',
     ],
     [
         'id'   => 'dry',
@@ -75,6 +113,27 @@ return [
         'term' => 'IFTA',
         'def'  => 'International Fuel Tax Agreement. Quarterly fuel-tax report by state for interstate carriers.',
         'link' => ['label' => 'IFTA calculator', 'path' => '/resources/ifta-calculator/'],
+    ],
+    [
+        'id'   => 'lane',
+        'term' => 'Lane',
+        'def'  => 'A regular route between an origin area and a destination area, such as Dallas to Atlanta.',
+    ],
+    [
+        'id'   => 'layover',
+        'term' => 'Layover',
+        'def'  => 'An accessorial charge when the driver has to wait overnight or longer for loading, unloading or the next load. Agree on it in the rate confirmation.',
+    ],
+    [
+        'id'   => 'line-haul',
+        'term' => 'Line haul',
+        'def'  => 'The base rate for moving the load from pickup to delivery, before accessorials and fuel.',
+    ],
+    [
+        'id'   => 'load-board',
+        'term' => 'Load board',
+        'def'  => 'A marketplace where brokers and shippers post loads and carriers search for them.',
+        'link' => ['label' => 'Amazon Relay load board', 'path' => '/blog/amazon-relay-load-board/'],
     ],
     [
         'id'   => 'lumper',
@@ -124,6 +183,17 @@ return [
         'id'   => 'scac',
         'term' => 'SCAC',
         'def'  => 'Standard Carrier Alpha Code, a two-to-four-letter code that identifies your company. Required by Amazon Relay and many shippers.',
+    ],
+    [
+        'id'   => 'settlement',
+        'term' => 'Settlement',
+        'def'  => 'The statement of what a carrier is paid for its loads, after deductions such as fees or advances. Check it line by line.',
+        'link' => ['label' => 'Trucking back office', 'path' => '/trucking-back-office/'],
+    ],
+    [
+        'id'   => 'spot-market',
+        'term' => 'Spot market',
+        'def'  => 'Loads booked one at a time at the current market rate, as opposed to a contracted or dedicated lane.',
     ],
     [
         'id'   => 'tonu',
