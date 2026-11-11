@@ -79,7 +79,7 @@ partial('hero', [
 
 <section class="section" aria-labelledby="rpm-steps-title">
   <div class="container stack">
-    <?php partial('section-head', ['eyebrow' => 'How to use it', 'title' => 'How to calculate rate per mile in three steps', 'id' => 'rpm-steps-title']); ?>
+    <?php partial('section-head', [ 'title' => 'How to calculate rate per mile in three steps', 'id' => 'rpm-steps-title']); ?>
     <ol class="tools-steps">
       <?php foreach ($steps as $n => $text): ?>
       <li class="tools-step"><?= e($text) ?></li>
@@ -93,7 +93,7 @@ partial('hero', [
 <?php if ($related): ?>
 <section class="section tools-related" aria-labelledby="rpm-related-title">
   <div class="container stack">
-    <?php partial('section-head', ['eyebrow' => 'Keep going', 'title' => 'Related resources', 'id' => 'rpm-related-title']); ?>
+    <?php partial('section-head', [ 'title' => 'Related resources', 'id' => 'rpm-related-title']); ?>
     <div class="g3">
       <?php foreach ($related as $c):
         partial('card', [

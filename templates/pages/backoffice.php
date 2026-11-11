@@ -39,7 +39,7 @@ partial('summary', summary_for($route));
 
 <section class="section" aria-labelledby="bo-included">
   <div class="container stack">
-    <?php partial('section-head', ['eyebrow' => 'Included', 'title' => 'Five back office jobs off your desk', 'id' => 'bo-included']); ?>
+    <?php partial('section-head', [ 'title' => 'Five back office jobs off your desk', 'id' => 'bo-included']); ?>
     <?php partial('numgrid', ['items' => $jobItems, 'label' => 'Back office jobs',
         'cta' => ['title' => 'Talk to the desk', 'text' => 'No forms first. Open WhatsApp with a ready message to send to a dispatcher.', 'href' => wa($route['wa']), 'label' => 'Talk to the desk about your back office on WhatsApp']]); ?>
   </div>
@@ -47,7 +47,6 @@ partial('summary', summary_for($route));
 
 <?php partial('photo-band', [
     'id'      => 'bo-team',
-    'eyebrow' => 'One team',
     'title'   => 'Dispatch and back office, one team',
     'lead'    => 'Because the same desk books and tracks the load, the back office already has every document it needs.',
     'image'   => ['base' => 'nf-resource-agreement', 'alt' => 'A two-page document with a pen on a wooden desk beside a lamp, a plant and a mug, with a hand resting on the desk', 'pos' => '70% 60%'],
@@ -59,7 +58,6 @@ partial('summary', summary_for($route));
 
 <?php partial('desk-block', [
     'id'      => 'bo-guides',
-    'eyebrow' => 'From the desk',
     'title'   => 'Paperwork and pay, explained',
     'lead'    => 'Practical guides on getting paid for every hour at the dock, filling a bill of lading and what dispatch costs.',
     'btn'     => ['label' => 'All articles', 'href' => url('/blog/')],

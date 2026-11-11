@@ -29,9 +29,6 @@
   .js-motion .curtain--short { height: calc(var(--cur-p) * 2); }
 }
 
-/* ---- Relleno de texto (data-textfill, >=1025px): cada palabra parte de opacidad .5 (AA medido) y motion.js la sube a 1 ---- */
-@media (min-width: 1025px) { .js-motion [data-textfill] .w { opacity: .65; } }
-
 /* ---- Escena 1: hero de la home. El contenedor de la foto se encoge y revela el fondo; necesita el radio fijo y el recorte ---- */
 @media (min-width: 1025px) {
   .js-motion .hero--home .hero__bg { clip-path: inset(1px round calc(var(--r-panel) - 1px)); will-change: transform; }   /* recorte ESTÁTICO con radio fijo (no se anima); el 1px evita la línea de foto cruda que asoma por el borde al escalar con medio píxel */

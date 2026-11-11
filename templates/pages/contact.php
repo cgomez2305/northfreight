@@ -53,7 +53,7 @@ partial('trio', ['label' => 'Ways to reach the desk', 'cls' => 'sb-ct-trio', 'it
 
 <section class="section pre-cta" aria-labelledby="ct-title" id="write">
   <div class="container container--narrow stack sb-ct-stack">
-    <?php partial('section-head', ['eyebrow' => 'Prefer to write?', 'title' => 'Tell us about your trucks', 'id' => 'ct-title']); ?>
+    <?php partial('section-head', [ 'title' => 'Tell us about your trucks', 'id' => 'ct-title']); ?>
 
     <?php $general = $err('form'); $fieldErrors = array_filter($errors, static fn($t, $k): bool => $k !== 'form' && $t !== '', ARRAY_FILTER_USE_BOTH); $labels = ['name' => 'Name', 'contact' => 'Email or phone', 'company' => 'Company', 'mc' => 'MC#', 'trucks' => 'Number of trucks', 'equipment' => 'Equipment', 'message' => 'Message']; ?>
     <?php if (!empty($flash['ok'])): ?>

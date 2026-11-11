@@ -3,7 +3,7 @@
  * Patrón D · banda fotográfica (separadores de sección): foto ancha con el titular y la frase ya afirmada abajo a la izquierda sobre degradado y, a la derecha, chips (lista corta ya afirmada) o un botón pill de vidrio.
  * Misma construcción que el hero fotográfico (foto anclada a la derecha con máscara). <1025px: foto arriba y texto debajo, sin superponer. Sin `.px`: la banda no necesita parallax y así no se amplía la foto.
  * Params:
- *  id, eyebrow, title, lead   cabecera de sección (partial section-head)
+ *  id, title, lead   cabecera de sección (partial section-head)
  *  image  array  ['base','alt','pos'?,'sizes'?]
  *  chips  array  textos de los chips (lista corta ya afirmada en la página); `chips_end` (bool) pinta el último chip en cian; `chips_arrow` (bool) añade → entre chips (flujo)
  *  link   array|null ['label','href'] botón pill de vidrio
@@ -19,7 +19,7 @@ $link = is_array($link ?? null) && !empty($link['href']) ? $link : null;
     <div class="pband">
       <figure class="pband__photo"<?= !empty($image['pos']) ? ' style="--pos:' . e($image['pos']) . '"' : '' ?>><?= ns_img(['base' => (string) $image['base'], 'alt' => (string) ($image['alt'] ?? ''), 'sizes' => $image['sizes'] ?? '(min-width:1025px) 1152px, (min-width:761px) 100vw, (min-width:641px) calc(100vw - 40px), 65vw']) ?></figure>
       <div class="pband__body">
-        <?php partial('section-head', ['id' => $id ?? '', 'eyebrow' => $eyebrow ?? '', 'title' => $title ?? '', 'lead' => $lead ?? '']); ?>
+        <?php partial('section-head', ['id' => $id ?? '', 'title' => $title ?? '', 'lead' => $lead ?? '']); ?>
         <?php if ($chips || $link): ?>
         <div class="pband__side">
           <?php if ($chips): ?>

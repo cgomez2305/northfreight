@@ -283,7 +283,7 @@ a.card:focus-visible { outline-offset: 3px; }
 .card__top { display: flex; justify-content: space-between; align-items: center; }
 .card__icon { width: 54px; height: 54px; background: var(--panel-2); color: var(--cyan); display: inline-flex; align-items: center; justify-content: center; border-radius: var(--r-tile); transition: background-color var(--t-fast), color var(--t-fast); }
 a.card:hover .card__icon, .card--hover:hover .card__icon { background: var(--cyan); color: var(--navy-deep); }
-.card__num { font-family: var(--font-mono); font-weight: 500; font-size: 13px; letter-spacing: .1em; line-height: 1; color: var(--cyan); }
+.card__num { font-family: var(--font-mono); font-weight: 500; font-size: 13px; letter-spacing: .1em; line-height: 1; color: var(--cyan-light); }
 .card__meta { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
 .card__tag { font-size: 11px; color: var(--cyan-light); }
 .card__code { font-family: var(--font-mono); font-size: 12px; letter-spacing: .06em; color: var(--cyan-light); }
@@ -457,7 +457,7 @@ body:has(.mobile-menu:not([hidden])) .wa-float, body.menu-open .wa-float { displ
 .log__row { position: relative; display: grid; grid-template-columns: 48px 1fr; gap: 10px; align-items: start; }
 .log__time { font-family: var(--font-mono); font-size: 12px; color: var(--text-3); }
 .log__text { font-size: 15px; line-height: 1.4; color: var(--text-2); }
-.log__row--on .log__time { color: var(--cyan); font-weight: 500; }
+.log__row--on .log__time { color: var(--cyan-light); font-weight: 500; }
 .log__row--on .log__text { font-weight: 600; color: var(--text); }
 .log__row--on::before { content: ""; position: absolute; left: calc(-1 * var(--log-pad) - 4px); top: 6px; width: 7px; height: 7px; border-radius: 50%; background: var(--cyan); }
 .input { width: 100%; min-height: 52px; padding: 12px 18px; border: 1px solid var(--field-line); border-radius: var(--r-tile); background: var(--bg); font-family: var(--font-body); font-size: 16px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--text); transition: border-color var(--t-fast); }

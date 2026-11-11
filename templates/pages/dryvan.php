@@ -31,7 +31,7 @@ partial('summary', summary_for($route));
 ?>
 <section class="section" aria-labelledby="dv-steps">
   <div class="container stack">
-    <?php partial('section-head', ['id' => 'dv-steps', 'eyebrow' => 'Included', 'title' => 'Every step of the dry van load']); ?>
+    <?php partial('section-head', ['id' => 'dv-steps', 'title' => 'Every step of the dry van load']); ?>
     <ol class="g3 sa-ol">
       <?php foreach ($steps as $i => $s): ?>
         <li><?php partial('card', ['variant' => $i === 5 ? 'dark' : 'light', 'cls' => 'sa-step', 'title' => $s]); ?></li>
@@ -43,7 +43,6 @@ partial('summary', summary_for($route));
 <?php partial('photo-card', [
     'id'      => 'dv-desk',
     'flip'    => true,
-    'eyebrow' => 'How we work',
     'title'   => 'One desk behind every dry van load',
     'lead'    => 'The same desk books, tracks and documents every load, as one team.',
     'image'   => ['base' => 'nf-check-dry-van-interior', 'alt' => 'Inside an empty dry van trailer, looking out through the open rear doors toward a warehouse with loading docks', 'pos' => '50% 55%'],

@@ -4,7 +4,7 @@
  * (partial row-card, size sm). Datos de app/data/posts.php (título, extracto, categoría, minutos). No muestra fechas mientras `published` esté vacío.
  * CSS: components.css (.dblock*, .dfeat*). Solo se pinta si hay al menos el destacado live.
  * Params:
- *  id, eyebrow, title, lead  cabecera (H2 con el id para aria-labelledby; el H2 debe ser único en la página y distinto en cada página)
+ *  id, title, lead  cabecera (H2 con el id para aria-labelledby; el H2 debe ser único en la página y distinto en cada página)
  *  paths  array   rutas de los artículos: [destacado, fila 1, fila 2] (rutas live de app/data/posts.php)
  *  btn    array   ['label','href'] botón a la izquierda
  *  exclude array  bases de foto ya usadas en la página (no se repiten)    alt array  ['/ruta/' => ['base','alt']] foto alternativa si la de la ruta ya está usada
@@ -48,7 +48,7 @@ foreach ($paths as $path) {
 <section class="section dblock<?= !empty($cls) ? ' ' . e($cls) : '' ?>"<?= !empty($id) ? ' aria-labelledby="' . e($id) . '"' : '' ?>>
   <div class="container dblock__in">
     <div class="dblock__head">
-      <?php partial('section-head', ['id' => $id ?? '', 'eyebrow' => $eyebrow ?? '', 'title' => $title ?? '', 'lead' => $lead ?? '']); ?>
+      <?php partial('section-head', ['id' => $id ?? '', 'title' => $title ?? '', 'lead' => $lead ?? '']); ?>
       <?php if (!empty($btn['href'])): ?><a class="btn btn--primary btn--card" href="<?= e((string) $btn['href']) ?>"><span class="btn__t"><?= e((string) $btn['label']) ?></span></a><?php endif; ?>
     </div>
     <div class="dblock__list">

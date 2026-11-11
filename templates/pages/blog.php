@@ -54,7 +54,7 @@ $chips = ['all' => 'All', 'dispatch' => 'Dispatch', 'relay' => 'Amazon Relay', '
 <section class="section blog-list" aria-labelledby="blog-list-title">
   <div class="container stack">
     <div class="blog-head">
-      <?php partial('section-head', ['eyebrow' => 'All articles', 'title' => 'Read by topic', 'id' => 'blog-list-title']); ?>
+      <?php partial('section-head', [ 'title' => 'Read by topic', 'id' => 'blog-list-title']); ?>
       <div class="blog-filter" role="group" aria-label="Filter by topic" data-blog-filter>
         <?php foreach ($chips as $key => $label): ?>
         <button type="button" class="blog-chip" data-filter="<?= e($key) ?>" aria-pressed="<?= $key === 'all' ? 'true' : 'false' ?>"><?= e($label) ?></button>

@@ -22,7 +22,7 @@ $csrf = function_exists('csrf_token') ? (string) csrf_token() : '';
   <div class="container stack">
     <div class="co-doc">
       <div class="co-doc__main">
-        <?php partial('section-head', ['eyebrow' => 'What\'s inside', 'title' => (string) ($doc['inside_title'] ?? 'Every field, already in place'), 'id' => 'doc-inside']); ?>
+        <?php partial('section-head', [ 'title' => (string) ($doc['inside_title'] ?? 'Every field, already in place'), 'id' => 'doc-inside']); ?>
         <ul class="co-list">
           <?php foreach ($doc['inside'] as $it): ?>
           <li><?= ns_star(16) ?><span><strong><?= e($it[0]) ?></strong>: <?= e($it[1]) ?></span></li>
@@ -55,7 +55,7 @@ $csrf = function_exists('csrf_token') ? (string) csrf_token() : '';
 
 <section class="section section--surface" aria-labelledby="doc-steps">
   <div class="container stack">
-    <?php partial('section-head', ['eyebrow' => 'How to use it', 'title' => $doc['steps_title'], 'id' => 'doc-steps']); ?>
+    <?php partial('section-head', [ 'title' => $doc['steps_title'], 'id' => 'doc-steps']); ?>
     <ol class="co-steps">
       <?php foreach ($doc['steps'] as $n => $st): ?>
       <li><strong class="co-step__t"><?= e($st[0]) ?></strong><span class="co-step__x"><?= e($st[1]) ?></span></li>
@@ -68,7 +68,6 @@ $csrf = function_exists('csrf_token') ? (string) csrf_token() : '';
   <div class="container stack">
     <div class="co-faqwrap">
       <div class="co-faqhead">
-        <span class="t-eyebrow">FAQ</span>
         <h2 class="t-h2 c-navy" id="doc-faq">Before you print it</h2>
       </div>
       <div class="co-faqlist">

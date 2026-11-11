@@ -1,9 +1,9 @@
 <?php
 /**
- * Patrón B · foto ancha con tarjeta solapada (sustituye a "texto | foto pequeña" en una caja). Foto 16:9 (radio 32, `.px`) y, solapándola por abajo, una tarjeta --panel con eyebrow, H2 y texto.
+ * Patrón B · foto ancha con tarjeta solapada (sustituye a "texto | foto pequeña" en una caja). Foto 16:9 (radio 32, `.px`) y, solapándola por abajo, una tarjeta --panel con H2 y texto.
  * CSS: components.css (.pcard__*). motion.js: la tarjeta sube con desfase respecto a la foto (scrub, solo transform). <1025px: foto y tarjeta apiladas con un solape pequeño.
  * Params:
- *  id, eyebrow, title, lead   cabecera de sección (partial section-head; el H2 lleva el id para aria-labelledby)
+ *  id, title, lead   cabecera de sección (partial section-head; el H2 lleva el id para aria-labelledby)
  *  image   array  ['base','alt','sizes'?,'pos'?] foto (3:2, 4:3 o 16:9; se recorta con cover). `sizes` = ancho útil del marco (por defecto 1152px en escritorio)
  *  link    array|null  ['label','href'] botón pill de vidrio dentro de la foto (solo si la sección ya tiene ese enlace)
  *  flip    bool   tarjeta a la derecha (cuando el sujeto de la foto está a la izquierda)
@@ -32,7 +32,7 @@ $bgvPoster = $hasBgv && is_file(NS_ROOT . '/assets/img/' . $image['base'] . '-vi
       </figure>
       <?php endif; ?>
       <div class="pcard__card">
-        <?php partial('section-head', ['id' => $id ?? '', 'eyebrow' => $eyebrow ?? '', 'title' => $title ?? '', 'lead' => $lead ?? '']); ?>
+        <?php partial('section-head', ['id' => $id ?? '', 'title' => $title ?? '', 'lead' => $lead ?? '']); ?>
         <?= $extra ?? '' ?>
       </div>
     </div>

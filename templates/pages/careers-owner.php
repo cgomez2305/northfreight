@@ -34,7 +34,7 @@ partial('summary', summary_for($route));
 ?>
 <section class="section" aria-labelledby="co-included">
   <div class="container stack">
-    <?php partial('section-head', ['id' => 'co-included', 'eyebrow' => 'What is included', 'title' => 'What the desk handles for your truck']); ?>
+    <?php partial('section-head', ['id' => 'co-included', 'title' => 'What the desk handles for your truck']); ?>
     <?php partial('numgrid', ['label' => 'What the desk handles', 'items' => array_map(static fn(array $g): array => [
         'title' => $g[0], 'text' => $g[1],
         'href'  => wa("Hi, I'm an owner-operator and I'd like to talk about " . strtolower($g[0]) . ' with NorthStar.'),
@@ -45,7 +45,6 @@ partial('summary', summary_for($route));
 
 <?php partial('photo-card', [
     'id'      => 'co-control',
-    'eyebrow' => 'Who decides',
     'title'   => 'Your truck, your decision.',
     'lead'    => 'You approve every load. We tell you what we booked and why, and you can message the desk on WhatsApp.',
     'image'   => ['base' => 'nf-check-owner-approve', 'alt' => 'Hands holding a smartphone beside a white truck at a fuel station at sunset', 'pos' => '60% 100%'],
@@ -61,7 +60,7 @@ $equip = [
 ?>
 <section class="section" aria-labelledby="co-equip">
   <div class="container stack">
-    <?php partial('section-head', ['id' => 'co-equip', 'eyebrow' => 'Equipment', 'title' => 'Equipment we dispatch', 'lead' => 'We book Amazon Relay, power only and dry van freight.']); ?>
+    <?php partial('section-head', ['id' => 'co-equip', 'title' => 'Equipment we dispatch', 'lead' => 'We book Amazon Relay, power only and dry van freight.']); ?>
     <div class="cr-rows">
       <?php foreach ($equip as $q): if (!route_is_live($q[0])) { continue; } $th = ns_thumb($q[0], $used); if ($th) { $used[] = $th[0]; }
           partial('row-card', ['href' => url($q[0]), 'title' => $q[1], 'text' => $q[2], 'chips' => $q[3], 'h' => 'p', 'image' => $th ? ['base' => $th[0], 'alt' => $th[1]] : null]);
@@ -72,7 +71,7 @@ $equip = [
 
 <section class="section" aria-labelledby="co-compare">
   <div class="container stack">
-    <?php partial('section-head', ['id' => 'co-compare', 'eyebrow' => 'Side by side', 'title' => 'On your own or with a dispatch desk']); ?>
+    <?php partial('section-head', ['id' => 'co-compare', 'title' => 'On your own or with a dispatch desk']); ?>
     <?php partial('compare', ['caption' => 'On your own versus with the NorthStar dispatch desk', 'rows' => [
         ['Finding loads', 'You search load boards and call around between drives.', 'We find and book the loads on your lanes.'],
         ['Brokers and rates', 'You set up with each broker and handle every rate confirmation.', 'Packets, rate confirmations and BOLs handled for you.'],
@@ -85,7 +84,7 @@ $equip = [
 
 <section class="section" aria-labelledby="co-fee">
   <div class="container stack">
-    <?php partial('section-head', ['id' => 'co-fee', 'eyebrow' => 'Fees', 'title' => 'How dispatch fees work']); ?>
+    <?php partial('section-head', ['id' => 'co-fee', 'title' => 'How dispatch fees work']); ?>
     <div class="cr-fee">
       <div class="cr-fee__text">
         <p class="t-body c-slate">Scope is agreed before we start, so you always know what the desk handles and what it costs.</p>
@@ -107,7 +106,7 @@ $equip = [
 
 <section class="section" aria-labelledby="co-start">
   <div class="container stack">
-    <?php partial('section-head', ['id' => 'co-start', 'eyebrow' => 'Start here', 'title' => 'Start your application', 'lead' => 'Tell us what you run. We take you to the short application with it filled in. No personal details yet.']); ?>
+    <?php partial('section-head', ['id' => 'co-start', 'title' => 'Start your application', 'lead' => 'Tell us what you run. We take you to the short application with it filled in. No personal details yet.']); ?>
     <form class="cr-quick" method="get" action="<?= e($applyUrl) ?>">
       <input type="hidden" name="type" value="owner-operator">
       <label class="field" for="cq-equipment">What do you run?

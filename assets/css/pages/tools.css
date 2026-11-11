@@ -17,12 +17,12 @@
 .tools-gloss__list { max-width: 960px; display: flex; flex-direction: column; gap: 28px; }
 .tools-letter, .tools-term { scroll-margin-top: calc(var(--header-h) + 24px); }
 .tools-letter { display: flex; flex-wrap: wrap; gap: clamp(16px, 4vw, 56px); border-top: 2px solid var(--hairline-strong); }
-.tools-letter__mark { flex: 0 0 auto; min-width: 72px; padding-top: 18px; line-height: 1; color: var(--cyan); font-family: var(--font-head); font-weight: 900; font-size: 48px; }
+.tools-letter__mark { flex: 0 0 auto; min-width: 72px; padding-top: 18px; line-height: 1; color: var(--cyan-light); font-family: var(--font-head); font-weight: 900; font-size: 48px; }
 .tools-letter__terms { flex: 1 1 480px; min-width: 0; display: flex; flex-direction: column; }
 .tools-term { display: flex; flex-direction: column; gap: 8px; padding: 22px 0; border-bottom: 1px solid var(--hairline); }
 .tools-term__name { margin: 0; font-family: var(--font-head); font-weight: 700; font-size: 28px; line-height: 1.05; letter-spacing: -.01em; color: var(--text); text-wrap: balance; }
 .tools-term__def { margin: 0; color: var(--text-2); line-height: 1.7; }
-.tools-term:target .tools-term__name { color: var(--cyan); }
+.tools-term:target .tools-term__name { color: var(--cyan-light); }
 /* ---- Pasos ---- */
 .tools-steps { display: flex; flex-direction: column; gap: 14px; max-width: 64ch; margin: 0; padding: 0 0 0 1.6em; list-style: decimal; color: var(--text); }
 .tools-step { padding-left: 6px; font-size: 17px; line-height: 1.55; color: var(--text); }
@@ -39,7 +39,7 @@
 .tools-calc__result { flex: 1 1 260px; min-width: 0; padding: clamp(20px, 3vw, 32px); background: var(--panel-2); color: var(--text); display: flex; flex-direction: column; }
 .tools-calc__out { display: flex; flex-direction: column; }
 .tools-calc__big-label { margin: 18px 0 0; font-family: var(--font-mono); font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--text-3); }
-.tools-calc__big { margin: 0; line-height: 1; color: var(--cyan); overflow-wrap: anywhere; font-family: var(--font-head); font-weight: 900; font-size: clamp(56px, 6vw, 84px); letter-spacing: -.02em; }
+.tools-calc__big { margin: 0; line-height: 1; color: var(--cyan-light); overflow-wrap: anywhere; font-family: var(--font-head); font-weight: 900; font-size: clamp(56px, 6vw, 84px); letter-spacing: -.02em; }
 .tools-calc__note { margin: 0; padding-top: 14px; font-size: 12px; line-height: 1.5; color: var(--text-3); }
 .tools-calc__notes { margin-top: auto; }
 .tools-noscript { margin: 14px 0 0; font-size: 14px; line-height: 1.5; color: var(--text-2); }
@@ -87,7 +87,7 @@
 .tools-state { text-transform: uppercase; }
 .tools-num { font-size: 14px; white-space: nowrap; color: var(--text); }
 .tools-num--b { font-weight: 600; }
-.tools-num.is-credit { color: var(--cyan); }
+.tools-num.is-credit { color: var(--cyan-light); }
 .tools-rmcell { width: 52px; }
 .tools-rm { width: 44px; height: 44px; border: 1px solid var(--hairline); border-radius: var(--r-pill); background: transparent; color: var(--text-2); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; transition: background-color var(--t-fast), color var(--t-fast); }
 .tools-rm:hover { border-color: var(--hairline-strong); color: var(--text); }

@@ -45,7 +45,7 @@ partial('trio', ['label' => 'What the desk does on every load', 'items' => [
   </div>
 </section>
 
-<?php partial('stage-table', ['eyebrow' => 'From booking to settlement', 'title' => 'A load, stage by stage', 'id' => 'hw-stages']); ?>
+<?php partial('stage-table', [ 'title' => 'A load, stage by stage', 'id' => 'hw-stages']); ?>
 
 <!-- CORTINA: foto grande fijada que el panel "What you can expect" (curtain-next) cubre al subir (≥1025px con JS); sin JS o en móvil, foto normal -->
 <?php partial('curtain', ['image' => ['base' => 'nf-check-tracking-mirror', 'alt' => 'Truck side mirror at sunset reflecting a white trailer and the highway behind it', 'pos' => '70% 50%'], 'short' => true]); ?>
@@ -58,6 +58,6 @@ partial('trio', ['label' => 'What the desk does on every load', 'items' => [
       <li class="card <?= $i === 2 ? 'card--dark' : 'card--white' ?> sb-hw-item"><?= ns_star(18) ?><span class="head sb-hw-item__text"><?= e($t) ?></span></li>
       <?php endforeach; ?>
     </ul>
-    <?php if (route_is_live('/careers/owner-operators/')): ?><p><a class="card__link" href="<?= e(url('/careers/owner-operators/')) ?>">Ready to start? Partner with the desk <span class="arrow" aria-hidden="true">→</span></a></p><?php endif; ?>
+    <?php if (route_is_live('/careers/owner-operators/')): ?><p><a class="card__link" href="<?= e(url('/careers/owner-operators/')) ?>">Partner with the desk <span class="arrow" aria-hidden="true">→</span></a></p><?php endif; ?>
   </div>
 </section>

@@ -44,7 +44,7 @@ partial('summary', summary_for($route));
 ?>
 <section class="section" aria-labelledby="owner-gets">
   <div class="container stack">
-    <?php partial('section-head', ['id' => 'owner-gets', 'eyebrow' => 'What you get', 'title' => 'One dispatch desk behind your truck']); ?>
+    <?php partial('section-head', ['id' => 'owner-gets', 'title' => 'One dispatch desk behind your truck']); ?>
     <?php partial('numgrid', ['items' => $getItems, 'label' => 'What you get',
         'cta' => ['title' => 'Talk to the desk', 'text' => 'No forms first. Open WhatsApp with a ready message to send to a dispatcher.', 'href' => wa($route['wa']), 'label' => 'Talk to a dispatcher on WhatsApp']]); ?>
   </div>
@@ -52,7 +52,6 @@ partial('summary', summary_for($route));
 
 <?php partial('photo-card', [
     'id'      => 'owner-control',
-    'eyebrow' => 'Why owner-operators work with us',
     'title'   => 'You stay in control.',
     'lead'    => 'You approve every load. We tell you what we booked and why, and you can message the desk on WhatsApp.',
     'image'   => ['base' => 'nf-check-owner-approve', 'alt' => 'Hands holding a smartphone beside a white truck at a fuel station at sunset', 'pos' => '60% 100%'],
@@ -61,7 +60,6 @@ partial('summary', summary_for($route));
 
 <?php partial('tabs', [
     'id'      => 'owner-setups',
-    'eyebrow' => 'Beyond one truck',
     'title'   => 'Running more than one truck?',
     'label'   => 'Choose your setup',
     'items'   => [

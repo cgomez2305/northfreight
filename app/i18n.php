@@ -237,7 +237,7 @@ function ns_translate_html(string $html, ?array &$missing = null): string
 
     // Bloques que NO se traducen (selector de idioma: «English» / «Español» van siempre en su propio idioma).
     $keep = [];
-    $html = (string) preg_replace_callback('~<(a|p)\b[^>]*\b(?:data-i18n-skip|data-textfill)\b[^>]*>.*?</\1>~is', static function (array $m) use (&$keep): string {
+    $html = (string) preg_replace_callback('~<(a|p)\b[^>]*\bdata-i18n-skip\b[^>]*>.*?</\1>~is', static function (array $m) use (&$keep): string {
         $keep[] = $m[0];
         return '<!--NSKEEP' . (count($keep) - 1) . '-->';
     }, $html);

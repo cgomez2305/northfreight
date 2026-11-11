@@ -4,7 +4,7 @@
  * El JSON-LD FAQPage lo pone el layout (page_schema) a partir de la ruta.
  * Params: items(array de ['q','a','link'=>['label','path']?] como devuelve route_faq_items()/faq_items(); el enlace también
  *         se acepta como [label, path]),
- *         title(string, defecto "Questions carriers ask us."), eyebrow(string, defecto "FAQ"),
+ *         title(string, defecto "Questions carriers ask us."),
  *         image(array|null, opcional: ['base'=>'nf-faq-dock-light-4x5','alt'=>'…','sizes'?]): en ≥1025px columna izquierda con la foto fija (sticky, radio 24, parallax .px)
  *           y a la derecha título + filas numeradas "Q/01…" en mono; <1025px la foto no se muestra. Sin image se mantiene el diseño de siempre. El JSON-LD FAQPage no cambia.
  *           `image.topics` (opcional): lista de fotos [['base','alt','sizes'?], …] indexada por tema; cada ítem de `items` lleva 'topic' (índice, por defecto 0). Al abrir una pregunta la foto del
@@ -54,7 +54,6 @@ $faqLink = static function (array $it): ?array {
   <div class="faq__main">
   <?php endif; ?>
   <div class="faq__head">
-    <span class="t-eyebrow"><?= e($eyebrow ?? 'FAQ') ?></span>
     <h2 class="t-h2 c-navy" id="faq-title"><?= ns_rich($title ?? 'Questions carriers ask us.') ?></h2>
   </div>
   <div class="faq__list">

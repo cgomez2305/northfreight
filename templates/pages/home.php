@@ -148,13 +148,13 @@ $figures = [
   </div>
 </section>
 
-<?php partial('summary', summary_for($route) + ['variant' => 'lead', 'textfill' => true]   /* relleno de texto con el scroll (motion.js textScene): usado una sola vez; quitar 'textfill' lo desactiva */); ?>
+<?php partial('summary', summary_for($route) + ['variant' => 'lead']); ?>
 
 <!-- 01 SERVICES: rejilla de 3 tarjetas con foto; con html.js-motion y ≥1025px motion.js la convierte en un carril horizontal fijado (.home-services__pin) -->
 <section class="section home-services" id="services" aria-labelledby="services-title">
   <div class="home-services__pin">
     <div class="container">
-      <?php partial('section-head', ['eyebrow' => 'What we manage', 'title' => 'Three fronts.{pill:nf-hero-amazon-relay}{br}One dispatch desk.{pill:nf-hero-dry-van}', 'id' => 'services-title', 'split' => true,
+      <?php partial('section-head', [ 'title' => 'Three fronts.{pill:nf-hero-amazon-relay}{br}One dispatch desk.{pill:nf-hero-dry-van}', 'id' => 'services-title', 'split' => true,
           'lead' => 'We stay on the load until it is documented and settled. The same team that books it tracks it and closes it out.']); ?>
     </div>
     <div class="container home-rail">
@@ -174,8 +174,7 @@ $figures = [
 <!-- 02 CHOOSE YOUR SETUP: pestañas (Owner-operator · Small fleet · Amazon Relay carrier). Cada panel = foto 16:9 con tarjeta solapada, 3 puntos ya afirmados en la página de destino, enlace y WhatsApp con el mensaje de esa variante. -->
 <?php partial('tabs', [
     'id'      => 'setup-title',
-    'eyebrow' => 'Your setup',
-    'title'   => 'Choose your setup',
+    'title'   => 'One truck, a small fleet or a Relay account.',
     'lead'    => 'Pick the one that looks like your operation. Each opens WhatsApp with a ready message.',
     'label'   => 'Choose your setup',
     'items'   => [
@@ -204,7 +203,6 @@ $figures = [
 <section class="home-relay curtain-next" aria-labelledby="relay-title">
   <div class="container home-relay__in">
     <div class="home-relay__main">
-      <span class="t-eyebrow">Specialty</span>
       <h2 class="t-h2" id="relay-title">Amazon Relay dispatch for <span class="hl">carriers who move fast.</span></h2>
       <p class="t-body home-relay__lead">Relay rewards carriers who move fast and keep clean records. Our desk watches the load board for you, books the blocks that fit your trucks and follows performance and disputes inside your account.</p>
       <a class="btn btn--primary home-relay__btn" href="<?= e(url('/amazon-relay-dispatch/')) ?>"><span class="btn__t">Amazon Relay dispatch</span></a>
@@ -220,7 +218,7 @@ $figures = [
 <section class="section home-why" aria-labelledby="why-title">
   <div class="why__pin">
     <div class="container">
-      <?php partial('section-head', ['eyebrow' => 'Why a desk', 'title' => 'A team, not a single dispatcher', 'id' => 'why-title']); ?>
+      <?php partial('section-head', [ 'title' => 'A team, not a single dispatcher', 'id' => 'why-title']); ?>
     </div>
     <div class="container why">
       <ol class="why__list">
@@ -243,7 +241,7 @@ $figures = [
 <!-- 04 ONBOARDING: columnas con foto, línea fina arriba y línea cian que se rellena con el scroll (motion.js); desfase vertical escalonado en escritorio -->
 <section class="section home-onboarding" aria-labelledby="onboarding-title">
   <div class="container stack">
-    <?php partial('section-head', ['eyebrow' => 'Onboarding', 'title' => 'How we plug into your operation.', 'id' => 'onboarding-title']); ?>
+    <?php partial('section-head', [ 'title' => 'How we plug into your operation.', 'id' => 'onboarding-title']); ?>
     <ol class="home-steps">
       <?php foreach ($steps as $si => [$title, $text, $gets, $photo]):
           $sv = (string) ($photo['video'] ?? '');
@@ -274,7 +272,6 @@ $videoReady = ns_video_ready();
 $teamCard = [
     'id'      => 'team-title',
     'cls'     => 'home-team',
-    'eyebrow' => 'The desk behind the load',
     'title'   => 'Built by dispatchers.{br}{hl}Run as a team.{/hl}',
     'image'   => ['base' => 'nf-dispatch-room-wide', 'alt' => 'A quiet dispatch desk by a large window at dusk, with two monitors, a headset, a notebook and a lamp, overlooking a freight yard with trailers', 'pos' => '50% 50%'],
 ];
@@ -299,7 +296,7 @@ partial('photo-card', $teamCard); ?>
 <section class="section" aria-labelledby="evidence-title">
   <div class="container split home-evidence">
     <div class="home-evidence__text">
-      <?php partial('section-head', ['eyebrow' => 'Proof, not promises', 'title' => 'Incidents are handled with evidence.', 'id' => 'evidence-title',
+      <?php partial('section-head', [ 'title' => 'Incidents are handled with evidence.', 'id' => 'evidence-title',
           'lead' => 'When a broker questions detention, a lumper fee or a late arrival, the answer is already on file. Here is what our desk keeps for every load.']); ?>
       <ul class="home-docs" aria-label="Documents the desk keeps for every load">
         <?php foreach ($docs as $i => $d): ?>
@@ -357,7 +354,6 @@ partial('photo-card', $teamCard); ?>
 <!-- 08 FROM THE DESK: artículo destacado + 2 filas (datos de app/data/posts.php; sin fechas mientras `published` esté vacío) -->
 <?php partial('desk-block', [
     'id'      => 'desk-guides',
-    'eyebrow' => 'From the desk',
     'title'   => 'Guides from the desk',
     'lead'    => 'Practical guides on what dispatch costs, how Amazon Relay works and how to get paid for every hour at the dock.',
     'btn'     => ['label' => 'All articles', 'href' => url('/blog/')],
@@ -365,7 +361,7 @@ partial('photo-card', $teamCard); ?>
 ]); ?>
 
 <!-- 09 FAQ -->
-<?php partial('faq', ['items' => route_faq_items($route), 'eyebrow' => 'FAQ', 'title' => 'Truck dispatch questions carriers ask us.', 'pre_cta' => true,
+<?php partial('faq', ['items' => route_faq_items($route), 'title' => 'Truck dispatch questions carriers ask us.', 'pre_cta' => true,
     // Foto del FAQ por tema (cada pregunta de app/data/faq.php lleva 'topic'): 0 costo, arranque y contrato · 1 Amazon Relay · 2 alcance · 3 con quién trabajamos. El tema 0 es la foto de siempre (4:5 nativo).
     'image' => ['base' => 'nf-faq-dock-light-4x5', 'alt' => 'White trailer backed into a dock door on a warehouse wall, with yellow bollards and painted parking lines', 'sizes' => '(min-width:1025px) 500px, 0px', 'topics' => [
         ['base' => 'nf-faq-dock-light-4x5', 'alt' => 'White trailer backed into a dock door on a warehouse wall, with yellow bollards and painted parking lines'],
