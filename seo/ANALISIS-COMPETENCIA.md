@@ -5,11 +5,20 @@ Fuente: DataForSEO Labs (Google EE. UU., inglés, datos de oct 2026) y los sitem
 ## 1. Qué hace Ninja (y qué tan fuerte es de verdad)
 
 - **Tamaño:** 130 keywords en Google EE. UU., tráfico orgánico estimado muy bajo (el home suma ~30 de ETV; el resto de páginas, de 0 a 7 cada una). Es débil en SEO: solo 30 de las 130 están en top 10 y 3 de esas son su propia marca.
-- **Arquitectura:** WordPress con Rank Math; 78 entradas de blog (2018 a 2026), 36 páginas, de ellas **17 páginas por estado** (`/locations/kentucky/`, etc.), un grupo de **8 páginas de dispatch nocturno / after-hours**, páginas de **Samsara** y **McLeod**, `pricing`, `faq`, `our-team`, `careers`.
+- **Arquitectura:** WordPress con Rank Math; 78 entradas de blog (2018 a 2026), 36 páginas, de ellas **15 páginas por estado (más el hub `/locations/`)** (`/locations/kentucky/`, etc.), un grupo de **8 páginas de dispatch nocturno / after-hours**, páginas de **Samsara** y **McLeod**, `pricing`, `faq`, `our-team`, `careers`.
 - **Dónde gana (top 10):** nicho y marca. Car hauler (3 coches, Kaufman, CDL para car haulers), tow truck dispatch, **night dispatch / overnight dispatcher / dispatch hours** (posiciones 2 a 8), "dispatch company" (8, 720/mes), Samsara.
 - **Dónde es débil (aprovechable):** los términos comerciales centrales los posiciona con el home en posiciones 15 a 35: "dispatching services for truckers" 720 (pos. 19), "trucking dispatch services" 590 (20), "truck dispatching company" 390 (17), "freight dispatch service" 170 (15), "dispatch services for owner operators" 260 (11, con un post de 2018), y todo el bloque de **precio** ("price dispatch" 2.900, "how much does dispatch cost" 1.300, "dispatch fee" 140…) en posiciones 22 a 35.
 - **Lo que NO tiene:** ninguna keyword de **Amazon Relay**, dry van, power only, box truck, seguimiento de cargas ni back office, y ninguna en español, en su top 130. Es el diferencial de NorthStar y tiene KD 0 a 4.
 - **Contenido de bajo valor para copiar:** páginas por estado (la de Kentucky: 1 keyword, posición 11 a 20, ETV 0,08), entradas de empleo ("how to become a dispatcher" 2.400, posición 69), reseñas de remolques. No encajan con un servicio remoto ni con la regla de §7.5.
+
+
+## 1b. Lectura del sitemap completo de Ninja (36 páginas y 78 entradas)
+
+- **Giro de posicionamiento:** todo lo publicado en 2025 y 2026 trata de dispatch nocturno / after-hours y de dispatch gestionado (frente a call centers y a un dispatcher interno), con páginas nuevas para flotas y brokers (`night-after-hours-fleet-manager`, `reefer-after-hours-dispatch`, `overnight-freight-coordinator`, `supply-chain-dispatch-service`). Ya no apunta de frente al owner-operator.
+- **Segmento descuidado:** su contenido para owner-operators (`truck-dispatching-services-for-owner-operators`, `how-much-do-dry-van-owner-operators-make`, `dispatch-service-cost`) tiene última modificación entre 2021 y 2022. El hueco para NorthStar es owner-operators y flotas pequeñas.
+- **Ritmo:** unas 14 entradas en 2026, casi todas opinión de mercado (aranceles, petróleo, ciclo del flete), de poco valor de búsqueda.
+- **Páginas de confianza que sí tiene:** `pricing`, `why-ninja`, `dashboard` (visibilidad para el cliente), `our-team`, `faq`, `careers`. Idea aprovechable: una página propia del «Desk log» (visibilidad del cliente) si Carlos lo aprueba; la de precio solo con respaldo del cliente (§8.2).
+- **No verificado:** el contenido de su página de precio (el HTML está tras Cloudflare); revisarla a mano en un navegador.
 
 ## 2. Qué copiamos, qué mejoramos y qué descartamos
 
@@ -19,7 +28,7 @@ Fuente: DataForSEO Labs (Google EE. UU., inglés, datos de oct 2026) y los sitem
 | Bloque de precio (post de costes con muchas variantes) | **Copiar y mejorar** | Ya existe `/blog/how-much-does-truck-dispatch-cost/`. Se añadieron 2 preguntas con la redacción exacta que se busca: «What is a dispatch fee?» y «How is a dispatcher fee calculated?» (FAQPage), con definición directa para snippet y AI Overview. Mejora frente al SERP: los resultados que ganan publican porcentajes (5 a 10 %, «8 %»); NorthStar no los publica (§8.2), así que el ángulo es **comparar los tres modelos, qué incluye y qué preguntar**, con la calculadora de rate per mile. |
 | Dispatch nocturno / after-hours (8 páginas) | **Cubrir sin competir de frente** | Ninja ya ocupa las posiciones 2 a 8 con 8 páginas para ~90 + 70 + 50 búsquedas al mes. NorthStar declara cobertura 24/7: FAQ nueva «Do you offer night or after-hours dispatch?» en el home. No se crea página propia hasta que Carlos valide el 24/7 (§10) y se vea demanda real en Search Console. |
 | «Near me» (dispatchers near me 1.000, dispatching company near me 210, dispatch companies near me 170, dispatch service near me 90) | **Mejorar** | FAQ nueva «Is there a dispatch company near me?» (home): servicio remoto, no hace falta oficina cerca, EE. UU. completo, WhatsApp. Sin páginas por ciudad. |
-| Páginas por estado (17) | **Descartar** | Casi sin tráfico y duplican contenido; un servicio remoto no tiene oficina por estado. Revisar solo si el cliente atiende un estado en particular y hay dato real. |
+| Páginas por estado (15) | **Descartar** | Casi sin tráfico y duplican contenido; un servicio remoto no tiene oficina por estado. Revisar solo si el cliente atiende un estado en particular y hay dato real. |
 | Samsara / McLeod | **Descartar** | NorthStar no ha afirmado ese software (§8.1: no presentar plataformas que no tenga). |
 | Car hauler, tow truck | **Descartar** | Equipos no ofrecidos. |
 | Entradas de empleo y «how to become a dispatcher» | **Descartar** | Intención de empleo/curso (§7.5). |
