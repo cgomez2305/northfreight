@@ -127,6 +127,17 @@ return [
             'a' => 'Yes. We work with owner-operators and small fleets that run Amazon Relay, power only and dry van freight. Tell us about your trucks and we will tell you honestly if we are a fit.',
         ],
         [
+            'q' => 'Is there a dispatch company near me?',
+            'topic' => 3,
+            'a' => 'NorthStar is a remote dispatch desk, so you do not need an office nearby. We work with owner-operators and small fleets across the U.S. and keep you updated on WhatsApp.',
+            'link' => ['label' => 'Talk to a dispatcher', 'path' => '/contact/'],
+        ],
+        [
+            'q' => 'Do you offer night or after-hours dispatch?',
+            'topic' => 2,
+            'a' => 'Dispatch desk coverage is 24/7. Message the desk on WhatsApp to talk about the hours your trucks run.',
+        ],
+        [
             'q' => 'Do I need a contract?',
             'topic' => 0,
             'a' => '{{ph:confirm terms: weekly, monthly, cancel anytime}}.',
@@ -252,6 +263,14 @@ return [
         ],
     ],
     'post-how-much-does-truck-dispatch-cost' => [
+        [
+            'q' => 'What is a dispatch fee?',
+            'a' => 'A dispatch fee is what a dispatch service charges for finding and booking your loads and handling the work around them. It is usually a percentage of each load, a flat weekly fee per truck or a fixed fee per load.',
+        ],
+        [
+            'q' => 'How is a dispatcher fee calculated?',
+            'a' => 'It depends on the model: a share of what each load pays, a fixed amount per truck per week or a fixed amount per load. Ask what the fee is calculated on and what the service includes before you compare.',
+        ],
         [
             'q' => 'Is a cheaper dispatcher always better?',
             'a' => 'Not necessarily. Compare what is included and how the dispatcher chooses loads. A lower fee on loads that pay less per mile can cost you more than a higher fee on better lanes.',

@@ -93,10 +93,21 @@ Title, meta, H1 y H2 **en inglés: cero diferencias** en las rutas live (compara
 
 Comprobaciones: `php bin/i18n.php check` OK; `audit` en 26 apariciones, todas falsos positivos de URLs `og:image` más ninguna cadena real (había 2 reales sin traducir y ya están). Sin CSS ni JS tocados, no hizo falta build. Sin guiones largos nuevos, sin código de pruebas en el repo.
 
+## 4b. Segunda pasada (misma fase): base técnica y competencia
+
+Aplicado tras la petición de Carlos de dejar la base técnica completa y trabajar la competencia (detalle y datos en `seo/ANALISIS-COMPETENCIA.md`):
+
+- **Titles en español en minúscula de frase** (24 rutas; hallazgo 6 resuelto): «Dispatch de camiones para owner operators», «Cómo funciona el load board de Amazon Relay», etc. Mismas palabras, solo la capitalización.
+- **Meta del home en inglés** ahora «Truck dispatch company for truckers and small fleets: …» (152): suma «dispatching services for truckers» (720) sin perder «dispatch company» (720). Title sin cambios.
+- **Meta robots en páginas indexables** (producción): `index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1`; las `noindex` no cambian.
+- **FAQ nuevas con keywords de competencia** (EN y ES, FAQPage): home «Is there a dispatch company near me?» (near me, ~1.470 búsquedas entre variantes) y «Do you offer night or after-hours dispatch?» (usa `COVERAGE_TEXT`, 24/7 pendiente de validar por Carlos); post de costes «What is a dispatch fee?» y «How is a dispatcher fee calculated?» (140 + 140 + 70).
+- **«In short» del home** menciona «freight dispatch service» (170).
+- Sin cambios en H1/H2 en inglés. Hallazgo 7 (cadena http→https→barra final) se deja: arreglarlo exige tocar `.htaccess` sin poder probarlo aquí (el servidor local no lo lee) y el beneficio es mínimo.
+
 ## 5. Recomendaciones que necesitan decisión de Carlos
 
-1. **"dispatch services for truckers"** (590, igual que "truck dispatch services"): añadir "truckers" al meta del home inglés. No se hizo porque exige reescribir una meta que ya mide 154. Propuesta: "Truck dispatch services for truckers and small fleets: Amazon Relay and dry van booking, load tracking and back office. Message a dispatcher on WhatsApp." (comprobar ≤ 155 antes de aplicar).
-2. Titles en español con mayúscula inicial (hallazgo 6).
+1. ~~«truckers» en el meta del home~~ y ~~titles en español~~: aplicados en la segunda pasada (§4b).
+2. Validar el 24/7 (la FAQ nocturna se apoya en él) y decidir si el cliente publica un rango de tarifa de dispatch (ver `seo/ANALISIS-COMPETENCIA.md` §4).
 3. Un solo salto http → https con barra final (hallazgo 7), si se quiere pulir.
 4. Fechas reales de los artículos (`published` en `posts.php`) para `datePublished` y `lastmod`.
 5. Ampliar FAQ en relay, owner y dry van: el sitio no afirma más de lo que ya dice, así que no se inventó nada; hacen falta respuestas del cliente (contrato, autoridades nuevas, cargos).

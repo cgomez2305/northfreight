@@ -39,7 +39,7 @@ return [
         ],
     ],
     '/' => [
-        'text'   => 'NorthStar is a remote truck dispatch company for owner-operators and small fleets. Our trucking dispatch services cover load booking on Amazon Relay and dry van, load tracking from pickup to POD and back-office work, all from one dispatch desk.',
+        'text'   => 'NorthStar is a remote truck dispatch company for owner-operators and small fleets. Our trucking dispatch services, a full freight dispatch service from one desk, cover load booking on Amazon Relay and dry van, load tracking from pickup to POD and back-office work.',
         'points' => [
             'Amazon Relay and dry van booking',
             'Load tracking and check calls',

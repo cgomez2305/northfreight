@@ -52,6 +52,8 @@ $jsList = array_values(array_filter($jsList, static fn($j): bool => is_string($j
 <?php endforeach; endif; ?>
 <?php if (noindex($route)): ?>
 <meta name="robots" content="<?= is_production() && ($route['status'] ?? 'live') === 'live' && ($route['gate'] ?? '') === '' ? 'noindex, follow' : 'noindex, nofollow' ?>">
+<?php else: ?>
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
 <?php endif; ?>
 <meta property="og:type" content="<?= $template === 'post' ? 'article' : 'website' ?>">
 <meta property="og:site_name" content="<?= e(cfg('brand')) ?>">
