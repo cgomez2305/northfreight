@@ -263,5 +263,12 @@ function llms_full_txt(): string
             }
         }
     }
+    // Fase AF: llms-full también apunta a la versión en español (H1 y meta ya publicados de cada página /es/).
+    if ($es = llms_es_lines()) {
+        $out[] = '## Español';
+        $out[] = '';
+        array_push($out, ...$es);
+        $out[] = '';
+    }
     return rtrim(implode("\n", $out)) . "\n";
 }

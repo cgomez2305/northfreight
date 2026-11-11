@@ -111,6 +111,12 @@ return [
             'a' => 'No. We combine dispatch, load tracking and back-office work according to the scope we agree with you.',
         ],
         [
+            'q' => 'What does a truck dispatcher do?',
+            'topic' => 2,
+            'a' => 'A truck dispatcher finds and books the loads, deals with brokers, tracks every trip and keeps the paperwork that gets you paid. At NorthStar one desk does all of it, and you approve every load.',
+            'link' => ['label' => 'How truck dispatching works', 'path' => '/how-it-works/'],
+        ],
+        [
             'q' => 'How do we get started?',
             'topic' => 0,
             'a' => 'Send us a WhatsApp message. We learn your operation, agree on contacts and scope, and review how we will work together before the first load.',

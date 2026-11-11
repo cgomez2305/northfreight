@@ -25,6 +25,9 @@
  */
 require_once __DIR__ . '/kit.php';
 $h1 = $h1 ?? (string) ($route['h1'] ?? '');
+if (($route['lang'] ?? 'en') === 'es' && !empty($route['h1_hl'])) {
+    $h1 = (string) $route['h1_hl'];   // fase AF: el H1 español sale de routes.es.php (con el acento {hl}), no de la traducción por trozos de la plantilla
+}
 $h1html = ns_rich($h1);
 $size = ($size ?? 'h1') === 'h1-long' ? 't-h1-long' : 't-h1';
 $h1tag = ($h1_tag ?? 'h1') === 'p' ? 'p' : 'h1';

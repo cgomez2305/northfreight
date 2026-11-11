@@ -453,6 +453,12 @@ function org_services(): array
     return $out;
 }
 
+/** URL de la home en inglés (fase AF): la Organization es UNA sola entidad en los dos idiomas, con el mismo @id y url (antes /es/ generaba una segunda entidad). */
+function org_home_url(): string
+{
+    return 'https://' . DOMAIN . '/';
+}
+
 /** URL absoluta del logo para JSON-LD (PNG cuadrado de 512 px: Google prefiere raster ≥ 112 px a un SVG). */
 function org_logo_url(): string
 {
@@ -468,9 +474,9 @@ function org_ref(): array
 {
     return [
         '@type' => 'Organization',
-        '@id'   => abs_url('/') . '#organization',
+        '@id'   => org_home_url() . '#organization',
         'name'  => BRAND,
-        'url'   => abs_url('/'),
+        'url'   => org_home_url(),
         'logo'  => org_logo_url(),
     ];
 }
@@ -482,9 +488,9 @@ function organization_schema(string $type = 'Organization'): array
     // Un solo nodo con los dos tipos (Organization + ProfessionalService) y un solo @id: antes eran dos nodos duplicados con los mismos datos.
     $node = [
         '@type'        => $type === 'Organization' ? ['Organization', 'ProfessionalService'] : $type,
-        '@id'          => abs_url('/') . '#organization',
+        '@id'          => org_home_url() . '#organization',
         'name'         => BRAND,
-        'url'          => abs_url('/'),
+        'url'          => org_home_url(),
         'logo'         => org_logo_url(),
         'telephone'    => PHONE,
         'email'        => EMAIL,
@@ -495,7 +501,7 @@ function organization_schema(string $type = 'Organization'): array
             'contactType'       => 'customer service',
             'telephone'         => PHONE,
             'email'             => EMAIL,
-            'availableLanguage' => (defined('LANGUAGES_TEXT') && stripos((string) LANGUAGES_TEXT, 'spanish') !== false) ? ['English', 'Spanish'] : 'English',   // LANGUAGES_TEXT (fase S)
+            'availableLanguage' => (defined('LANGUAGES_TEXT') && stripos((string) LANGUAGES_TEXT, 'spanish') !== false) ? ['en', 'es'] : 'en',   // LANGUAGES_TEXT (fase S)
         ],
     ];
     if ($type === 'Organization' && $services) {
@@ -548,7 +554,7 @@ function website_schema(): array
         'name'       => BRAND,
         'url'        => abs_url('/'),
         'inLanguage' => 'en-US',
-        'publisher'  => ['@id' => abs_url('/') . '#organization'],   // el nodo Organization está en el mismo documento (home)
+        'publisher'  => ['@id' => org_home_url() . '#organization'],   // el nodo Organization está en el mismo documento (home)
     ];
 }
 

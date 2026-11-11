@@ -89,7 +89,7 @@ function ns_add_es_routes(array $routes): array
         }
         $r = $routes[$enPath];
         $esPath = (string) $m['path'];
-        foreach (['title', 'meta', 'h1', 'breadcrumb', 'schema_name', 'og_alt'] as $k) {
+        foreach (['title', 'meta', 'h1', 'h1_hl', 'breadcrumb', 'schema_name', 'og_alt'] as $k) {
             if (isset($m[$k])) {
                 $r[$k] = $m[$k];
             }
@@ -303,7 +303,7 @@ function ns_translate_jsonld(string $block, callable $miss): string
     // Claves cuyo valor es un identificador técnico (tipo schema.org, URL, moneda, código de idioma…): nunca se traducen.
     $skip = ['@type' => 1, '@context' => 1, '@id' => 1, 'url' => 1, 'sameAs' => 1, 'priceCurrency' => 1, 'telephone' => 1, 'email' => 1, 'inLanguage' => 1,
         'datePublished' => 1, 'dateModified' => 1, 'item' => 1, 'image' => 1, 'logo' => 1, 'contentUrl' => 1, 'thumbnailUrl' => 1, 'areaServed' => 1, 'applicationCategory' => 1,
-        'operatingSystem' => 1, 'availability' => 1, 'price' => 1, 'position' => 1];
+        'operatingSystem' => 1, 'availability' => 1, 'price' => 1, 'position' => 1, 'contactType' => 1, 'availableLanguage' => 1];   // fase AF: identificadores técnicos
     $walk = static function (mixed $n, string $key = '') use (&$walk, $dict, $miss, $skip): mixed {
         if (is_array($n)) {
             foreach ($n as $k => $v) {

@@ -1,6 +1,6 @@
 # =====================================================================
 # NorthStar Freight Solutions — .htaccess (Hostinger / LiteSpeed / Apache)
-# Orden: HTTPS -> (www) -> bloqueos -> barra final -> front controller
+# Orden: (www) + HTTPS -> bloqueos -> barra final -> front controller
 # =====================================================================
 
 Options -Indexes -MultiViews
@@ -11,24 +11,18 @@ AddDefaultCharset UTF-8
 <IfModule mod_rewrite.c>
 RewriteEngine On
 
-# ---- 1) HTTPS forzado (se omite en localhost para poder probar) -----
+# ---- 1) Dominio ÚNICO sin www + HTTPS forzado (fase AF) -------------
+# Dominio definitivo: northstarfreightsolutions.us SIN www (el canonical y el sitemap ya usan el apex).
+# www -> apex en UN solo salto (antes servía 200 en www con el mismo contenido).
+# Si el dominio cambia: sustituir aquí y fijar DOMAIN en app/config.local.php.
+RewriteCond %{HTTP_HOST} ^www\.northstarfreightsolutions\.us$ [NC]
+RewriteRule ^ https://northstarfreightsolutions.us%{REQUEST_URI} [L,R=301]
+
+# HTTPS forzado (se omite en localhost para poder probar)
 RewriteCond %{HTTPS} !=on
 RewriteCond %{HTTP:X-Forwarded-Proto} !https [NC]
 RewriteCond %{HTTP_HOST} !^(localhost|127\.0\.0\.1)(:[0-9]+)?$ [NC]
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
-
-# ---- 2) Dominio ÚNICO (www o no-www; el cliente decide) -------------
-# Dominio definitivo PENDIENTE. Al decidirlo:
-#   a) fija DOMAIN en app/config.local.php (sin www si eliges no-www);
-#   b) descomenta SOLO UNA de las dos reglas y sustituye "example.com".
-#
-# Opción A — forzar SIN www:
-# RewriteCond %{HTTP_HOST} ^www\.example\.com$ [NC]
-# RewriteRule ^ https://example.com%{REQUEST_URI} [L,R=301]
-#
-# Opción B — forzar CON www:
-# RewriteCond %{HTTP_HOST} ^example\.com$ [NC]
-# RewriteRule ^ https://www.example.com%{REQUEST_URI} [L,R=301]
 
 # ---- 2b) "//ruta/" -> "/ruta/" (301, sin URLs duplicadas; index.php hace lo mismo como respaldo) ----
 RewriteCond %{REQUEST_METHOD} ^(GET|HEAD)$

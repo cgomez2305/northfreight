@@ -17,7 +17,7 @@ return [
     '/' => [
         'path'       => '/es/',
         'title'      => 'Dispatch de Camiones para Owner Operators | NorthStar',
-        'meta'       => 'Servicio de dispatch de camiones para owner-operators y flotas pequeñas: Amazon Relay, dry van, seguimiento y back office. Escríbenos por WhatsApp.',
+        'meta'       => 'Dispatcher de camiones y servicio de dispatch para owner-operators y flotas pequeñas: Amazon Relay, dry van, seguimiento y back office. Escríbenos.',
         'h1'         => 'Servicio de dispatch de camiones para owner-operators y flotas pequeñas',
         'breadcrumb' => 'Inicio',
     ],
@@ -26,6 +26,7 @@ return [
         'title'      => 'Dispatch para Owner Operators en Español | NorthStar',
         'meta'       => 'Servicio de dispatch para owner-operators: tu equipo de dispatch consigue tus cargas, trata con los brokers y sigue cada viaje. Avisos por WhatsApp.',
         'h1'         => 'Servicio de dispatch para owner-operators',
+        'h1_hl'      => 'Servicio de dispatch para {hl}owner-operators{/hl}',
         'breadcrumb' => 'Owner-operators',
     ],
     '/amazon-relay-dispatch/' => [
@@ -40,6 +41,7 @@ return [
         'title'      => 'Servicio de Dispatch para Dry Van | NorthStar Freight',
         'meta'       => 'Dispatch para dry van para owner-operators y flotas pequeñas: búsqueda de cargas, negociación de tarifas, check calls y papeleo desde un solo equipo.',
         'h1'         => 'Servicio de dispatch para dry van',
+        'h1_hl'      => 'Servicio de dispatch para {hl}dry van{/hl}',
         'breadcrumb' => 'Dry van',
     ],
     '/power-only-dispatch/' => [
@@ -47,6 +49,7 @@ return [
         'title'      => 'Dispatch para Power Only | NorthStar Freight',
         'meta'       => 'Dispatch power only para owner-operators: cargas para tu tractor, recogida y entrega del trailer confirmadas, con seguimiento y documentos.',
         'h1'         => 'Servicios de dispatch para power only',
+        'h1_hl'      => 'Servicios de dispatch para {hl}power only{/hl}',
         'breadcrumb' => 'Power only',
     ],
     '/load-tracking/' => [
@@ -61,6 +64,7 @@ return [
         'title'      => 'Back Office para Camioneros | NorthStar Freight',
         'meta'       => 'Back office para empresas de camiones: settlements, disputas, documentos y alta de choferes, a cargo de tu equipo de dispatch.',
         'h1'         => 'Servicios de back office para camiones',
+        'h1_hl'      => 'Servicios de back office para {hl}camiones{/hl}',
         'breadcrumb' => 'Back office',
     ],
     '/how-it-works/' => [
@@ -75,6 +79,7 @@ return [
         'title'      => 'Sobre NorthStar Freight Solutions | Nuestro Equipo',
         'meta'       => 'Conoce al equipo de dispatch de NorthStar: quienes reservan, siguen y documentan tus cargas, y por qué operamos como un solo equipo.',
         'h1'         => 'Creado por dispatchers. Operado como equipo.',
+        'h1_hl'      => 'Creado por dispatchers. {hl}Operado como equipo.{/hl}',
         'breadcrumb' => 'Nuestro equipo',
     ],
     '/contact/' => [
@@ -89,20 +94,23 @@ return [
         'title'      => 'Recursos Gratis para Camioneros | NorthStar',
         'meta'       => 'Herramientas, plantillas y guías gratis de un equipo de dispatch: calculadoras de IFTA y tarifa por milla, plantilla de BOL, contrato, glosario y blog.',
         'h1'         => 'Recursos gratis para camioneros, del equipo de dispatch',
+        'h1_hl'      => 'Recursos gratis para camioneros, {hl}del equipo de dispatch{/hl}',
         'breadcrumb' => 'Recursos',
     ],
     '/resources/bol-template/' => [
         'path'       => '/es/recursos/plantilla-bol/',
-        'title'      => 'Plantilla de BOL (Bill of Lading) en PDF y Word | NorthStar',
+        'title'      => 'Bill of Lading en Español: Plantilla de BOL | NorthStar',
         'meta'       => 'Plantilla gratis de bill of lading (BOL) en PDF y Word: los campos que esperan brokers y receptores, lista para imprimir. El BOL de nuestro equipo.',
         'h1'         => 'Plantilla de bill of lading',
+        'h1_hl'      => 'Plantilla de {hl}bill of lading{/hl}',
         'breadcrumb' => 'Plantilla de bill of lading',
     ],
     '/resources/ifta-calculator/' => [
         'path'       => '/es/recursos/calculadora-ifta/',
-        'title'      => 'Calculadora IFTA para Owner Operators | NorthStar',
+        'title'      => 'Calculadora IFTA en Español para Camioneros | NorthStar',
         'meta'       => 'Calculadora IFTA gratis: ingresa millas y galones por estado y mira el MPG de la flota, los galones gravables netos y el impuesto estimado. Solo estimados.',
         'h1'         => 'Calculadora IFTA',
+        'h1_hl'      => 'Calculadora {hl}IFTA{/hl}',
         'breadcrumb' => 'Calculadora IFTA',
     ],
     '/resources/rate-per-mile-calculator/' => [
@@ -110,6 +118,7 @@ return [
         'title'      => 'Calculadora de Tarifa por Milla (RPM) | NorthStar',
         'meta'       => 'Calculadora gratis de tarifa por milla: RPM cargado y total, costo de combustible y lo que te queda del viaje. Sabe si una carga paga antes de reservarla.',
         'h1'         => 'Calculadora de tarifa por milla',
+        'h1_hl'      => 'Calculadora de {hl}tarifa por milla{/hl}',
         'breadcrumb' => 'Calculadora de tarifa por milla',
     ],
     '/resources/dispatcher-carrier-agreement/' => [
@@ -117,6 +126,7 @@ return [
         'title'      => 'Contrato Dispatcher-Carrier (Plantilla) | NorthStar',
         'meta'       => 'Plantilla de contrato dispatcher-carrier: qué cubre un contrato justo, del alcance y las tarifas a tu derecho a rechazar cargas. No es asesoría legal.',
         'h1'         => 'Contrato dispatcher-carrier',
+        'h1_hl'      => 'Contrato {hl}dispatcher-carrier{/hl}',
         'breadcrumb' => 'Contrato dispatcher-carrier',
     ],
     '/resources/glossary/' => [
@@ -124,6 +134,7 @@ return [
         'title'      => 'Glosario de Trucking: Términos de Dispatch | NorthStar',
         'meta'       => 'Glosario de trucking de un equipo de dispatch: deadhead, TONU, rate con, lumper, detention y más, explicados en una o dos líneas.',
         'h1'         => 'Glosario de trucking',
+        'h1_hl'      => 'Glosario de {hl}trucking{/hl}',
         'breadcrumb' => 'Glosario de trucking',
     ],
     '/blog/' => [
@@ -166,6 +177,7 @@ return [
         'title'      => 'Trabajo de Chofer y Alianzas con Owner Operators | NorthStar',
         'meta'       => 'Trabajo de chofer y alianzas con owner operators: NorthStar es un servicio de dispatch, no una oferta de empleo. Asóciate con el equipo o mira vacantes.',
         'h1'         => 'Trabajo de chofer y alianzas con owner operators',
+        'h1_hl'      => 'Trabajo de chofer y {hl}alianzas con owner operators{/hl}',
         'breadcrumb' => 'Trabaja con nosotros',
     ],
     '/careers/owner-operators/' => [
