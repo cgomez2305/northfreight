@@ -74,6 +74,7 @@ return [
         [
             'q' => 'What equipment do you dispatch?',
             'a' => 'We dispatch Amazon Relay, power only and dry van freight. Tell us about your trucks and we will tell you honestly if we are a fit.',
+            'link' => ['label' => 'Power only dispatch', 'path' => '/power-only-dispatch/'],
         ],
         [
             'q' => 'Can you help if I am just getting my authority?',
@@ -125,6 +126,7 @@ return [
             'q' => 'Do you work with owner-operators?',
             'topic' => 3,
             'a' => 'Yes. We work with owner-operators and small fleets that run Amazon Relay, power only and dry van freight. Tell us about your trucks and we will tell you honestly if we are a fit.',
+            'link' => ['label' => 'Power only dispatch', 'path' => '/power-only-dispatch/'],
         ],
         [
             'q' => 'Is there a dispatch company near me?',
@@ -157,6 +159,7 @@ return [
         [
             'q' => 'What equipment do you dispatch?',
             'a' => 'We dispatch Amazon Relay, power only and dry van freight. Tell us about your trucks and we will tell you honestly if we are a fit.',
+            'link' => ['label' => 'Power only dispatch', 'path' => '/power-only-dispatch/'],
         ],
     ],
 
@@ -194,6 +197,7 @@ return [
         [
             'q' => 'How do I get updates?',
             'a' => 'On WhatsApp, at every stage of the load.',
+            'link' => ['label' => 'Load tracking', 'path' => '/load-tracking/'],
         ],
     ],
 
