@@ -54,7 +54,7 @@ ns_default('DOMAIN', 'northstarfreight.example');
 ns_default('LEGAL_NAME', 'NorthStar Freight Solutions LLC');   // nombre legal (confirmado por el cliente, fase S). Llega a JSON-LD legalName. No es secreto.
 ns_default('CREDIT_URL', 'https://clikrank.com/');   // crédito del footer «Developed by ClikRank ♥» (enlace nofollow). Vacío = sin crédito. Confirmar la URL con Carlos.
 ns_default('ADDRESS', []);         // OMITIDA a propósito (decisión del cliente, fase S: no se publica dirección). ['street'=>'', 'city'=>'', 'region'=>'', 'postal'=>'', 'country'=>'US']
-ns_default('SAME_AS', []);         // URLs de perfiles oficiales (LinkedIn, Facebook, YouTube…)
+ns_default('SAME_AS', ['https://www.instagram.com/northstarfreightsolutionsllc']);   // perfiles oficiales (cliente, 2026-11-20: Instagram; sin LinkedIn, Facebook ni YouTube todavía)
 ns_default('FOUNDING_DATE', '');   // PENDIENTE (fecha exacta). 'YYYY' o 'YYYY-MM-DD'. Solo se sabe que opera desde el 1 de junio de 2026: no se publica sin confirmar.
 // robots.txt de producción: bots de ENTRENAMIENTO de IA (GPTBot, ClaudeBot, Google-Extended, Applebot-Extended, CCBot).
 // 'allow' (defecto) | 'block'. Los bots de búsqueda/respuesta de IA (OAI-SearchBot, PerplexityBot…) siempre quedan permitidos.
@@ -75,8 +75,8 @@ ns_default('MAIL_TO', EMAIL);                     // destino de los envíos del 
 // Cada solicitud se guarda como una línea JSON en storage/leads/AAAA-MM.jsonl (sin base de datos) y avisa por correo.
 // LEAD_WEBHOOK_URL (opcional, en config.local.php): si existe, cada lead se envía también por POST JSON (cURL, timeout 4 s; un fallo nunca rompe la respuesta al usuario).
 ns_default('LEAD_WEBHOOK_URL', '');
-// Años mínimos de experiencia para marcar un lead como `qualified` (junto con CDL estándar = Sí e inglés Sí/Básico). PENDIENTE (cliente): confirmar el número.
-ns_default('LEAD_MIN_YEARS', 1);
+// Años mínimos de experiencia para marcar un lead de CONDUCTOR (perfil company-driver) como `qualified` (junto con CDL estándar = Sí e inglés Sí/Básico). Cliente, 2026-11-20: 2 años verificables; carriers y owner-operators sin mínimo.
+ns_default('LEAD_MIN_YEARS', 2);
 // Analítica: reservados para cuando Carlos elija herramienta (§10). HOY NO SE CARGA NINGÚN SCRIPT DE TERCEROS: los eventos (generate_lead / Lead) solo se emiten si ya existen gtag/fbq en la página.
 // Mini-CRM de captacion (captacion/): 1 = ademas del JSONL, cada lead se entrega al motor en proceso (requiere captacion/config/.env y la base migrada). 0 = apagado (comportamiento de la fase P).
 // Por defecto se enciende solo donde exista captacion/config/.env (el servidor); en local y en pruebas queda apagado. Un define('CAPTACION_ENABLED', 0|1) en config.local.php siempre manda.
@@ -107,7 +107,7 @@ ns_default('SHOW_ON_SHIFT', false);   // fase S: retirado en TODOS los entornos 
 // Cobertura del desk (fase S, decisión del cliente: 24/7). UN solo sitio para cambiarla o vaciarla: con '' desaparece de todas las páginas.
 // Aparece solo donde había un hueco natural: la línea de horario de /contact/ (rótulo "Desk hours") y el cierre de /our-desk/. Sin promesas de tiempo de respuesta.
 // Sin openingHours en JSON-LD a propósito. PENDIENTE de validar por Carlos con el cliente.
-ns_default('COVERAGE_TEXT', 'Dispatch desk coverage: 24/7');
+ns_default('COVERAGE_TEXT', 'Dispatch desk coverage: 24/7, all U.S. states');
 // Idiomas de atención (fase S: el equipo atiende en inglés y español). '' = no se muestra. Aparece en /contact/ y en el cierre de /our-desk/.
 ns_default('LANGUAGES_TEXT', 'English and Spanish');
 // Descargables (BOL y agreement): el cliente pidió NO ofrecerlos hasta que estén aprobados. false (defecto) = en ENV=production las rutas /resources/bol-template/ y

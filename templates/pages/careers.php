@@ -84,13 +84,13 @@ $driverCard = $jobs
 </section>
 
 <?php
-// Requisitos: SOLO datos pendientes del cliente. En producción ph() devuelve '' y la sección entera desaparece (nunca un hueco).
-$reqs = array_values(array_filter([
-    ph('Minimum driving experience'),
-    ph('Authority and insurance needed'),
-    ph('Equipment types accepted'),
-    ph('Documents to have ready'),
-], static fn(string $h): bool => $h !== ''));
+// Requisitos confirmados por el cliente (2026-11-20): autoridad activa, seguro, equipo y documentos; conductores: 2 años de experiencia verificable.
+$reqs = [
+    'Carriers and owner-operators: an active authority (MC) and insurance in force.',
+    'Equipment for dry van or Amazon Relay freight.',
+    'The company and equipment documents needed to operate day to day.',
+    'Drivers: at least two years of verifiable truck driving experience.',
+];
 if ($reqs): ?>
 <section class="section" aria-labelledby="cr-reqs">
   <div class="container stack">

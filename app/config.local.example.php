@@ -56,7 +56,7 @@ define('RATE_LIMIT', 5);
 // define('SHOW_ON_SHIFT', true);
 // define('SHOW_ON_SHIFT_PRODUCTION', true);
 // Cobertura e idiomas (texto visible en /contact/ y /our-desk/). Vacío = desaparece de todo el sitio.
-// define('COVERAGE_TEXT', 'Dispatch desk coverage: 24/7');
+// define('COVERAGE_TEXT', 'Dispatch desk coverage: 24/7, all U.S. states');
 // define('LANGUAGES_TEXT', 'English and Spanish');
 // Descargables (BOL y agreement): false (defecto) = en producción dan 404 y no aparecen en ningún sitio; true solo cuando el cliente apruebe los archivos de assets/downloads/.
 // define('DOWNLOADS_APPROVED', true);

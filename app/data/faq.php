@@ -38,11 +38,11 @@ return [
         ],
         [
             'q' => 'What does it cost?',
-            'a' => 'NorthStar quotes each operation individually, based on the volume of active trucks and the scope of service. Scope is agreed before we start, so you always know what the desk handles. Message the desk on WhatsApp to get a quote for your operation.',
+            'a' => 'Amazon Relay dispatch is a flat fee per truck, between $20 and $40 per truck depending on how many trucks you run. Dry van and booking outside Amazon is currently 5% of the truck\'s gross for the week. Billing is weekly. Scope is agreed before we start, so you always know what the desk handles.',
         ],
         [
             'q' => 'What do I need to apply?',
-            'a' => '{{ph:confirm requirements: authority, insurance, equipment and documents}}.',
+            'a' => 'Carriers and owner-operators need an active authority, insurance, equipment and the company and equipment documents required to operate day to day. Drivers need at least two years of verifiable truck driving experience.',
         ],
         [
             'q' => 'I do not own a truck. Can you help me find a driving job?',
@@ -65,7 +65,7 @@ return [
         ],
         [
             'q' => 'How much does a dispatcher charge an owner-operator?',
-            'a' => 'NorthStar quotes each operation individually, based on the volume of active trucks and the scope of service. Scope is agreed before we start. Message the desk on WhatsApp to get a quote for your operation.',
+            'a' => 'Amazon Relay dispatch is a flat fee per truck, between $20 and $40 per truck depending on how many trucks you run. Dry van and booking outside Amazon is currently 5% of the truck\'s gross for the week. Billing is weekly. Scope is agreed before we start.',
         ],
         [
             'q' => 'Who decides which loads I run?',
@@ -73,11 +73,11 @@ return [
         ],
         [
             'q' => 'What equipment do you dispatch?',
-            'a' => 'We dispatch Amazon Relay, power only and dry van freight. Tell us about your trucks and we will tell you honestly if we are a fit.',
+            'a' => 'We dispatch Amazon Relay and dry van freight. Tell us about your trucks and we will tell you honestly if we are a fit.',
         ],
         [
             'q' => 'Can you help if I am just getting my authority?',
-            'a' => '{{ph:confirm whether the desk works with new authorities and what it needs}}.',
+            'a' => 'Yes. We work with newly issued MC authorities. You still need active insurance, equipment and the documents to operate, and we agree on scope before we start.',
         ],
         [
             'q' => 'Do you dispatch Amazon Relay loads?',
@@ -98,7 +98,7 @@ return [
         [
             'q' => 'How much does a truck dispatch service cost?',
             'topic' => 0,
-            'a' => 'NorthStar quotes each operation individually, based on the volume of active trucks and the scope of service. Scope is agreed before we start, so you always know what the desk handles. Message the desk on WhatsApp to get a quote for your operation.',
+            'a' => 'Amazon Relay dispatch is a flat fee per truck, between $20 and $40 per truck depending on how many trucks you run. Dry van and booking outside Amazon is currently 5% of the truck\'s gross for the week. Billing is weekly. Scope is agreed before we start, so you always know what the desk handles.',
         ],
         [
             'q' => 'Do you dispatch Amazon Relay loads?',
@@ -118,12 +118,12 @@ return [
         [
             'q' => 'Do you work with owner-operators?',
             'topic' => 3,
-            'a' => 'Yes. We work with owner-operators and small fleets that run Amazon Relay, power only and dry van freight. Tell us about your trucks and we will tell you honestly if we are a fit.',
+            'a' => 'Yes. We work with owner-operators and small fleets that run Amazon Relay and dry van freight. Tell us about your trucks and we will tell you honestly if we are a fit.',
         ],
         [
             'q' => 'Do I need a contract?',
             'topic' => 0,
-            'a' => '{{ph:confirm terms: weekly, monthly, cancel anytime}}.',
+            'a' => 'Billing is weekly and you can cancel whenever you want: you settle your last weekly payment once you no longer need the service.',
         ],
     ],
 
@@ -131,7 +131,7 @@ return [
     'owner' => [
         [
             'q' => 'How much does a dispatcher charge an owner-operator?',
-            'a' => 'NorthStar quotes each operation individually, based on the volume of active trucks and the scope of service. Scope is agreed before we start. Message the desk on WhatsApp to get a quote for your operation.',
+            'a' => 'Amazon Relay dispatch is a flat fee per truck, between $20 and $40 per truck depending on how many trucks you run. Dry van and booking outside Amazon is currently 5% of the truck\'s gross for the week. Billing is weekly. Scope is agreed before we start.',
         ],
         [
             'q' => 'Do I have to take every load you find?',
@@ -139,7 +139,7 @@ return [
         ],
         [
             'q' => 'What equipment do you dispatch?',
-            'a' => 'We dispatch Amazon Relay, power only and dry van freight. Tell us about your trucks and we will tell you honestly if we are a fit.',
+            'a' => 'We dispatch Amazon Relay and dry van freight. Tell us about your trucks and we will tell you honestly if we are a fit.',
         ],
     ],
 
@@ -155,7 +155,7 @@ return [
         ],
         [
             'q' => 'Can you help a new Relay carrier?',
-            'a' => '{{ph:confirm}}.',
+            'a' => 'Yes. We work with newly issued MC authorities. Amazon decides who is approved on Relay, so we agree on scope and next steps with you before we start.',
         ],
         [
             'q' => 'Do you also dispatch non-Relay loads?',

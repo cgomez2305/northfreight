@@ -39,7 +39,7 @@ partial('summary', summary_for($route));
 
 <section class="section" aria-labelledby="bo-included">
   <div class="container stack">
-    <?php partial('section-head', [ 'title' => 'Five back office jobs off your desk', 'id' => 'bo-included']); ?>
+    <?php partial('section-head', [ 'title' => 'Five back office jobs off your desk', 'id' => 'bo-included', 'lead' => 'We prepare and organize your paperwork. We do not handle your money: brokers, shippers or your factoring company pay you directly.']); ?>
     <?php partial('numgrid', ['items' => $jobItems, 'label' => 'Back office jobs',
         'cta' => ['title' => 'Talk to the desk', 'text' => 'No forms first. Open WhatsApp with a ready message to send to a dispatcher.', 'href' => wa($route['wa']), 'label' => 'Talk to the desk about your back office on WhatsApp']]); ?>
   </div>

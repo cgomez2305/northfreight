@@ -60,7 +60,7 @@ $equip = [
 ?>
 <section class="section" aria-labelledby="co-equip">
   <div class="container stack">
-    <?php partial('section-head', ['id' => 'co-equip', 'title' => 'Equipment we dispatch', 'lead' => 'We book Amazon Relay, power only and dry van freight.']); ?>
+    <?php partial('section-head', ['id' => 'co-equip', 'title' => 'Equipment we dispatch', 'lead' => 'We book Amazon Relay and dry van freight.']); ?>
     <div class="cr-rows">
       <?php foreach ($equip as $q): if (!route_is_live($q[0])) { continue; } $th = ns_thumb($q[0], $used); if ($th) { $used[] = $th[0]; }
           partial('row-card', ['href' => url($q[0]), 'title' => $q[1], 'text' => $q[2], 'chips' => $q[3], 'h' => 'p', 'image' => $th ? ['base' => $th[0], 'alt' => $th[1]] : null]);
@@ -88,7 +88,7 @@ $equip = [
     <div class="cr-fee">
       <div class="cr-fee__text">
         <p class="t-body c-slate">Scope is agreed before we start, so you always know what the desk handles and what it costs.</p>
-        <p class="t-body c-slate">NorthStar quotes each operation individually, based on the volume of active trucks and the scope of service. <a href="<?= e(wa($route['wa'])) ?>" rel="noopener">Message the desk on WhatsApp</a> to get a quote for your operation.</p>
+        <p class="t-body c-slate">Amazon Relay dispatch is a flat fee per truck, between $20 and $40 per truck depending on how many trucks you run. Dry van and booking outside Amazon is currently 5% of the truck’s gross for the week. Billing is weekly and you can cancel by settling your last payment. <a href="<?= e(wa($route['wa'])) ?>" rel="noopener">Message the desk on WhatsApp</a> to get your numbers.</p>
       </div>
       <div class="cr-rows">
         <?php
