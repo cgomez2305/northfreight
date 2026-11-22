@@ -4,7 +4,7 @@ Fecha: 2026-11-22 · Modo: AUDITAR_Y_MEJORAR · Rama de trabajo: `claude/tender-
 
 ## 1. Resumen
 
-El proyecto (sitio público PHP sin framework + mini-CRM de captación en `captacion/`) está en buen estado de seguridad: **no se encontraron vulnerabilidades críticas ni altas**. La revisión confirmó 4 defectos de severidad media o baja, que quedaron **corregidos y verificados con pruebas de regresión** (comprobadas contra el código anterior: fallan con él y pasan con el nuevo), y dejó documentados otros 14 puntos de menor severidad, de diseño o informativos para decidir. La suite del CRM pasó de 3.247 a **3.262 pruebas, 0 fallos**.
+El proyecto (sitio público PHP sin framework + mini-CRM de captación en `captacion/`) está en buen estado de seguridad: **no se encontraron vulnerabilidades críticas ni altas**. La revisión confirmó 5 defectos de severidad media o baja (4 en el CRM y 1 preventivo en la exportación del sitio), que quedaron **corregidos y verificados con pruebas de regresión** (comprobadas contra el código anterior: fallan con él y pasan con el nuevo), y dejó documentados otros 14 puntos de menor severidad, de diseño o informativos para decidir. La suite del CRM pasó de 3.247 a **3.263 pruebas, 0 fallos**.
 
 ## 2. Alcance real y limitaciones
 
@@ -85,7 +85,7 @@ No se tocaron reglas de negocio, contratos de API ni la interfaz pública del si
 
 | Comando | Resultado |
 |---|---|
-| `php captacion/tests/run.php` (suite completa, MariaDB temporal) | **3.262 ok, 0 fallos** (línea base 3.247; +15 pruebas de regresión) |
+| `php captacion/tests/run.php` (suite completa, MariaDB temporal) | **3.263 ok, 0 fallos** (línea base 3.247; +16 pruebas de regresión) |
 | Regresiones **contra el código anterior** (se restauró el archivo del commit previo, se ejecutó el bloque y se volvió al nuevo) | **B1**: 6 fallos (`[::1]`, `[::ffff:127.0.0.1]`, `[::ffff:7f00:1]`, `[fd00::1]`, `0x7f.1`, dominio sin resolver) · **A4**: 1 fallo · **B3**: 1 fallo («un token de baja VÁLIDO sigue funcionando») · **A3**: 3 fallos (2 en actividad, 1 en el tope de exportaciones). Con el código nuevo, todas pasan |
 | Corrección de una prueba propia | la primera versión de la prueba A4 **no detectaba el defecto** (el intento caía en el bloqueo por IP de los fallos anteriores y no llegaba a registrarse); se detectó al contrastarla con el código anterior y se corrigió limpiando los intentos previos |
 | `php -l` de los archivos modificados | sin errores |
