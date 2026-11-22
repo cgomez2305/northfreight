@@ -4,8 +4,8 @@
     "css": {
         "blog-motion": {
             "file": "css/dist/blog-motion.css",
-            "hash": "3054cae577",
-            "bytes": 84819,
+            "hash": "572e0a00b7",
+            "bytes": 84837,
             "sources": [
                 {
                     "path": "css/fonts.css",
@@ -34,15 +34,15 @@
                 },
                 {
                     "path": "css/motion.css",
-                    "size": 9594,
-                    "crc32": "55b686a8"
+                    "size": 9953,
+                    "crc32": "4398e314"
                 }
             ]
         },
         "careers-motion": {
             "file": "css/dist/careers-motion.css",
-            "hash": "c5d95957a5",
-            "bytes": 85415,
+            "hash": "0bcdb5cca9",
+            "bytes": 85433,
             "sources": [
                 {
                     "path": "css/fonts.css",
@@ -71,15 +71,15 @@
                 },
                 {
                     "path": "css/motion.css",
-                    "size": 9594,
-                    "crc32": "55b686a8"
+                    "size": 9953,
+                    "crc32": "4398e314"
                 }
             ]
         },
         "company-motion": {
             "file": "css/dist/company-motion.css",
-            "hash": "644db2d393",
-            "bytes": 84885,
+            "hash": "c4e841d341",
+            "bytes": 84903,
             "sources": [
                 {
                     "path": "css/fonts.css",
@@ -108,15 +108,15 @@
                 },
                 {
                     "path": "css/motion.css",
-                    "size": 9594,
-                    "crc32": "55b686a8"
+                    "size": 9953,
+                    "crc32": "4398e314"
                 }
             ]
         },
         "home-motion": {
             "file": "css/dist/home-motion.css",
-            "hash": "a7697394c4",
-            "bytes": 93427,
+            "hash": "1a00c9b36a",
+            "bytes": 93445,
             "sources": [
                 {
                     "path": "css/fonts.css",
@@ -145,15 +145,15 @@
                 },
                 {
                     "path": "css/motion.css",
-                    "size": 9594,
-                    "crc32": "55b686a8"
+                    "size": 9953,
+                    "crc32": "4398e314"
                 }
             ]
         },
         "services-a-motion": {
             "file": "css/dist/services-a-motion.css",
-            "hash": "927860f62d",
-            "bytes": 77978,
+            "hash": "c1e1a5079b",
+            "bytes": 77996,
             "sources": [
                 {
                     "path": "css/fonts.css",
@@ -182,15 +182,15 @@
                 },
                 {
                     "path": "css/motion.css",
-                    "size": 9594,
-                    "crc32": "55b686a8"
+                    "size": 9953,
+                    "crc32": "4398e314"
                 }
             ]
         },
         "services-b-motion": {
             "file": "css/dist/services-b-motion.css",
-            "hash": "2a692d86e2",
-            "bytes": 86207,
+            "hash": "97fde1f6b7",
+            "bytes": 86225,
             "sources": [
                 {
                     "path": "css/fonts.css",
@@ -219,15 +219,15 @@
                 },
                 {
                     "path": "css/motion.css",
-                    "size": 9594,
-                    "crc32": "55b686a8"
+                    "size": 9953,
+                    "crc32": "4398e314"
                 }
             ]
         },
         "tools-motion": {
             "file": "css/dist/tools-motion.css",
-            "hash": "8a9c7a38d8",
-            "bytes": 82875,
+            "hash": "e2621d10b9",
+            "bytes": 82893,
             "sources": [
                 {
                     "path": "css/fonts.css",
@@ -256,8 +256,8 @@
                 },
                 {
                     "path": "css/motion.css",
-                    "size": 9594,
-                    "crc32": "55b686a8"
+                    "size": 9953,
+                    "crc32": "4398e314"
                 }
             ]
         }

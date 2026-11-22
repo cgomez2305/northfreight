@@ -4,7 +4,7 @@
 
 /* ---- Footer y bandas: el desplazamiento inicial hacia abajo (y: 60) de la última banda no debe alargar la altura del documento mientras se hace scroll
    (si lo alargara, el scrub del footer nunca llegaría a 1). overflow-y: clip recorta ese desborde sin crear contenedor de scroll ni romper el header sticky ---- */
-@supports (overflow-y: clip) { .js-motion body { overflow-y: clip; } }
+@supports (overflow-y: clip) { .js-motion body { overflow-y: clip; display: flow-root; } }   /* flow-root: sin él, el margen superior del header (24 px) se colapsa a través del body y este arranca en y=24; el hero del home sube con margen negativo hasta y=8 y el overflow-y: clip del body le recortaba esos 16 px (borde superior plano y esquinas cuadradas en reposo; al hacer scroll el hero se mueve y se veían redondeadas) */
 
 /* ---- Escena 3: parallax de fotos (.px). Marco con overflow hidden; la imagen mide 110 % del alto (el mínimo que da recorrido al parallax sin ampliar la foto más de la cuenta: cada punto extra
    obliga a ampliar la foto y a pedir una variante mayor) y arranca centrada (-4,55 % de su alto).
