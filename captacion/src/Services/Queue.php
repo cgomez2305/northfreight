@@ -105,6 +105,8 @@ final class Queue
 
     public static function recoverStale(): int
     {
+        // un job que mata el proceso una y otra vez no debe reintentarse para siempre (attempts es TINYINT y frenaria toda la cola al desbordar)
+        Db::run("UPDATE jobs SET status = 'failed', last_error = 'Abandonado: el proceso murio en cada intento' WHERE status = 'running' AND attempts > ? AND started_at < ?", [count(self::BACKOFF), Clock::shift(-self::STALE_AFTER)]);
         return Db::run("UPDATE jobs SET status = 'pending', last_error = 'Recuperado: el proceso anterior no termino' WHERE status = 'running' AND started_at < ?", [Clock::shift(-self::STALE_AFTER)])->rowCount();
     }
 

@@ -40,7 +40,10 @@
    if (!reduce) t.appendChild(el('i', 'toast__bar'));
   }
   var x = el('button', 'toast__x'); x.type = 'button'; x.setAttribute('aria-label', 'Cerrar aviso'); x.appendChild(icon('x')); x.addEventListener('click', gone); t.appendChild(x);
-  tbox.appendChild(t); timer = setTimeout(gone, o.bad ? 9000 : (o.undo ? 6000 : 4500));
+  var ms = o.bad ? 9000 : (o.undo ? 10000 : 4500), arm = function () { clearTimeout(timer); timer = setTimeout(gone, ms); };
+  t.addEventListener('mouseenter', function () { clearTimeout(timer); }); t.addEventListener('focusin', function () { clearTimeout(timer); });
+  t.addEventListener('mouseleave', arm); t.addEventListener('focusout', arm);
+  tbox.appendChild(t); arm();
   return t;
  };
  NS.undo = function (token) {

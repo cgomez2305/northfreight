@@ -5,7 +5,7 @@ use Captacion\Ui;
 /** Barra de acciones sobre la selección (Lista y Tabla). Variable opcional $exportAction: ruta a la que va «Exportar selección» (por defecto /leads/bulk). */
 ?>
   <div class="bulk" data-bulkbar hidden role="region" aria-label="Acciones sobre la selección">
-    <p class="bulk__n"><b data-count>0</b> seleccionados</p>
+    <p class="bulk__n" role="status"><b data-count>0</b> seleccionados</p>
     <div class="bulk__a">
       <label class="sr" for="bulk-stage">Cambiar etapa a</label>
       <select id="bulk-stage" name="stage" data-bulk-stage><option value="contacted">Contactado</option><option value="qualified">Calificado / Precalificado</option><option value="lost">Perdido / Descartado</option></select>

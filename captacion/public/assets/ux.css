@@ -41,7 +41,8 @@
 .toast__t{flex:1;min-width:0}
 .toast__u,.toast__x{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:0 10px;border:1px solid currentColor;border-radius:var(--r-ctl);background:none;color:inherit;font-weight:600;cursor:pointer}
 .toast__x{border-color:transparent;padding:0 6px}
-.toast__bar{position:absolute;left:0;bottom:0;height:2px;width:100%;background:var(--pop-ink-2);opacity:.6;transform-origin:left;animation:tbar 6s linear forwards}
+.toast__bar{position:absolute;left:0;bottom:0;height:2px;width:100%;background:var(--pop-ink-2);opacity:.6;transform-origin:left;animation:tbar 10s linear forwards}
+.toast:hover .toast__bar,.toast:focus-within .toast__bar{animation-play-state:paused}
 @keyframes tin{from{opacity:0;transform:translateY(8px)}}
 @keyframes tbar{to{transform:scaleX(0)}}
 .field__err{color:var(--bad);font-size:13px}

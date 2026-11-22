@@ -45,10 +45,10 @@
  $$('[data-open]').forEach(function (b) { b.addEventListener('click', function () { var d = $(b.getAttribute('data-open')); if (d && d.showModal) { d.showModal(); var f = $('select,input:not([type=hidden]),textarea', d); if (f) f.focus(); } }); });
  $$('dialog').forEach(function (d) {
  $$('[data-close]', d).forEach(function (b) { b.addEventListener('click', function () { d.close(); }); });
- d.addEventListener('click', function (e) { if (e.target === d) d.close(); });
+ var down = false; d.addEventListener('mousedown', function (e) { down = e.target === d; }); d.addEventListener('click', function (e) { if (e.target === d && down) d.close(); down = false; });
  });
  var cd = $('#confirm'), pending = null;
- D.addEventListener('click', function (e) { var b = e.target.closest ? e.target.closest('[data-confirm]') : null; if (!b || !cd || !cd.showModal || b.disabled) return; e.preventDefault(); pending = b; $('#confirm-m').textContent = b.getAttribute('data-confirm'); cd.showModal(); $('#confirm-y').focus(); });
+ D.addEventListener('click', function (e) { var b = e.target.closest ? e.target.closest('[data-confirm]') : null; if (!b || !cd || !cd.showModal || b.disabled) return; e.preventDefault(); pending = b; $('#confirm-m').textContent = b.getAttribute('data-confirm'); cd.showModal(); var no = $('.btn--ghost', cd); (no || $('#confirm-y')).focus(); });
  if (cd) cd.addEventListener('close', function () { if (cd.returnValue === 'yes' && pending) { var f = pending.form; pending.removeAttribute('data-confirm'); if (f.requestSubmit) f.requestSubmit(pending); else f.submit(); } cd.returnValue = ''; pending = null; });
  $$('[data-toggle]').forEach(function (b) { b.addEventListener('click', function () { var t = $(b.getAttribute('data-toggle')); if (!t) return; var show = t.hidden || (t.classList.contains('filters') && !t.classList.contains('is-open')); if (t.classList.contains('filters')) t.classList.toggle('is-open', show); else t.hidden = !show; b.setAttribute('aria-expanded', show ? 'true' : 'false'); if (show) { var f = $('textarea,input:not([type=hidden])', t); if (f) f.focus(); } }); });
  $$('[data-print]').forEach(function (b) { b.addEventListener('click', function () { window.print(); }); });

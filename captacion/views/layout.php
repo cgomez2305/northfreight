@@ -193,7 +193,7 @@ $ni = static function (string $href, string $icon, string $label, string $key, a
 <dialog class="dlg" id="mv-dlg" aria-labelledby="mv-t">
   <form method="dialog" data-mv-form>
     <div class="dlg__h"><h2 class="dlg__t" id="mv-t">Mover lead</h2><button class="icon-btn icon-btn--sm" type="button" data-close aria-label="Cerrar"><?= Ui::icon('x') ?></button></div>
-    <p class="dlg__m" data-mv-msg></p>
+    <p class="dlg__m" data-mv-msg role="alert"></p>
     <label class="field" data-mv-pick hidden><span>Mover a</span><select name="to"></select></label>
     <label class="field" data-mv-reason hidden><span>Motivo</span>
       <select name="reason"><option value="">Elige un motivo…</option><?php foreach (\Captacion\Services\Catalog::LOSS_REASONS as $k => $l): ?><option value="<?= $e($k) ?>"><?= $e($l) ?></option><?php endforeach; ?></select></label>
