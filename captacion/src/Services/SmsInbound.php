@@ -4,6 +4,7 @@
  *
  *  - STOP, STOPALL, UNSUBSCRIBE, CANCEL, END, QUIT (palabra sola, sin importar mayusculas ni signos): revoca el consentimiento de SMS y de WhatsApp (A15). Respuesta TwiML vacia
  *    (Twilio manda su propia confirmacion de baja si el Opt-Out avanzado esta activo).
+ *  - Fase AM: STOP de un numero que aun no es lead se anota en la lista de supresion (Suppression); START la quita si la razon era sms_stop.
  *  - START, YES, UNSTOP: restablece SOLO el SMS y solo si ese lead ya habia dado consentimiento de SMS antes.
  *  - HELP, INFO: responde con el texto de ayuda (Configuracion > Canales externos) en TwiML.
  *  - Cualquier otra respuesta: la guarda, pausa las secuencias del lead (A7), anota el evento y avisa a Carlos por Telegram.
@@ -105,6 +106,18 @@ final class SmsInbound
         }
         $ids = array_map(static fn($r) => (int) $r['id'], Db::all('SELECT id FROM leads WHERE phone_e164 = ? AND deleted_at IS NULL ORDER BY id DESC', [$from['e164']]));
         if ($ids === []) {
+            // Fase AM: un STOP de un numero que aun no es lead NO se pierde. Va a la lista de supresion (solo hash) para que, si ese numero llega despues como lead,
+            // nazca con la bandera stop_sms y sin consentimiento de SMS. START lo quita si la razon era sms_stop.
+            if ($kw === 'stop') {
+                Suppression::add('phone', $from['e164'], Suppression::SMS_STOP);
+                Webhook::finish($evId, 'processed', null, 'STOP de un número que no es un lead: anotado en la lista de supresión');
+                return $res('processed', 'stop (lista de supresión)', null, $help);
+            }
+            if ($kw === 'start') {
+                $q = Suppression::removeSmsStop($from['e164']);
+                Webhook::finish($evId, 'processed', null, $q ? 'START de un número que no es un lead: quitado de la lista de supresión' : 'START de un número que no es un lead (no estaba en la lista)');
+                return $res('processed', $q ? 'start (quitado de la lista)' : 'start', null, $help);
+            }
             Webhook::finish($evId, 'ignored', null, ($kw ?? 'respuesta') . ' de un número que no es un lead');
             return $res('ignored', 'número desconocido', null, $help);
         }
@@ -116,11 +129,13 @@ final class SmsInbound
         }
         if ($kw === 'stop') {
             $r = Consent::revokeChannels($from['e164'], ['sms', 'whatsapp', 'whatsapp_inbound'], 'stop_sms');
+            Suppression::add('phone', $from['e164'], Suppression::SMS_STOP, $lead);   // fase AM: tambien a la lista, por si se crea otro lead con ese numero
             Webhook::finish($evId, 'processed', $lead, 'STOP: ' . $r['revoked'] . ' consentimientos revocados');
             return $res('processed', 'stop', $lead);
         }
         if ($kw === 'start') {
             $n = Consent::restoreSms($from['e164'], $body);
+            Suppression::removeSmsStop($from['e164']);
             Webhook::finish($evId, 'processed', $lead, $n > 0 ? 'START: SMS restablecido' : 'START sin consentimiento previo (no se restablece nada)');
             return $res('processed', 'start', $lead);
         }

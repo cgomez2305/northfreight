@@ -70,6 +70,10 @@ final class LeadsController extends Responder
         $user = self::user();
         $lead = Lead::find($id);
         if ($lead === null) {
+            $into = Db::value('SELECT merged_into FROM leads WHERE id = ? AND merged_into IS NOT NULL', [$id]);   // fase AM: un lead fusionado redirige a su principal
+            if ($into !== null && Lead::find((int) $into) !== null) {
+                self::redirect('/leads/' . (int) $into, 302);
+            }
             self::notFound();
         }
         $events = Db::all('SELECT type, payload, user_id, created_at FROM lead_events WHERE lead_id = ? ORDER BY created_at DESC, id DESC LIMIT 300', [$id]);

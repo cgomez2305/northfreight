@@ -38,6 +38,7 @@ final class JobHandlers
             'rule_alert'              => [RuleEffects::class, 'jobAlert'],
             'rule_simulate'           => [RuleSim::class, 'jobStep'],
             'sla_breach'              => [Sla::class, 'jobBreach'],
+            'lead_import'             => [LeadImport::class, 'jobStep'],   // fase AM
         ];
     }
 

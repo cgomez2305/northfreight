@@ -134,3 +134,7 @@ body.is-dragging *{cursor:grabbing!important}
 .who__sla{display:block;margin-top:2px}
 .pk__asg{margin:0 0 10px}
 .rsp{display:inline-flex;align-items:center;gap:6px;min-width:0}.rsp>span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* Fase AM · formularios de privacidad y fusion de la ficha (se cargan diferidos con el resto de ux.css) */
+.priv__form{display:flex;flex-direction:column;gap:12px;margin-top:10px}
+.priv__form .btn{align-self:flex-start}
+.opts--stack{grid-template-columns:minmax(0,1fr)}

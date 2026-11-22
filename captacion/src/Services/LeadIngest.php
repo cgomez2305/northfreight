@@ -99,6 +99,11 @@ final class LeadIngest
     {
         $quiet = !empty($ctx['quiet']);
         $now = Clock::now();
+        foreach ((array) ($ctx['flags'] ?? []) as $extra) {   // fase AM: etiquetas de origen (p. ej. tag:import-archivo de la importacion CSV)
+            if (is_string($extra) && $extra !== '') {
+                $flags[] = $extra;
+            }
+        }
         if ($lead['referral_code'] !== null) {
             $refRow = Referrals::find($lead['referral_code']);
             $lead['referral_code'] = $refRow !== null ? (string) $refRow['code'] : null;   // codigo inexistente o desactivado: se ignora sin error y sin puntos de referido; si existe, se guarda en su forma canonica
@@ -149,6 +154,10 @@ final class LeadIngest
             $mflags = Flags::add($mflags, 'fmcsa_pending');
         }
         $mflags = Flags::add($mflags, ...array_values(array_diff($flags, ['phone_invalid'])));
+        $sup = Suppression::check($merged['phone_e164'] ?? null, $merged['email'] ?? null);   // fase AM: lista de supresion (STOP de desconocidos y borrados a peticion)
+        if ($sup['reason'] !== null) {
+            $mflags = Flags::add($mflags, ...$sup['flags']);
+        }
         $mflags = Flags::derive($mflags, $merged);
         $scored = RuleRunner::score(['flags' => $mflags] + $merged);   // puntuacion base del documento + reglas PUBLICADAS (sin reglas, identica a Scoring::score)
         $mflags = RuleEffects::flags($mflags, $scored['effects'] ?? null);
@@ -160,7 +169,10 @@ final class LeadIngest
         }
 
         if ($lead['consent']['given']) {
-            Consent::record($leadId, $lead['consent'], $lead['consent']['channels'] ?? Consent::FORM_CHANNELS);
+            Consent::record($leadId, $lead['consent'], array_values(array_diff($lead['consent']['channels'] ?? Consent::FORM_CHANNELS, $sup['drop'])));
+        }
+        if ($sup['reason'] !== null) {
+            self::event($leadId, 'suppressed', ['reason' => $sup['reason'], 'blocked' => $sup['drop'], 'consent_offered' => (bool) $lead['consent']['given']]);
         }
         $daysLost = $reopen ? (int) floor((Clock::time() - (int) Clock::parse((string) $existing['lost_at'])) / 86400) : null;
         self::event($leadId, $reopen ? 'reopened' : 'reentry', [
@@ -200,6 +212,10 @@ final class LeadIngest
             $flags[] = 'fmcsa_pending';
         }
         $lead['source'] = $source;
+        $sup = Suppression::check($lead['phone_e164'], $lead['email']);   // fase AM: lista de supresion
+        if ($sup['reason'] !== null) {
+            $flags = array_merge($flags, $sup['flags']);
+        }
         $flags = Flags::derive($flags, $lead);
         $scored = RuleRunner::score($lead + ['flags' => $flags, 'stage' => 'new']);   // base del documento + reglas publicadas (sin reglas, identica a Scoring::score)
         $flags = RuleEffects::flags($flags, $scored['effects'] ?? null);
@@ -224,7 +240,10 @@ final class LeadIngest
             'consent_given' => $lead['consent']['given'], 'flags' => $flags,
         ], $lead['created_at']);
         if ($lead['consent']['given']) {
-            Consent::record($leadId, $lead['consent'], $lead['consent']['channels'] ?? Consent::FORM_CHANNELS);
+            Consent::record($leadId, $lead['consent'], array_values(array_diff($lead['consent']['channels'] ?? Consent::FORM_CHANNELS, $sup['drop'])));
+        }
+        if ($sup['reason'] !== null) {
+            self::event($leadId, 'suppressed', ['reason' => $sup['reason'], 'blocked' => $sup['drop'], 'consent_offered' => (bool) $lead['consent']['given']]);
         }
         if ($fm !== null) {
             self::event($leadId, 'fmcsa', self::fmcsaSummary($fm));
@@ -313,8 +332,8 @@ final class LeadIngest
     {
         return Db::transaction(static function () use ($leadId, $reason, $enqueue) {
             $lead = Lead::find($leadId, true);
-            if ($lead === null) {
-                return null;
+            if ($lead === null || ($lead['anonymized_at'] ?? null) !== null) {
+                return null;   // fase AM: un lead anonimizado conserva su puntuacion historica; recalcularla sin sus datos falsearia las estadisticas
             }
             $flags = Flags::derive($lead['flags'], $lead);
             $scored = RuleRunner::score(['flags' => $flags] + $lead);   // base del documento + reglas publicadas (sin reglas, identica a Scoring::score)

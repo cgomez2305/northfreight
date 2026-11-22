@@ -263,6 +263,7 @@ final class ProspectImport
             $pin = implode(',', array_fill(0, count($phones), '?'));
             $leadPhone = array_flip(array_column(Db::all("SELECT phone_e164 FROM leads WHERE deleted_at IS NULL AND phone_e164 IN ($pin)", $phones), 'phone_e164'));
             $dncPhone = array_flip(array_column(Db::all("SELECT phone_e164 FROM dnc_numbers WHERE phone_e164 IN ($pin)", $phones), 'phone_e164'));
+            $dncPhone += Suppression::erasedPhones($phones);   // fase AM: telefonos borrados a peticion del titular (solo hash): nunca se vuelven a listar para llamar
             $prospPhone = array_flip(array_column(Db::all("SELECT phone FROM prospects_fmcsa WHERE phone IN ($pin)", $phones), 'phone'));
         }
         $listedToday = (int) Db::value('SELECT COUNT(*) FROM prospects_fmcsa WHERE listed_on = ?', [$today]);
