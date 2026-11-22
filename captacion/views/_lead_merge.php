@@ -23,7 +23,7 @@ $mgName = Fmt::name($lead);
         </fieldset>
         <p class="foot-note">Se conservan la etapa, el perfil, la fuente y la fecha de alta del principal. Si uno ya está firmado, tiene que ser el principal.</p>
         <label class="check"><input type="checkbox" name="confirm" value="1" required><span>Entiendo que la fusión no se puede deshacer.</span></label>
-        <button class="btn btn--secondary" type="submit" data-confirm="Se fusionarán los dos leads. No se puede deshacer."><?= Ui::icon('users') ?>Fusionar</button>
+        <button class="btn btn--secondary" type="submit" data-confirm="Se fusionarán los dos leads. No se puede deshacer." data-confirm-title="¿Fusionar los leads?" data-confirm-label="Fusionar" data-confirm-danger><?= Ui::icon('users') ?>Fusionar</button>
       </form>
     </details>
     <?php endforeach; ?>

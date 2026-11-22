@@ -32,7 +32,7 @@ $prFresh = Reauth::fresh();
         <label class="field"><span>Tu contraseña</span><input type="password" name="password" required autocomplete="current-password"></label>
         <label class="field"><span>Código de tu app de autenticación (uno nuevo, no el del acceso)</span><input type="text" name="code" required inputmode="numeric" autocomplete="one-time-code" maxlength="8" pattern="[0-9 ]{6,8}"></label>
         <?php else: ?><p class="muted">Tu identidad está confirmada ahora mismo.</p><?php endif; ?>
-        <button class="btn btn--danger" type="submit" data-confirm="Se eliminarán los datos personales de este lead de forma irreversible."><?= Ui::icon('trash') ?>Anonimizar este lead</button>
+        <button class="btn btn--danger" type="submit" data-confirm="Se eliminarán los datos personales de este lead de forma irreversible." data-confirm-title="¿Anonimizar el lead?" data-confirm-label="Anonimizar" data-confirm-danger><?= Ui::icon('trash') ?>Anonimizar este lead</button>
       </form>
     </details>
   </div>

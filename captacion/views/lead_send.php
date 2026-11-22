@@ -57,7 +57,7 @@ $langs = ['en' => 'Inglés', 'es' => 'Español'];
         <p class="muted">Se envía un correo real a <b><?= $e($lead['email']) ?></b> y queda en la línea de tiempo y en los mensajes del lead.</p>
         <form method="post" action="/leads/<?= $e($id) ?>/enviar">
           <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="tpl" value="<?= $e($tpl['id']) ?>"><input type="hidden" name="channel" value="email">
-          <button class="btn btn--primary" type="submit" data-confirm="Se enviará este correo a <?= $e($lead['email']) ?>. No se puede deshacer."><span class="btn__t">Enviar correo</span></button>
+          <button class="btn btn--primary" type="submit" data-confirm="Se enviará este correo a <?= $e($lead['email']) ?>. No se puede deshacer." data-confirm-title="¿Enviar el correo?" data-confirm-label="Enviar"><span class="btn__t">Enviar correo</span></button>
         </form>
       <?php endif; ?>
     </div>

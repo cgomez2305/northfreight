@@ -489,6 +489,12 @@ return static function (array $ctx): void {
     if ($r['temperature'] === 'hot') {
         T::ok(in_array('lead.hot', array_column($pend, 'event'), true), '  y, si es caliente, lead.hot');
     }
+    // integracion fase AM: anonimizar emite lead.anonymized sin datos personales en la carga util
+    $anId = (int) LeadIngest::handle(['profile' => 'owner_operator', 'name' => 'Borrame Ahora', 'phone' => '+1 305 555 4499', 'email' => 'borrame44@example.com', 'state' => 'TX', 'source' => 'web_careers'], 'web_careers', ['skip_antispam' => true, 'fmcsa_sync' => false])['lead_id'];
+    $an = \Captacion\Services\LeadErasure::anonymize($anId, $aid);
+    $ad = Db::one("SELECT * FROM outbound_deliveries WHERE lead_id = ? AND event = 'lead.anonymized'", [$anId]);
+    $blob = (string) json_encode($ad);
+    T::ok($an['ok'] && $ad !== null && !str_contains($blob, 'Borrame') && !str_contains($blob, '4499') && !str_contains($blob, 'borrame44'), 'anonimizar emite lead.anonymized sin nombre, teléfono ni correo');
     Fx::runJobs(10);
     $h = $hooks();
     $first = $h[0] ?? null;
@@ -519,7 +525,7 @@ return static function (array $ctx): void {
     // anonimización: nunca PII, aunque se pase y aunque esté el contacto activado
     OutboundWebhooks::emit('lead.anonymized', $newId, ['name' => 'Hook Prueba', 'phone' => '+13055554410', 'email' => 'hook44@example.com', 'reason' => 'solicitud'], 'anon-44');
     Fx::runJobs(10);
-    $an = array_values(array_filter($hooks(), static fn($x) => ($hookBody($x)['event'] ?? '') === 'lead.anonymized'))[0] ?? null;
+    $an = array_values(array_filter($hooks(), static fn($x) => ($hookBody($x)['event'] ?? '') === 'lead.anonymized' && (int) ($hookBody($x)['lead']['id'] ?? 0) === $newId))[0] ?? null;
     $anb = $an ? $hookBody($an) : [];
     T::ok($an !== null && array_keys($anb['lead'] ?? []) === ['id', 'code', 'url'] && !str_contains((string) $an['body'], 'Hook Prueba') && !str_contains((string) $an['body'], '4410') && !str_contains((string) $an['body'], 'hook44@') && ($anb['data']['reason'] ?? '') === 'solicitud',
         'lead.anonymized solo lleva id, código y enlace: nunca nombre, teléfono ni correo (aunque se pasen y «incluir contacto» esté activo)');

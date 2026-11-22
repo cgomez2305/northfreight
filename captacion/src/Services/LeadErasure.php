@@ -120,6 +120,7 @@ final class LeadErasure
                 }
                 LeadActions::event($leadId, 'anonymized', [], $userId);
                 ActivityLog::record('lead_anonymize', $userId, 'lead', $leadId);
+                OutboundWebhooks::emit('lead.anonymized', $leadId, [], 'anon:' . $leadId);   // sin PII: solo id y estado
                 return ['ok' => true, 'msg' => 'Lead anonimizado. Se eliminaron sus datos personales' . ($stopped > 0 ? ' y se detuvieron ' . $stopped . ' secuencia' . ($stopped === 1 ? '' : 's') : '') . '. No se puede deshacer.'];
             });
         } finally {

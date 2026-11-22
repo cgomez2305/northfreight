@@ -34,7 +34,7 @@ $n = static fn($v): string => number_format((int) $v, 0, ',', '.');
   <?php if (!$recent): ?>
     <div class="card__b"><p class="muted">Todavía no se ha importado nada.</p></div>
   <?php else: ?>
-  <div class="tw"><table class="tbl">
+  <div class="tw"><table aria-labelledby="h-rec" class="tbl">
     <thead><tr><th scope="col">Archivo</th><th scope="col">Estado</th><th scope="col">Filas</th><th scope="col">Creados</th><th scope="col">Duplicados</th><th scope="col">Rechazados</th><th scope="col">Cuándo</th></tr></thead>
     <tbody>
       <?php foreach ($recent as $r): ?>
@@ -73,7 +73,7 @@ $n = static fn($v): string => number_format((int) $v, 0, ',', '.');
 <?php if ($probs): ?>
 <section class="card" aria-labelledby="h-pr">
   <header class="card__h"><h2 class="label" id="h-pr">Filas con novedad</h2><span class="muted">primeras <?= $e(count($probs)) ?></span></header>
-  <div class="tw"><table class="tbl">
+  <div class="tw"><table aria-labelledby="h-pr" class="tbl">
     <thead><tr><th scope="col">Fila</th><th scope="col">Resultado</th><th scope="col">Motivo</th></tr></thead>
     <tbody><?php foreach ($probs as $pr): ?><tr><th scope="row"><?= $e($pr['row']) ?></th><td><?= $e($pr['status'] === 'reject' ? 'Rechazada' : 'Duplicada') ?></td><td><?= $e($pr['reason']) ?><?php if (!empty($pr['lead_id'])): ?> · <a href="/leads/<?= $e($pr['lead_id']) ?>"><?= $e(Fmt::code((int) $pr['lead_id'])) ?></a><?php endif; ?></td></tr><?php endforeach; ?></tbody>
   </table></div>
@@ -86,7 +86,7 @@ $n = static fn($v): string => number_format((int) $v, 0, ',', '.');
   <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>">
   <section class="card" aria-labelledby="h-map">
     <header class="card__h"><h2 class="label" id="h-map">Columnas de «<?= $e($imp['filename']) ?>»</h2><span class="muted"><?= $e($n($imp['total_rows'])) ?> filas · separador <?= $e(LeadImport::DELIMITERS[$imp['delimiter_char']] ?? $imp['delimiter_char']) ?> · <?= $e($imp['encoding']) ?></span></header>
-    <div class="tw"><table class="tbl dimp__map">
+    <div class="tw"><table aria-labelledby="h-map" class="tbl dimp__map">
       <thead><tr><th scope="col">Columna del archivo</th><th scope="col">Ejemplo</th><th scope="col">Campo del lead</th></tr></thead>
       <tbody>
         <?php foreach ($headers as $i => $h): $sample = ''; foreach ($preview as $pr) { if (($pr['cells'][$i] ?? '') !== '') { $sample = (string) $pr['cells'][$i]; break; } } ?>
@@ -129,7 +129,7 @@ $n = static fn($v): string => number_format((int) $v, 0, ',', '.');
       <?php endif; ?>
       <?php if ($sim['problems']): ?>
       <details class="dimp__det"><summary>Ver las primeras <?= $e(count($sim['problems'])) ?> filas con novedad</summary>
-        <div class="tw"><table class="tbl">
+        <div class="tw"><table aria-label="Filas con novedad de la simulación" class="tbl">
           <thead><tr><th scope="col">Fila</th><th scope="col">Resultado</th><th scope="col">Motivo</th></tr></thead>
           <tbody><?php foreach ($sim['problems'] as $pr): ?><tr><th scope="row"><?= $e($pr['row']) ?></th><td><?= $e($pr['status'] === 'reject' ? 'Rechazada' : 'Duplicada') ?></td><td><?= $e($pr['reason']) ?><?php if (!empty($pr['lead_id'])): ?> · <a href="/leads/<?= $e($pr['lead_id']) ?>"><?= $e(Fmt::code((int) $pr['lead_id'])) ?></a><?php endif; ?></td></tr><?php endforeach; ?></tbody>
         </table></div>
@@ -150,5 +150,5 @@ $n = static fn($v): string => number_format((int) $v, 0, ',', '.');
     </div>
   </section>
 </form>
-<form method="post" action="/importar/<?= $e($id) ?>/discard"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><button class="btn btn--ghost btn--sm" type="submit" data-confirm="Se descarta la subida y se borra el archivo del servidor.">Descartar esta subida</button></form>
+<form method="post" action="/importar/<?= $e($id) ?>/discard"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><button class="btn btn--ghost btn--sm" type="submit" data-confirm-title="¿Descartar la importación?" data-confirm-label="Descartar" data-confirm-danger data-confirm="Se descarta la subida y se borra el archivo del servidor.">Descartar esta subida</button></form>
 <?php endif; ?>
