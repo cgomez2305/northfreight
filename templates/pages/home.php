@@ -15,15 +15,6 @@ $tags = $variantA
 // Hero: mensaje de WhatsApp de la página.
 $waHref = wa($route['wa'] ?? null);
 
-// Widget "Start in WhatsApp" (hero): pestañas = quién eres, chips = en qué ayudamos (los servicios que ya existen). main.js recompone el enlace wa.me
-// con el mensaje; sin JS el botón apunta al enlace por defecto de la ruta. No se guarda ni se envía ningún dato.
-$waTabs = [
-    ['owner', 'Owner-operator', 'I run an owner-operator business'],
-    ['fleet', 'Small fleet', 'I run a small fleet'],
-    ['relay', 'Amazon Relay', 'I haul Amazon Relay freight'],
-];
-$waChips = ['Load booking', 'Load tracking', 'Back office'];
-
 // Video del hero: assets/video/hero.mp4 (escena de una sola pasada, 1080p, sin audio, SIN bucle: se queda en el último fotograma). main.js lo monta tras load + idle solo en >=1025px sobre la foto (que es su primer fotograma). Ver ns_hero_video() en kit.php.
 $heroVideo = ns_hero_video('hero');
 
@@ -102,7 +93,7 @@ $figures = [
 ?>
 <!-- HERO: foto protagonista (v3: nf-hero-highway-poster = primer fotograma de hero.mp4 a 1920×1080, sin master mayor porque el video de origen es 1280×720; degradado solo desde la izquierda y abajo) + titular + widget de WhatsApp. Recortes reales: -m (4:5, ≤760 px) y -sq (cuadrado, 761 a 1024 px); en escritorio la foto 16:9 completa con srcset 640 a 1920.
      Slot de video: si existe assets/video/hero.mp4 (o .webm) $heroVideo lo activa: el <video> va vacío (preload none, sin src) y main.js le pone la fuente tras load + idle en >=1025px, con fundido sobre la foto (que sigue siendo el LCP). Sin archivos no se emite nada y no hay peticiones. -->
-<script>(function(w,d){var r=d.documentElement;r.classList.add('js-wa');if(w.matchMedia&&w.matchMedia('(min-width:1025px)').matches&&!w.matchMedia('(prefers-reduced-motion: reduce)').matches){r.style.setProperty('--pin-h',w.innerHeight+'px');r.classList.add('hero-pre');w.addEventListener('load',function(){setTimeout(function(){if(!r.classList.contains('js-motion'))r.classList.remove('hero-pre')},7000)})}})(window,document)</script>
+<script>(function(w,d){var r=d.documentElement;if(w.matchMedia&&w.matchMedia('(min-width:1025px)').matches&&!w.matchMedia('(prefers-reduced-motion: reduce)').matches){r.style.setProperty('--pin-h',w.innerHeight+'px');r.classList.add('hero-pre');w.addEventListener('load',function(){setTimeout(function(){if(!r.classList.contains('js-motion'))r.classList.remove('hero-pre')},7000)})}})(window,document)</script>
 <section class="hero hero--home" id="top">
   <div class="hero__bg"<?= $heroVideo ? ' data-hero-video data-mp4="' . e($heroVideo['mp4'] ?? '') . '" data-webm="' . e($heroVideo['webm'] ?? '') . '"' : '' ?>><?= ns_img(['base' => 'nf-hero-highway-poster', 'widths' => [640, 1024, 1280, 1600, 1920], 'alt' => 'White semi truck driving away along an empty highway at golden hour, with the sun low over the plains', 'eager' => true, 'sizes' => '100vw',
         'art' => [
@@ -124,26 +115,6 @@ $figures = [
       <ul class="tags eyebrow" aria-label="What we cover">
         <?php foreach ($tags as $t): ?><li class="tag"><?= e($t) ?></li><?php endforeach; ?>
       </ul>
-    </div>
-    <div class="hero-wa" data-wa-widget data-wa-base="<?= e(cfg('wa_base')) ?>">
-      <p class="hero-wa__title t-meta">Start in WhatsApp</p>
-      <p class="hero-wa__note" data-wa-note>Open WhatsApp with a ready message to send to a dispatcher.</p>
-      <div class="hero-wa__ui" data-wa-ui hidden>
-        <div class="hero-wa__tabs" role="tablist" aria-label="I am">
-          <?php foreach ($waTabs as $i => [$key, $label, $who]): ?>
-          <button type="button" class="hero-wa__tab" role="tab" id="wa-tab-<?= e($key) ?>" aria-selected="<?= $i === 0 ? 'true' : 'false' ?>" aria-controls="wa-panel"<?= $i === 0 ? '' : ' tabindex="-1"' ?> data-who="<?= e($who) ?>"><?= e($label) ?></button>
-          <?php endforeach; ?>
-        </div>
-        <div class="hero-wa__panel" role="tabpanel" id="wa-panel" aria-labelledby="wa-tab-owner">
-          <div class="hero-wa__chips" role="group" aria-label="I want help with">
-            <?php foreach ($waChips as $c): ?>
-            <button type="button" class="hero-wa__chip" aria-pressed="false" data-svc="<?= e(strtolower($c)) ?>"><?= e($c) ?></button>
-            <?php endforeach; ?>
-          </div>
-          <p class="hero-wa__msg" data-wa-msg><?= e('Hi, ' . $waTabs[0][2] . ' and I\'d like to talk about dispatch with NorthStar.') ?></p>
-        </div>
-      </div>
-      <a class="btn btn--primary btn--card hero-wa__go" href="<?= e($waHref) ?>" rel="noopener" data-wa-open><span class="btn__t">Open WhatsApp</span></a>
     </div>
   </div>
 </section>

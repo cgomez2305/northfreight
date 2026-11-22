@@ -100,60 +100,6 @@
     sync(true);
   })();
 
-  /* ---- Widget "Start in WhatsApp" (hero del home): pestañas (quién eres) + chips (en qué ayudamos) => mensaje y enlace wa.me.
-     No se guarda ni se envía ningún dato. Sin JS el botón conserva el enlace por defecto de la ruta y los controles siguen ocultos. ---- */
-  (function () {
-    var w = d.querySelector('[data-wa-widget]');
-    if (!w) return;
-    var ui = w.querySelector('[data-wa-ui]'), note = w.querySelector('[data-wa-note]'), msg = w.querySelector('[data-wa-msg]'), go = w.querySelector('[data-wa-open]');
-    var panel = w.querySelector('[role="tabpanel"]'), base = w.getAttribute('data-wa-base');
-    var tabs = $$('[role="tab"]', w), chips = $$('[data-svc]', w);
-    if (!ui || !msg || !go || !base || !tabs.length) return;
-    function text() {
-      var who = (tabs.filter(function (t) { return t.getAttribute('aria-selected') === 'true'; })[0] || tabs[0]).getAttribute('data-who');
-      var svc = chips.filter(function (c) { return c.getAttribute('aria-pressed') === 'true'; }).map(function (c) { return c.getAttribute('data-svc'); });
-      var list = svc.length > 1 ? svc.slice(0, -1).join(', ') + t(' and ') + svc[svc.length - 1] : (svc[0] || '');
-      return t('Hi, ') + who + t(" and I'd like ") + (list ? t('help with ') + list : t('to talk about dispatch')) + t(' with NorthStar.');
-    }
-    function sync() {
-      var t = text();
-      msg.textContent = t;
-      go.setAttribute('href', base + '?text=' + encodeURIComponent(t).replace(/'/g, '%27'));
-    }
-    function pick(tab, focus) {
-      tabs.forEach(function (t) {
-        var on = t === tab;
-        t.setAttribute('aria-selected', on ? 'true' : 'false');
-        t.tabIndex = on ? 0 : -1;
-      });
-      if (panel) panel.setAttribute('aria-labelledby', tab.id);
-      if (focus) tab.focus();
-      sync();
-    }
-    tabs.forEach(function (t, i) {
-      t.addEventListener('click', function () { pick(t, false); });
-      t.addEventListener('keydown', function (e) {
-        var n = null;
-        if (e.key === 'ArrowRight') n = (i + 1) % tabs.length;
-        else if (e.key === 'ArrowLeft') n = (i - 1 + tabs.length) % tabs.length;
-        else if (e.key === 'Home') n = 0;
-        else if (e.key === 'End') n = tabs.length - 1;
-        if (n === null) return;
-        e.preventDefault();
-        pick(tabs[n], true);
-      });
-    });
-    chips.forEach(function (c) {
-      c.addEventListener('click', function () {
-        c.setAttribute('aria-pressed', c.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
-        sync();
-      });
-    });
-    ui.hidden = false;
-    if (note) note.hidden = true;
-    sync();
-  })();
-
   /* ---- Videos de fondo (hero del home y banda de video). Los <video> viajan vacíos en el HTML (preload none, sin src): aquí se les pone la fuente.
      Solo en >=1025px, sin prefers-reduced-motion ni saveData, tras `load` + idle (así la foto del hero sigue siendo el LCP). Son escenas breves SIN bucle:
      se reproducen UNA vez y se quedan en el último fotograma (no se reinician aunque la sección salga y vuelva a entrar). El hero arranca ya; la banda empieza

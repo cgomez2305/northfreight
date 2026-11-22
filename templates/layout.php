@@ -87,7 +87,7 @@ $jsList = array_values(array_filter($jsList, static fn($j): bool => is_string($j
 <?php endforeach; endif; ?>
 <?php schema_json(page_schema($route)); ?>
 </head>
-<body<?= $ctaOn ? '' : ' class="no-cta"' ?>>
+<body<?php $bodyCls = trim(($ctaOn ? '' : 'no-cta ') . ($template === 'home' ? 'is-home' : '')); echo $bodyCls !== '' ? ' class="' . e($bodyCls) . '"' : ''; ?>>
 <a class="skip-link" href="#main">Skip to content</a>
 <div class="site-top on-dark">
 <header class="header" id="site-header">

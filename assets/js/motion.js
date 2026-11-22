@@ -59,7 +59,7 @@
     var main = hero && one('.hero__main', hero);
     if (!hero || !bg || !img || !main) return;
     var l1 = one('.home-hero__l1', hero), l2 = one('.home-hero__l2', hero);
-    var tags = one('.tags', hero), ctas = one('.hero__ctas', hero), wa = one('.hero-wa', hero), vid = one('video', bg);
+    var tags = one('.tags', hero), ctas = one('.hero__ctas', hero), vid = one('video', bg);
     var tl = g.timeline({
       defaults: { ease: 'none', duration: 1 },  // duración 1 = todo el recorrido del pin
       scrollTrigger: { trigger: hero, start: 'top top', end: function () { return '+=' + Math.round(vh()); }, pin: true, scrub: 0.6, anticipatePin: 1, invalidateOnRefresh: true }
@@ -69,7 +69,6 @@
       .fromTo(main, { y: 0 }, { y: -140 }, 0)
       .fromTo(main, { opacity: 1 }, { opacity: 0, duration: 0.6 }, 0);
     if (vid) tl.fromTo(vid, { yPercent: 0 }, { yPercent: -2 }, 0);   // video de fondo opcional: sigue a la foto
-    if (wa) tl.fromTo(wa, { y: 0, opacity: 1 }, { y: -90, opacity: 0, duration: 0.5 }, 0);   // el widget de WhatsApp se desvanece con el texto
     if (l1) tl.fromTo(l1, { x: 0 }, { x: -48 }, 0);
     if (l2) tl.fromTo(l2, { x: 0 }, { x: 48 }, 0);
     var fade = [tags, ctas].filter(Boolean);
