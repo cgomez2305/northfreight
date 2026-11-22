@@ -115,8 +115,8 @@
         },
         "home-motion": {
             "file": "css/dist/home-motion.css",
-            "hash": "1a00c9b36a",
-            "bytes": 93445,
+            "hash": "1830d366fd",
+            "bytes": 93467,
             "sources": [
                 {
                     "path": "css/fonts.css",
@@ -140,8 +140,8 @@
                 },
                 {
                     "path": "css/pages/home.css",
-                    "size": 25776,
-                    "crc32": "356f96ed"
+                    "size": 25901,
+                    "crc32": "52e56cc4"
                 },
                 {
                     "path": "css/motion.css",
