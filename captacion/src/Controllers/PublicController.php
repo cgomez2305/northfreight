@@ -21,6 +21,7 @@ use Captacion\View;
 final class PublicController
 {
     public const LIMIT = 60;
+    public const LIMIT_VALID = 2000;   // peticiones por IP y hora con un token de baja VÁLIDO (techo anti-abuso, muy por encima del uso real)
 
     private static function page(string $view, array $vars, int $status = 200): never
     {
@@ -32,10 +33,10 @@ final class PublicController
         exit;
     }
 
-    private static function limited(string $bucket): bool
+    private static function limited(string $bucket, int $limit = self::LIMIT): bool
     {
         $ip = \Captacion\Services\ClientIp::get();
-        if (RateLimiter::tooMany($bucket, $ip, self::LIMIT, 3600)) {
+        if (RateLimiter::tooMany($bucket, $ip, $limit, 3600)) {
             return true;
         }
         RateLimiter::hit($bucket, $ip, 3600);
@@ -81,11 +82,13 @@ final class PublicController
 
     public static function unsubscribe(string $token): never
     {
-        if (self::limited('pub_unsub')) {
+        // La firma se comprueba PRIMERO (es solo un HMAC). Un token válido solo sale de un correo nuestro y su baja es idempotente: no puede quedar bloqueada por un límite
+        // por IP compartido (Gmail, pasarelas corporativas y escáneres de enlaces salen de pocas IP y la baja es una obligación legal). Los tokens inválidos sí tienen límite estricto.
+        $id = Unsub::verify($token);
+        if (self::limited($id === null ? 'pub_unsub' : 'pub_unsub_ok', $id === null ? self::LIMIT : self::LIMIT_VALID)) {
             header('Retry-After: 3600');
             self::page('unsub', ['state' => 'limited', 'lang' => 'en'], 429);
         }
-        $id = Unsub::verify($token);
         if ($id === null) {
             self::page('unsub', ['state' => 'invalid', 'lang' => 'en'], 404);
         }

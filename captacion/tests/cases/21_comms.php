@@ -329,6 +329,16 @@ return static function (array $ctx): void {
     T::ok($g2['status'] === 200 && $p2['status'] === 200 && (int) Db::value("SELECT COUNT(*) FROM lead_events WHERE lead_id = ? AND type = 'consent_revoked'", [$u]) === 1, 'repetir la baja (POST del botón o «One-Click» del cliente de correo) es idempotente');
     T::eq(Infra::http('GET', $panel->base . '/u/' . substr($tok, 0, -1) . 'x')['status'], 404, 'token de baja manipulado: 404');
     T::eq(Infra::http('GET', $panel->base . '/u/' . str_repeat('a', 60))['status'], 404, 'token de baja inventado: 404');
+    // Regresión B3 (auditoría 2026-11-22): una IP ya limitada por tokens inventados NO bloquea una baja con token válido (obligación legal de la baja)
+    $st = 0;
+    for ($i = 0; $i < 70; $i++) {
+        $st = Infra::http('GET', $panel->base . '/u/' . str_repeat('b', 60))['status'];
+        if ($st === 429) {
+            break;
+        }
+    }
+    T::eq($st, 429, 'tokens de baja inventados: límite estricto por IP (429)');
+    T::eq(Infra::http('POST', $panel->base . '/u/' . $tok, ['form' => ['List-Unsubscribe' => 'One-Click']])['status'], 200, 'con la IP ya limitada, un token de baja VÁLIDO sigue funcionando');
     $b = count($mails());
     Clock::travel(40 * 86400);
     $tick();
