@@ -495,7 +495,9 @@ return static function (array $ctx): void {
     T::ok($r['status'] === 303 && Scoring::settings()['scoring.owner']['cdl_standard'] === 22, 'guardar puntuacion por HTTP');
     $r = $short->post('/config/scoring/recalc', ['_csrf' => $short->csrf]);
     T::ok(!ScoringConfig::running(), 'recalcular sin marcar la confirmacion: no arranca');
+    Settings::clear();
     $r = $short->post('/config/scoring/recalc', ['_csrf' => $short->csrf, 'confirm' => '1']);
+    Settings::clear();
     T::ok(ScoringConfig::running() && (int) Db::value("SELECT COUNT(*) FROM jobs WHERE type = 'rescore_batch'") === 1, 'recalcular confirmado por HTTP: arranca el job');
     $r = $short->post('/config/scoring/reset', ['_csrf' => $short->csrf, 'group' => 'all']);
     Settings::clear();
