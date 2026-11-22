@@ -140,7 +140,7 @@ return static function (array $ctx): void {
     // exportar
     $r = $s->post('/actividad/export', ['qs' => 'ty=login']);
     T::ok(!str_contains(Infra::header($r, 'content-type'), 'text/csv'), 'exportar sin CSRF: no entrega CSV');
-    // Regresión A3 (auditoría 2026-11-22): sin confirmar identidad (contraseña + 2FA) el POST directo no exporta, igual que la pantalla bloqueada
+    // Regresión A3 (auditoría 2026-11-22): sin confirmar identidad (contraseña + 2FA) no se exporta el registro, igual que no se cambia la retención ni se descargan copias
     $r = $s->post('/actividad/export', ['_csrf' => $s->csrf, 'qs' => 'ty=login']);
     T::ok($r['status'] === 303 && !str_contains(Infra::header($r, 'content-type'), 'text/csv') && (int) Db::value("SELECT COUNT(*) FROM activity_log WHERE action = 'activity_export'") === 0, 'exportar SIN confirmar identidad: 303 y no entrega el CSV');
     // retencion con reautenticacion
