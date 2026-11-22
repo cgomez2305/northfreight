@@ -122,3 +122,14 @@ body.is-dragging *{cursor:grabbing!important}
   .dlg__row{grid-template-columns:1fr}
   .dlg{border-radius:var(--r-card)}
 }
+
+/* AM: indicador del plazo de primer contacto (punto de 6 px + texto) y selector de responsable */
+.sla{display:inline-flex;align-items:center;gap:6px;font-size:var(--fs-xs);color:var(--ink-2);white-space:nowrap}
+.sla .dot,.sla--ok .dot{background:var(--ok-dot)}
+.sla--soon .dot{background:var(--warn-dot)}
+.sla--late{color:var(--bad);font-weight:500}.sla--late .dot{background:var(--bad-dot)}
+.asg{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0}
+.asg .field{flex:1 1 180px;margin:0}
+.who__sla{display:block;margin-top:2px}
+.pk__asg{margin:0 0 10px}
+.rsp{display:inline-flex;align-items:center;gap:6px;min-width:0}.rsp>span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}

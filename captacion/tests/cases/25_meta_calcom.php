@@ -258,7 +258,7 @@ return static function (array $ctx): void {
     T::ok(count($rem) === 2 && $rem[0]['run_at'] === gmdate('Y-m-d H:i:s', $start - 86400) && $rem[1]['run_at'] === gmdate('Y-m-d H:i:s', $start - 3600), '  dos recordatorios programados: 24 h y 1 h antes');
     T::ok($count('lead_events', "type = 'appointment_booked' AND lead_id = " . (int) $lead['id']) === 1, '  evento de la linea de tiempo');
     $r = $cal($b);
-    T::ok(json_decode($r['body'], true)['status'] === 'duplicate' && $count('appointments') === 1 && $count('tasks') === 1 && $count('jobs', "type = 'appointment_reminder'") === 2 && $count('leads') === 1, 'el mismo evento dos veces no duplica cita, tarea, recordatorios ni lead');
+    T::ok(json_decode($r['body'], true)['status'] === 'duplicate' && $count('appointments') === 1 && $count('tasks', 'kind IS NULL') === 1 && $count('jobs', "type = 'appointment_reminder'") === 2 && $count('leads') === 1, 'el mismo evento dos veces no duplica cita, tarea, recordatorios ni lead');
     // La vista de /tareas ya preparada muestra la cita
     $adm = Panel::user('admin');
     $ap = $panel->another();
@@ -272,7 +272,7 @@ return static function (array $ctx): void {
     $r = $cal($b);
     $rows = Db::all('SELECT * FROM appointments');
     T::ok($r['status'] === 200 && count($rows) === 1 && $rows[0]['calcom_id'] === 'bkg-BBBB22' && $rows[0]['prev_calcom_id'] === 'bkg-AAAA11' && $rows[0]['starts_at'] === gmdate('Y-m-d H:i:s', $start2) && (int) $rows[0]['reschedules'] === 1, 'reprogramada: la MISMA cita cambia de hora y de uid (prev_calcom_id guarda el anterior)');
-    $tasks = Db::all('SELECT due_at FROM tasks WHERE deleted_at IS NULL');
+    $tasks = Db::all('SELECT due_at FROM tasks WHERE deleted_at IS NULL AND kind IS NULL');
     T::ok(count($tasks) === 1 && $tasks[0]['due_at'] === gmdate('Y-m-d H:i:s', $start2), '  la tarea se mueve a la nueva hora (no se crea otra)');
     T::ok($count('jobs', "type = 'appointment_reminder' AND status = 'cancelled'") === 2 && $count('jobs', "type = 'appointment_reminder' AND status = 'pending'") === 2, '  los recordatorios viejos se cancelan y se programan los nuevos');
     $late = $mk('BOOKING_CREATED', 'bkg-AAAA11', $start, time() - 60);
@@ -285,7 +285,7 @@ return static function (array $ctx): void {
     $a2 = Db::one('SELECT * FROM appointments');
     T::ok($r['status'] === 200 && $a2['status'] === 'cancelled' && $a2['cancelled_at'] !== null, 'cancelada: la cita queda «cancelled»');
     T::eq(Db::value('SELECT stage FROM leads WHERE id = ?', [$lead['id']]), 'qualified', '  la etapa vuelve a Calificado');
-    T::ok($count('tasks', 'deleted_at IS NULL') === 0 && $count('jobs', "type = 'appointment_reminder' AND status = 'pending'") === 0, '  la tarea se borra y no quedan recordatorios pendientes');
+    T::ok($count('tasks', 'deleted_at IS NULL AND kind IS NULL') === 0 && $count('jobs', "type = 'appointment_reminder' AND status = 'pending'") === 0, '  la tarea se borra y no quedan recordatorios pendientes');
     $pg = $ap->get('/tareas?tab=upcoming');
     T::ok(!str_contains($pg['body'], 'Agendada'), '  /tareas ya no la lista');
     $r = $cal($mk('BOOKING_CANCELLED', 'bkg-BBBB22', $start2, time() + 0));
@@ -297,7 +297,7 @@ return static function (array $ctx): void {
     $cal($mk('BOOKING_CANCELLED', 'bkg-CCCC33', $start, $c1 + 50, ['email' => 'ooo.cal@example.com', 'name' => 'Orden Inverso']));
     $r = $cal($mk('BOOKING_CREATED', 'bkg-CCCC33', $start, $c1, ['email' => 'ooo.cal@example.com', 'name' => 'Orden Inverso']));
     $o = Db::one("SELECT * FROM appointments WHERE calcom_id = 'bkg-CCCC33'");
-    T::ok($o['status'] === 'cancelled' && json_decode($r['body'], true)['status'] === 'stale' && $count('tasks', 'deleted_at IS NULL') === 0 && $count('jobs', "type = 'appointment_reminder' AND status = 'pending'") === 0, 'cancelar ANTES de crear (llegan al reves): el estado final es cancelada, sin tarea ni recordatorios');
+    T::ok($o['status'] === 'cancelled' && json_decode($r['body'], true)['status'] === 'stale' && $count('tasks', 'deleted_at IS NULL AND kind IS NULL') === 0 && $count('jobs', "type = 'appointment_reminder' AND status = 'pending'") === 0, 'cancelar ANTES de crear (llegan al reves): el estado final es cancelada, sin tarea ni recordatorios');
     $cal($mk('BOOKING_RESCHEDULED', 'bkg-EEEE55', $start + 7200, $c1 + 50, ['email' => 'ooo2.cal@example.com', 'name' => 'Reprog Primero'], ['rescheduleUid' => 'bkg-DDDD44']));
     $r = $cal($mk('BOOKING_CREATED', 'bkg-DDDD44', $start, $c1, ['email' => 'ooo2.cal@example.com', 'name' => 'Reprog Primero']));
     T::ok($count('appointments', "lead_id = " . (int) Db::value("SELECT id FROM leads WHERE email = 'ooo2.cal@example.com'")) === 1 && json_decode($r['body'], true)['status'] === 'stale', 'reprogramar ANTES de crear: una sola cita y el «creada» llega obsoleto');

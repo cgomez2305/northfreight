@@ -307,7 +307,7 @@ return static function (array $ctx): void {
     Db::pdo()->exec('DELETE FROM jobs');
     $t0 = Clock::time();
     $tk = LeadIngest::handle($payload('4001', ['truck_count' => 11]), 'web_careers');
-    $task = Db::one('SELECT * FROM tasks WHERE lead_id = ?', [$tk['lead_id']]);
+    $task = Db::one('SELECT * FROM tasks WHERE lead_id = ? AND kind IS NULL', [$tk['lead_id']]);
     T::ok($task !== null && $task['title'] === 'Llamar a Ana 4001 (Owner-operator)' && abs((int) Clock::parse($task['due_at']) - ($t0 + 7200)) <= 3 && (int) $task['priority'] === 1, 'tarea de regla: se crea con las variables resueltas, vence en 2 h y con la prioridad pedida');
     T::ok($count('lead_events', "lead_id = ? AND type = 'task_created'", [$tk['lead_id']]) === 1, '  y queda el evento task_created');
     $tkLead = Lead::find((int) $tk['lead_id']);
@@ -315,7 +315,7 @@ return static function (array $ctx): void {
     T::eq([Catalog::label(Catalog::FLAGS, 'tag:revisar-fmcsa'), Catalog::label(Catalog::FLAGS, 'review_queue')], ['Etiqueta: revisar-fmcsa', 'Por revisar'], '  con etiquetas legibles en el panel');
     LeadIngest::rescore((int) $tk['lead_id']);
     LeadIngest::rescore((int) $tk['lead_id']);
-    T::eq($count('tasks', 'lead_id = ?', [$tk['lead_id']]), 1, 'tarea de regla: recalcular no crea otra (deduplicada por regla, lead e intento)');
+    T::eq($count('tasks', 'lead_id = ? AND kind IS NULL', [$tk['lead_id']]), 1, 'tarea de regla: recalcular no crea otra (deduplicada por regla, lead e intento)');
     // Retirar la regla y recalcular: las banderas de reglas se quitan
     RuleSets::unpublish($rt, $uid);
     LeadIngest::rescore((int) $tk['lead_id']);

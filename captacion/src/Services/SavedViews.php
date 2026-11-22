@@ -24,13 +24,15 @@ final class SavedViews
         'discarded'      => ['name' => 'Descartados', 'icon' => 'flag', 'pin' => true],
         'presented_wait' => ['name' => 'Presentados sin respuesta', 'icon' => 'send', 'pin' => false],
         'review'         => ['name' => 'Por revisar', 'icon' => 'eye', 'pin' => false],   // Q5b: cola de revision de las reglas
+        'mine'           => ['name' => 'Mis leads', 'icon' => 'user', 'pin' => true],     // AM: abiertos y asignados a quien mira (rs=me se resuelve con LeadQuery::forUser)
+        'sla'            => ['name' => 'SLA vencido', 'icon' => 'clock', 'pin' => false], // AM: sin primer contacto y con el plazo vencido
     ];
     /** Pantallas (modos) en que se puede abrir una vista: clave => ruta. */
     public const SCREENS = ['leads' => '/leads', 'pipeline' => '/pipeline', 'tabla' => '/tabla', 'calendario' => '/calendario', 'cronologia' => '/cronologia'];
     /** Modo de la vista guardada (valor de la columna `mode` y de Prefs::MODES) => pantalla. */
     public const MODE_SCREEN = ['lista' => 'leads', 'tablero' => 'pipeline', 'tabla' => 'tabla', 'calendario' => 'calendario', 'cronologia' => 'cronologia'];
     /** Claves de la URL que forman una vista (los filtros de LeadQuery). */
-    private const FILTER_KEYS = ['t', 'pf', 'src', 'st', 'eq', 'us', 'lg', 'from', 'to', 'q', 'ct', 'fl', 'nt', 'op', 'hs'];
+    private const FILTER_KEYS = ['t', 'pf', 'src', 'st', 'eq', 'us', 'lg', 'from', 'to', 'q', 'ct', 'fl', 'nt', 'op', 'hs', 'rs', 'sla'];
 
     /** @return array<string,string> */
     private static function systemFilters(string $key): array
@@ -42,6 +44,8 @@ final class SavedViews
             'discarded'      => ['t' => 'disqualified'],
             'presented_wait' => ['hs' => 'wait'],
             'review'         => ['fl' => 'review_queue'],
+            'mine'           => ['rs' => 'me', 'op' => '1'],
+            'sla'            => ['sla' => '1'],
             default          => [],
         };
     }

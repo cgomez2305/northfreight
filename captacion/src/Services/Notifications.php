@@ -32,6 +32,16 @@ final class Notifications
                 'href' => '/leads?t=hot&ct=none',
             ];
         }
+        // AM: leads con el plazo de primer contacto vencido que le tocan a este usuario (los suyos y los que no tienen responsable)
+        $sla = Sla::overdueFor($userId);
+        if ($sla['n'] > 0) {
+            $secs = $sla['oldest'] !== null ? max(0, Clock::time() - (int) Clock::parse((string) $sla['oldest']) - Sla::minutes() * 60) : null;
+            $items[] = [
+                'key' => 'sla_overdue:' . $sla['n'] . ':' . $sla['max_id'], 'kind' => 'hot',
+                'title' => $sla['n'] === 1 ? '1 lead con el plazo de primer contacto vencido' : $sla['n'] . ' leads con el plazo de primer contacto vencido',
+                'meta' => $secs !== null ? 'El más antiguo venció hace ' . Fmt::dur($secs) : 'Sin primer contacto', 'href' => '/leads?sla=1',
+            ];
+        }
         $failed = (int) Db::value("SELECT COUNT(*) FROM jobs WHERE status = 'failed'");
         if ($failed > 0) {
             $last = Db::one("SELECT id, type, last_error FROM jobs WHERE status = 'failed' ORDER BY id DESC LIMIT 1");

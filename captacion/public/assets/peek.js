@@ -106,6 +106,10 @@
   else { field = $('#pk-call-o', body); fields = { outcome: field.value, minutes: $('#pk-call-m', body).value, note: $('#pk-call-n', body).value }; }
   sv.disabled = true; NS.act(cur, kind, fields).then(function (j) { sv.disabled = false; if (j.ok) reload(); });
  });
+ body.addEventListener('change', function (e) {
+  var a = e.target.closest ? e.target.closest('[data-pk-assign]') : null; if (!a) return;
+  a.disabled = true; NS.act(cur, 'assign', { to: a.value }).then(function () { a.disabled = false; reload(); });
+ });
  D.addEventListener('ns:lead-action', function (e) {
   if (!isOpen() || !cur || e.detail.leadId !== cur) return;
   var kind = e.detail.act; if (kind === 'responded') return;

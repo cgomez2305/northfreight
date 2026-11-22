@@ -37,6 +37,7 @@ final class JobHandlers
             'telegram_notice'         => [self::class, 'telegramNotice'],
             'rule_alert'              => [RuleEffects::class, 'jobAlert'],
             'rule_simulate'           => [RuleSim::class, 'jobStep'],
+            'sla_breach'              => [Sla::class, 'jobBreach'],
         ];
     }
 

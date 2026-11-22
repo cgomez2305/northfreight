@@ -71,8 +71,8 @@ final class Kanban
         $order = $stage === 'lost' ? 'l.lost_at DESC, l.id DESC' : 'l.score DESC, l.id DESC';
         $rows = Db::all(
             "SELECT l.id, l.first_name, l.last_name, l.profile, l.pipeline, l.stage, l.state, l.equipment_types, l.truck_count, l.score, l.temperature, l.flags, l.lost_reason, l.lost_at,
-                    l.source, l.created_at, l.language, COALESCE(l.stage_changed_at, l.created_at) AS in_stage_since
-               FROM leads l WHERE $base ORDER BY $order LIMIT " . (self::PAGE + 1) . ' OFFSET ' . max(0, $offset),
+                    l.source, l.created_at, l.language, COALESCE(l.stage_changed_at, l.created_at) AS in_stage_since, l.assigned_to, l.first_contact_at, l.stage_changed_at, au.name AS assignee
+               FROM leads l LEFT JOIN users au ON au.id = l.assigned_to WHERE $base ORDER BY $order LIMIT " . (self::PAGE + 1) . ' OFFSET ' . max(0, $offset),
             $params
         );
         $hasMore = count($rows) > self::PAGE;
@@ -85,8 +85,8 @@ final class Kanban
     {
         $rows = Db::all(
             "SELECT l.id, l.first_name, l.last_name, l.profile, l.pipeline, l.stage, l.state, l.equipment_types, l.truck_count, l.score, l.temperature, l.flags, l.lost_reason, l.lost_at,
-                    l.source, l.created_at, COALESCE(l.stage_changed_at, l.created_at) AS in_stage_since
-               FROM leads l WHERE l.id = ? AND l.deleted_at IS NULL",
+                    l.source, l.created_at, COALESCE(l.stage_changed_at, l.created_at) AS in_stage_since, l.assigned_to, l.first_contact_at, l.stage_changed_at, au.name AS assignee
+               FROM leads l LEFT JOIN users au ON au.id = l.assigned_to WHERE l.id = ? AND l.deleted_at IS NULL",
             [$leadId]
         );
         return $rows ? self::decorate($rows)[0] : null;

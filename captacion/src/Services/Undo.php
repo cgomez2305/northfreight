@@ -3,7 +3,7 @@
  * «Deshacer» (Q5a-G): avisos con un boton de 6 s para las acciones reversibles. El servidor emite un token firmado (HMAC con APP_KEY, atado al usuario y con caducidad de 10 min) que describe
  * QUE se deshace; el cliente solo lo devuelve. Al aplicarlo se vuelven a validar las condiciones actuales (el lead sigue en la etapa, la tarea sigue hecha, la nota sigue borrada),
  * con las mismas funciones que el resto del panel, y queda evento en el historial. Reversibles: cambio de etapa (individual, tablero y masivo; no el que genera una entrega a NorthStar),
- * completar una tarea, mover o posponer una tarea (calendario) y borrar una nota.
+ * completar una tarea, mover o posponer una tarea (calendario), borrar una nota y asignar un responsable (AM: individual o masivo; solo si el lead sigue con quien se puso).
  */
 
 declare(strict_types=1);
@@ -44,6 +44,16 @@ final class Undo
             }
         }
         return $items ? self::sign('bulk', $userId, ['i' => $items]) : null;
+    }
+
+    /** Asignacion de responsable (individual o masiva); null si no cambio nada. @param list<array{0:int,1:int,2:int}> $changes [lead, antes (0 = nadie), despues (0 = nadie)] */
+    public static function assign(int $userId, array $changes): ?string
+    {
+        $items = [];
+        foreach (array_slice($changes, 0, 200) as $c) {
+            $items[] = [(int) $c[0], (int) $c[1], (int) $c[2]];
+        }
+        return $items ? self::sign('assign', $userId, ['i' => $items]) : null;
     }
 
     public static function task(int $userId, int $taskId): string
@@ -105,6 +115,8 @@ final class Undo
                     }
                 }
                 return ['ok' => $ok > 0, 'msg' => $ok . ($ok === 1 ? ' cambio deshecho' : ' cambios deshechos') . ($skip > 0 ? ' · ' . $skip . ' no se pudieron deshacer (ya habían cambiado)' : '') . '.', 'lead_ids' => $ids];
+            case 'assign':
+                return Assignment::undo((array) ($d['i'] ?? []), $userId);
             case 'task':
                 return Tasks::reopen((int) ($d['t'] ?? 0), $userId);
             case 'resched':

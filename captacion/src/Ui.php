@@ -37,6 +37,13 @@ final class Ui
         return '<span class="av' . ($size !== '' ? ' av--' . self::e($size) : '') . '" aria-hidden="true">' . self::e(Fmt::initials($name)) . '</span>';
     }
 
+    /** Indicador del plazo de primer contacto (AM): punto de 6 px + texto («vence en 23 min» / «vencido hace 2 h»); nunca solo color. @param array{late:bool,secs:int,label:string} $s de Sla::status */
+    public static function sla(array $s): string
+    {
+        $cls = $s['late'] ? 'late' : ($s['secs'] <= 900 ? 'soon' : 'ok');
+        return '<span class="sla sla--' . $cls . '"><i class="dot" aria-hidden="true"></i><span class="sr">Plazo de primer contacto: </span>' . self::e($s['label']) . '</span>';
+    }
+
     public static function score(int $score, string $temp): string
     {
         $cls = $temp === 'disqualified' ? 'dq' : $temp;

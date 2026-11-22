@@ -48,7 +48,7 @@ return static function (array $ctx): void {
     $q2b->exec("INSERT INTO referrals (referral_code_id, lead_id) VALUES (1, 1)");
     $q2b->exec("INSERT INTO job_postings (title, slug, valid_through, is_active) VALUES ('Driver viejo', 'driver-viejo', '2027-01-01', 1)");
     $newOnes = Migrator::run($q2b, $dir);
-    T::eq($newOnes, ['006_handoff', '007_viewer_reports', '008_comms', '009_prospects_referrals_jobs', '010_channels', '011_ux_prefs_views', '012_rules', '013_lead_modes'], 'sobre la base de Q2b se aplican solo 006 a 013');
+    T::eq($newOnes, ['006_handoff', '007_viewer_reports', '008_comms', '009_prospects_referrals_jobs', '010_channels', '011_ux_prefs_views', '012_rules', '013_lead_modes', '015_responsable_sla'], 'sobre la base de Q2b se aplican solo 006 a 013 y 015');
     T::eq([$q2b->query('SELECT status FROM referrals WHERE id = 1')->fetchColumn(), $q2b->query("SELECT status FROM job_postings WHERE slug = 'driver-viejo'")->fetchColumn(), (int) $q2b->query('SELECT attempts FROM prospects_fmcsa')->fetchColumn(), $q2b->query('SELECT source FROM prospects_fmcsa')->fetchColumn()],
         ['referred', 'active', 1, 'socrata'], '  009 conserva las filas previas (el referido pasa de «new» a «referred», la vacante activa queda «active»)');
     T::eq([(int) $q2b->query('SELECT COUNT(*) FROM leads')->fetchColumn(), (int) $q2b->query('SELECT COUNT(*) FROM sequence_enrollments')->fetchColumn(), (int) $q2b->query('SELECT COUNT(*) FROM messages')->fetchColumn(), (int) $q2b->query('SELECT COUNT(*) FROM users')->fetchColumn()], [1, 1, 1, 1], '  y los datos existentes siguen ahi');
@@ -87,7 +87,7 @@ return static function (array $ctx): void {
     $q5a->exec("INSERT INTO leads (profile, first_name, last_name, source, stage, temperature, score) VALUES ('owner_operator', 'Real', 'Lead', 'web_careers', 'new', 'warm', 55)");
     $q5a->exec("INSERT INTO saved_views (user_id, name, filters) VALUES (1, 'Mi vista', '{\"t\":\"hot\"}')");
     $q5a->exec("INSERT INTO user_prefs (user_id, pkey, pvalue) VALUES (1, 'theme', 'dark')");
-    T::eq(Migrator::run($q5a, $dir), ['012_rules', '013_lead_modes'], '  sobre ella se aplican solo 012_rules y 013_lead_modes');
+    T::eq(Migrator::run($q5a, $dir), ['012_rules', '013_lead_modes', '015_responsable_sla'], '  sobre ella se aplican solo 012_rules, 013_lead_modes y 015_responsable_sla');
     T::eq([(int) $q5a->query('SELECT COUNT(*) FROM leads')->fetchColumn(), (int) $q5a->query('SELECT COUNT(*) FROM saved_views')->fetchColumn(), (int) $q5a->query('SELECT COUNT(*) FROM user_prefs')->fetchColumn(), $q5a->query('SELECT score FROM leads')->fetchColumn()], [1, 1, 1, 55], '  los datos de Q5a siguen ahi, sin cambios');
     T::eq(Migrator::run($q5a, $dir), [], '  repetirla no hace nada');
     $q5aTables = $q5a->query('SHOW TABLES')->fetchAll(PDO::FETCH_COLUMN);
@@ -136,7 +136,7 @@ return static function (array $ctx): void {
     $q5b->exec("INSERT INTO tasks (title, lead_id, due_at) VALUES ('Llamar', 1, '2026-11-10 14:00:00')");
     $q5b->exec("INSERT INTO lead_events (lead_id, type, payload) VALUES (1, 'created', '{}')");
     $q5b->exec("INSERT INTO jobs (type, payload, run_at) VALUES ('handoff_deliver', '{}', '2026-11-10 14:00:00')");
-    T::eq(Migrator::run($q5b, $dir), ['013_lead_modes'], 'sobre la base de Q5b se aplica solo 013_lead_modes');
+    T::eq(Migrator::run($q5b, $dir), ['013_lead_modes', '015_responsable_sla'], 'sobre la base de Q5b se aplican solo 013_lead_modes y 015_responsable_sla');
     T::eq([(int) $q5b->query('SELECT COUNT(*) FROM leads')->fetchColumn(), (int) $q5b->query('SELECT COUNT(*) FROM tasks')->fetchColumn(), (int) $q5b->query('SELECT COUNT(*) FROM lead_events')->fetchColumn(), (int) $q5b->query('SELECT COUNT(*) FROM jobs')->fetchColumn(), $q5b->query('SELECT sort FROM saved_views')->fetchColumn(), $q5b->query('SELECT mode FROM saved_views')->fetchColumn()],
         [1, 1, 1, 1, 'score', null], '  los datos previos siguen y la vista guardada antigua queda «sin modo» (se abre en la pantalla actual)');
     T::eq(Migrator::run($q5b, $dir), [], '  repetirla no hace nada');

@@ -14,7 +14,7 @@
 .tbl tr[data-peek]{cursor:pointer}
 .tbl tr.is-cur td,.tbl tr.is-open td{background:var(--accent-tint)}
 .c-tk{white-space:nowrap}
-[data-hide~=prof] .k-prof,[data-hide~=st] .k-st,[data-hide~=eq] .k-eq,[data-hide~=pts] .k-pts,[data-hide~=temp] .k-temp,[data-hide~=stage] .k-stage,[data-hide~=src] .k-src,[data-hide~=when] .k-when,[data-hide~=task] .k-task{display:none}
+[data-hide~=prof] .k-prof,[data-hide~=st] .k-st,[data-hide~=eq] .k-eq,[data-hide~=pts] .k-pts,[data-hide~=temp] .k-temp,[data-hide~=stage] .k-stage,[data-hide~=src] .k-src,[data-hide~=when] .k-when,[data-hide~=task] .k-task,[data-hide~=resp] .k-resp{display:none}
 html[data-density=compact] .tbl--leads td,html[data-density=compact] .tbl--leads th{height:44px;padding-top:4px;padding-bottom:4px}
 html[data-density=compact] .tbl--leads .av{width:28px;height:28px;font-size:11px}
 .dot--ok{background:var(--ok-dot)}

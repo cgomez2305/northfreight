@@ -139,3 +139,4 @@
 .q3a{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.q3l{display:grid;gap:14px}.q3l li{display:grid;gap:3px}
 .scorel__rh{margin:14px 0 8px}
 @media (max-width:760px){.contact dd a{display:inline-block;padding:12px 0}}
+.lead__back{margin:0 0 8px;font-size:var(--fs-sm)}.lead__back .ic{width:14px;height:14px;vertical-align:-2px;margin-right:4px}

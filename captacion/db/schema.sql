@@ -825,12 +825,22 @@ CREATE TABLE IF NOT EXISTS rule_simulation_rows (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ===== 013_lead_modes.sql =====
--- 013_lead_modes: fase Q5c (vistas Tabla, Calendario y Cronología). Idempotente (IF NOT EXISTS: MariaDB 10.1+; se puede repetir sin daño).
+-- 013_lead_modes: fase Q5c (vistas Tabla, Calendario y Cronología). SQL estándar (MariaDB y MySQL 8); el migrador registra la versión y no la repite.
 -- 1) Una vista guardada recuerda también el modo (lista, tablero, tabla, calendario o cronología). NULL = la pantalla en la que se abre.
-ALTER TABLE saved_views ADD COLUMN IF NOT EXISTS mode VARCHAR(12) NULL AFTER pipeline;
+ALTER TABLE saved_views ADD COLUMN mode VARCHAR(12) NULL AFTER pipeline;
 -- 2) Cronología global: los eventos de todos los leads por fecha (desc) con cursor (created_at, id); sin este índice cada página recorrería la tabla entera.
-ALTER TABLE lead_events ADD KEY IF NOT EXISTS idx_events_created (created_at, id);
+ALTER TABLE lead_events ADD KEY idx_events_created (created_at, id);
 -- 3) Calendario por rango visible: tareas por fecha de vencimiento (hechas o no) y entregas programadas (jobs pendientes por tipo y hora).
-ALTER TABLE tasks ADD KEY IF NOT EXISTS idx_tasks_due_range (deleted_at, due_at);
-ALTER TABLE jobs ADD KEY IF NOT EXISTS idx_jobs_type_run (type, status, run_at);
+ALTER TABLE tasks ADD KEY idx_tasks_due_range (deleted_at, due_at);
+ALTER TABLE jobs ADD KEY idx_jobs_type_run (type, status, run_at);
+
+-- ===== 015_responsable_sla.sql =====
+-- 015_responsable_sla: fase AM-operacion. SQL estándar (MariaDB 10.11 y MySQL 8); el migrador registra la versión y no la repite.
+-- 1) Responsable del lead: id del usuario (admin activo) a cargo. NULL = sin asignar. Sin FK a propósito: si un usuario se borra, el lead queda "sin asignar" por la lógica
+--    de la aplicación (Assignment::assignable) y no se bloquea el borrado. El índice cubre «Mis leads» y los filtros por responsable.
+ALTER TABLE leads ADD COLUMN assigned_to BIGINT UNSIGNED NULL AFTER external_crm_id;
+ALTER TABLE leads ADD KEY idx_leads_assigned (assigned_to, deleted_at);
+-- 2) Tipo de una tarea creada por el sistema (p. ej. 'sla_first_contact': «Primer contacto con …»); NULL = tarea normal. Sirve para no duplicarla y para cerrarla sola al contactar.
+ALTER TABLE tasks ADD COLUMN kind VARCHAR(24) NULL AFTER priority;
+ALTER TABLE tasks ADD KEY idx_tasks_kind (kind, lead_id);
 

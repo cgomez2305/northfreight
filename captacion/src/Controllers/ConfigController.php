@@ -131,7 +131,8 @@ final class ConfigController extends Responder
                 'provPending' => ScoringConfig::provisionalList(), 'history' => ScoringConfig::history(), 'defaults' => Scoring::DEFAULTS, 'provErrors' => [], 'provForm' => null,
                 'pending' => (int) Db::value('SELECT COUNT(*) FROM leads WHERE deleted_at IS NULL') <= 20000 ? ScoringConfig::preview(Scoring::settings()) : null,
             ],
-            'alertas'       => ['alerts' => Alerts::get(), 'warmOn' => Alerts::warmTelegram(), 'fmcsaKey' => Alerts::fmcsaKey(), 'tgOk' => \Captacion\Services\Telegram::configured(), 'envMail' => (string) \Captacion\Env::get('MAIL_TO', '')],
+            'alertas'       => ['alerts' => Alerts::get(), 'warmOn' => Alerts::warmTelegram(), 'fmcsaKey' => Alerts::fmcsaKey(), 'tgOk' => \Captacion\Services\Telegram::configured(), 'envMail' => (string) \Captacion\Env::get('MAIL_TO', ''),
+                'sla' => \Captacion\Services\Sla::config(), 'assign' => \Captacion\Services\Assignment::config(), 'admins' => \Captacion\Services\Assignment::admins()],
             'costos'        => self::costsVars(),
             'integraciones' => ['cards' => Integrations::status(), 'testResult' => self::takeTestResult(), 'testUsdot' => Integrations::TEST_USDOT],
             'horario'       => ['zones' => Display::ZONES, 'tz' => Display::timezone(), 'hours' => Display::hours()],
@@ -266,13 +267,24 @@ final class ConfigController extends Responder
     {
         $back = self::guardPost('alertas');
         $v = Alerts::validate($_POST);
-        if (!$v['ok']) {
+        // AM: el formulario nuevo trae el marcador am_form; un POST antiguo (sin el) no toca el plazo de primer contacto ni el reparto
+        $am = ($_POST['am_form'] ?? '') === '1';
+        $vs = $am ? \Captacion\Services\Sla::validate($_POST) : ['ok' => true, 'errors' => [], 'values' => \Captacion\Services\Sla::config()];
+        $va = $am ? \Captacion\Services\Assignment::validate($_POST) : ['ok' => true, 'errors' => [], 'values' => \Captacion\Services\Assignment::config()];
+        $errors = $v['errors'] + $vs['errors'] + $va['errors'];
+        if ($errors) {
             self::flash(false, 'Revisa los campos marcados. No se guardó nada.');
-            self::index($user, ['alerts' => $v['values'], 'errors' => $v['errors']], 422, 'alertas');
+            self::index($user, ['alerts' => $v['values'], 'sla' => $vs['values'], 'assign' => $va['values'], 'errors' => $errors], 422, 'alertas');
         }
         $before = Alerts::get();
+        $beforeSla = \Captacion\Services\Sla::config();
+        $beforeAssign = \Captacion\Services\Assignment::config();
         Settings::set('alerts', $v['values']);
+        \Captacion\Services\Sla::save($vs['values']);
+        Settings::set(\Captacion\Services\Assignment::KEY, $va['values']);
         $changed = ActivityLog::settingsChange((int) $user['id'], 'alerts', $before, Alerts::get());
+        $changed = ActivityLog::settingsChange((int) $user['id'], 'sla', $beforeSla, \Captacion\Services\Sla::config()) || $changed;
+        $changed = ActivityLog::settingsChange((int) $user['id'], 'assign', array_diff_key($beforeAssign, ['last' => 1]), array_diff_key(\Captacion\Services\Assignment::config(), ['last' => 1])) || $changed;
         self::flash(true, $changed ? 'Alertas guardadas. Se aplican a partir de ahora.' : 'No había cambios que guardar.');
         self::redirect($back);
     }

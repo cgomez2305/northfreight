@@ -308,7 +308,7 @@ return static function (array $ctx): void {
     $c0 = count($mails());
     $out = Infra::cli([$ctx['root'] . '/cron/reports_cron.php', '--now=2026-12-07T09:00'], ['CAPTACION_ENV_FILE' => $envFile]);
     $out2 = Infra::cli([$ctx['root'] . '/cron/reports_cron.php', '--now=2026-12-07T09:30'], ['CAPTACION_ENV_FILE' => $envFile]);
-    T::ok($out['code'] === 0 && str_contains($out['out'], 'enviado 2026-W49') && $out2['code'] === 0 && str_contains($out2['out'], 'ya enviado') && count($mails()) === $c0 + 1, 'cron/reports_cron.php por CLI: envía una vez y la segunda pasada no repite');
+    T::ok($out['code'] === 0 && str_contains($out['out'], 'enviado 2026-W49') && $out2['code'] === 0 && str_contains($out2['out'], 'ya enviado') && count($mails()) === $c0 + 2, 'cron/reports_cron.php por CLI: envía una vez y la segunda pasada no repite (el +2 es el resumen semanal y el resumen diario de las 8:00 de AM, que también va una sola vez)');
     T::ok(Settings::get('cron.reports') !== null || (int) Db::value("SELECT COUNT(*) FROM settings WHERE `key` = 'cron.reports'") === 1, '  y deja la marca de la última pasada');
     Infra::stop('panel20');
     Infra::stop('smtp20');

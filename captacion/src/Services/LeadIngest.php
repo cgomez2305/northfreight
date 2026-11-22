@@ -179,6 +179,7 @@ final class LeadIngest
         if (!$quiet) {
             if ($reopen) {
                 self::enqueueFor($leadId, $scored['temperature'], $attempt);
+                self::slaTask($merged + ['id' => $leadId]);
             } else {
                 if ($scored['temperature'] === 'hot' && $existing['temperature'] !== 'hot') {
                     self::enqueueFor($leadId, 'hot', $attempt);
@@ -205,12 +206,13 @@ final class LeadIngest
 
         $row = $lead;
         unset($row['consent']);
+        $assignee = $quiet ? null : self::autoAssignee();   // AM: reparto automatico opcional (apagado por defecto); las altas quiet (importaciones, alta manual) no se reparten
         $row += [
             'score' => $scored['score'], 'temperature' => $scored['temperature'], 'score_breakdown' => $scored['breakdown'], 'disqualified_reason' => $scored['disqualified_reason'],
             'pipeline' => $lead['profile'] === 'company_driver' ? 'B' : 'A', 'stage' => 'new', 'attempt' => 1,
             'fmcsa_data' => $fm, 'fmcsa_checked_at' => $fm !== null ? $now : null, 'flags' => $flags,
             'updated_at' => $now,
-        ];
+        ] + ($assignee !== null ? ['assigned_to' => $assignee] : []);
         $leadId = Db::insert('leads', $row);
         if ($lead['referral_code'] !== null) {
             Referrals::attach($leadId, $lead['referral_code']);
@@ -231,8 +233,12 @@ final class LeadIngest
         if ($scored['temperature'] === 'disqualified') {
             self::event($leadId, 'disqualified', ['reasons' => $scored['breakdown']['disqualified']]);
         }
+        if ($assignee !== null) {
+            self::event($leadId, 'assigned', array_filter(['to' => $assignee, 'to_name' => Assignment::name($assignee), 'auto' => true]));
+        }
         if (!$quiet) {
             self::enqueueFor($leadId, $scored['temperature'], 1);
+            self::slaTask($row + ['id' => $leadId]);
         }
         if ($fmPending) {
             Queue::push('fmcsa_enrich', ['lead_id' => $leadId], $now, 'fmcsa_enrich:' . $leadId . ':' . $lead['usdot']);
@@ -266,6 +272,27 @@ final class LeadIngest
                     Storage::error('enrollWarm failed', get_class($t) . ': ' . $t->getMessage());
                 }
             }
+        }
+    }
+
+    /** Responsable del reparto automatico (AM) o null; nunca rompe la alta del lead. */
+    private static function autoAssignee(): ?int
+    {
+        try {
+            return Assignment::pickNext();
+        } catch (\Throwable $t) {
+            Storage::error('auto assign failed', get_class($t) . ': ' . $t->getMessage());
+            return null;
+        }
+    }
+
+    /** Tarea «Primer contacto con …» (AM, solo con sla.auto_task); nunca rompe la alta del lead. */
+    private static function slaTask(array $lead): void
+    {
+        try {
+            Sla::ensureTask($lead);
+        } catch (\Throwable $t) {
+            Storage::error('sla task failed', get_class($t) . ': ' . $t->getMessage());
         }
     }
 

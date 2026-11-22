@@ -62,7 +62,7 @@ final class Telegram
     }
 
     /**
-     * Texto de la alerta de un lead (HTML de Telegram). $kind: 'hot' | 'warm' | 'followup' | 'signed_reentry'; $minutes = espera de la segunda alerta.
+     * Texto de la alerta de un lead (HTML de Telegram). $kind: 'hot' | 'warm' | 'followup' | 'sla' | 'signed_reentry'; $minutes = espera de la segunda alerta.
      * Lleva: nombre, perfil, estado, equipo, puntuacion, fuente, pagina de llegada, enlace tel: y enlace al lead en el panel.
      */
     public static function leadText(array $lead, string $kind, ?int $minutes = null): string
@@ -73,6 +73,7 @@ final class Telegram
         $equipment = self::equipment($lead);
         $head = match ($kind) {
             'followup'       => 'SIN CONTACTO tras ' . ($minutes ?? 15) . ' min: lead caliente',
+            'sla'            => 'PLAZO VENCIDO: sin primer contacto tras ' . ($minutes ?? 60) . ' min',
             'warm'           => 'Lead TIBIO',
             'signed_reentry' => 'Un lead ya FIRMADO volvio a escribir',
             default          => 'Lead CALIENTE',
@@ -82,6 +83,7 @@ final class Telegram
             '<b>' . self::e($name !== '' ? $name : 'Sin nombre') . '</b> (' . self::e($profiles[$lead['profile'] ?? ''] ?? '?') . ')',
             'Estado: ' . self::e($lead['state'] ?? '-') . ' | Equipo: ' . self::e($equipment !== '' ? $equipment : '-'),
             'Puntuacion: ' . self::e($lead['score'] ?? 0) . '/100',
+            ...(!empty($lead['assignee']) ? ['Responsable: ' . self::e($lead['assignee'])] : []),
             'Fuente: ' . self::e($lead['source'] ?? '-') . ' | Llego por: ' . self::e($lead['landing_page'] ?? '-'),
             ...(self::redFlags($lead) !== '' ? ['<b>Banderas rojas:</b> ' . self::e(self::redFlags($lead))] : []),
             $phone !== '' ? 'Llamar: <a href="tel:' . self::e($phone) . '">' . self::e($phone) . '</a>' : 'Sin telefono valido',

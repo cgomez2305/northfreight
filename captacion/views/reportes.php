@@ -75,4 +75,22 @@ $grp = static function (array $rows, string $first, callable $name): string {
   <section class="card card--table" aria-labelledby="r-st"><header class="card__h"><h2 class="label" id="r-st">Por estado de EE. UU.</h2><?= $exp('estados', 'Estados') ?></header><?= $grp($m['states'], 'Estado', static fn($k) => $k) ?></section>
 </div>
 
+<section class="card card--table" aria-labelledby="r-as">
+  <header class="card__h"><h2 class="label" id="r-as">Por responsable</h2><?= $exp('responsables', 'Por responsable') ?></header>
+  <div class="tw"><table class="tbl tbl--rep">
+    <caption class="sr">Leads recibidos en el rango, por responsable: contacto, plazo, etapas alcanzadas y tareas vencidas</caption>
+    <thead><tr><th scope="col">Responsable</th><th scope="col" class="num-c">Leads asignados</th><th scope="col" class="num-c">Contactados</th><th scope="col" class="num-c">Mediana a primer contacto</th><th scope="col" class="num-c">Dentro del plazo</th><th scope="col" class="num-c">Calificados</th><th scope="col" class="num-c">Presentados</th><th scope="col" class="num-c">Firmados</th><th scope="col" class="num-c">Tareas vencidas</th></tr></thead>
+    <tbody>
+    <?php foreach ($m['assignees'] ?? [] as $as): ?>
+      <tr><th scope="row" class="c-n"><?= $e($as['label']) ?></th><td class="num-c" data-l="Leads asignados"><?= $e($as['leads']) ?></td><td class="num-c" data-l="Contactados"><?= $e($as['contacted']) ?></td>
+        <td class="num-c" data-l="Mediana a primer contacto"><?= $as['median'] !== null ? $e(Fmt::dur($as['median'])) : '—' ?></td>
+        <td class="num-c" data-l="Dentro del plazo"><?= $as['sla_pct'] !== null ? $e(Fmt::pct((float) $as['sla_pct'], 0)) . ' <small class="muted">(' . $e($as['sla_ok']) . ' de ' . $e($as['sla_total']) . ')</small>' : '—' ?></td>
+        <td class="num-c" data-l="Calificados"><?= $e($as['qualified']) ?></td><td class="num-c" data-l="Presentados"><?= $e($as['presented']) ?></td><td class="num-c" data-l="Firmados"><?= $e($as['signed']) ?></td>
+        <td class="num-c<?= $as['overdue'] > 0 ? ' late' : '' ?>" data-l="Tareas vencidas"><?= $e($as['overdue']) ?></td></tr>
+    <?php endforeach; ?>
+    <?php if (empty($m['assignees'])): ?><tr><td colspan="9" class="muted">Sin leads en el rango.</td></tr><?php endif; ?>
+    </tbody></table></div>
+  <p class="foot-note rep-note">«Dentro del plazo» usa el plazo de primer contacto vigente (Configuración &gt; Alertas) sobre los leads cuyo plazo ya terminó. Las tareas vencidas son las de hoy de los leads que tiene asignados. Solo administradores: el lector no ve esta tabla.</p>
+</section>
+
 <p class="foot-note rep-note">Definiciones: «recibidos» son los leads que llegaron en el rango; «calificados» los que llegaron a Calificado (o Precalificado); «firmados» los de esa cohorte con firma. La primera respuesta es la mediana entre la llegada y el primer contacto. Los costos se cargan por mes (Configuración &gt; Costos por canal) y solo se usan los meses completos del rango. <?= $m['hotwarm'] ?> de los <?= $m['received'] ?> recibidos tienen puntuación alta (caliente o tibio).</p>
