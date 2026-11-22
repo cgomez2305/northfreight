@@ -60,7 +60,6 @@ a.btn--primary:is(:hover, :focus-visible)::after, a.btn--navy:is(:hover, :focus-
 .hdr__island { position: relative; height: var(--hdr-h); display: flex; align-items: center; border: 1px solid var(--hairline); border-radius: var(--r-pill); pointer-events: auto; }
 .hdr__island::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none; background: var(--glass-bg); -webkit-backdrop-filter: blur(var(--glass-blur)); backdrop-filter: blur(var(--glass-blur)); }
 /* Al hacer scroll las islas pasan a vidrio más opaco: el texto de la página que pasa por debajo no compite con el de la cabecera */
-.is-scrolled .hdr__island::before { background: var(--glass-strong); }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .header .hdr__island::before { background: var(--panel); } }
 @media (prefers-reduced-transparency: reduce) { .header .hdr__island::before { background: var(--panel); -webkit-backdrop-filter: none; backdrop-filter: none; } }
 .hdr__brand { justify-self: start; padding: 0 20px 0 9px; }
@@ -111,18 +110,17 @@ a.btn--primary:is(:hover, :focus-visible)::after, a.btn--navy:is(:hover, :focus-
   .nav__burger:not(.nav__burger--link) { display: none; }
   .nav__burger--link { display: inline-flex; }
 }
-/* Compactación al hacer scroll (≥1025px; main.js pone .is-scrolled pasados ~80px): el logo se queda en el isotipo y la isla de acciones pierde el chip del reloj. Ancho animado solo en islas pequeñas y con altura fija: no mueve el contenido de la página */
-@media (min-width: 1025px) {
-  .hdr__brand, .hdr__act, .hdr__desk, .hdr__brand .logo__text { transition: padding .28s ease, max-width .28s ease, margin .28s ease, opacity .2s ease; }
-  .hdr__brand .logo__text { max-width: 190px; overflow: hidden; }
-  .hdr__desk { max-width: 260px; overflow: hidden; }
-  .is-scrolled .hdr__brand { padding-right: 9px; }
-  .is-scrolled .hdr__brand .logo { gap: 0; }
-  .is-scrolled .hdr__brand .logo__text { max-width: 0; opacity: 0; }
-  .is-scrolled .hdr__desk { max-width: 0; margin-right: 0; padding-left: 0; opacity: 0; }
-}
+/* Al hacer scroll (main.js pone .is-scrolled en el <header> pasados ~80px) las islas se funden en UNA sola barra de vidrio (el .hdr::before de fondo aparece y el fondo y el borde de cada isla se desvanecen): la cabecera deja de verse partida en trozos sueltos. El logo no se encoge y las posiciones no cambian, solo el vidrio; el desenfoque sigue en pseudo-elementos (nunca en .header) y solo hay uno activo a la vez. */
+.hdr { position: relative; }
+.hdr::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: var(--r-pill); border: 1px solid var(--hairline); pointer-events: none; background: var(--glass-strong); -webkit-backdrop-filter: blur(var(--glass-blur)); backdrop-filter: blur(var(--glass-blur)); opacity: 0; transition: opacity .28s ease; }
+.hdr__island, .hdr__island::before { transition: opacity .28s ease, border-color .28s ease; }
+.is-scrolled .hdr::before { opacity: 1; }
+.is-scrolled .hdr__island { border-color: transparent; }
+.is-scrolled .hdr__island::before { opacity: 0; }
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .header .hdr::before { background: var(--panel); } }
+@media (prefers-reduced-transparency: reduce) { .header .hdr::before { background: var(--panel); -webkit-backdrop-filter: none; backdrop-filter: none; } }
 @media (prefers-reduced-motion: reduce) {
-  .hdr__brand, .hdr__act, .hdr__desk, .hdr__brand .logo__text, .nav__pill, .nav__trigger .icon { transition: none !important; }
+  .hdr::before, .hdr__island, .hdr__island::before, .nav__pill, .nav__trigger .icon { transition: none !important; }
 }
 
 /* ---- Mega menús ---- */
