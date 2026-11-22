@@ -57,6 +57,11 @@
   .hero-pre .hero--home { margin-bottom: var(--pin-h, 100vh); }
 }
 
+/* Escritorio: el velo del hero (los tres degradados de arriba) va como UNA imagen con el mismo canal alfa (assets/img/hero-fade-home.png, 1280×720, color --bg, generada con las paradas de --hero-fade-left/-bottom/-top). Chromium tramea (dither) los degradados CSS con una rejilla regular de ±1 nivel que sobre el video oscuro se ve como un punteado fino; una imagen no la lleva. Si se cambian esos tokens hay que regenerarla. */
+@media (min-width: 1025px) {
+  .hero__bg::after { background: url("../../img/hero-fade-home.png") 0 0 / 100% 100% no-repeat; }
+}
+
 @media (min-width: 761px) and (max-width: 1024px) {
   .hero__bg::after { background: var(--hero-fade-top), var(--hero-fade-bottom), var(--hero-fade-tablet); }
 }
