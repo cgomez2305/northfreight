@@ -166,6 +166,9 @@ final class Db
         return is_array($d) ? $d : [];
     }
 
+    /** @var list<callable> callbacks que corren al terminar (commit o rollback) la transaccion externa */
+    private static array $onEnd = [];
+
     /** Ejecuta $fn dentro de una transaccion (reentrante: si ya hay una, solo la ejecuta). */
     public static function transaction(callable $fn): mixed
     {
@@ -177,12 +180,40 @@ final class Db
         try {
             $r = $fn();
             $pdo->commit();
-            return $r;
         } catch (\Throwable $t) {
             if ($pdo->inTransaction()) {
                 $pdo->rollBack();
             }
+            self::runOnEnd();
             throw $t;
+        }
+        self::runOnEnd();
+        return $r;
+    }
+
+    /**
+     * Fase AM: ejecuta $fn cuando termine la transaccion EXTERNA (despues del commit o del rollback); si no hay transaccion abierta, la ejecuta ya.
+     * Sirve para soltar bloqueos (GET_LOCK) solo cuando los datos protegidos ya son visibles para los demas.
+     */
+    public static function onEnd(callable $fn): void
+    {
+        if (self::pdo()->inTransaction()) {
+            self::$onEnd[] = $fn;
+            return;
+        }
+        $fn();
+    }
+
+    private static function runOnEnd(): void
+    {
+        $fns = self::$onEnd;
+        self::$onEnd = [];
+        foreach ($fns as $f) {
+            try {
+                $f();
+            } catch (\Throwable) {
+                // un fallo al soltar un bloqueo no debe tapar el resultado de la transaccion
+            }
         }
     }
 

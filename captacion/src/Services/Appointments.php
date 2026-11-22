@@ -223,6 +223,8 @@ final class Appointments
         self::cancelReminders($id);
         foreach (['24h' => 86400, '1h' => 3600] as $which => $sec) {
             if ($start - $sec > Clock::time()) {
+                // Fase AM: un recordatorio CANCELADO con la misma clave (A>B>A, o cancelar y reactivar) impedia reprogramarlo; se borra solo el cancelado
+                Db::run("DELETE FROM jobs WHERE type = 'appointment_reminder' AND status = 'cancelled' AND dedupe_key = ?", ['appt_rem:' . $id . ':' . $start . ':' . $which]);
                 Queue::push('appointment_reminder', ['appointment_id' => $id, 'which' => $which, 'starts_at' => $a['starts_at']], Clock::at($start - $sec), 'appt_rem:' . $id . ':' . $start . ':' . $which);
             }
         }
@@ -301,6 +303,10 @@ final class Appointments
         }
         if (!Sequences::enabled()) {
             $skip('mail_disabled');
+            return;
+        }
+        if (!Mailer::canDeliver()) {
+            $skip('no_smtp');   // fase AM: sin SMTP real no se cuenta como enviado (antes quedaba «reminder_sent» con status logged)
             return;
         }
         if ($lead['email'] === null || filter_var($lead['email'], FILTER_VALIDATE_EMAIL) === false) {

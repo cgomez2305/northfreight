@@ -128,6 +128,40 @@ final class RuleEngine
         return 'match';
     }
 
+    /**
+     * Fase AM: regla de «Eventos y tiempo». Sin condiciones CUANDO coincide siempre (el disparador ya es la condicion); EXCEPTO anula como en las demas.
+     * @return 'match'|'no_match'|'excepted'
+     */
+    public static function matchesEvent(array $rule, array $f): string
+    {
+        $w = $rule['when'] ?? null;
+        if (!empty($w['items']) && !self::block($w, $f)) {
+            return 'no_match';
+        }
+        if (!empty($rule['except']) && self::block($rule['except'], $f)) {
+            return 'excepted';
+        }
+        return 'match';
+    }
+
+    /**
+     * ¿El disparador de la regla corresponde a este suceso? Funcion PURA. $ctx: to (etapa nueva), channels (canales revocados; 'all' si fueron todos), hours (horas sin contacto), overdue_hours (horas de retraso de la tarea).
+     */
+    public static function triggerMatches(array $trigger, string $type, array $ctx): bool
+    {
+        if (($trigger['type'] ?? '') !== $type) {
+            return false;
+        }
+        $have = array_map('strval', (array) ($ctx['channels'] ?? []));   // canales revocados ('all' = todos)
+        return match ($type) {
+            'stage_change'     => ($trigger['to'] ?? '') === '' || ($trigger['to'] ?? '') === (string) ($ctx['to'] ?? ''),
+            'consent_revoked'  => ($trigger['channel'] ?? '') === '' || in_array((string) $trigger['channel'], $have, true) || in_array('all', $have, true),
+            'no_first_contact' => (float) ($ctx['hours'] ?? 0) >= (float) ($trigger['hours'] ?? 1),
+            'task_overdue'     => (float) ($ctx['overdue_hours'] ?? 0) >= (float) ($trigger['hours'] ?? 0),
+            default            => false,
+        };
+    }
+
     /** ¿Alguna regla de estos conjuntos mira el consentimiento? (para no consultarlo si nadie lo usa). */
     public static function usesField(array $sets, string $field): bool
     {

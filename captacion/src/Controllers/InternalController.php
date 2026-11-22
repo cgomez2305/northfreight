@@ -121,7 +121,7 @@ final class InternalController extends Responder
                     self::json(['ok' => false, 'error' => 'invalid_event', 'events' => N8nBridge::EVENTS], 422);
                 }
                 $res = Db::transaction(static function () use ($id, $body, $eid): array {
-                    $wid = Webhook::claim('n8n', Webhook::key('i', (string) $id, $eid));
+                    $wid = Webhook::claim('n8n', Webhook::key('i', (string) $id, $eid), null, null, true);   // fase AM: un evento que fallo se puede reintentar con el mismo event_id
                     if ($wid === null) {
                         return ['ok' => true, 'duplicate' => true];
                     }

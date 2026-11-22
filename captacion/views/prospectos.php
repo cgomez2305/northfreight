@@ -12,7 +12,7 @@ $nFilters = (int) ($f['q'] !== '') + (int) ($f['us'] !== '') + (int) ($f['fl'] !
 $qsBase = array_filter(['tab' => $f['tab'] !== 'today' ? $f['tab'] : null, 'q' => $f['q'] ?: null, 'us' => $f['us'] ?: null, 'fl' => $f['fl'] ?: null, 'ag' => $f['ag'] ?: null, 'ph' => $f['ph'] ?: null, 'per' => $per !== 25 ? $per : null], static fn($v) => $v !== null);
 $tabHref = static fn(string $tab): string => '/prospectos' . Ui::qs(array_merge(array_diff_key($qsBase, ['tab' => 1]), $tab !== 'today' ? ['tab' => $tab] : []));
 $tabHint = ['today' => 'Por llamar y reintentos que ya tocan', 'to_call' => 'Nunca llamados', 'no_answer' => 'Hasta 3 intentos sin respuesta', 'talked' => 'Hubo conversación', 'interested' => 'Quieren seguir; conviértelos en lead', 'not_interested' => 'Dijeron que no', 'dnc' => 'Permanente: nunca se vuelven a listar'];
-$todayEt = Fmt::et($now)->format('Y-m-d');
+$todayEt = \Captacion\Services\Prospects::etDay($now);   // el dia de las llamadas es por ET, no por la zona de visualizacion
 $ageLabel = static function (?string $granted) use ($now): string {
     if ($granted === null) {
         return 'Sin fecha';
@@ -171,12 +171,12 @@ $cronAt = is_array($cron) ? ($cron['at'] ?? null) : null;
           <summary>Nota y siguiente intento (opcional)</summary>
           <div class="pc__fields">
             <label class="field"><span>Nota</span><input type="text" name="note" maxlength="500" autocomplete="off" placeholder="Qué dijo, a qué hora llamar…"></label>
-            <label class="field"><span>Siguiente intento (<?= $e(Fmt::zone()) ?>)</span><input type="date" name="next" min="<?= $e($todayEt) ?>"></label>
+            <label class="field"><span>Siguiente intento (ET)</span><input type="date" name="next" min="<?= $e($todayEt) ?>"></label>
           </div>
         </details>
         <div class="pc__btns" role="group" aria-label="Registrar el resultado de la llamada a <?= $e($name) ?>">
           <?php foreach (Prospects::RESULTS as $k => $label): ?>
-            <button class="rbtn rbtn--<?= $e($k) ?>" type="submit" name="result" value="<?= $e($k) ?>"<?= $k === 'dnc' ? ' data-confirm="¿Marcar «' . $e($name) . '» como No llamar más? Es permanente: su teléfono no volverá a listarse."' : '' ?>><?= Ui::icon($resultIcon[$k]) ?><?= $e($label) ?></button>
+            <button class="rbtn rbtn--<?= $e($k) ?>" type="submit" name="result" value="<?= $e($k) ?>"<?= $k === 'dnc' ? ' data-confirm-title="¿No llamar más?" data-confirm-label="Marcar como no llamar" data-confirm-danger data-confirm="¿Marcar «' . $e($name) . '» como No llamar más? Es permanente: su teléfono no volverá a listarse."' : '' ?>><?= Ui::icon($resultIcon[$k]) ?><?= $e($label) ?></button>
           <?php endforeach; ?>
         </div>
       </form>
@@ -188,7 +188,7 @@ $cronAt = is_array($cron) ? ($cron['at'] ?? null) : null;
           <a class="btn btn--secondary btn--sm" href="/leads/<?= $e($r['converted_lead_id']) ?>">Ver lead #<?= $e($r['converted_lead_id']) ?></a>
         <?php else: ?>
           <form method="post" action="/prospectos/<?= $e($id) ?>/convert"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="back" value="<?= $e($back) ?>">
-            <button class="btn btn--secondary btn--sm" type="submit"<?= $r['status'] !== 'interested' ? ' data-confirm="¿Convertir a «' . $e($name) . '» en lead? Se crea en «Contactado», sin consentimiento de mensajes y sin alertas."' : '' ?>><?= Ui::icon('user-plus') ?>Convertir en lead</button></form>
+            <button class="btn btn--secondary btn--sm" type="submit"<?= $r['status'] !== 'interested' ? ' data-confirm-title="¿Convertir en lead?" data-confirm-label="Convertir" data-confirm="¿Convertir a «' . $e($name) . '» en lead? Se crea en «Contactado», sin consentimiento de mensajes y sin alertas."' : '' ?>><?= Ui::icon('user-plus') ?>Convertir en lead</button></form>
         <?php endif; ?>
         <?php if ($closed && !$conv): ?>
           <form method="post" action="/prospectos/<?= $e($id) ?>/reopen"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="back" value="<?= $e($back) ?>"><button class="btn btn--ghost btn--sm" type="submit"><?= Ui::icon('refresh') ?>Reabrir</button></form>

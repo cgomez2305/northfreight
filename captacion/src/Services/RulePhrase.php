@@ -80,9 +80,29 @@ final class RulePhrase
         return implode($join, $parts);
     }
 
+    /** «Cuando el lead pasa a Calificado» (reglas de eventos y tiempo). */
+    public static function trigger(array $rule): string
+    {
+        $t = $rule['trigger'] ?? null;
+        if (!is_array($t)) {
+            return '';
+        }
+        return match ($t['type'] ?? '') {
+            'stage_change'     => ($t['to'] ?? '') === '' ? 'el lead cambia de etapa' : 'el lead pasa a «' . Catalog::stageAny((string) $t['to']) . '»',
+            'no_first_contact' => 'pasan ' . (int) ($t['hours'] ?? 0) . ' h desde que llegó el lead sin primer contacto',
+            'task_overdue'     => (int) ($t['hours'] ?? 0) === 0 ? 'una tarea del lead vence' : 'una tarea del lead lleva ' . (int) $t['hours'] . ' h vencida',
+            'consent_revoked'  => ($t['channel'] ?? '') === '' ? 'se revoca el consentimiento del lead' : 'se revoca el consentimiento de ' . mb_strtolower(Rules::CONSENT[$t['channel']] ?? (string) $t['channel']),
+            default            => 'ocurre un evento sin completar',
+        };
+    }
+
     public static function when(array $rule): string
     {
         $t = self::block($rule['when'] ?? null);
+        if (isset($rule['trigger'])) {
+            $tr = self::trigger($rule);
+            return 'Cuando ' . $tr . ($t !== '' ? ' y ' . $t : '');
+        }
         return $t === '' ? 'Cuando (sin condiciones)' : 'Cuando ' . $t;
     }
 
@@ -109,6 +129,10 @@ final class RulePhrase
                 return 'avisar por Telegram' . (($a['urgency'] ?? '') === 'urgent' ? ' (urgente)' : '') . ': «' . (string) ($a['text'] ?? '') . '»';
             case 'create_task':
                 return 'crear la tarea «' . (string) ($a['title'] ?? '') . '» para dentro de ' . (int) ($a['due_hours'] ?? 0) . ' h';
+            case 'notify_bell':
+                return 'avisar en la campana: «' . (string) ($a['text'] ?? '') . '»';
+            case 'outbound_webhook':
+                return 'enviar el webhook saliente (rule.fired)';
             case 'tag':
                 return 'poner la etiqueta «' . (string) ($a['tag'] ?? '') . '»';
             case 'review_queue':
@@ -127,6 +151,8 @@ final class RulePhrase
             'telegram_alert'  => 'alerta por Telegram',
             'create_task'     => 'tarea: ' . (string) ($e['title'] ?? ''),
             'tag'             => 'etiqueta «' . (string) ($e['tag'] ?? '') . '»',
+            'notify_bell'     => 'aviso en la campana',
+            'outbound_webhook' => 'webhook saliente',
             'review_queue'    => 'a la cola de revisión',
             default           => '',
         };

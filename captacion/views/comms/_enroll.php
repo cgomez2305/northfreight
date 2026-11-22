@@ -5,7 +5,7 @@ use Captacion\Services\Sequences;
 use Captacion\Ui;
 
 /** Variables: $rows, $counts, $st, $sq, $caps, $sentHour, $csrf */
-$btn = static fn(int $id, string $a, string $label, string $cls, string $confirm = ''): string => '<form class="inl" method="post" action="/comunicaciones/inscripciones/' . $id . '/' . $a . '"><input type="hidden" name="_csrf" value="' . htmlspecialchars((string) $csrf, ENT_QUOTES) . '"><button class="btn btn--sm ' . $cls . '" type="submit"' . ($confirm !== '' ? ' data-confirm="' . htmlspecialchars($confirm, ENT_QUOTES) . '"' : '') . '>' . htmlspecialchars($label, ENT_QUOTES) . '</button></form>';
+$btn = static fn(int $id, string $a, string $label, string $cls, string|array $confirm = ''): string => '<form class="inl" method="post" action="/comunicaciones/inscripciones/' . $id . '/' . $a . '"><input type="hidden" name="_csrf" value="' . htmlspecialchars((string) $csrf, ENT_QUOTES) . '"><button class="btn btn--sm ' . $cls . '" type="submit"' . ($confirm !== '' ? Ui::confirm($confirm) : '') . '>' . htmlspecialchars($label, ENT_QUOTES) . '</button></form>';
 ?>
 <div class="cm-seqs">
   <?php foreach (Sequences::DEFS as $key => $def): $c = $counts[$key] ?? []; ?>
@@ -34,7 +34,7 @@ $btn = static fn(int $id, string $a, string $label, string $cls, string $confirm
   <?php if (!$rows): ?>
     <div class="empty empty--sm"><?= Ui::icon('star', 'empty__star ic--star') ?><h3>Nadie está inscrito<?= $st !== '' || $sq !== '' ? ' con ese filtro' : ' todavía' ?></h3><p>Los leads tibios con consentimiento de correo entran a A6 solos cuando las secuencias están encendidas; al firmar, cada lead entra a A12.</p></div>
   <?php else: ?>
-    <div class="tw"><table class="tbl tbl--cm">
+    <div class="tw"><table class="tbl tbl--cm" aria-label="Inscripciones a secuencias">
       <thead><tr><th scope="col">Lead</th><th scope="col">Secuencia</th><th scope="col">Paso siguiente</th><th scope="col">Estado</th><th scope="col">Próximo envío</th><th scope="col"><span class="sr">Acciones</span></th></tr></thead>
       <tbody>
         <?php foreach ($rows as $r): ?>
@@ -44,7 +44,7 @@ $btn = static fn(int $id, string $a, string $label, string $cls, string $confirm
             <td data-l="Estado"><span class="chip chip--<?= $r['status'] === 'active' ? 'warm' : 'plain' ?>"><i class="dot"></i><?= $e(Sequences::STATUS[$r['status']] ?? $r['status']) ?></span><?php if ($r['paused_reason']): ?><small class="muted"><?= $e(Sequences::REASONS[$r['paused_reason']] ?? $r['paused_reason']) ?></small><?php endif; ?><?php if ($r['blocked_reason'] && $r['status'] === 'active'): ?><small class="late"><?= $e($r['blocked_reason']) ?></small><?php endif; ?></td>
             <td class="c-when" data-l="Próximo envío"><?= $r['status'] === 'active' && $r['next_run_at'] ? $e(Fmt::dateTime($r['next_run_at'])) : '—' ?></td>
             <td class="c-act"><?php if ($r['status'] === 'active'): ?><?= $btn((int) $r['id'], 'pause', 'Pausar', 'btn--ghost') ?><?php elseif ($r['status'] === 'paused'): ?><?= $btn((int) $r['id'], 'resume', 'Reanudar', 'btn--secondary') ?><?php endif; ?>
-              <?php if (in_array($r['status'], ['active', 'paused'], true)): ?><?= $btn((int) $r['id'], 'remove', 'Sacar', 'btn--ghost', '¿Sacar a este lead de la secuencia?') ?><?php endif; ?></td></tr>
+              <?php if (in_array($r['status'], ['active', 'paused'], true)): ?><?= $btn((int) $r['id'], 'remove', 'Sacar', 'btn--ghost', ['text' => '¿Sacar a este lead de la secuencia?', 'title' => '¿Sacar de la secuencia?', 'label' => 'Sacar', 'danger' => true]) ?><?php endif; ?></td></tr>
         <?php endforeach; ?>
       </tbody>
     </table></div>

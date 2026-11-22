@@ -146,11 +146,20 @@ final class Webhook
         return strlen($k) > 120 ? substr(hash('sha256', $k), 0, 64) : $k;
     }
 
-    /** Reclama el evento. @return ?int id de la fila, o null si YA se habia recibido (duplicado: no se vuelve a procesar). */
-    public static function claim(string $source, string $key, ?string $eventAt = null, ?string $summary = null): ?int
+    /**
+     * Reclama el evento. @return ?int id de la fila, o null si YA se habia recibido (duplicado: no se vuelve a procesar).
+     * Fase AM: con $retryErrors un evento anterior que quedo en 'error' se vuelve a reclamar (un reintento corregido se aplica); uno 'processed' sigue siendo duplicado.
+     */
+    public static function claim(string $source, string $key, ?string $eventAt = null, ?string $summary = null, bool $retryErrors = false): ?int
     {
         $st = Db::run('INSERT IGNORE INTO webhook_events (source, event_key, status, event_at, summary) VALUES (?, ?, ?, ?, ?)', [$source, substr($key, 0, 128), 'received', $eventAt, $summary !== null ? mb_substr($summary, 0, 190) : null]);
         if ($st->rowCount() !== 1) {
+            if ($retryErrors) {
+                $up = Db::run("UPDATE webhook_events SET status = 'received', summary = NULL WHERE source = ? AND event_key = ? AND status = 'error'", [$source, substr($key, 0, 128)]);
+                if ($up->rowCount() === 1) {
+                    return (int) Db::value('SELECT id FROM webhook_events WHERE source = ? AND event_key = ?', [$source, substr($key, 0, 128)]);
+                }
+            }
             return null;
         }
         if (random_int(1, 200) === 1) {

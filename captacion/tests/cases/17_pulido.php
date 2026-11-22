@@ -43,7 +43,10 @@ return static function (array $ctx): void {
     T::eq($m[1], ['fonts', 'panel', 'auth'], 'pantalla de acceso: fonts + panel + auth');
     $nf = Infra::http('GET', $s->base . '/no-existe', ['jar' => $s->jar]);
     preg_match_all('#<link rel="stylesheet" href="/assets/([a-z0-9-]+)\.css\?v=#', $nf['body'], $m);
-    T::ok($nf['status'] === 404 && $m[1] === ['fonts', 'panel', 'auth'] && str_contains($nf['body'], 'No encontrado'), 'pagina 404: carga auth.css y muestra el mensaje');
+    T::ok($nf['status'] === 404 && $m[1] === ['fonts', 'panel'] && str_contains($nf['body'], 'No encontrado') && str_contains($nf['body'], 'class="shell"'), 'pagina 404 con sesion (fase AM): dentro del shell, sin auth.css, con el mensaje');
+    $nfa = Infra::http('GET', $s->base . '/no-existe');
+    preg_match_all('#<link rel="stylesheet" href="/assets/([a-z0-9-]+)\.css\?v=#', $nfa['body'], $ma);
+    T::ok($nfa['status'] === 404 && $ma[1] === ['fonts', 'panel', 'auth'] && str_contains($nfa['body'], 'No encontrado'), 'pagina 404 sin sesion: la tarjeta simple, carga auth.css y muestra el mensaje');
     $sum = $size('fonts') + $size('panel');
     T::ok($size('panel') < 35000, 'panel.css (base) mide menos de 35 KB: ' . $size('panel') . ' bytes (antes de Q2b-F: 51.353)');
     // ------------------------------------------------------------------ Barra lateral y migas por rol

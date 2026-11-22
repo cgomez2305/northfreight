@@ -13,6 +13,16 @@ if ($impactErr !== ''): ?>
     $temps = ['hot' => 'Caliente', 'warm' => 'Tibio', 'cold' => 'Frío', 'disqualified' => 'Descartado'];
     $tot = max(1, (int) $s['scanned']);
     $W = 260; ?>
+<?php if (!empty($impact['auto'])): ?>
+  <p class="rp-big"><b><?= $e(Fmt::num((int) $s['matched'])) ?></b><span>de <?= $e(Fmt::num((int) $s['scanned'])) ?> leads habrían activado alguna regla (con sus datos de hoy y los eventos que ya ocurrieron)</span></p>
+  <?php if ($impact['partial']): ?><p class="rp-note rp-note--warn"><?= Ui::icon('clock') ?><span>Se agotó el tiempo: es un cálculo parcial de <?= $e(Fmt::num((int) $s['scanned'])) ?> leads. Usa un alcance menor o ejecuta la simulación.</span></p><?php endif; ?>
+  <dl class="rp-kv">
+    <div><dt>Avisos en la campana</dt><dd><?= $e((int) $s['bells']) ?></dd></div>
+    <div><dt>Webhooks salientes</dt><dd><?= $e((int) $s['hooks']) ?></dd></div>
+    <div><dt>Alertas por Telegram</dt><dd><?= $e((int) $s['alerts']) ?></dd></div>
+    <div><dt>Tareas que se habrían creado</dt><dd><?= $e((int) $s['tasks']) ?></dd></div>
+  </dl>
+<?php else: ?>
   <p class="rp-big"><b><?= $e(Fmt::num((int) $s['changed'])) ?></b><span>de <?= $e(Fmt::num((int) $s['scanned'])) ?> leads cambiarían de puntuación o de temperatura</span></p>
   <?php if ($impact['partial']): ?><p class="rp-note rp-note--warn"><?= Ui::icon('clock') ?><span>Se agotó el tiempo: es un cálculo parcial de <?= $e(Fmt::num((int) $s['scanned'])) ?> leads. Usa un alcance menor o ejecuta la simulación.</span></p><?php endif; ?>
   <figure class="rp-chart" aria-label="Distribución de temperaturas antes y después">
@@ -34,6 +44,7 @@ if ($impactErr !== ''): ?>
     <div><dt>Tareas que se habrían creado</dt><dd><?= $e((int) $s['tasks']) ?></dd></div>
     <div><dt>Etiquetas o cola de revisión</dt><dd><?= $e((int) $s['tags'] + (int) $s['review']) ?></dd></div>
   </dl>
+<?php endif; ?>
   <h4 class="label rp-h">Muestras (<?= $e(count($impact['samples'])) ?>)</h4>
   <?php if (!$impact['samples']): ?><p class="rp-note"><?= Ui::icon('info') ?><span>Ningún lead de este alcance cambiaría ni coincidiría con la regla.</span></p><?php endif; ?>
   <ul class="rp-samples">

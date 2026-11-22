@@ -45,6 +45,13 @@ set_exception_handler(static function (Throwable $t): void {
         \Captacion\Middleware\SecurityHeaders::send();
         header('Content-Type: text/html; charset=utf-8');
     }
+    if (!headers_sent()) {
+        try {
+            \Captacion\Controllers\Responder::errorPage('Error', 'Algo falló', 'El panel no pudo completar la petición. Revisa storage/error.log en el servidor.', 500);
+        } catch (Throwable) {
+            // sin shell: tarjeta simple (abajo)
+        }
+    }
     echo \Captacion\View::render('message', ['title' => 'Error', 'heading' => 'Algo falló', 'text' => 'El panel no pudo completar la petición. Revisa storage/error.log en el servidor.']);
 });
 
@@ -109,6 +116,10 @@ switch (true) {
         UxController::counters();
     case preg_match('#^/ajax/rules/(panel|row|preview|simulate|simstatus)$#', $path, $m) === 1:
         ReglasController::ajax($m[1]);
+    // --- Fase AM · automatizacion ---------------------------------------------------------------------------------------------
+    case $path === '/ajax/config/recalc':
+        ConfigController::recalcStatus();
+    // --- fin Fase AM -----------------------------------------------------------------------------------------------------------
     case $path === '/undo':
         UxController::undoForm();
     case preg_match('#^/vistas/(new|\d{1,12})(?:/(rename|pin|unpin|delete|update))?$#', $path, $m) === 1:
@@ -162,8 +173,5 @@ switch (true) {
     case preg_match('#^/leads/(\d{1,12})/([a-z-]{3,20})$#', $path, $m) === 1:
         LeadActionsController::handle((int) $m[1], $m[2]);
     default:
-        http_response_code(404);
-        \Captacion\Middleware\SecurityHeaders::send();
-        header('Content-Type: text/html; charset=utf-8');
-        echo \Captacion\View::render('message', ['title' => 'No encontrado', 'heading' => 'No encontrado', 'text' => 'Esta página no existe.']);
+        \Captacion\Controllers\Responder::errorPage('No encontrado', 'No encontrado', 'Esta página no existe.', 404);
 }

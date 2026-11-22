@@ -4,7 +4,7 @@
  * y aplica las operaciones estructurales del editor sin JavaScript (añadir, quitar, duplicar, subir, bajar). Los valores NO se validan aqui: eso lo hace Services\Rules::normalize();
  * aqui solo se conserva lo escrito (aunque sea invalido) para volver a pintarlo con sus errores.
  *
- * Nombres de campo: rules[<clave>][name|enabled|stop|example|id], rules[<clave>][when|except][mode|items][<n>][field|op|value] (un grupo lleva su propio items),
+ * Nombres de campo: rules[<clave>][name|enabled|stop|example|id], rules[<clave>][trigger][type|to|hours|channel] (solo conjuntos de eventos y tiempo), rules[<clave>][when|except][mode|items][<n>][field|op|value] (un grupo lleva su propio items),
  * rules[<clave>][then][<n>][type|points|cap|level|urgency|text|title|due_hours|priority|tag]. Las claves son [A-Za-z0-9_]{1,24}; el orden de las reglas es el del envio (el JS reordena el DOM).
  */
 
@@ -98,6 +98,8 @@ final class RuleForm
             'min_temperature' => ['type' => $type, 'level' => 'hot'],
             'telegram_alert'  => ['type' => $type, 'urgency' => 'normal', 'text' => ''],
             'create_task'     => ['type' => $type, 'title' => '', 'due_hours' => '2', 'priority' => '2'],
+            'notify_bell'     => ['type' => $type, 'text' => ''],
+            'outbound_webhook' => ['type' => $type],
             'tag'             => ['type' => $type, 'tag' => ''],
             default           => ['type' => 'review_queue'],
         };
@@ -106,7 +108,7 @@ final class RuleForm
     public static function blankRule(string $kind): array
     {
         $b = Rules::blank($kind);
-        $b['when'] = ['mode' => 'all', 'items' => ['c1' => self::blankCond()]];
+        $b['when'] = ['mode' => 'all', 'items' => $kind === 'automation' ? [] : ['c1' => self::blankCond()]];   // con disparador, las condiciones son opcionales
         $b['then'] = ['a1' => self::blankAction($kind)];
         return $b;
     }

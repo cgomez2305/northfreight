@@ -51,7 +51,7 @@ $hasErr = (bool) $errors;
       <button class="btn btn--secondary" type="submit" name="op" value="add_rule" data-add="rule"><?= Ui::icon('plus') ?>Añadir regla</button>
 
       <label class="field rp__note"><span>Nota de esta versión <small>(opcional, se ve en el historial)</small></span><input type="text" name="note" value="<?= $e($meta['note']) ?>" maxlength="200" autocomplete="off" placeholder="Qué cambió y por qué"></label>
-      <?php if ($draft !== null): ?><button class="btn btn--ghost btn--sm rp__discard" type="submit" formaction="/config/rules/discard" data-confirm="¿Descartar el borrador? Se pierden los cambios sin publicar. La versión publicada no se toca."><?= Ui::icon('trash') ?>Descartar el borrador</button><?php endif; ?>
+      <?php if ($draft !== null): ?><button class="btn btn--ghost btn--sm rp__discard" type="submit" formaction="/config/rules/discard" data-confirm-title="¿Descartar el borrador?" data-confirm-label="Descartar" data-confirm-danger data-confirm="¿Descartar el borrador? Se pierden los cambios sin publicar. La versión publicada no se toca."><?= Ui::icon('trash') ?>Descartar el borrador</button><?php endif; ?>
 
       <?php if ($diffDraft): ?>
       <details class="rp__diff" open><summary><?= Ui::icon('layers') ?>Cambios del borrador frente a la versión publicada <span class="rp__n"><?= $e(count($diffDraft)) ?></span></summary>
@@ -70,7 +70,7 @@ $hasErr = (bool) $errors;
             <?php if ($h['reverted_from'] !== null): ?><p class="muted">Vuelve a las reglas de la versión <?= $e($h['reverted_from']) ?>.</p><?php endif; ?>
             <?php if (!empty($h['diff'])): ?><details class="rp-hist__d"><summary>Ver cambios respecto a la versión anterior <span class="rp__n"><?= $e(count($h['diff'])) ?></span></summary><?= \Captacion\View::render('config/_rule_diff', ['diff' => $h['diff'], 'e' => $e], false) ?></details><?php endif; ?>
             <?php if ($h['status'] === 'archived'): ?>
-              <button class="btn btn--secondary btn--sm" type="submit" formaction="/config/rules/revert" name="version" value="<?= $e($h['id']) ?>"<?= $locked ? ' disabled' : '' ?> data-confirm="¿Volver a las reglas de la versión <?= $e($h['version']) ?>? Se publica como una versión nueva y la historia se conserva. Se aplica a los leads nuevos y a los que cambien."><?= Ui::icon('undo') ?>Revertir a v<?= $e($h['version']) ?></button>
+              <button class="btn btn--secondary btn--sm" type="submit" formaction="/config/rules/revert" name="version" value="<?= $e($h['id']) ?>"<?= $locked ? ' disabled' : '' ?> data-confirm-title="¿Volver a una versión anterior?" data-confirm-label="Volver a esa versión" data-confirm="¿Volver a las reglas de la versión <?= $e($h['version']) ?>? Se publica como una versión nueva y la historia se conserva. Se aplica a los leads nuevos y a los que cambien."><?= Ui::icon('undo') ?>Revertir a v<?= $e($h['version']) ?></button>
             <?php endif; ?>
           </li>
           <?php endforeach; ?>
@@ -108,7 +108,7 @@ $hasErr = (bool) $errors;
     <button class="btn btn--ghost" type="submit" name="op" value="simulate" data-sim-go><?= Ui::icon('flask') ?>Ejecutar simulación</button>
     <span class="rp__foot-sp"></span>
     <button class="btn btn--secondary" type="submit" name="op" value="save"><?= Ui::icon('check') ?>Guardar borrador</button>
-    <button class="btn btn--primary" type="submit" formaction="/config/rules/publish"<?= $locked ? ' disabled title="Confirma tu identidad para publicar"' : '' ?> data-confirm="¿Publicar la versión <?= $e($nextVer) ?>? Se aplicará a los leads nuevos y a los que cambien; los existentes solo con «Recalcular». Quedará en el registro de actividad."><span class="btn__t">Publicar v<?= $e($nextVer) ?></span></button>
+    <button class="btn btn--primary" type="submit" formaction="/config/rules/publish"<?= $locked ? ' disabled title="Confirma tu identidad para publicar"' : '' ?> data-confirm-title="¿Publicar la versión?" data-confirm-label="Publicar" data-confirm="¿Publicar la versión <?= $e($nextVer) ?>? Se aplicará a los leads nuevos y a los que cambien; los existentes solo con «Recalcular». Quedará en el registro de actividad."><span class="btn__t">Publicar v<?= $e($nextVer) ?></span></button>
   </footer>
 </form>
 

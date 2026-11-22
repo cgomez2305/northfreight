@@ -200,7 +200,7 @@
  /* ---------- Paleta de comandos (Ctrl/⌘ K, «/»): acciones, leads, pantallas y vistas ---------- */
  var sd = $('#search'), sq = $('#search-q'), sl = $('#search-list'), sm = $('#search-msg'), kd = $('#keys'), CM = {};
  try { CM = JSON.parse(sd ? sd.getAttribute('data-cmds') || '{}' : '{}'); } catch (e) { CM = {}; }
- var leadRows = [], rows = [], sel = -1, sTimer = 0, sCtl = null, recent = null;
+ var leadRows = [], rows = [], sel = -1, sTimer = 0, sCtl = null, recent = null, searching = false;   /* searching: hay una búsqueda de leads pendiente o en vuelo */
  function themeAct(v) { return function () { NS.setTheme(v); NS.toast('Tema ' + { light: 'claro', dark: 'oscuro', auto: 'automático' }[v] + '.'); }; }
  var ACT = {
   new_lead: function () { NS.openQC(); }, new_task: function () { location.href = '/tareas?new=1'; }, keys: function () { openKeys(); }, side: function () { NS.toggleSide(); },
@@ -226,13 +226,13 @@
   return { g: g, lead: r, t: r.name, s: [r.profile, r.state, r.phone !== '—' ? r.phone : '', r.usdot ? 'USDOT ' + r.usdot : '', r.stage].filter(Boolean).join(' · '), run: function () { location.href = r.url; } };
  }
  function render() {
-  var q = sq.value.trim(), list = allItems(q), order = ['Acciones', 'Leads', 'Recientes', 'Pantallas', 'Vistas'], last = '', idx = 0;
+  var q = sq.value.trim(), list = allItems(q), order = q ? ['Leads', 'Acciones', 'Recientes', 'Pantallas', 'Vistas'] : ['Acciones', 'Leads', 'Recientes', 'Pantallas', 'Vistas'], last = '', idx = 0;   /* con texto, los leads van antes que las acciones */
   sl.textContent = ''; rows = [];
   order.forEach(function (g) {
    var its = list.filter(function (i) { return i.g === g; }); if (!q && g === 'Pantallas') its = its.slice(0, 6); if (!q && g === 'Vistas') its = its.slice(0, 4); if (!its.length) return;
    var gh = el('li', 'srch__g', g); gh.setAttribute('role', 'presentation'); sl.appendChild(gh);
    its.forEach(function (it) {
-    var li = el('li'), d = el('div', 'res'); d.id = 'res-' + idx; d.setAttribute('role', 'option'); d.setAttribute('aria-selected', 'false'); d.setAttribute('data-i', idx);
+    var li = el('li'), d = el('div', 'res'); li.setAttribute('role', 'presentation'); d.id = 'res-' + idx; d.setAttribute('role', 'option'); d.setAttribute('aria-selected', 'false'); d.setAttribute('data-i', idx);
     if (it.lead) { var r = it.lead, av = el('span', 'av', r.initials); av.setAttribute('aria-hidden', 'true'); d.appendChild(av); } else { var ic = el('span', 'res__ic'); ic.appendChild(icon(it.ic)); d.appendChild(ic); }
     var t = el('span', 'res__t'); t.appendChild(el('b', null, it.t)); if (it.s) t.appendChild(el('small', null, it.s)); d.appendChild(t);
     if (it.lead) { var c = el('span', 'chip chip--' + (it.lead.temp === 'disqualified' ? 'dq' : it.lead.temp)); c.appendChild(el('i', 'dot')); c.appendChild(D.createTextNode(it.lead.temp_label)); d.appendChild(c); }
@@ -244,16 +244,17 @@
   sel = -1; if (rows.length) pick(0);
  }
  function pick(i) { var o = $$('.res', sl); if (!o.length) return; sel = (i + o.length) % o.length; o.forEach(function (x, k) { x.setAttribute('aria-selected', k === sel ? 'true' : 'false'); }); sq.setAttribute('aria-activedescendant', o[sel].id); o[sel].scrollIntoView({ block: 'nearest' }); }
- function runSel() { var it = rows[sel]; if (!it) return; sd.close(); it.run(); }
+ function runSel() { if (searching) return; var it = rows[sel]; if (!it) return; sd.close(); it.run(); }   /* Enter no ejecuta nada hasta que lleguen los leads: la primera fila aún puede cambiar */
  function fetchLeads(q) {
-  if (sCtl) sCtl.abort(); sCtl = W.AbortController ? new AbortController() : null;
+  if (sCtl) sCtl.abort(); sCtl = W.AbortController ? new AbortController() : null; if (q !== '') searching = true;
   fetch('/ajax/search', { method: 'POST', credentials: 'same-origin', signal: sCtl ? sCtl.signal : undefined, headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': CSRF }, body: JSON.stringify({ q: q }) })
    .then(function (r) { return r.json(); }).then(function (j) {
     if (sq.value.trim() !== q) return;
+    searching = false;
     if (!j.ok) { leadRows = []; render(); sm.textContent = j.error === 'rate_limited' ? 'Demasiadas búsquedas seguidas. Espera un momento.' : 'No se pudo buscar. Recarga la página e inténtalo de nuevo.'; return; }
     if (q === '') { recent = j.items.map(function (r) { return leadItem(r, 'Recientes'); }); } else { leadRows = j.items.map(function (r) { return leadItem(r, 'Leads'); }); }
     render(); if (q !== '' && j.total > j.items.length) sm.textContent = 'Mostrando ' + j.items.length + ' de ' + j.total + ' leads. Afina la búsqueda o usa Leads.';
-   }).catch(function (e) { if (e && e.name === 'AbortError') return; leadRows = []; render(); sm.textContent = 'No se pudo buscar. Recarga la página e inténtalo de nuevo.'; });
+   }).catch(function (e) { if (e && e.name === 'AbortError') return; searching = false; leadRows = []; render(); sm.textContent = 'No se pudo buscar. Recarga la página e inténtalo de nuevo.'; });
  }
  NS.palette = function (q) {
   if (!sd || !sd.showModal || sd.open) return; D.body.classList.remove('nav-open'); $$('[data-dd] [aria-expanded=true]').forEach(function (b) { b.click(); });
@@ -262,24 +263,33 @@
  $$('[data-search]').forEach(function (b) { b.addEventListener('click', function () { NS.palette(''); }); });
  if (sq) {
   sq.addEventListener('input', function () {
-   clearTimeout(sTimer); var q = sq.value.trim(); render();
-   if (q.length >= 2) { sTimer = setTimeout(function () { fetchLeads(q); }, 170); } else { leadRows = []; }
+   clearTimeout(sTimer); var q = sq.value.trim(); searching = q.length >= 2; render();
+   if (q.length >= 2) { sm.textContent = 'Buscando leads…'; sTimer = setTimeout(function () { fetchLeads(q); }, 170); } else { leadRows = []; if (sCtl) sCtl.abort(); }
   });
   sq.addEventListener('keydown', function (e) {
    if (e.key === 'ArrowDown') { e.preventDefault(); pick(sel + 1); } else if (e.key === 'ArrowUp') { e.preventDefault(); pick(sel - 1); } else if (e.key === 'Enter') { e.preventDefault(); runSel(); }
   });
   sl.addEventListener('click', function (e) { var d = e.target.closest('.res'); if (!d) return; sel = parseInt(d.getAttribute('data-i'), 10); runSel(); });
-  sd.addEventListener('close', function () { sq.value = ''; sl.textContent = ''; leadRows = []; });
+  sd.addEventListener('close', function () { sq.value = ''; sl.textContent = ''; leadRows = []; searching = false; clearTimeout(sTimer); });
  }
 
  /* ---------- Atajos ---------- */
  function openKeys() { if (kd && kd.showModal && !kd.open) uxReady.then(function () { if (!kd.open) kd.showModal(); }); }
  $$('[data-keys]').forEach(function (b) { b.addEventListener('click', function () { $$('[data-dd] [aria-expanded=true]').forEach(function (x) { x.click(); }); openKeys(); }); });
+ NS.shortcutsOn = function () { return H.getAttribute('data-keys') !== 'off'; };
+ $$('[data-keys-toggle]').forEach(function (b) {
+  b.addEventListener('click', function () {
+   var on = b.getAttribute('aria-checked') !== 'true'; b.setAttribute('aria-checked', on ? 'true' : 'false'); H.setAttribute('data-keys', on ? 'on' : 'off');
+   var st = $('[data-keys-state]', b); if (st) st.textContent = on ? 'Activados' : 'Desactivados';
+   api('/ajax/prefs', { key: 'keys', value: on ? 'on' : 'off' }); NS.toast(on ? 'Atajos de una tecla activados.' : 'Atajos de una tecla desactivados. Siguen Ctrl/⌘ K y Esc.');
+  });
+ });
  var gPending = 0;
  D.addEventListener('keydown', function (e) {
   var t = e.target, typing = t && (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable);
   if ((e.key === 'k' || e.key === 'K') && (e.ctrlKey || e.metaKey) && !e.altKey) { e.preventDefault(); if (sd && sd.open) sd.close(); else if (!D.querySelector('dialog[open]')) NS.palette(''); return; }
   if (typing || e.ctrlKey || e.metaKey || e.altKey || D.querySelector('dialog[open]')) return;
+  if (!NS.shortcutsOn()) return;   /* desactivados: solo Ctrl/⌘ K (arriba) y Esc */
   var k = e.key;
   if (gPending && Date.now() - gPending < 1300) {
    gPending = 0; var to = { d: '/', l: '/leads', p: '/pipeline', t: '/tareas', b: '/tabla', c: '/calendario', r: '/cronologia' }[k.toLowerCase()];

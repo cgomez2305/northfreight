@@ -37,6 +37,9 @@ final class JobHandlers
             'telegram_notice'         => [self::class, 'telegramNotice'],
             'rule_alert'              => [RuleEffects::class, 'jobAlert'],
             'rule_simulate'           => [RuleSim::class, 'jobStep'],
+            // Fase AM · automatizacion
+            'rules_time'              => [RuleAutomation::class, 'jobTick'],
+            'outbound_webhook'        => [OutboundWebhooks::class, 'deliver'],
         ];
     }
 

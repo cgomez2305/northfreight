@@ -26,3 +26,10 @@
 .intg__lnk{margin:0;font-size:14px}
 .intg__lnk a{display:inline-flex;gap:4px;align-items:center}
 .intg__lnk .ic{width:14px;height:14px;margin-left:4px;vertical-align:-2px}
+/* Fase AM: webhooks salientes genéricos */
+.whout{margin-top:14px}
+.whout__once{display:grid;gap:6px;padding:12px 14px;border:1px solid var(--accent-line);background:var(--accent-tint);border-radius:var(--r-card)}
+.whout__ev{display:grid;gap:8px}
+.whout__t{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.whout__t .cfg-fs{display:flex;gap:12px;align-items:center;flex-wrap:wrap;border:0;padding:0;margin:0}
+.whout__h{margin-top:18px}

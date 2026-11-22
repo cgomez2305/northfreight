@@ -133,7 +133,7 @@ return static function (array $ctx): void {
         }
     }
     T::eq($bad, [], 'validación: ' . count($actTable) . ' acciones (rangos, topes, variables permitidas, tipo del conjunto)');
-    T::eq(array_keys(Rules::ACTIONS), ['add_points', 'min_temperature', 'telegram_alert', 'create_task', 'tag', 'review_queue'], 'catálogo: 6 acciones (puntos, temperatura mínima, Telegram, tarea, etiqueta, cola de revisión)');
+    T::eq(array_keys(Rules::ACTIONS), ['add_points', 'min_temperature', 'telegram_alert', 'create_task', 'tag', 'review_queue', 'notify_bell', 'outbound_webhook'], 'catálogo: 8 acciones (puntos, temperatura mínima, Telegram, tarea, etiqueta, cola de revisión y, fase AM, avisar en la campana y webhook saliente)');
     T::eq($act(['type' => 'tag', 'tag' => 'Revisar FMCSA'], 'routing_tasks')['rules'][0]['then'][0]['tag'], 'revisar-fmcsa', 'normalización: la etiqueta se vuelve minúsculas con guiones');
     T::ok(in_array('rules.0.then.1.type', $errs([$rule(['then' => [['type' => 'add_points', 'points' => 5], ['type' => 'add_points', 'points' => 6]]])]), true), 'validación: la misma acción dos veces en una regla da error');
     T::ok(in_array('rules.0.then', $errs([$rule(['then' => array_fill(0, 5, ['type' => 'tag', 'tag' => 'a'])])], 'routing_tasks'), true), 'límite: más de 4 acciones por regla da error');

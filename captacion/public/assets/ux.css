@@ -122,3 +122,17 @@ body.is-dragging *{cursor:grabbing!important}
   .dlg__row{grid-template-columns:1fr}
   .dlg{border-radius:var(--r-card)}
 }
+/* Fase AM: interruptor «Atajos de una tecla» del menú de usuario */
+.dd__item--sw{justify-content:flex-start}
+.dd__sw-t{flex:1}
+.dd__state{margin-left:auto;font-size:var(--fs-sm);color:var(--ink-3)}
+.dd__item--sw[aria-checked=true] .dd__state{color:var(--accent-ink);font-weight:500}
+/* Fase AM: objetivos táctiles de 44 px en pantallas táctiles de cualquier ancho (con puntero fino no cambia nada) */
+@media (pointer:coarse){
+  .icon-btn,.icon-btn--sm{width:44px;height:44px}
+  .btn--sm,.seg__i,.nav-i,.dd__item,.ptab,.vtab{min-height:44px}
+  .tick{position:relative}
+  .tick::after{content:"";position:absolute;inset:-8px}
+  .tbl .btn--sm,.tbl .icon-btn{min-height:44px}
+  .pk__e{margin:4px 0 0}
+}

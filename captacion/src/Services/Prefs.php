@@ -12,7 +12,7 @@ use Captacion\Db;
 
 final class Prefs
 {
-    public const DEFAULTS = ['theme' => 'auto', 'side' => 'open', 'density' => 'comfortable', 'cols' => 'prof,st,eq,pts,temp,stage,src,when', 'lmode' => 'lista', 'tcols' => 'prof,st,eq,trucks,exp,pts,temp,stage,src,when,task', 'calm' => 'mes'];
+    public const DEFAULTS = ['theme' => 'auto', 'side' => 'open', 'density' => 'comfortable', 'cols' => 'prof,st,eq,pts,temp,stage,src,when', 'lmode' => 'lista', 'tcols' => 'prof,st,eq,trucks,exp,pts,temp,stage,src,when,task', 'calm' => 'mes', 'keys' => 'on'];
     /** Modo de vista de los leads que se recuerda por usuario (Q5c): cada uno es una pantalla con los mismos filtros (clave => ruta). */
     public const MODES = ['lista' => '/leads', 'tablero' => '/pipeline', 'tabla' => '/tabla', 'calendario' => '/calendario', 'cronologia' => '/cronologia'];
     /** Columnas opcionales de la bandeja (clave => etiqueta). «Lead» y la casilla siempre se ven. */
@@ -62,6 +62,8 @@ final class Prefs
             'lmode' => isset(self::MODES[$v]) ? $v : null,
             'tcols' => self::validTableCols($v),
             'calm' => in_array($v, ['mes', 'semana', 'dia'], true) ? $v : null,
+            'keys' => in_array($v, ['on', 'off'], true) ? $v : null,   // fase AM: atajos de una tecla
+
             default => null,
         };
     }

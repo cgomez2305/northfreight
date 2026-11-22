@@ -22,6 +22,7 @@ use Captacion\Services\MetaLeads;
 use Captacion\Services\Appointments;
 use Captacion\Services\SmsInbound;
 use Captacion\Services\N8nBridge;
+use Captacion\Services\OutboundWebhooks;
 use Captacion\Services\Webhook;
 use Captacion\Services\Catalog;
 use Captacion\Services\LeadPayload;
@@ -87,9 +88,28 @@ final class ConfigController extends Responder
             'canales/calcom'      => self::canalesSave($user, 'calcom'),
             'canales/twilio'      => self::canalesSave($user, 'twilio'),
             'canales/n8n'         => self::canalesSave($user, 'n8n'),
+            'webhooks/save'       => self::webhooksSave($user),   // fase AM: webhooks salientes genericos
+            'webhooks/test'       => self::webhooksTest($user),
             default               => self::notFound(),
         };
         self::notFound();
+    }
+
+    /** Fase AM: estado del recalculo para la barra de progreso (POST JSON, solo admin; sin recargar la pagina). */
+    public static function recalcStatus(): never
+    {
+        [$user] = self::jsonPost(256);
+        if (($user['role'] ?? '') !== 'admin') {
+            self::json(['ok' => false, 'error' => 'forbidden'], 403);
+        }
+        $s = ScoringConfig::state();
+        if ($s === null) {
+            self::json(['ok' => true, 'status' => 'none', 'processed' => 0, 'total' => 0, 'changed' => 0, 'pct' => 100]);
+        }
+        $total = (int) ($s['total'] ?? 0);
+        $done = (int) ($s['processed'] ?? 0);
+        self::json(['ok' => true, 'status' => ScoringConfig::running() ? 'running' : 'done', 'processed' => $done, 'total' => $total, 'changed' => (int) ($s['changed'] ?? 0),
+            'pct' => $total > 0 ? (int) round($done / $total * 100) : 100]);
     }
 
     private static function tabOf(mixed $v): string
@@ -133,7 +153,7 @@ final class ConfigController extends Responder
             ],
             'alertas'       => ['alerts' => Alerts::get(), 'warmOn' => Alerts::warmTelegram(), 'fmcsaKey' => Alerts::fmcsaKey(), 'tgOk' => \Captacion\Services\Telegram::configured(), 'envMail' => (string) \Captacion\Env::get('MAIL_TO', '')],
             'costos'        => self::costsVars(),
-            'integraciones' => ['cards' => Integrations::status(), 'testResult' => self::takeTestResult(), 'testUsdot' => Integrations::TEST_USDOT],
+            'integraciones' => ['cards' => Integrations::status(), 'testResult' => self::takeTestResult(), 'testUsdot' => Integrations::TEST_USDOT, 'wh' => OutboundWebhooks::viewConfig(), 'whView' => OutboundWebhooks::overview(), 'whErrors' => [], 'once' => self::takeOnce()],
             'horario'       => ['zones' => Display::ZONES, 'tz' => Display::timezone(), 'hours' => Display::hours()],
             'copias'        => Backup::pageVars(),
             'entrega'       => ['hand' => Handoff::config(), 'handView' => Handoff::overview(), 'handTargets' => Handoff::targets(), 'once' => self::takeOnce()],
@@ -474,6 +494,50 @@ final class ConfigController extends Responder
         // lo que estaba esperando un destino se pone en cola ahora que lo hay
         $extra = Handoff::configured() ? Handoff::retryPending((int) $user['id']) : null;
         self::flash(true, $r['msg'] . ($extra !== null && $extra['ok'] && !str_starts_with($extra['msg'], 'No había') ? ' ' . $extra['msg'] : ''));
+        self::redirect($back);
+    }
+
+    /** Fase AM: guarda el destino, los eventos y el secreto del webhook saliente generico (confirmacion reciente). El secreto nuevo se muestra UNA vez. */
+    private static function webhooksSave(array $user): never
+    {
+        $back = self::guardPost('integraciones', true, '#webhooks-out');
+        $v = OutboundWebhooks::validate($_POST);
+        $mode = is_string($_POST['secret_mode'] ?? null) && in_array($_POST['secret_mode'], ['keep', 'generate', 'clear'], true) ? $_POST['secret_mode'] : 'keep';
+        $secret = null;
+        $once = null;
+        if ($mode === 'generate') {
+            $secret = OutboundWebhooks::generateSecret();
+            $once = ['kind' => 'secret', 'value' => $secret];
+        } elseif ($mode === 'clear') {
+            $secret = '';
+        }
+        if (!$v['ok']) {
+            self::flash(false, 'Revisa los campos marcados. No se guardó nada.');
+            self::index($user, ['wh' => $v['values'] + ['secret_set' => OutboundWebhooks::config()['secret_set']], 'whErrors' => $v['errors']], 422, 'integraciones');
+        }
+        $r = OutboundWebhooks::saveConfig($v['values'], $secret, (int) $user['id']);
+        if (!$r['ok']) {
+            self::flash(false, $r['msg']);
+            self::redirect($back);
+        }
+        if ($once !== null) {
+            $_SESSION['cfg_once'] = $once;
+        }
+        self::flash(true, $r['msg']);
+        self::redirect($back);
+    }
+
+    private static function webhooksTest(array $user): never
+    {
+        $back = self::guardPost('integraciones', true, '#webhooks-out');
+        $key = 'u' . (int) $user['id'];
+        if (RateLimiter::tooMany('webhook_out_test', $key, 4, 60)) {
+            self::flash(false, 'Demasiadas pruebas seguidas. Espera un minuto.');
+            self::redirect($back);
+        }
+        RateLimiter::hit('webhook_out_test', $key, 60);
+        $r = OutboundWebhooks::sendTest((int) $user['id']);
+        self::flash($r['ok'], $r['msg']);
         self::redirect($back);
     }
 

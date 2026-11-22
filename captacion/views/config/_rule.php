@@ -1,4 +1,5 @@
 <?php
+use Captacion\Services\Rules;
 use Captacion\Ui;
 
 /** Una regla (tarjeta). Variables: $k (clave), $r (del formulario), $errors, $kind, $phr (frases de esta regla o null), $total (reglas del conjunto) */
@@ -38,8 +39,33 @@ foreach ($errors as $p => $_) {
   <small class="rp-err" data-err="<?= $e($dp) ?>.name"<?= $er('name') === '' ? ' hidden' : '' ?>><?= $e($er('name')) ?></small>
   <p class="rule__phrase" data-phrase aria-live="polite"><?php if ($phr): ?><?= $e($phr['when']) ?>. <b><?= $e($phr['then']) ?>.</b><?= $phr['except'] !== '' ? ' ' . $e($phr['except']) . '.' : '' ?><?php else: ?><span class="muted">La frase aparece cuando la regla está completa.</span><?php endif; ?></p>
 
+<?php if ($kind === 'automation'):
+    $tr = is_array($r['trigger'] ?? null) ? $r['trigger'] : ['type' => 'stage_change', 'to' => ''];
+    $tt = in_array((string) ($tr['type'] ?? ''), array_keys(Rules::TRIGGERS), true) ? (string) $tr['type'] : '';
+    $tnp = $np . '[trigger]';
+    $tdp = $dp . '.trigger';
+    $te = static fn(string $f): string => (string) ($errors[$tdp . '.' . $f] ?? ''); ?>
+  <section class="rule__s" aria-label="Disparador">
+    <h4 class="label rule__l">Cuando ocurre</h4>
+    <div class="rt" data-trigger data-helps="<?= $e(json_encode(Rules::TRIGGER_HELP, JSON_UNESCAPED_UNICODE)) ?>">
+      <label class="rt__t"><span class="sr">Evento que activa la regla</span>
+        <select name="<?= $e($tnp) ?>[type]" data-rt="type"<?= $te('type') !== '' ? ' aria-invalid="true"' : '' ?>>
+          <?php if ($tt === ''): ?><option value="" selected>Elige el evento…</option><?php endif; ?>
+          <?php foreach (Rules::TRIGGERS as $tk => $tl): ?><option value="<?= $e($tk) ?>"<?= $tt === $tk ? ' selected' : '' ?>><?= $e($tl) ?></option><?php endforeach; ?>
+        </select></label>
+      <label class="rt__p" data-rt-p="stage_change"<?= $tt === 'stage_change' ? '' : ' hidden' ?>><span>A la etapa</span>
+        <select name="<?= $e($tnp) ?>[to]"><option value="">cualquiera</option><?php foreach (Rules::options('stage') as $sk => $sl): ?><option value="<?= $e($sk) ?>"<?= (string) ($tr['to'] ?? '') === $sk ? ' selected' : '' ?>><?= $e($sl) ?></option><?php endforeach; ?></select></label>
+      <label class="rt__p" data-rt-p="no_first_contact task_overdue"<?= in_array($tt, Rules::TIME_TRIGGERS, true) ? '' : ' hidden' ?>><span>Horas <small>(<?= $tt === 'task_overdue' ? '0 a 720' : '1 a 720' ?>)</small></span>
+        <input type="text" inputmode="numeric" name="<?= $e($tnp) ?>[hours]" value="<?= $e((string) ($tr['hours'] ?? '')) ?>" maxlength="3" autocomplete="off"<?= $te('hours') !== '' ? ' aria-invalid="true"' : '' ?>></label>
+      <label class="rt__p" data-rt-p="consent_revoked"<?= $tt === 'consent_revoked' ? '' : ' hidden' ?>><span>Canal</span>
+        <select name="<?= $e($tnp) ?>[channel]"><option value="">cualquiera</option><?php foreach (Rules::CONSENT as $ck => $cl): ?><option value="<?= $e($ck) ?>"<?= (string) ($tr['channel'] ?? '') === $ck ? ' selected' : '' ?>><?= $e($cl) ?></option><?php endforeach; ?></select></label>
+      <p class="rt__h" data-rt-help><?= $e($tt !== '' ? Rules::TRIGGER_HELP[$tt] : 'Elige qué evento activa la regla.') ?></p>
+      <?php foreach (['type', 'to', 'hours', 'channel'] as $f): ?><small class="rp-err" data-err="<?= $e($tdp) ?>.<?= $e($f) ?>"<?= $te($f) === '' ? ' hidden' : '' ?>><?= $e($te($f)) ?></small><?php endforeach; ?>
+    </div>
+  </section>
+<?php endif; ?>
   <section class="rule__s" aria-label="Cuando">
-    <h4 class="label rule__l">Cuando</h4>
+    <h4 class="label rule__l"><?= $kind === 'automation' ? 'Solo si (opcional)' : 'Cuando' ?></h4>
     <?= \Captacion\View::render('config/_rule_block', ['np' => $np . '[when]', 'dp' => $dp . '.when', 'block' => $when, 'errors' => $errors, 'which' => 'when', 'key' => $k, 'e' => $e], false) ?>
   </section>
 

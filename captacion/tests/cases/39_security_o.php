@@ -37,6 +37,8 @@ return static function (array $ctx): void {
         '/vacantes/1', '/vacantes/1/pause', '/resultados', '/reportes', '/reportes/export', '/informes', '/informes/1', '/informes/1/publish', '/informes/generate', '/comunicaciones', '/comunicaciones/plantillas',
         '/comunicaciones/plantillas/1', '/comunicaciones/plantillas/new', '/comunicaciones/plantillas/1/save', '/comunicaciones/envios', '/c/' . $token40, '/invite/' . $hex64, '/u/' . $tok20, '/login', '/login/2fa', '/logout',
         '/leads/1', '/leads/1/stage', '/leads/1/note', '/leads/1/task',
+        // Fase AM · automatizacion
+        '/ajax/config/recalc', '/config/webhooks/save', '/config/webhooks/test',
     ];
     $uncovered = [];
     foreach ($m1[1] as $p) {

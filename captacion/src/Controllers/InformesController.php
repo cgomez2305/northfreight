@@ -62,11 +62,13 @@ final class InformesController extends Responder
         if (!is_array($metrics)) {
             self::notFound();
         }
+        $internal = $admin && $r['status'] === 'draft' && is_array($metrics['internal_actions'] ?? null) ? array_values($metrics['internal_actions']) : [];
+        unset($metrics['internal_actions']);   // fase AM: las sugerencias internas nunca viajan al lector ni a un informe publicado
         $cur = $admin ? $metrics['cur'] : Reports::forViewer($metrics['cur']);
         $prev = $admin ? $metrics['prev'] : Reports::forViewer($metrics['prev']);
         self::page('informe', $user, 'informes', [['Informes', '/informes'], [$metrics['label'] ?? (string) $r['period'], null]], [
             'title' => 'Informe de ' . ($metrics['label'] ?? $r['period']), 'css' => ['charts', 'reportes'], 'report' => $r, 'meta' => $metrics, 'm' => $cur, 'p' => $prev,
-            'actions' => json_decode((string) $r['actions'], true) ?: [], 'isAdminView' => $admin, 'recipients' => \Captacion\Services\Sequences::mailSettings()['monthly_to'],
+            'actions' => json_decode((string) $r['actions'], true) ?: [], 'internalActions' => $internal, 'isAdminView' => $admin, 'recipients' => \Captacion\Services\Sequences::mailSettings()['monthly_to'],
         ]);
     }
 

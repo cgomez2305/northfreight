@@ -18,10 +18,13 @@ final class RuleSets
 {
     /** @var list<array>|null */
     private static ?array $engineCache = null;
+    /** @var list<array>|null */
+    private static ?array $autoCache = null;
 
     public static function clearCache(): void
     {
         self::$engineCache = null;
+        self::$autoCache = null;
     }
 
     private static function ok(string $msg, array $x = []): array
@@ -46,7 +49,7 @@ final class RuleSets
              LEFT JOIN rule_versions p ON p.set_id = s.id AND p.pub_slot = 1
              LEFT JOIN users up ON up.id = p.published_by
              LEFT JOIN rule_versions d ON d.set_id = s.id AND d.draft_slot = 1
-             WHERE s.deleted_at IS NULL ORDER BY FIELD(s.kind, \'scoring\', \'alerts\', \'routing_tasks\'), s.position, s.id'
+             WHERE s.deleted_at IS NULL ORDER BY FIELD(s.kind, \'scoring\', \'alerts\', \'routing_tasks\', \'automation\'), s.position, s.id'
         );
         $out = [];
         foreach ($rows as $r) {
@@ -325,9 +328,22 @@ final class RuleSets
         }
         $rows = Db::all(
             "SELECT s.id AS set_id, s.name, s.kind, v.id AS version_id, v.version, v.rules FROM rule_sets s JOIN rule_versions v ON v.set_id = s.id AND v.pub_slot = 1
-             WHERE s.deleted_at IS NULL ORDER BY FIELD(s.kind, 'scoring', 'alerts', 'routing_tasks'), s.position, s.id"
-        );
+             WHERE s.deleted_at IS NULL AND s.kind <> 'automation' ORDER BY FIELD(s.kind, 'scoring', 'alerts', 'routing_tasks'), s.position, s.id"
+        );   // los conjuntos «automation» (eventos y tiempo) NO entran al motor de puntuacion: los evalua RuleAutomation
         return self::$engineCache = array_map(static fn($r) => ['set_id' => (int) $r['set_id'], 'version_id' => (int) $r['version_id'], 'name' => (string) $r['name'], 'kind' => (string) $r['kind'], 'version' => (int) $r['version'], 'rules' => Db::decode($r['rules'])], $rows);
+    }
+
+    /** @return list<array{set_id:int,version_id:int,name:string,kind:string,version:int,rules:list<array>}> versiones PUBLICADAS de los conjuntos de eventos y tiempo (fase AM) */
+    public static function automationSets(): array
+    {
+        if (self::$autoCache !== null) {
+            return self::$autoCache;
+        }
+        $rows = Db::all(
+            "SELECT s.id AS set_id, s.name, s.kind, v.id AS version_id, v.version, v.rules FROM rule_sets s JOIN rule_versions v ON v.set_id = s.id AND v.pub_slot = 1
+             WHERE s.deleted_at IS NULL AND s.kind = 'automation' ORDER BY s.position, s.id"
+        );
+        return self::$autoCache = array_map(static fn($r) => ['set_id' => (int) $r['set_id'], 'version_id' => (int) $r['version_id'], 'name' => (string) $r['name'], 'kind' => (string) $r['kind'], 'version' => (int) $r['version'], 'rules' => Db::decode($r['rules'])], $rows);
     }
 
     // --- Diferencias -------------------------------------------------------------------------------------------------------------
@@ -363,6 +379,9 @@ final class RuleSets
             $cmp('Nombre', (string) $o['name'], (string) $r['name']);
             $cmp('Estado', !empty($o['enabled']) ? 'activada' : 'desactivada', !empty($r['enabled']) ? 'activada' : 'desactivada');
             $cmp('Detener al coincidir', !empty($o['stop']) ? 'sí' : 'no', !empty($r['stop']) ? 'sí' : 'no');
+            if (isset($o['trigger']) || isset($r['trigger'])) {
+                $cmp('Evento', RulePhrase::trigger($o), RulePhrase::trigger($r));
+            }
             $cmp('CUANDO', RulePhrase::block($o['when'] ?? null), RulePhrase::block($r['when'] ?? null));
             $cmp('EXCEPTO', RulePhrase::block($o['except'] ?? null), RulePhrase::block($r['except'] ?? null));
             $cmp('ENTONCES', implode(' y ', array_map([RulePhrase::class, 'action'], (array) $o['then'])), implode(' y ', array_map([RulePhrase::class, 'action'], (array) $r['then'])));
