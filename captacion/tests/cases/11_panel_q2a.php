@@ -300,7 +300,7 @@ return static function (array $ctx): void {
         T::ok(!preg_match('/\sstyle="/i', $pr['body']) && !preg_match('/\son\w+="/i', $pr['body']) && preg_match('/<script(?![^>]*\bnonce=")/i', $pr['body']) === 0, "$pth: sin estilos ni handlers en linea, scripts con nonce");
     }
     $lp = $get('/leads?t=hot&q=Acceso');
-    T::ok($lp['status'] === 200 && str_contains($lp['body'], 'Acceso Prueba') && str_contains($lp['body'], 'aria-current="true"'), 'bandeja con filtros por URL: 200 y muestra el lead');
+    T::ok($lp['status'] === 200 && str_contains($lp['body'], 'Acceso Prueba') && str_contains($lp['body'], 'aria-current="page"'), 'bandeja con filtros por URL: 200 y muestra el lead');
     T::eq($get('/leads?t=%27%3Bdrop&page=-5&per=9999&sort=zz')['status'], 200, 'bandeja con parametros hostiles: 200 (se normalizan)');
     $fp = $get("/leads/$leadA");
     T::ok($fp['status'] === 200 && str_contains($fp['body'], 'Revocar consentimiento') && str_contains($fp['body'], 'href="tel:+13055550199"') && str_contains($fp['body'], 'wa.me/13055550199'), 'ficha: botones Llamar (tel:) y WhatsApp, y revocar consentimiento');

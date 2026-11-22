@@ -6,6 +6,7 @@ declare(strict_types=1);
 namespace Captacion\Controllers;
 
 use Captacion\Db;
+use Captacion\Services\Assignment;
 use Captacion\Services\Handoff;
 use Captacion\Services\LeadActions;
 use Captacion\Models\Lead;
@@ -15,7 +16,7 @@ use Captacion\Services\Undo;
 final class LeadActionsController extends Responder
 {
     private const ANCHORS = ['stage' => '', 'note' => '#notas', 'note-edit' => '#notas', 'note-delete' => '#notas', 'task' => '#tareas', 'task-done' => '#tareas', 'call' => '#linea', 'reopen' => '', 'revoke' => '#consentimientos',
-        'handoff-signed' => '#entrega', 'handoff-rejected' => '#entrega', 'handoff-resend' => '#entrega', 'seq-pause' => '#secuencias', 'seq-resume' => '#secuencias', 'seq-remove' => '#secuencias', 'responded' => '#secuencias'];
+        'handoff-signed' => '#entrega', 'handoff-rejected' => '#entrega', 'handoff-resend' => '#entrega', 'seq-pause' => '#secuencias', 'seq-resume' => '#secuencias', 'seq-remove' => '#secuencias', 'responded' => '#secuencias', 'assign' => '#responsable'];
 
     public static function handle(int $id, string $action): never
     {
@@ -42,6 +43,7 @@ final class LeadActionsController extends Responder
             'handoff-resend'   => Handoff::resend($id, $uid),
             'seq-pause', 'seq-resume', 'seq-remove' => self::sequence($id, $action, $uid),
             'responded'        => Sequences::responded($id, $uid),
+            'assign'           => self::assign($id, $uid),
         };
         // Q5a-G: «Deshacer» para el cambio de etapa (si es reversible), completar una tarea y borrar una nota
         $undo = null;
@@ -50,11 +52,22 @@ final class LeadActionsController extends Responder
                 'stage' => Undo::stage($uid, $id, $from, (string) ($_POST['stage'] ?? '')),
                 'task-done' => Undo::task($uid, (int) ($_POST['task_id'] ?? 0)),
                 'note-delete' => Undo::note($uid, $id, (int) ($_POST['note_id'] ?? 0)),
+                'assign' => ($r['changed'] ?? false) ? Undo::assign($uid, [[$id, (int) ($r['from'] ?? 0), (int) ($r['to'] ?? 0)]]) : null,
                 default => null,
             };
         }
         self::flash($r['ok'], $r['msg'], $undo);
         self::redirect($back . self::ANCHORS[$action]);
+    }
+
+    /** Cambia el responsable de un lead («» = sin asignar). Solo administradores activos (Assignment valida). */
+    private static function assign(int $leadId, int $userId): array
+    {
+        $to = is_string($_POST['to'] ?? null) && ctype_digit($_POST['to']) && (int) $_POST['to'] > 0 ? (int) $_POST['to'] : null;
+        if (is_string($_POST['to'] ?? null) && $_POST['to'] !== '' && $to === null) {
+            return ['ok' => false, 'msg' => 'Elige una persona de la lista.'];
+        }
+        return Assignment::assign($leadId, $to, $userId);
     }
 
     /** Pausar / reanudar / sacar una inscripcion; solo si pertenece a este lead. */

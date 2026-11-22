@@ -79,6 +79,28 @@ final class Timeline
                 $title = $kinds[$p['kind'] ?? 'hot'] ?? 'Alerta enviada';
                 $detail = 'Por ' . ucfirst((string) ($p['channel'] ?? 'telegram')) . '.' . (($p['kind'] ?? '') === 'rule' && !empty($p['rule']) ? ' Regla: ' . mb_substr((string) $p['rule'], 0, 80) . '.' : '');
                 break;
+            case 'assigned':
+                $icon = 'user';
+                $tone = 'accent';
+                $to = isset($p['to_name']) ? (string) $p['to_name'] : null;
+                $title = $to !== null ? 'Responsable: ' . $to : 'Lead sin responsable';
+                $bits = [];
+                if (!empty($p['from_name'])) {
+                    $bits[] = 'Antes: ' . (string) $p['from_name'];
+                }
+                if (!empty($p['auto'])) {
+                    $bits[] = 'Reparto automático';
+                }
+                if (!empty($p['undo'])) {
+                    $bits[] = 'Deshecho a petición';
+                }
+                $detail = implode(' · ', $bits);
+                break;
+            case 'sla_breached':
+                $icon = 'clock';
+                $tone = 'bad';
+                $detail = 'Sin primer contacto tras ' . (int) ($p['minutes'] ?? 0) . ' min · aviso por ' . ucfirst((string) ($p['channel'] ?? 'telegram')) . '.';
+                break;
             case 'a3_cancelled':
                 $icon = 'bell';
                 $detail = (string) ($p['why'] ?? '');

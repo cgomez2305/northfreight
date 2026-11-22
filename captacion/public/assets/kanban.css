@@ -42,7 +42,7 @@
 .kc__sc b{font:500 11.5px var(--f-sans);font-variant-numeric:tabular-nums;color:var(--ink-2)}
 .kc__f{display:flex;align-items:center;gap:10px;font-size:var(--fs-xs);color:var(--ink-3)}
 .kc__prog{display:inline-flex;align-items:center;gap:7px;font:500 11.5px var(--f-sans);font-variant-numeric:tabular-nums;flex:1;min-width:0}
-.kc__f .av{margin-left:auto}
+.kc__f .kc__who{margin-left:auto;display:inline-flex}.kc__sla{margin:0;font-size:var(--fs-xs)}
 .kc__f{position:relative}
 @media (min-width:761px){
   .kc__mv{position:absolute;right:0;bottom:-2px;width:32px;min-height:0;height:32px;margin:0;padding:0;border-radius:var(--r-ctl);border-color:transparent;background:none}

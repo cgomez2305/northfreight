@@ -50,6 +50,16 @@ try {
     } catch (Throwable $t) {
         Storage::error('reactivation enroll failed', get_class($t) . ': ' . $t->getMessage());
     }
+    try {
+        // AM: plazo de primer contacto (cierra las tareas «Primer contacto» ya resueltas y encola una alerta por lead e intento; idempotente, sin cron de cuenta propio)
+        $sla = \Captacion\Services\Sla::tick();
+        \Captacion\Services\Settings::set('cron.sla', ['at' => \Captacion\Clock::now()] + $sla);
+        if ($sla['escalated'] > 0) {
+            fwrite(STDOUT, 'sla: ' . $sla['escalated'] . " alertas en cola\n");
+        }
+    } catch (Throwable $t) {
+        Storage::error('sla tick failed', get_class($t) . ': ' . $t->getMessage());
+    }
     $stats = Queue::runBatch(JobHandlers::all(), Env::int('JOBS_MAX_SECONDS', 50), 20);
     fwrite(STDOUT, 'jobs: ' . json_encode($stats) . "\n");
 } catch (Throwable $t) {

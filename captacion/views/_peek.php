@@ -29,11 +29,12 @@ $lost = $lead['stage'] === 'lost';
     <?= Ui::temp((string) $lead['temperature']) ?>
     <?= Ui::stage((string) $lead['stage'], (string) $lead['pipeline']) ?>
     <?= Ui::tags($lead, 1) ?>
+    <?php $pkSla = \Captacion\Services\Sla::status($lead); if ($pkSla !== null): ?><?= Ui::sla($pkSla) ?><?php endif; ?>
     <span class="pk__score"><?= Ui::scoreBar((int) $lead['score'], (string) $lead['temperature']) ?><b><?= $e($lead['score']) ?></b><small>/100</small></span>
   </div>
   <div class="pk__acts">
     <?php if ($phone): ?><a class="btn btn--primary btn--sm" href="tel:<?= $e($phone) ?>"><span class="btn__t">Llamar</span></a><?php endif; ?>
-    <?php if ($wa): ?><a class="btn btn--secondary btn--sm" href="https://wa.me/<?= $e($wa) ?>?text=<?= $e(rawurlencode($waText)) ?>" rel="noopener noreferrer" target="_blank"><?= Ui::icon('chat') ?>WhatsApp</a><?php endif; ?>
+    <?php if ($wa): ?><a class="btn btn--secondary btn--sm" href="https://wa.me/<?= $e($wa) ?>?text=<?= $e(rawurlencode($waText)) ?>" rel="noopener noreferrer" target="_blank"><?= Ui::icon('chat') ?>WhatsApp<span class="sr"> (abre en otra pestaña)</span></a><?php endif; ?>
     <?php if ($lead['email']): ?><a class="btn btn--secondary btn--sm" href="mailto:<?= $e($lead['email']) ?>"><?= Ui::icon('mail') ?>Correo</a><?php endif; ?>
   </div>
 </div>
@@ -55,6 +56,14 @@ $lost = $lead['stage'] === 'lost';
         <button class="btn btn--secondary btn--sm" type="button" data-pk-move><?= Ui::icon('layers') ?>Cambiar etapa</button>
       </div>
     <?php endif; ?>
+  </section>
+
+  <section class="pk__sec" aria-label="Responsable">
+    <div class="pk__row">
+      <label class="label" for="pk-asg">Responsable</label>
+      <?php $pkTo = $lead['assigned_to'] !== null ? (int) $lead['assigned_to'] : 0; ?>
+      <select id="pk-asg" data-pk-assign data-lead="<?= $e($id) ?>"><option value="">Sin asignar</option><?php foreach (($admins ?? []) as $aid => $aname): ?><option value="<?= $e($aid) ?>"<?= $pkTo === $aid ? ' selected' : '' ?>><?= $e($aname) ?></option><?php endforeach; ?></select>
+    </div>
   </section>
 
   <section class="pk__sec" aria-label="Datos clave">

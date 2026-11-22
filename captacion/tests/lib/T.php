@@ -65,7 +65,7 @@ final class T
         if ($withUsers) {
             $pdo->exec('TRUNCATE TABLE users');
         }
-        $pdo->exec("DELETE FROM settings WHERE `key` LIKE 'cron.%' OR `key` LIKE 'prospects.%' OR `key` LIKE 'referrals.%' OR `key` LIKE 'jobs.%' OR `key` LIKE 'rules.%'");
+        $pdo->exec("DELETE FROM settings WHERE `key` LIKE 'cron.%' OR `key` LIKE 'prospects.%' OR `key` LIKE 'referrals.%' OR `key` LIKE 'jobs.%' OR `key` LIKE 'rules.%' OR `key` LIKE 'sla.%' OR `key` = 'assign'");
         $pdo->exec('SET FOREIGN_KEY_CHECKS = 1');
         \Captacion\Services\Settings::clear();
         \Captacion\Clock::travel(0);

@@ -13,6 +13,7 @@ use Captacion\Clock;
 use Captacion\Db;
 use Captacion\Models\Lead;
 use Captacion\Services\ActivityLog;
+use Captacion\Services\Assignment;
 use Captacion\Services\Catalog;
 use Captacion\Services\Fmt;
 use Captacion\Services\Kanban;
@@ -78,7 +79,7 @@ final class UxController extends Responder
         }
         $html = View::render('_peek', [
             'lead' => $lead, 'tasks' => $tasks, 'timeline' => array_slice(Timeline::build($lead, $events, [], [], $users), 0, 5), 'stages' => Catalog::STAGES[(string) $lead['pipeline']] ?? Catalog::STAGES['A'],
-            'openTasks' => (int) Db::value('SELECT COUNT(*) FROM tasks WHERE lead_id = ? AND deleted_at IS NULL AND done_at IS NULL', [$id]), 'now' => Clock::time(),
+            'openTasks' => (int) Db::value('SELECT COUNT(*) FROM tasks WHERE lead_id = ? AND deleted_at IS NULL AND done_at IS NULL', [$id]), 'now' => Clock::time(), 'admins' => Assignment::admins(),
         ], false);
         self::json(['ok' => true, 'id' => $id, 'name' => Fmt::name($lead), 'code' => Fmt::code($id), 'stage' => (string) $lead['stage'], 'stages' => Catalog::STAGES[(string) $lead['pipeline']] ?? Catalog::STAGES['A'],
             'stage_chip' => \Captacion\Ui::stage((string) $lead['stage'], (string) $lead['pipeline']), 'html' => $html]);
@@ -113,6 +114,15 @@ final class UxController extends Responder
                 break;
             case 'responded':
                 $r = Sequences::responded($id, $uid);
+                break;
+            case 'assign':
+                $raw = is_scalar($b['to'] ?? null) ? (string) $b['to'] : '';
+                $to = ctype_digit($raw) && (int) $raw > 0 ? (int) $raw : null;
+                if ($raw !== '' && $to === null) {
+                    self::json(['ok' => false, 'error' => 'invalid', 'msg' => 'Elige una persona de la lista.'], 422);
+                }
+                $r = Assignment::assign($id, $to, $uid);
+                $undo = $r['ok'] && $r['changed'] ? Undo::assign($uid, [[$id, (int) ($r['from'] ?? 0), (int) ($r['to'] ?? 0)]]) : null;
                 break;
             default:
                 self::json(['ok' => false, 'error' => 'invalid', 'msg' => 'Acción no válida.'], 422);

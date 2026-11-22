@@ -24,11 +24,11 @@ final class PipelineController extends Responder
     public const MOVE_LIMIT = 120;   // movimientos por minuto y usuario
 
     /** @param list<array> $cards */
-    private static function renderCards(array $cards, bool $canWrite): string
+    private static function renderCards(array $cards, bool $canWrite, ?string $backTo = null): string
     {
         $html = '';
         foreach ($cards as $c) {
-            $html .= View::render('_kcard', ['c' => $c, 'canWrite' => $canWrite], false);
+            $html .= View::render('_kcard', ['c' => $c, 'canWrite' => $canWrite, 'back' => $backTo], false);
         }
         return $html;
     }
@@ -49,11 +49,13 @@ final class PipelineController extends Responder
             }
         }
         $uid = (int) $user['id'];
+        $active = SavedViews::active($uid, $_GET, $f);
+        $backTo = '/pipeline' . \Captacion\Ui::qs(array_merge(['pl' => $pl === 'A' ? null : $pl], $f, ['v' => $active !== null ? $active['view']['id'] : null]));   // «Volver a la lista» de la ficha
         self::page('pipeline', $user, 'pipeline', [['Leads', '/leads'], ['Tablero', null]], [
-            'title' => 'Pipeline', 'css' => ['kanban', 'views', 'etiquetas'], 'js' => ['kanban', 'peek', 'views'], 'pl' => $pl, 'activeView' => SavedViews::active($uid, $_GET, $f), 'sysViews' => SavedViews::system(), 'myViews' => SavedViews::mine($uid),
+            'title' => 'Pipeline', 'css' => ['kanban', 'views', 'etiquetas'], 'js' => ['kanban', 'peek', 'views'], 'pl' => $pl, 'activeView' => $active, 'sysViews' => SavedViews::system(), 'myViews' => SavedViews::mine($uid),
             'density' => Prefs::get($uid, 'density'), 'peekId' => (int) ($_GET['peek'] ?? 0), 'f' => $f, 'stages' => $stages, 'counts' => $counts, 'columns' => $columns,
             'totals' => Kanban::pipelineTotals(), 'canWrite' => $canWrite, 'facets' => LeadQuery::facets(),
-            'render' => static fn(array $cards): string => self::renderCards($cards, $canWrite),
+            'render' => static fn(array $cards): string => self::renderCards($cards, $canWrite, $backTo),
         ]);
     }
 

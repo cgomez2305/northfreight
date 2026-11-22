@@ -74,6 +74,7 @@ final class Catalog
         'message_sent' => 'Mensaje enviado (n8n)', 'message_failed' => 'Falló un mensaje (n8n)', 'sequence_message_sent' => 'Paso de secuencia enviado por WhatsApp', 'bot_finished' => 'El bot de WhatsApp terminó',
         'handoff_ready' => 'Listo para hablar con Carlos', 'automation_error' => 'Error de una automatización', 'lead_updated' => 'Datos actualizados por una automatización', 'meta_fields_unmapped' => 'Campos de Meta sin mapear',
         'rule_alert_skipped' => 'Alerta de regla omitida (tope por hora)', 'prospect_converted' => 'Convertido desde un prospecto FMCSA', 'referral_linked' => 'Llegó por un código de referido', 'referral_signed' => 'Su referido firmó',
+        'assigned' => 'Responsable asignado', 'sla_breached' => 'Venció el plazo de primer contacto',
     ];
 
     /** Grupo de filtro de la linea de tiempo de cada tipo de evento. */

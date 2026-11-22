@@ -16,11 +16,13 @@ $chipLabels = [
     'pf' => static fn($v) => 'Perfil: ' . Catalog::label(Catalog::PROFILES, $v), 'src' => static fn($v) => 'Fuente: ' . Catalog::source($v), 'st' => static fn($v) => 'Etapa: ' . Catalog::stageAny($v),
     'eq' => static fn($v) => 'Equipo: ' . Catalog::label(Catalog::EQUIPMENT, $v), 'us' => static fn($v) => 'Estado: ' . $v, 'lg' => static fn($v) => 'Idioma: ' . Catalog::label(Catalog::LANGS, $v),
     'from' => static fn($v) => 'Desde: ' . $v, 'to' => static fn($v) => 'Hasta: ' . $v, 'q' => static fn($v) => 'Texto: «' . $v . '»', 'ct' => static fn() => 'Sin contactar', 'fl' => static fn($v) => $v === 'review_queue' ? 'Por revisar' : (str_starts_with((string) $v, 'tag:') ? 'Etiqueta: ' . substr((string) $v, 4) : 'FMCSA pendiente'), 'nt' => static fn() => 'Sin tarea abierta', 'op' => static fn() => 'Solo abiertos', 'hs' => static fn() => 'Presentados sin respuesta',
+    'sla' => static fn() => 'SLA vencido',
+    'rs' => static fn($v) => 'Responsable: ' . ($v === 'me' ? 'yo' : ($v === 'none' ? 'sin asignar' : (($facets['admins'][(int) $v] ?? null) ?? 'otra persona'))),
 ];
 ?>
 <form class="filters<?= !empty($fa['fold']) ? ' filters--fold' : '' ?><?= $nFilters > 0 ? ' is-open' : '' ?>" id="filters" method="get" action="<?= $e($fa['path']) ?>" aria-label="Filtros">
   <?php if (isset($f['t']) && !$withTemp): ?><input type="hidden" name="t" value="<?= $e($f['t']) ?>"><?php endif; ?>
-  <?php foreach (['nt', 'op', 'hs', 'fl'] as $hk): if (isset($f[$hk])): ?><input type="hidden" name="<?= $e($hk) ?>" value="<?= $e($f[$hk]) ?>"><?php endif; endforeach; ?>
+  <?php foreach (['nt', 'op', 'hs', 'fl', 'sla'] as $hk): if (isset($f[$hk])): ?><input type="hidden" name="<?= $e($hk) ?>" value="<?= $e($f[$hk]) ?>"><?php endif; endforeach; ?>
   <?php foreach ($keep as $k => $kv): if ($kv !== null && $kv !== ''): ?><input type="hidden" name="<?= $e($k) ?>" value="<?= $e($kv) ?>"><?php endif; endforeach; ?>
   <label class="field field--q"><span>Buscar</span><div class="inp"><?= Ui::icon('search') ?><input type="search" name="q" value="<?= $e($f['q'] ?? '') ?>" placeholder="Nombre, teléfono, correo o USDOT" maxlength="100"></div></label>
   <?php if ($withTemp): ?><label class="field"><span>Temperatura</span><select name="t"><option value="">Todas</option><?php foreach (Catalog::TEMPS as $k => $l): ?><option value="<?= $e($k) ?>"<?= ($f['t'] ?? '') === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label><?php endif; ?>
@@ -29,6 +31,7 @@ $chipLabels = [
   <label class="field"><span>Fuente</span><select name="src"><option value="">Todas</option><?php foreach ($facets['sources'] as $k): ?><option value="<?= $e($k) ?>"<?= ($f['src'] ?? '') === $k ? ' selected' : '' ?>><?= $e(Catalog::source($k)) ?></option><?php endforeach; ?></select></label>
   <label class="field"><span>Equipo</span><select name="eq"><option value="">Todos</option><?php foreach (Catalog::EQUIPMENT as $k => $l): ?><option value="<?= $e($k) ?>"<?= ($f['eq'] ?? '') === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
   <label class="field"><span>Estado (EE. UU.)</span><select name="us"><option value="">Todos</option><?php foreach ($facets['states'] as $k): ?><option value="<?= $e($k) ?>"<?= ($f['us'] ?? '') === $k ? ' selected' : '' ?>><?= $e($k) ?> · <?= $e(UsStates::NAMES[$k] ?? '') ?></option><?php endforeach; ?></select></label>
+  <label class="field"><span>Responsable</span><select name="rs"><option value="">Todos</option><option value="me"<?= ($f['rs'] ?? '') === 'me' ? ' selected' : '' ?>>Mis leads</option><option value="none"<?= ($f['rs'] ?? '') === 'none' ? ' selected' : '' ?>>Sin asignar</option><?php foreach (($facets['admins'] ?? []) as $k => $l): ?><option value="<?= $e($k) ?>"<?= ($f['rs'] ?? '') === (string) $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
   <label class="field"><span>Idioma</span><select name="lg"><option value="">Todos</option><?php foreach (Catalog::LANGS as $k => $l): ?><option value="<?= $e($k) ?>"<?= ($f['lg'] ?? '') === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
   <label class="field"><span>Desde (<?= $e(Fmt::zone()) ?>)</span><input type="date" name="from" value="<?= $e($f['from'] ?? '') ?>"></label>
   <label class="field"><span>Hasta (<?= $e(Fmt::zone()) ?>)</span><input type="date" name="to" value="<?= $e($f['to'] ?? '') ?>"></label>

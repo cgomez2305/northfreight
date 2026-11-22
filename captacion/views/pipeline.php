@@ -28,13 +28,13 @@ $filtered = count($f) > 0;
 
 <div class="ptabs" role="group" aria-label="Pipeline">
   <?php foreach ($labels as $k => $label): ?>
-    <a class="ptab<?= $pl === $k ? ' is-on' : '' ?>" href="/pipeline<?= $e(Ui::qs(array_merge(['pl' => $k === 'A' ? null : $k], $f))) ?>"<?= $pl === $k ? ' aria-current="true"' : '' ?>><?= $e($k) ?> · <?= $e($label) ?><span class="ptab__n"><?= $e($totals[$k]) ?></span></a>
+    <a class="ptab<?= $pl === $k ? ' is-on' : '' ?>" href="/pipeline<?= $e(Ui::qs(array_merge(['pl' => $k === 'A' ? null : $k], $f))) ?>"<?= $pl === $k ? ' aria-current="page"' : '' ?>><?= $e($k) ?> · <?= $e($label) ?><span class="ptab__n"><?= $e($totals[$k]) ?></span></a>
   <?php endforeach; ?>
 </div>
 
 <form class="kq" method="get" action="/pipeline" data-autosubmit>
   <?php if ($pl === 'B'): ?><input type="hidden" name="pl" value="B"><?php endif; ?>
-  <?php foreach (array_diff_key($f, ['t' => 1, 'src' => 1, 'q' => 1]) as $hk => $hv): ?><input type="hidden" name="<?= $e($hk) ?>" value="<?= $e($hv) ?>"><?php endforeach; ?>
+  <?php foreach (array_diff_key($f, ['t' => 1, 'src' => 1, 'q' => 1, 'rs' => 1]) as $hk => $hv): ?><input type="hidden" name="<?= $e($hk) ?>" value="<?= $e($hv) ?>"><?php endforeach; ?>
   <?php if (isset($activeView)): ?><input type="hidden" name="v" value="<?= $e($activeView['view']['id']) ?>"><?php endif; ?>
   <div class="seg seg--wrap kq__t" role="group" aria-label="Temperatura">
     <?php foreach ($tempTabs as $k => $label): ?>
@@ -46,6 +46,10 @@ $filtered = count($f) > 0;
     <select name="src" aria-label="Fuente"><option value="">Todas las fuentes</option>
       <?php foreach ($facets['sources'] as $s): ?><option value="<?= $e($s) ?>"<?= ($f['src'] ?? '') === $s ? ' selected' : '' ?>><?= $e(Catalog::source($s)) ?></option><?php endforeach; ?>
     </select></label>
+  <label class="field kq__s"><span class="sr">Responsable</span>
+    <select name="rs" aria-label="Responsable"><option value="">Todos los responsables</option><option value="me"<?= ($f['rs'] ?? '') === 'me' ? ' selected' : '' ?>>Mis leads</option><option value="none"<?= ($f['rs'] ?? '') === 'none' ? ' selected' : '' ?>>Sin asignar</option>
+      <?php foreach (($facets['admins'] ?? []) as $ak => $al): ?><option value="<?= $e($ak) ?>"<?= ($f['rs'] ?? '') === (string) $ak ? ' selected' : '' ?>><?= $e($al) ?></option><?php endforeach; ?>
+    </select></label>
   <label class="inp kq__q"><?= Ui::icon('search') ?><input type="search" name="q" value="<?= $e($f['q'] ?? '') ?>" placeholder="Buscar lead…" maxlength="100" aria-label="Buscar por nombre, teléfono, correo o USDOT"></label>
   <button class="btn btn--secondary btn--sm kq__go" type="submit">Filtrar</button>
   <?php if ($filtered): ?><a class="btn btn--ghost btn--sm" href="/pipeline<?= $pl === 'B' ? '?pl=B' : '' ?>"><?= Ui::icon('x') ?>Quitar filtros</a><?php endif; ?>
@@ -55,7 +59,7 @@ $chipLabels = [
     't' => static fn($v) => 'Temperatura: ' . Catalog::label(Catalog::TEMPS, $v), 'pf' => static fn($v) => 'Perfil: ' . Catalog::label(Catalog::PROFILES, $v), 'src' => static fn($v) => 'Fuente: ' . Catalog::source($v),
     'eq' => static fn($v) => 'Equipo: ' . Catalog::label(Catalog::EQUIPMENT, $v), 'us' => static fn($v) => 'Estado: ' . $v, 'lg' => static fn($v) => 'Idioma: ' . Catalog::label(Catalog::LANGS, $v),
     'from' => static fn($v) => 'Desde: ' . $v, 'to' => static fn($v) => 'Hasta: ' . $v, 'q' => static fn($v) => 'Texto: «' . $v . '»', 'ct' => static fn() => 'Sin contactar', 'fl' => static fn() => 'FMCSA pendiente',
-    'nt' => static fn() => 'Sin tarea abierta', 'op' => static fn() => 'Solo abiertos', 'hs' => static fn() => 'Presentados sin respuesta',
+    'nt' => static fn() => 'Sin tarea abierta', 'op' => static fn() => 'Solo abiertos', 'hs' => static fn() => 'Presentados sin respuesta', 'sla' => static fn() => 'SLA vencido', 'rs' => static fn($v) => 'Responsable: ' . ($v === 'me' ? 'yo' : ($v === 'none' ? 'sin asignar' : 'otra persona')),
 ];
 if ($f): ?>
 <ul class="chips" aria-label="Filtros activos">

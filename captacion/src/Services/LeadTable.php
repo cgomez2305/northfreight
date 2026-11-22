@@ -18,19 +18,19 @@ final class LeadTable
     /** Columnas opcionales (clave => etiqueta). «Lead» (nombre) siempre se ve y va fija a la izquierda. */
     public const COLUMNS = [
         'code' => 'Código', 'prof' => 'Perfil', 'st' => 'Estado', 'lang' => 'Idioma', 'eq' => 'Equipo', 'trucks' => 'Camiones', 'exp' => 'Años de experiencia', 'usdot' => 'USDOT',
-        'phone' => 'Teléfono', 'email' => 'Correo', 'pts' => 'Puntos', 'temp' => 'Temperatura', 'stage' => 'Etapa', 'src' => 'Fuente', 'contact' => 'Primer contacto',
+        'phone' => 'Teléfono', 'email' => 'Correo', 'pts' => 'Puntos', 'temp' => 'Temperatura', 'stage' => 'Etapa', 'resp' => 'Responsable', 'src' => 'Fuente', 'contact' => 'Primer contacto',
         'when' => 'Recibido', 'changed' => 'Último cambio', 'task' => 'Próxima tarea',
     ];
     /** Etiqueta corta de la cabecera. */
     public const HEAD = [
         'code' => 'Código', 'prof' => 'Perfil', 'st' => 'Est.', 'lang' => 'Idioma', 'eq' => 'Equipo', 'trucks' => 'Camiones', 'exp' => 'Años', 'usdot' => 'USDOT', 'phone' => 'Teléfono', 'email' => 'Correo',
-        'pts' => 'Pts', 'temp' => 'Temp.', 'stage' => 'Etapa', 'src' => 'Fuente', 'contact' => '1.er contacto', 'when' => 'Recibido', 'changed' => 'Cambio', 'task' => 'Próxima tarea',
+        'pts' => 'Pts', 'temp' => 'Temp.', 'stage' => 'Etapa', 'resp' => 'Responsable', 'src' => 'Fuente', 'contact' => '1.er contacto', 'when' => 'Recibido', 'changed' => 'Cambio', 'task' => 'Próxima tarea',
     ];
     /** Claves de orden (URL) => [expresion SQL, puede ser NULL]. «name» y las de la Lista (created, score) tienen alias. */
     public const SORTS = [
         'name' => ["CONCAT_WS(' ', l.first_name, l.last_name)", false], 'code' => ['l.id', false], 'prof' => ['l.profile', false], 'st' => ['l.state', true], 'lang' => ['l.language', false],
         'trucks' => ['l.truck_count', true], 'exp' => ['l.years_experience', true], 'usdot' => ['l.usdot', true], 'pts' => ['l.score', false], 'temp' => ['l.temperature', false],
-        'stage' => ['STAGE', false], 'src' => ['l.source', false], 'contact' => ['l.first_contact_at', true], 'when' => ['l.created_at', false], 'changed' => ['l.updated_at', false],
+        'stage' => ['STAGE', false], 'resp' => ['au.name', true], 'src' => ['l.source', false], 'contact' => ['l.first_contact_at', true], 'when' => ['l.created_at', false], 'changed' => ['l.updated_at', false],
     ];
     private const ALIAS = ['created' => 'when', 'score' => 'pts'];
     public const PER = [25, 50, 100];
@@ -68,7 +68,8 @@ final class LeadTable
     }
 
     private const SELECT = 'l.id, l.first_name, l.last_name, l.profile, l.state, l.language, l.equipment_types, l.truck_count, l.years_experience, l.usdot, l.phone_e164, l.email, l.score, l.temperature, l.stage,
-                    l.pipeline, l.source, l.first_contact_at, l.created_at, l.updated_at, l.flags';
+                    l.pipeline, l.source, l.first_contact_at, l.created_at, l.updated_at, l.flags, l.assigned_to, l.stage_changed_at, au.name AS assignee';
+    private const FROM = 'FROM leads l LEFT JOIN users au ON au.id = l.assigned_to';
 
     /** @return array{rows:list<array>,total:int,page:int,pages:int,per:int} */
     public static function list(array $f, array $paging): array
@@ -77,7 +78,7 @@ final class LeadTable
         $total = (int) Db::value("SELECT COUNT(*) FROM leads l WHERE $where", $params);
         $pages = max(1, (int) ceil($total / $paging['per']));
         $page = min($paging['page'], $pages);
-        $rows = Db::all('SELECT ' . self::SELECT . " FROM leads l WHERE $where ORDER BY " . self::orderBy($paging) . ' LIMIT ' . (int) $paging['per'] . ' OFFSET ' . (int) (($page - 1) * $paging['per']), $params);
+        $rows = Db::all('SELECT ' . self::SELECT . ' ' . self::FROM . " WHERE $where ORDER BY " . self::orderBy($paging) . ' LIMIT ' . (int) $paging['per'] . ' OFFSET ' . (int) (($page - 1) * $paging['per']), $params);
         foreach ($rows as &$r) {
             $r['equipment_types'] = Db::decode($r['equipment_types']);
             $r['flags'] = Db::decode($r['flags']);
@@ -125,6 +126,7 @@ final class LeadTable
             'pts' => (string) (int) $r['score'],
             'temp' => Catalog::label(Catalog::TEMPS, (string) $r['temperature']),
             'stage' => Catalog::stageLabel((string) $r['pipeline'], (string) $r['stage']),
+            'resp' => (string) ($r['assignee'] ?? ''),
             'src' => Catalog::source((string) $r['source']),
             'contact' => $tz($r['first_contact_at']),
             'when' => $tz($r['created_at']),
@@ -153,7 +155,7 @@ final class LeadTable
         } else {
             [$where, $params] = LeadQuery::where($f);
         }
-        $rows = Db::all('SELECT ' . self::SELECT . " FROM leads l WHERE $where ORDER BY " . self::orderBy($paging) . ' LIMIT 10000', $params);
+        $rows = Db::all('SELECT ' . self::SELECT . ' ' . self::FROM . " WHERE $where ORDER BY " . self::orderBy($paging) . ' LIMIT 10000', $params);
         foreach ($rows as &$r) {
             $r['equipment_types'] = Db::decode($r['equipment_types']);
         }

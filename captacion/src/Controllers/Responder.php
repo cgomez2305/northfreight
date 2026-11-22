@@ -10,6 +10,7 @@ use Captacion\Db;
 use Captacion\Middleware\SecurityHeaders;
 use Captacion\Models\User;
 use Captacion\Services\Commands;
+use Captacion\Services\LeadQuery;
 use Captacion\Services\Notifications;
 use Captacion\Services\Prefs;
 use Captacion\Services\SavedViews;
@@ -56,6 +57,7 @@ abstract class Responder
         if (($user['role'] ?? '') === 'viewer' && !$viewerOk) {
             self::html('message', ['title' => 'Sin permiso', 'heading' => 'Sin permiso', 'text' => 'Tu cuenta solo puede ver los resultados y los informes.', 'linkHref' => '/resultados', 'linkText' => 'Ir a resultados'], 403);
         }
+        LeadQuery::forUser((int) $user['id']);   // AM: «Mis leads» (rs=me) necesita saber quién mira
         return $user;
     }
 
@@ -71,6 +73,7 @@ abstract class Responder
         if (($user['role'] ?? '') === 'viewer' && !$viewerOk) {
             self::json(['ok' => false, 'error' => 'forbidden'], 403);
         }
+        LeadQuery::forUser((int) $user['id']);
         return $user;
     }
 
