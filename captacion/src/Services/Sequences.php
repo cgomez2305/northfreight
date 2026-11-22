@@ -50,7 +50,7 @@ final class Sequences
     public const STATUS = ['active' => 'Activa', 'paused' => 'En pausa', 'completed' => 'Completada', 'stopped' => 'Detenida'];
     public const REASONS = [
         'stage' => 'El lead avanzó de etapa', 'responded' => 'El lead respondió', 'manual' => 'Pausada a mano', 'unsubscribed' => 'Se dio de baja', 'no_consent' => 'Sin consentimiento de correo vigente',
-        'removed' => 'Sacada a mano', 'no_email' => 'El lead no tiene correo', 'lead_deleted' => 'El lead ya no existe',
+        'removed' => 'Sacada a mano', 'no_email' => 'El lead no tiene correo', 'lead_deleted' => 'El lead ya no existe', 'erasure' => 'Lead anonimizado a petición', 'merged' => 'Lead fusionado en otro',
     ];
     public const DEFAULT_CAP_HOUR = 20;
     public const DEFAULT_CAP_LEAD = 1;

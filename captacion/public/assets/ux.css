@@ -122,3 +122,7 @@ body.is-dragging *{cursor:grabbing!important}
   .dlg__row{grid-template-columns:1fr}
   .dlg{border-radius:var(--r-card)}
 }
+/* Fase AM · formularios de privacidad y fusion de la ficha (se cargan diferidos con el resto de ux.css) */
+.priv__form{display:flex;flex-direction:column;gap:12px;margin-top:10px}
+.priv__form .btn{align-self:flex-start}
+.opts--stack{grid-template-columns:minmax(0,1fr)}

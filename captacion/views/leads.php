@@ -23,16 +23,17 @@ $isEmptyDb = $grandTotal === 0;
     <h1 class="h1">Leads</h1>
     <p class="sub"><?= $isEmptyDb ? 'Aquí aparecerán los leads de owner-operators, carriers y company drivers.' : $e(Fmt::num($list['total'])) . ' lead' . ($list['total'] === 1 ? '' : 's') . ($nFilters + (isset($f['t']) ? 1 : 0) > 0 ? ' con los filtros actuales' : ' en total') ?></p>
   </div>
-  <?php if (!$isEmptyDb): ?>
   <div class="page-head__a">
+  <?php if (!$isEmptyDb): ?>
     <button class="btn btn--secondary filters-toggle" type="button" data-toggle="#filters" aria-expanded="<?= $nFilters > 0 ? 'true' : 'false' ?>" aria-controls="filters"><?= Ui::icon('filter') ?>Filtros<?= $nFilters > 0 ? ' <b class="badge">' . $e($nFilters) . '</b>' : '' ?></button>
     <form method="post" action="/leads/export">
       <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="scope" value="filters"><input type="hidden" name="qs" value="<?= $e(ltrim($qsAll(), '?')) ?>">
       <button class="btn btn--secondary" type="submit"><span class="btn__t">Exportar CSV</span></button>
     </form>
     <button class="btn btn--primary" type="button" data-new-lead><span class="btn__t">Nuevo lead</span></button>
-  </div>
   <?php endif; ?>
+    <?php if (!empty($isAdmin)): ?><a class="btn btn--secondary" href="/importar"><?= Ui::icon('inbox') ?>Importar CSV</a><?php endif; ?>
+  </div>
 </div>
 
 <?php if ($isEmptyDb): ?>

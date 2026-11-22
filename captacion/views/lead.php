@@ -24,6 +24,7 @@ $waText = $lead['language'] === 'es' ? 'Hola ' . $lead['first_name'] . ', te esc
 $flags = (array) $lead['flags'];
 $activeConsents = array_filter($consents, static fn($c) => $c['revoked_at'] === null);
 $stopped = in_array('stop', $flags, true);
+$anon = ($lead['anonymized_at'] ?? null) !== null;   // fase AM: lead anonimizado, sin acciones de contacto
 $groups = ['all' => 'Todo', 'contact' => 'Contacto', 'stage' => 'Etapas', 'note' => 'Notas', 'task' => 'Tareas', 'system' => 'Sistema'];
 $gc = array_fill_keys(array_keys($groups), 0);
 foreach ($timeline as $t) {
@@ -57,7 +58,7 @@ $loc = trim(($lead['city'] ? $lead['city'] . ', ' : '') . ($lead['state'] ?? '')
     <?php if ($phone): ?><a class="btn btn--primary" href="tel:<?= $e($phone) ?>"><span class="btn__t">Llamar</span></a><?php endif; ?>
     <?php if ($wa): ?><a class="btn btn--secondary" href="https://wa.me/<?= $e($wa) ?>?text=<?= $e(rawurlencode($waText)) ?>" rel="noopener noreferrer" target="_blank"><?= Ui::icon('chat') ?>WhatsApp</a><?php endif; ?>
     <?php if ($lead['email']): ?><a class="btn btn--secondary" href="mailto:<?= $e($lead['email']) ?>"><?= Ui::icon('mail') ?>Correo</a><?php endif; ?>
-    <button class="btn btn--secondary" type="button" data-open="#call-dlg"><?= Ui::icon('history') ?>Registrar llamada</button>
+    <?php if (!$anon): ?><button class="btn btn--secondary" type="button" data-open="#call-dlg"><?= Ui::icon('history') ?>Registrar llamada</button><?php endif; ?>
     <?php if ($lost): ?>
       <form method="post" action="/leads/<?= $e($id) ?>/reopen"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><button class="btn btn--secondary" type="submit"><?= Ui::icon('refresh') ?>Reabrir lead</button></form>
     <?php else: ?>
@@ -75,6 +76,7 @@ $loc = trim(($lead['city'] ? $lead['city'] . ', ' : '') . ($lead['state'] ?? '')
   </dl>
 </header>
 
+<?php if ($anon) { require __DIR__ . '/_lead_anon_notice.php'; } ?>
 <?php if ($lost): ?>
 <p class="flash flash--bad" role="status"><?= Ui::icon('flag') ?><span><b><?= $e($stages['lost']) ?></b><?= $lead['lost_reason'] ? ' · ' . $e(Catalog::label(Catalog::LOSS_REASONS, $lead['lost_reason'])) : '' ?><?= $lead['lost_at'] ? ' · ' . $e(Fmt::dateTime($lead['lost_at'])) : '' ?>. Puedes reabrirlo si vuelve a mostrar interés.</span></p>
 <?php elseif ($lead['temperature'] === 'disqualified'): ?>
@@ -165,6 +167,7 @@ $loc = trim(($lead['city'] ? $lead['city'] . ', ' : '') . ($lead['state'] ?? '')
 
   <div class="lead__side">
     <?php require __DIR__ . '/_lead_q3.php'; ?>
+    <?php require __DIR__ . '/_lead_datos.php'; ?>
     <section class="card" aria-labelledby="h-score">
       <header class="card__h"><h2 class="label" id="h-score">Puntuación desglosada</h2><b class="mono"><?= $e($lead['score']) ?>/100</b></header>
       <div class="card__b">

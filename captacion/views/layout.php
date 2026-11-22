@@ -15,6 +15,7 @@ $brand = '<a class="brand" href="' . (!empty($isViewer) ? '/resultados' : '/') .
 <meta name="robots" content="noindex, nofollow, noarchive">
 <meta name="color-scheme" content="light dark">
 <title><?= $e($title ?? 'Captación') ?> · NorthStar Captación</title>
+<?php if (!empty($refresh)): ?><meta http-equiv="refresh" content="0;url=<?= $e($refresh) ?>"><?php endif; ?>
 <link rel="icon" href="/assets/isotype.svg" type="image/svg+xml">
 <link rel="preload" href="/assets/fonts/geist-var.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/fonts.css?v=<?= $e($assetV('fonts.css')) ?>">

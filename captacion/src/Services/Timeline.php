@@ -218,6 +218,31 @@ final class Timeline
                 $tone = 'bad';
                 $detail = 'Canal: ' . ($p['channel'] ?? 'all') . ' · vía ' . ($p['via'] ?? '—');
                 break;
+            case 'anonymized':
+                $icon = 'shield';
+                $tone = 'bad';
+                $detail = 'Datos personales eliminados. Se conservan fechas, fuente, etapa y puntuación.';
+                break;
+            case 'merged':
+                $icon = 'users';
+                $tone = 'accent';
+                $detail = !empty($p['into']) ? 'Este lead se fusionó en el #' . (int) $p['into'] . '.' : (!empty($p['from']) ? 'Se fusionó el lead #' . (int) $p['from'] . ' en este.' : '');
+                break;
+            case 'suppressed':
+                $icon = 'shield';
+                $tone = 'bad';
+                $detail = (($p['reason'] ?? '') === 'erasure' ? 'Borrado a petición: sin consentimiento ni contacto.' : 'STOP por SMS anterior: sin consentimiento de SMS ni WhatsApp.') . (!empty($p['consent_offered']) ? ' El consentimiento que venía marcado no se guardó.' : '');
+                break;
+            case 'template_sent':
+                $icon = 'mail';
+                $tone = 'slate';
+                $detail = 'Plantilla «' . mb_substr((string) ($p['tkey'] ?? ''), 0, 60) . '» por correo (' . ($p['status'] ?? '') . ')';
+                break;
+            case 'whatsapp_opened':
+                $icon = 'chat';
+                $tone = 'slate';
+                $detail = 'Plantilla «' . mb_substr((string) ($p['tkey'] ?? ''), 0, 60) . '». Se abrió WhatsApp desde el panel; el panel no puede saber si se envió.';
+                break;
         }
         $group = Catalog::EVENT_GROUPS[$type] ?? ('system');
         return ['at' => $at, 'icon' => $icon, 'tone' => $tone, 'group' => $group, 'title' => $title, 'detail' => $detail, 'by' => $by];
