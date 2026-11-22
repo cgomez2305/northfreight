@@ -140,9 +140,9 @@ return static function (array $ctx): void {
     // exportar
     $r = $s->post('/actividad/export', ['qs' => 'ty=login']);
     T::ok(!str_contains(Infra::header($r, 'content-type'), 'text/csv'), 'exportar sin CSRF: no entrega CSV');
+    // Regresión A3 (auditoría 2026-11-22): sin confirmar identidad (contraseña + 2FA) el POST directo no exporta, igual que la pantalla bloqueada
     $r = $s->post('/actividad/export', ['_csrf' => $s->csrf, 'qs' => 'ty=login']);
-    T::ok($r['status'] === 200 && str_contains(Infra::header($r, 'content-type'), 'text/csv') && str_contains(Infra::header($r, 'content-disposition'), 'attachment') && str_starts_with($r['body'], "\xEF\xBB\xBF") && str_contains($r['body'], 'Inicio de sesión') && !str_contains($r['body'], 'Cambio de etapa'), 'exportar con CSRF: CSV adjunto con los filtros aplicados');
-    T::eq((int) Db::value("SELECT COUNT(*) FROM activity_log WHERE action = 'activity_export'"), 1, '  la exportacion queda en el registro');
+    T::ok($r['status'] === 303 && !str_contains(Infra::header($r, 'content-type'), 'text/csv') && (int) Db::value("SELECT COUNT(*) FROM activity_log WHERE action = 'activity_export'") === 0, 'exportar SIN confirmar identidad: 303 y no entrega el CSV');
     // retencion con reautenticacion
     $r = $s->post('/actividad/retention', ['_csrf' => $s->csrf, 'days' => '90']);
     T::ok($r['status'] === 303 && ActivityView::retentionDays() === 365 && str_contains($s->get('/actividad')['body'], 'Confirmar para editar'), 'cambiar la retencion SIN confirmar identidad: se rechaza y no cambia');
@@ -152,6 +152,10 @@ return static function (array $ctx): void {
     $s->post('/actividad/retention', ['_csrf' => $s->csrf, 'days' => '90']);
     Settings::clear();
     T::eq(ActivityView::retentionDays(), 90, 'con la confirmacion vigente: la retencion cambia a 90');
+    // con la identidad confirmada (vigente aquí) la exportación sí entrega el CSV
+    $r = $s->post('/actividad/export', ['_csrf' => $s->csrf, 'qs' => 'ty=login']);
+    T::ok($r['status'] === 200 && str_contains(Infra::header($r, 'content-type'), 'text/csv') && str_contains(Infra::header($r, 'content-disposition'), 'attachment') && str_starts_with($r['body'], "\xEF\xBB\xBF") && str_contains($r['body'], 'Inicio de sesión') && !str_contains($r['body'], 'Cambio de etapa'), 'exportar con CSRF: CSV adjunto con los filtros aplicados');
+    T::eq((int) Db::value("SELECT COUNT(*) FROM activity_log WHERE action = 'activity_export'"), 1, '  la exportacion queda en el registro');
     $r = $s->post('/actividad/retention', ['_csrf' => $s->csrf, 'days' => '5']);
     Settings::clear();
     T::ok(ActivityView::retentionDays() === 90 && str_contains($s->get('/actividad')['body'], 'entre 30 y 3650'), 'retencion invalida por HTTP: mensaje y no cambia');

@@ -334,6 +334,13 @@ return static function (array $ctx): void {
     T::ok($r['status'] === 200 && str_contains($r['body'], 'ID,'), 'exportar el periodo del dashboard: CSV');
     $r = $post('/leads/bulk', ['_csrf' => $csrf, 'do' => 'export', 'ids' => [(string) $leadA, 'x']]);
     T::ok(str_contains(Infra::header($r, 'content-type'), 'text/csv') && str_contains($r['body'], 'Acceso Prueba'), 'exportar la seleccion (acepta solo ids validos)');
+    // Regresión A3 (auditoría 2026-11-22): las exportaciones de leads tienen tope por usuario (20 por hora), también la selección masiva
+    $blocked = 0;
+    foreach (range(1, 24) as $i) {
+        $r = $post($i % 2 === 0 ? '/leads/export' : '/leads/bulk', ['_csrf' => $csrf, 'scope' => 'filters', 'qs' => 'q=Acceso', 'do' => 'export', 'ids' => [(string) $leadA]]);
+        $blocked += str_contains(Infra::header($r, 'content-type'), 'text/csv') ? 0 : 1;
+    }
+    T::ok(24 - $blocked <= 17 && $blocked >= 7, 'más de 20 exportaciones de leads en una hora: se frenan (sin CSV); ya había 3 antes de este bucle, así que salen como mucho 17 de las 24');
     // AJAX
     T::eq(Infra::http('GET', "$B/ajax/search", ['jar' => $jar])['status'], 405, '/ajax/search con GET: 405');
     T::eq($ajax('/ajax/search', ['q' => 'Acceso'], null)['status'], 403, '/ajax/search sin X-CSRF-Token: 403');

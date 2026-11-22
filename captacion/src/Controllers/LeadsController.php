@@ -18,6 +18,7 @@ use Captacion\Services\LeadActions;
 use Captacion\Services\LeadQuery;
 use Captacion\Services\Sequences;
 use Captacion\Services\Prefs;
+use Captacion\Services\RateLimiter;
 use Captacion\Services\SavedViews;
 use Captacion\Services\Timeline;
 use Captacion\Services\Undo;
@@ -113,6 +114,7 @@ final class LeadsController extends Responder
         $ids = is_array($_POST['ids'] ?? null) ? array_map('intval', $_POST['ids']) : [];
         $act = is_string($_POST['do'] ?? null) ? $_POST['do'] : '';
         if ($act === 'export') {
+            self::exportBudget($user);
             self::exportResponse($user, null, $ids, 'seleccion');
         }
         $r = LeadActions::bulkStage($ids, (string) ($_POST['stage'] ?? ''), ['reason' => (string) ($_POST['reason'] ?? ''), 'note' => (string) ($_POST['note'] ?? '')], (int) $user['id']);
@@ -125,6 +127,7 @@ final class LeadsController extends Responder
     {
         $user = self::user();
         self::requirePost('/leads');
+        self::exportBudget($user);
         $ids = is_array($_POST['ids'] ?? null) ? array_map('intval', $_POST['ids']) : null;
         $scope = is_string($_POST['scope'] ?? null) ? $_POST['scope'] : 'filters';
         if ($scope === 'period') {
@@ -140,6 +143,20 @@ final class LeadsController extends Responder
         }
         parse_str(is_string($_POST['qs'] ?? null) ? (string) $_POST['qs'] : '', $q);
         self::exportResponse($user, LeadQuery::filters($q), $scope === 'selection' ? $ids : null, $scope === 'selection' ? 'seleccion' : 'filtro');
+    }
+
+    /**
+     * Mismo tope que /tabla/export (20 por hora y usuario) para TODAS las salidas CSV de leads (filtros, periodo y selección masiva): una sesión robada no puede vaciar
+     * la base (hasta 10.000 filas con nombre, teléfono y correo) en bucle. Al pasarse, vuelve a la bandeja con un aviso.
+     */
+    private static function exportBudget(array $user): void
+    {
+        $key = 'u' . (int) $user['id'];
+        if (RateLimiter::tooMany('leads_export', $key, ModosController::EXPORT_LIMIT, 3600)) {
+            self::flash(false, 'Hiciste muchas exportaciones seguidas. Espera un rato y vuelve a intentarlo.');
+            self::redirect(self::backUrl());
+        }
+        RateLimiter::hit('leads_export', $key, 3600);
     }
 
     private static function exportResponse(array $user, ?array $f, ?array $ids, string $tag): never
