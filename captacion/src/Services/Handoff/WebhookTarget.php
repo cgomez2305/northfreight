@@ -57,6 +57,10 @@ final class WebhookTarget implements HandoffTarget
         if (!$this->enabled()) {
             throw new \RuntimeException('Webhook sin configurar.');
         }
+        $problem = Handoff::urlProblem($c['webhook_url']);   // se revalida al ENVIAR: el DNS pudo cambiar desde que se guardó la URL
+        if ($problem !== null) {
+            throw new \RuntimeException('Webhook bloqueado: ' . $problem);
+        }
         $body = self::body($card, $handoff);
         $ts = (string) Clock::time();
         $r = Http::request('POST', $c['webhook_url'], $body, [
