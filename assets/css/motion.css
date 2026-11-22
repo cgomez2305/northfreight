@@ -31,7 +31,7 @@
 
 /* ---- Escena 1: hero de la home. El contenedor de la foto se encoge y revela el fondo; necesita el radio fijo y el recorte ---- */
 @media (min-width: 1025px) {
-  .js-motion .hero--home .hero__bg { clip-path: inset(1px round calc(var(--r-panel) - 1px)); will-change: transform; }   /* recorte ESTÁTICO con radio fijo (no se anima); el 1px evita la línea de foto cruda que asoma por el borde al escalar con medio píxel */
+  .js-motion .hero--home .hero__bg { clip-path: inset(0 round var(--r-panel)); will-change: transform; }   /* recorte ESTÁTICO con radio fijo (no se anima). Sin el inset de 1px: con la escena a escala fraccionaria, ese recorte caía en medio de un píxel y dejaba una línea clara (foto cruda sin el degradado) en los bordes izquierdo y superior; medido con el póster y con el video */
   .js-motion .hero--home .hero__bg picture { overflow: hidden; border-radius: var(--r-panel); }   /* la foto se recorta también en su propio marco: atenúa la fila de borde que asoma al escalar */
   .js-motion .hero--home .hero__main,
   .js-motion .hero--home .tags,
