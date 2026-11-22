@@ -825,12 +825,22 @@ CREATE TABLE IF NOT EXISTS rule_simulation_rows (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ===== 013_lead_modes.sql =====
--- 013_lead_modes: fase Q5c (vistas Tabla, Calendario y Cronología). Idempotente (IF NOT EXISTS: MariaDB 10.1+; se puede repetir sin daño).
+-- 013_lead_modes: fase Q5c (vistas Tabla, Calendario y Cronología). SQL estándar (MariaDB y MySQL 8); el migrador registra la versión y no la repite.
 -- 1) Una vista guardada recuerda también el modo (lista, tablero, tabla, calendario o cronología). NULL = la pantalla en la que se abre.
-ALTER TABLE saved_views ADD COLUMN IF NOT EXISTS mode VARCHAR(12) NULL AFTER pipeline;
+ALTER TABLE saved_views ADD COLUMN mode VARCHAR(12) NULL AFTER pipeline;
 -- 2) Cronología global: los eventos de todos los leads por fecha (desc) con cursor (created_at, id); sin este índice cada página recorrería la tabla entera.
-ALTER TABLE lead_events ADD KEY IF NOT EXISTS idx_events_created (created_at, id);
+ALTER TABLE lead_events ADD KEY idx_events_created (created_at, id);
 -- 3) Calendario por rango visible: tareas por fecha de vencimiento (hechas o no) y entregas programadas (jobs pendientes por tipo y hora).
-ALTER TABLE tasks ADD KEY IF NOT EXISTS idx_tasks_due_range (deleted_at, due_at);
-ALTER TABLE jobs ADD KEY IF NOT EXISTS idx_jobs_type_run (type, status, run_at);
+ALTER TABLE tasks ADD KEY idx_tasks_due_range (deleted_at, due_at);
+ALTER TABLE jobs ADD KEY idx_jobs_type_run (type, status, run_at);
+
+-- ===== 014_cliente_ah.sql =====
+-- 014_cliente_ah: fase AH (respuestas del cliente, 2026-11-20). NorthStar solo atiende Amazon Relay y dry van, y a un company driver le pide 2 años de experiencia.
+-- Solo se cambia lo que sigue exactamente como lo sembró 003: si Carlos ya lo editó desde Configuración, no se toca. Estándar en MariaDB y MySQL 8.
+UPDATE settings SET value = '["dry-van","amazon-relay"]'
+ WHERE `key` = 'dispatched_equipment' AND value = '["dry-van","reefer","flatbed","box-truck","hotshot","power-only"]';
+UPDATE settings SET value = '2' WHERE `key` = 'driver_min_years' AND value = '1';
+-- Equipos y años mínimos dejan de ser provisionales; estados de contratación y tramos de experiencia siguen pendientes.
+UPDATE settings SET value = '["hiring_states","scoring.driver.experience"]'
+ WHERE `key` = 'provisional' AND value = '["dispatched_equipment","hiring_states","driver_min_years","scoring.driver.experience"]';
 
