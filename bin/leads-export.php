@@ -14,7 +14,7 @@
  *
  * Columnas: id, created_at (UTC), profile, job, qualified, name, phone, email, state, language, contact_pref, best_time, trucks, equipment (separado por "; "), years, authority,
  * cdl_standard, english, consent_given, consent_version, consent_at, consent_ip, consent_text, utm_source, utm_medium, utm_campaign, utm_term, utm_content, referrer, landing, first_seen,
- * ip_hash, user_agent. Las líneas que no se pueden leer se saltan y se avisan por la salida de errores. Las celdas que empiezan por = + - @ llevan un apóstrofo delante para que Excel
+ * ip_hash, user_agent. Las líneas que no se pueden leer se saltan y se avisan por la salida de errores. Las celdas que empiezan por = + - @ (o tabulador o retorno) llevan un apóstrofo delante para que Excel
  * y Google Sheets no las interpreten como fórmulas (los teléfonos EE. UU. salen como "+1 863 555 0101" para que la hoja los deje como texto). El CSV lleva BOM UTF-8 (Excel abre bien "Español" y los acentos). Contiene datos personales: no lo subas a ningún sitio público.
  *
  * bin/ está bloqueado en la web (.htaccess e index.php); aun así el script solo corre por línea de comandos.
@@ -70,7 +70,7 @@ $cell = static function (mixed $v): string {
         return '';
     }
     // Fórmulas: = y @ siempre; + y - solo si no son un teléfono o un número con ese aspecto (los teléfonos E.164 se imprimen con espacios y quedan como texto).
-    if ($s[0] === '=' || $s[0] === '@' || (($s[0] === '+' || $s[0] === '-') && preg_match('/^[+-]?\d[\d\s.()-]*$/', $s) !== 1)) {
+    if ($s[0] === '=' || $s[0] === '@' || $s[0] === "\t" || $s[0] === "\r" || (($s[0] === '+' || $s[0] === '-') && preg_match('/^[+-]?\d[\d\s.()-]*$/', $s) !== 1)) {
         return "'" . $s;
     }
     return $s;
