@@ -10,10 +10,10 @@ $tn = ['email' => 'Correo', 'webhook' => 'Webhook'];
 $ds = ['pending' => 'en cola', 'retrying' => 'reintentando', 'sent' => 'enviada', 'failed' => 'falló', 'skipped' => 'omitida'];
 $confTxt = $hl === null ? '' : ['signed' => 'Firmó', 'rejected' => 'Rechazado', 'superseded' => 'Reemplazada por una versión nueva'][$hl['confirm_status'] ?? ''] ?? 'Esperando respuesta';
 $presented = $lead['stage'] === 'presented';
-$post = static fn(string $action, string $label, string $icon, string $cls = 'btn--secondary', string $confirm = '', array $extra = []) => '<form method="post" action="/leads/' . (int) $id . '/' . $action . '" class="q3f">'
+$post = static fn(string $action, string $label, string $icon, string $cls = 'btn--secondary', string|array $confirm = '', array $extra = []) => '<form method="post" action="/leads/' . (int) $id . '/' . $action . '" class="q3f">'
     . '<input type="hidden" name="_csrf" value="' . htmlspecialchars((string) $csrf, ENT_QUOTES) . '">'
     . implode('', array_map(static fn($k, $v) => '<input type="hidden" name="' . htmlspecialchars($k, ENT_QUOTES) . '" value="' . htmlspecialchars((string) $v, ENT_QUOTES) . '">', array_keys($extra), $extra))
-    . '<button class="btn btn--sm ' . $cls . '" type="submit"' . ($confirm !== '' ? ' data-confirm="' . htmlspecialchars($confirm, ENT_QUOTES) . '"' : '') . '>' . Ui::icon($icon) . htmlspecialchars($label, ENT_QUOTES) . '</button></form>';
+    . '<button class="btn btn--sm ' . $cls . '" type="submit"' . ($confirm !== '' ? Ui::confirm($confirm) : '') . '>' . Ui::icon($icon) . htmlspecialchars($label, ENT_QUOTES) . '</button></form>';
 $activeSeq = array_filter($seqs, static fn($s) => $s['status'] === 'active');
 ?>
 <?php if ($hl !== null || $presented): ?>
@@ -35,10 +35,10 @@ $activeSeq = array_filter($seqs, static fn($s) => $s['status'] === 'active');
     <?php if ($presented): ?>
     <div class="q3a">
       <?php if ($handoff['open']): ?>
-        <?= $post('handoff-signed', 'Marcar firmó', 'check', 'btn--primary', 'Esto mueve el lead a «' . ($lead['pipeline'] === 'B' ? 'Contratado' : 'Firmado') . '», registra la conversión y programa el pedido de referidos. ¿Confirmas que NorthStar lo firmó?') ?>
+        <?= $post('handoff-signed', 'Marcar firmó', 'check', 'btn--primary', ['text' => 'Esto mueve el lead a «' . ($lead['pipeline'] === 'B' ? 'Contratado' : 'Firmado') . '», registra la conversión y programa el pedido de referidos. ¿Confirmas que NorthStar lo firmó?', 'title' => '¿Marcar como firmado?', 'label' => 'Sí, firmó']) ?>
         <button class="btn btn--sm btn--secondary" type="button" data-open="#reject-dlg"><?= Ui::icon('flag') ?>Marcar rechazado</button>
       <?php endif; ?>
-      <?= $post('handoff-resend', 'Reenviar entrega', 'send', 'btn--ghost', 'Se crea una versión nueva de la entrega y los enlaces de la anterior dejan de valer. ¿Reenviar?') ?>
+      <?= $post('handoff-resend', 'Reenviar entrega', 'send', 'btn--ghost', ['text' => 'Se crea una versión nueva de la entrega y los enlaces de la anterior dejan de valer. ¿Reenviar?', 'title' => '¿Reenviar la entrega?', 'label' => 'Reenviar']) ?>
     </div>
     <?php endif; ?>
   </div>
@@ -69,7 +69,7 @@ $activeSeq = array_filter($seqs, static fn($s) => $s['status'] === 'active');
           <?php if ($s['blocked_reason'] && $s['status'] === 'active'): ?><small class="late">Detenida: <?= $e($s['blocked_reason']) ?></small><?php endif; ?>
           <?php if (in_array($s['status'], ['active', 'paused'], true)): ?><span class="q3a">
             <?= $s['status'] === 'active' ? $post('seq-pause', 'Pausar', 'pause', 'btn--ghost', '', ['enrollment_id' => $s['id']]) : $post('seq-resume', 'Reanudar', 'refresh', 'btn--secondary', '', ['enrollment_id' => $s['id']]) ?>
-            <?= $post('seq-remove', 'Sacar', 'x', 'btn--ghost', '¿Sacar a este lead de la secuencia?', ['enrollment_id' => $s['id']]) ?></span><?php endif; ?></li>
+            <?= $post('seq-remove', 'Sacar', 'x', 'btn--ghost', ['text' => '¿Sacar a este lead de la secuencia?', 'title' => '¿Sacar de la secuencia?', 'label' => 'Sacar', 'danger' => true], ['enrollment_id' => $s['id']]) ?></span><?php endif; ?></li>
       <?php endforeach; ?>
     </ul>
     <?php if ($activeSeq): ?><div class="q3a"><?= $post('responded', 'El lead respondió', 'chat', 'btn--secondary', '', []) ?></div><?php endif; ?>

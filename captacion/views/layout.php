@@ -8,7 +8,7 @@ $shell = !empty($shell);
 $brand = '<a class="brand" href="' . (!empty($isViewer) ? '/resultados' : '/') . '" aria-label="NorthStar Captación, ir al inicio" data-tip="NorthStar Captación"><img class="brand__mark" src="/assets/isotype.svg" width="26" height="26" alt=""><span class="brand__txt"><b>NorthStar</b><small>Captación</small></span>' . Ui::icon('chevrons') . '</a>';
 ?>
 <!doctype html>
-<html lang="es"<?= isset($prefs) ? ' data-theme-pref="' . $e($prefs['theme']) . '" data-side="' . $e($prefs['side']) . '" data-density="' . $e($prefs['density']) . '"' : '' ?>>
+<html lang="es"<?= isset($prefs) ? ' data-theme-pref="' . $e($prefs['theme']) . '" data-side="' . $e($prefs['side']) . '" data-density="' . $e($prefs['density']) . '"' . (empty($isViewer) ? ' data-keys="' . $e($prefs['keys'] ?? 'on') . '"' : '') : '' ?>>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -90,12 +90,12 @@ $ni = static function (string $href, string $icon, string $label, string $key, a
       </a><?php endif; ?>
       <?php if (empty($isViewer)): ?><button class="side__fold" type="button" data-side-toggle aria-pressed="<?= ($prefs['side'] ?? 'open') === 'collapsed' ? 'true' : 'false' ?>" data-tip="Contraer barra lateral"><?= Ui::icon('panel-left') ?><span class="nav-i__t">Contraer barra lateral</span></button><?php endif; ?>
       <div class="dd" data-dd>
-        <button class="user" type="button" aria-expanded="false" aria-haspopup="menu" aria-controls="dd-user">
+        <button class="user" type="button" aria-expanded="false" aria-controls="dd-user">
           <?= Ui::avatar((string) $user['name'], 'md', 0) ?>
           <span class="user__txt"><b><?= $e($user['name']) ?></b><small><?= $e($user['role'] === 'admin' ? 'Administrador' : 'Lector · NorthStar') ?></small></span>
           <?= Ui::icon('chevrons') ?>
         </button>
-        <div class="dd__panel dd__panel--up" id="dd-user" role="menu" hidden>
+        <div class="dd__panel dd__panel--up" id="dd-user" aria-label="Cuenta" hidden>
           <?php require __DIR__ . '/_usermenu.php'; ?>
         </div>
       </div>
@@ -219,7 +219,7 @@ $ni = static function (string $href, string $icon, string $label, string $key, a
   <form method="dialog">
     <h2 id="confirm-t" class="dlg__t">¿Seguro?</h2>
     <p id="confirm-m" class="dlg__m"></p>
-    <div class="dlg__a"><button class="btn btn--ghost" value="no">Cancelar</button><button class="btn btn--danger" value="yes" id="confirm-y">Confirmar</button></div>
+    <div class="dlg__a"><button class="btn btn--ghost" value="no">Cancelar</button><button class="btn btn--primary" value="yes" id="confirm-y">Confirmar</button></div>
   </form>
 </dialog>
 <script nonce="<?= $e($nonce) ?>" src="/assets/panel.js?v=<?= $e($assetV('panel.js')) ?>" defer data-csrf="<?= $e($csrf) ?>"></script>

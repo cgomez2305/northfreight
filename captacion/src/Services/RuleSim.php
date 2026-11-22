@@ -151,7 +151,7 @@ final class RuleSim
     private static function blank(): array
     {
         $z = ['hot' => 0, 'warm' => 0, 'cold' => 0, 'disqualified' => 0];
-        return ['scanned' => 0, 'before' => $z, 'after' => $z, 'changed' => 0, 'to_hot' => 0, 'from_hot' => 0, 'matched' => 0, 'alerts' => 0, 'tasks' => 0, 'tags' => 0, 'review' => 0, 'score_delta' => 0];
+        return ['scanned' => 0, 'before' => $z, 'after' => $z, 'changed' => 0, 'to_hot' => 0, 'from_hot' => 0, 'matched' => 0, 'alerts' => 0, 'tasks' => 0, 'tags' => 0, 'review' => 0, 'score_delta' => 0, 'bells' => 0, 'hooks' => 0];
     }
 
     private static function add(array &$sum, array $r): void
@@ -167,14 +167,16 @@ final class RuleSim
         $sum['tasks'] += $r['tasks'] > 0 ? 1 : 0;
         $sum['tags'] += $r['tags'] > 0 ? 1 : 0;
         $sum['review'] += $r['review'] > 0 ? 1 : 0;
+        $sum['bells'] += ($r['bells'] ?? 0) > 0 ? 1 : 0;   // fase AM: reglas de eventos y tiempo
+        $sum['hooks'] += ($r['hooks'] ?? 0) > 0 ? 1 : 0;
         $sum['score_delta'] += $r['after']['score'] - $r['before']['score'];
     }
 
     private static function sample(array $lead, array $r): array
     {
         $fx = [];
-        foreach (['alerts' => 'alerta', 'tasks' => 'tarea', 'tags' => 'etiqueta', 'review' => 'cola de revisión'] as $k => $l) {
-            if ($r[$k] > 0) {
+        foreach (['alerts' => 'alerta', 'tasks' => 'tarea', 'tags' => 'etiqueta', 'review' => 'cola de revisión', 'bells' => 'aviso en la campana', 'hooks' => 'webhook saliente'] as $k => $l) {
+            if (($r[$k] ?? 0) > 0) {
                 $fx[] = $l;
             }
         }
@@ -193,6 +195,9 @@ final class RuleSim
     {
         $t0 = microtime(true);
         $maxSeconds ??= self::PREVIEW_SECONDS;
+        if (($target['kind'] ?? '') === 'automation') {
+            return self::previewAuto($target, $scope, $maxSeconds);
+        }
         [$before, $after] = self::sets($target);
         $settings = Scoring::settings();
         $needConsent = RuleEngine::usesField($before, 'consent') || RuleEngine::usesField($after, 'consent');
@@ -232,6 +237,45 @@ final class RuleSim
         }
         $samples = array_slice([...$samples, ...$extra], 0, self::SAMPLES);
         return ['summary' => $sum, 'samples' => $samples, 'partial' => $partial, 'seconds' => round(microtime(true) - $t0, 3), 'scope' => ''];
+    }
+
+    /**
+     * Fase AM: vista previa de un conjunto de EVENTOS Y TIEMPO. Cuenta los leads del alcance en los que alguna regla habria actuado (con los datos de hoy y el historial de eventos ya ocurridos)
+     * y que acciones habria disparado. No cambia puntuaciones, no escribe nada.
+     */
+    private static function previewAuto(array $target, array $scope, float $maxSeconds): array
+    {
+        $t0 = microtime(true);
+        $now = Clock::time();
+        [$w, $p] = self::where($scope);
+        $sum = self::blank();
+        $samples = [];
+        $partial = false;
+        $limit = $scope['mode'] === 'last' ? min((int) $scope['n'], self::PREVIEW_ROWS) : self::PREVIEW_ROWS;
+        $needConsent = RuleEngine::usesField([['rules' => $target['rules']]], 'consent');
+        $cursor = PHP_INT_MAX;
+        while ($sum['scanned'] < $limit) {
+            $rows = Db::all('SELECT * FROM leads WHERE ' . $w . ' AND id < ? ORDER BY id DESC LIMIT ' . min(500, $limit - $sum['scanned']), [...$p, $cursor]);
+            if (!$rows) {
+                break;
+            }
+            $leads = array_map([Lead::class, 'hydrate'], $rows);
+            $cons = $needConsent ? RuleRunner::consentMap($leads) : [];
+            $pre = RuleAutomation::simPrefetch($leads, $now);
+            foreach ($leads as $lead) {
+                $cursor = (int) $lead['id'];
+                $r = RuleAutomation::simLead($lead, RuleRunner::facts($lead, $now, $cons[$cursor] ?? []), $target['rules'], $now, $pre);
+                self::add($sum, $r);
+                if ($r['matched'] && count($samples) < self::SAMPLES) {
+                    $samples[] = self::sample($lead, $r);
+                }
+            }
+            if (microtime(true) - $t0 > $maxSeconds) {
+                $partial = $sum['scanned'] < $limit;
+                break;
+            }
+        }
+        return ['summary' => $sum, 'samples' => $samples, 'partial' => $partial, 'seconds' => round(microtime(true) - $t0, 3), 'scope' => '', 'auto' => true];
     }
 
     // --- Simulacion ----------------------------------------------------------------------------------------------------------------
@@ -281,7 +325,8 @@ final class RuleSim
             }
             $scope = Db::decode($sim['params']);
             $target = ['set_id' => (int) $set['id'], 'name' => (string) $set['name'], 'kind' => (string) $set['kind'], 'rules' => Db::decode($sim['rules'])];
-            [$before, $after] = self::sets($target);
+            $auto = (string) $set['kind'] === 'automation';   // fase AM: conjuntos de eventos y tiempo (sin puntuacion antes / despues)
+            [$before, $after] = $auto ? [[], [['rules' => $target['rules']]]] : self::sets($target);
             $settings = Scoring::settings();
             $needConsent = RuleEngine::usesField($before, 'consent') || RuleEngine::usesField($after, 'consent');
             $now = Clock::time();
@@ -303,20 +348,22 @@ final class RuleSim
                 $leads = array_map([Lead::class, 'hydrate'], $rows);
                 $cons = $needConsent ? RuleRunner::consentMap($leads) : [];
                 $ins = [];
+                $pre = $auto ? RuleAutomation::simPrefetch($leads, $now) : [];
                 foreach ($leads as $lead) {
                     $last = (int) $lead['id'];
-                    $r = self::evalLead($lead, RuleRunner::facts($lead, $now, $cons[$last] ?? []), $before, $after, $settings, $target['set_id']);
+                    $facts = RuleRunner::facts($lead, $now, $cons[$last] ?? []);
+                    $r = $auto ? RuleAutomation::simLead($lead, $facts, $target['rules'], $now, $pre) : self::evalLead($lead, $facts, $before, $after, $settings, $target['set_id']);
                     self::add($sum, $r);
                     if (($r['changed'] || $r['matched']) && $stored < self::ROWS_MAX) {
-                        $ins[] = [$simId, $last, $r['before']['score'], $r['before']['temperature'], $r['after']['score'], $r['after']['temperature'], json_encode($r['mine'], JSON_UNESCAPED_UNICODE), min(255, $r['alerts']), min(255, $r['tasks']), min(255, $r['tags']), min(255, $r['review'])];
+                        $ins[] = [$simId, $last, $r['before']['score'], $r['before']['temperature'], $r['after']['score'], $r['after']['temperature'], json_encode($r['mine'], JSON_UNESCAPED_UNICODE), min(255, $r['alerts']), min(255, $r['tasks']), min(255, $r['tags']), min(255, $r['review']), min(255, (int) ($r['bells'] ?? 0)), min(255, (int) ($r['hooks'] ?? 0))];
                         $stored++;
                     } elseif (($r['changed'] || $r['matched'])) {
                         $sum['rows_truncated'] = true;
                     }
                 }
                 foreach (array_chunk($ins, 200) as $chunk) {
-                    Db::run('INSERT IGNORE INTO rule_simulation_rows (sim_id, lead_id, before_score, before_temp, after_score, after_temp, rules, alerts, tasks, tags, review) VALUES '
-                        . implode(',', array_fill(0, count($chunk), '(?,?,?,?,?,?,?,?,?,?,?)')), array_merge(...$chunk));
+                    Db::run('INSERT IGNORE INTO rule_simulation_rows (sim_id, lead_id, before_score, before_temp, after_score, after_temp, rules, alerts, tasks, tags, review, bells, hooks) VALUES '
+                        . implode(',', array_fill(0, count($chunk), '(?,?,?,?,?,?,?,?,?,?,?,?,?)')), array_merge(...$chunk));
                 }
                 $sum['rows'] = $stored;
                 Db::update('rule_simulations', $simId, ['processed' => $sum['scanned'], 'last_id' => $last, 'summary' => $sum]);
@@ -354,7 +401,7 @@ final class RuleSim
     /** @return array{id:int,set_id:int,version_id:?int,status:string,total:int,processed:int,percent:int,last_id:int,summary:array,samples:list<array>,error:string,created_at:string,finished_at:?string,scope:array}|null */
     public static function status(int $simId, bool $withSamples = true): ?array
     {
-        $s = Db::one('SELECT id, set_id, version_id, status, total, processed, last_id, summary, error, created_at, finished_at, params FROM rule_simulations WHERE id = ?', [$simId]);
+        $s = Db::one('SELECT id, set_id, version_id, status, total, processed, last_id, summary, error, created_at, finished_at, params, (SELECT kind FROM rule_sets x WHERE x.id = rule_simulations.set_id) AS set_kind FROM rule_simulations WHERE id = ?', [$simId]);
         if ($s === null) {
             return null;
         }
@@ -367,7 +414,7 @@ final class RuleSim
             );
             foreach ($rows as $r) {
                 $fx = [];
-                foreach (['alerts' => 'alerta', 'tasks' => 'tarea', 'tags' => 'etiqueta', 'review' => 'cola de revisión'] as $k => $l) {
+                foreach (['alerts' => 'alerta', 'tasks' => 'tarea', 'tags' => 'etiqueta', 'review' => 'cola de revisión', 'bells' => 'aviso en la campana', 'hooks' => 'webhook saliente'] as $k => $l) {
                     if ((int) $r[$k] > 0) {
                         $fx[] = $l;
                     }
@@ -381,7 +428,7 @@ final class RuleSim
         return ['id' => (int) $s['id'], 'set_id' => (int) $s['set_id'], 'version_id' => $s['version_id'] !== null ? (int) $s['version_id'] : null, 'status' => (string) $s['status'], 'total' => $total,
             'processed' => (int) $s['processed'], 'percent' => $s['status'] === 'done' ? 100 : ($total > 0 ? (int) min(99, floor((int) $s['processed'] / $total * 100)) : 0), 'last_id' => (int) $s['last_id'],
             'summary' => array_replace(self::blank(), Db::decode($s['summary'])), 'samples' => $samples, 'error' => (string) ($s['error'] ?? ''), 'created_at' => (string) $s['created_at'],
-            'finished_at' => $s['finished_at'] !== null ? (string) $s['finished_at'] : null, 'scope' => Db::decode($s['params'])];
+            'finished_at' => $s['finished_at'] !== null ? (string) $s['finished_at'] : null, 'scope' => Db::decode($s['params']), 'auto' => ($s['set_kind'] ?? '') === 'automation'];
     }
 
     /** Ultima simulacion de un conjunto (la mas reciente) o null. */

@@ -70,7 +70,7 @@ $active = ($hand['email'] !== '' ? 1 : 0) + (($hand['webhook_on'] && $hand['webh
   <?php if (!$handView['recent']): ?>
     <div class="empty empty--sm"><?= Ui::icon('star', 'empty__star ic--star') ?><h3>Aún no se ha presentado ningún lead</h3><p>Cuando pases uno a «Presentado a NorthStar», su entrega aparece aquí con el estado de cada destino.</p></div>
   <?php else: ?>
-    <div class="tw"><table class="tbl"><thead><tr><th scope="col">Lead</th><th scope="col">Versión</th><th scope="col">Entrega</th><th scope="col">Destinos</th><th scope="col">NorthStar</th><th scope="col">Fecha</th></tr></thead><tbody>
+    <div class="tw"><table class="tbl" aria-label="Entregas a NorthStar"><thead><tr><th scope="col">Lead</th><th scope="col">Versión</th><th scope="col">Entrega</th><th scope="col">Destinos</th><th scope="col">NorthStar</th><th scope="col">Fecha</th></tr></thead><tbody>
       <?php foreach ($handView['recent'] as $h): ?>
         <tr><th scope="row" class="c-n"><a href="/leads/<?= $e($h['lead_id']) ?>"><?= $e(Fmt::name($h)) ?></a></th><td data-l="Versión">v<?= $e($h['version']) ?></td><td data-l="Entrega"><?= $e($st[$h['status']] ?? $h['status']) ?></td>
           <td data-l="Destinos"><?= $e(implode(' · ', array_map(static function ($p) use ($tn, $st) { [$t, $s] = array_pad(explode(':', $p, 2), 2, ''); return ($tn[$t] ?? $t) . ' ' . strtolower($st[$s] ?? $s); }, array_filter(explode(' · ', (string) $h['deliveries']))))) ?: '—' ?></td>

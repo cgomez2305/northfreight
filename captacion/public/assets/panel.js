@@ -11,6 +11,7 @@
  var b = $('button[aria-expanded]', dd), p = $('.dd__panel', dd);
  b.addEventListener('click', function () { var was = openDd === dd; closeDd(); if (!was) { p.hidden = false; b.setAttribute('aria-expanded', 'true'); openDd = dd; var f = $('a,button.dd__item', p); if (f && b.getAttribute('aria-haspopup') === 'menu') f.focus(); } });
  dd.addEventListener('keydown', function (e) { if (e.key === 'Escape' && openDd === dd) { e.stopPropagation(); closeDd(true); } });
+ dd.addEventListener('focusout', function (e) { if (openDd === dd && e.relatedTarget && !dd.contains(e.relatedTarget)) closeDd(); });
  });
  D.addEventListener('click', function (e) { if (openDd && !openDd.contains(e.target)) closeDd(); });
 
@@ -31,9 +32,18 @@
  $$('[data-theme-set]').forEach(function (b) { b.addEventListener('click', function () { setTheme(b.getAttribute('data-theme-set')); }); });
  $$('[data-theme-cycle]').forEach(function (b) { b.addEventListener('click', function () { var cur = H.getAttribute('data-theme-pref') || 'auto'; setTheme({ auto: 'light', light: 'dark', dark: 'auto' }[cur]); }); });
  applyTheme(H.getAttribute('data-theme-pref') || 'auto');
- var side = $('#side'), lastOpener = null;
- function navOpen(btn) { lastOpener = btn; D.body.classList.add('nav-open'); $$('[data-nav-open]').forEach(function (b) { b.setAttribute('aria-expanded', 'true'); }); var f = $('a', side); if (f) f.focus(); }
- function navClose(back) { if (!D.body.classList.contains('nav-open')) return; D.body.classList.remove('nav-open'); $$('[data-nav-open]').forEach(function (b) { b.setAttribute('aria-expanded', 'false'); }); if (back && lastOpener) lastOpener.focus(); }
+ /* Fase AM: mientras un panel modal no nativo (cajón móvil, vistazo en hoja) está abierto, el resto de la página queda inerte (sin foco ni lectura). Devuelve la función que lo revierte. */
+ window.NS.inertOthers = function (keep) {
+ var done = [], skip = 'dialog,#toasts,script,link,style,[data-no-inert]', path = [];
+ keep = keep.filter(Boolean);
+ keep.forEach(function (k) { for (var n = k; n && n !== D.documentElement; n = n.parentNode) path.push(n); });
+ var seen = [];
+ keep.forEach(function (k) { for (var a = k.parentNode; a && a !== D.documentElement; a = a.parentNode) { if (seen.indexOf(a) >= 0) continue; seen.push(a); Array.prototype.slice.call(a.children).forEach(function (c) { if (path.indexOf(c) >= 0 || (c.matches && c.matches(skip)) || c.inert) return; c.inert = true; done.push(c); }); } });
+ return function () { done.forEach(function (c) { c.inert = false; }); done = []; };
+ };
+ var side = $('#side'), lastOpener = null, releaseNav = null;
+ function navOpen(btn) { lastOpener = btn; D.body.classList.add('nav-open'); if (releaseNav) releaseNav(); releaseNav = window.NS.inertOthers([side, $('.scrim')]); $$('[data-nav-open]').forEach(function (b) { b.setAttribute('aria-expanded', 'true'); }); var f = $('a', side); if (f) f.focus(); }
+ function navClose(back) { if (!D.body.classList.contains('nav-open')) return; D.body.classList.remove('nav-open'); if (releaseNav) { releaseNav(); releaseNav = null; } $$('[data-nav-open]').forEach(function (b) { b.setAttribute('aria-expanded', 'false'); }); if (back && lastOpener) lastOpener.focus(); }
  $$('[data-nav-open]').forEach(function (b) { b.addEventListener('click', function () { navOpen(b); }); });
  $$('[data-nav-close]').forEach(function (b) { b.addEventListener('click', function () { navClose(true); }); });
  D.addEventListener('keydown', function (e) { if (e.key === 'Escape') navClose(true); });
@@ -47,8 +57,8 @@
  $$('[data-close]', d).forEach(function (b) { b.addEventListener('click', function () { d.close(); }); });
  var down = false; d.addEventListener('mousedown', function (e) { down = e.target === d; }); d.addEventListener('click', function (e) { if (e.target === d && down) d.close(); down = false; });
  });
- var cd = $('#confirm'), pending = null;
- D.addEventListener('click', function (e) { var b = e.target.closest ? e.target.closest('[data-confirm]') : null; if (!b || !cd || !cd.showModal || b.disabled) return; e.preventDefault(); pending = b; $('#confirm-m').textContent = b.getAttribute('data-confirm'); cd.showModal(); var no = $('.btn--ghost', cd); (no || $('#confirm-y')).focus(); });
+ var cd = $('#confirm'), pending = null, cTitle = $('#confirm-t'), cYes = $('#confirm-y');
+ D.addEventListener('click', function (e) { var b = e.target.closest ? e.target.closest('[data-confirm]') : null; if (!b || !cd || !cd.showModal || b.disabled) return; e.preventDefault(); pending = b; $('#confirm-m').textContent = b.getAttribute('data-confirm'); var dng = b.hasAttribute('data-confirm-danger'); cTitle.textContent = b.getAttribute('data-confirm-title') || '¿Seguro?'; cYes.textContent = b.getAttribute('data-confirm-label') || 'Confirmar'; cYes.className = 'btn ' + (dng ? 'btn--danger' : 'btn--primary'); cd.showModal(); (dng ? $('button[value=no]', cd) : cYes).focus(); });
  if (cd) cd.addEventListener('close', function () { if (cd.returnValue === 'yes' && pending) { var f = pending.form; pending.removeAttribute('data-confirm'); if (f.requestSubmit) f.requestSubmit(pending); else f.submit(); } cd.returnValue = ''; pending = null; });
  $$('[data-toggle]').forEach(function (b) { b.addEventListener('click', function () { var t = $(b.getAttribute('data-toggle')); if (!t) return; var show = t.hidden || (t.classList.contains('filters') && !t.classList.contains('is-open')); if (t.classList.contains('filters')) t.classList.toggle('is-open', show); else t.hidden = !show; b.setAttribute('aria-expanded', show ? 'true' : 'false'); if (show) { var f = $('textarea,input:not([type=hidden])', t); if (f) f.focus(); } }); });
  $$('[data-print]').forEach(function (b) { b.addEventListener('click', function () { window.print(); }); });

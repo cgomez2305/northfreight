@@ -26,7 +26,7 @@ $cmp = RepView::compareRows($m, $p);
 
 <section class="card" aria-labelledby="i-cmp">
   <header class="card__h"><h2 class="label" id="i-cmp">Tendencia frente al mes anterior</h2></header>
-  <div class="tw"><table class="tbl tbl--rep"><thead><tr><th scope="col">Indicador</th><th scope="col" class="num-c"><?= $e(ucfirst($meta['label'] ?? 'Este mes')) ?></th><th scope="col" class="num-c"><?= $e(ucfirst($meta['prev_label'] ?? 'Mes anterior')) ?></th><th scope="col" class="num-c">Variación</th></tr></thead><tbody>
+  <div class="tw"><table class="tbl tbl--rep" aria-label="Indicadores del mes frente al mes anterior"><thead><tr><th scope="col">Indicador</th><th scope="col" class="num-c"><?= $e(ucfirst($meta['label'] ?? 'Este mes')) ?></th><th scope="col" class="num-c"><?= $e(ucfirst($meta['prev_label'] ?? 'Mes anterior')) ?></th><th scope="col" class="num-c">Variación</th></tr></thead><tbody>
     <?php foreach ($cmp as $c): ?><tr><th scope="row" class="c-n"><?= $e($c['label']) ?></th><td class="num-c" data-l="Este mes"><?= $e($c['cur']) ?></td><td class="num-c" data-l="Mes anterior"><?= $e($c['prev']) ?></td><td class="num-c" data-l="Variación"><?= Ui::delta($c['delta']) ?></td></tr><?php endforeach; ?>
   </tbody></table></div>
 </section>
@@ -55,12 +55,22 @@ $cmp = RepView::compareRows($m, $p);
       <?php for ($i = 0; $i < 3; $i++): ?><label class="field"><span>Acción <?= $e($i + 1) ?></span><input type="text" name="action[]" value="<?= $e($actions[$i] ?? '') ?>" maxlength="220" autocomplete="off"></label><?php endfor; ?>
       <div class="q3a"><button class="btn btn--secondary" type="submit"><span class="btn__t">Guardar acciones</span></button></div>
     </form>
-    <p class="muted rep-pad">Las sugirió el sistema con reglas simples sobre tus datos (leads sin contactar, tareas vencidas, canales, costos). Cámbialas por lo que de verdad vayas a hacer.</p>
+    <p class="muted rep-pad">Las sugirió el sistema con reglas simples sobre los datos que NorthStar ya ve en este informe (canales, captación, presentados sin respuesta). Se publican tal cual las dejes: no escribas aquí nada interno.</p>
   <?php else: ?>
     <ol class="rep-acts"><?php foreach ($actions as $a): ?><li><?= $e($a) ?></li><?php endforeach; ?></ol>
   <?php endif; ?>
   </div>
 </section>
+
+<?php if ($isAdminView && !empty($internalActions)): ?>
+<section class="card rep-nop" id="internas" aria-labelledby="i-in">
+  <header class="card__h"><h2 class="label" id="i-in">Sugerencias internas</h2><span class="muted">Solo tú · no se publican</span></header>
+  <div class="card__b">
+    <ol class="rep-acts"><?php foreach ($internalActions as $a): ?><li><?= $e($a) ?></li><?php endforeach; ?></ol>
+    <p class="muted rep-pad">Trabajo operativo del equipo de captación (leads sin contactar, tareas vencidas, costos por cargar). El lector nunca las ve, ni en el borrador ni en el informe publicado.</p>
+  </div>
+</section>
+<?php endif; ?>
 
 <?php if ($isAdminView): ?>
 <section class="card rep-nop" aria-labelledby="i-pb">
@@ -68,7 +78,7 @@ $cmp = RepView::compareRows($m, $p);
   <div class="card__b">
     <?php if (!$published): ?>
       <p>Al publicar, NorthStar lo ve en <b>Informes</b><?= $recipients ? ' y se envía el enlace a ' . $e(implode(', ', $recipients)) : ' (no hay destinatarios configurados para el enlace: Configuración &gt; Correo)' ?>.</p>
-      <form method="post" action="/informes/<?= $e($report['id']) ?>/publish"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><div class="q3a"><button class="btn btn--primary" type="submit" data-confirm="¿Publicar este informe para NorthStar? Las acciones ya no se podrán editar."><span class="btn__t">Publicar</span></button></div></form>
+      <form method="post" action="/informes/<?= $e($report['id']) ?>/publish"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><div class="q3a"><button class="btn btn--primary" type="submit" data-confirm="¿Publicar este informe para NorthStar? Las acciones ya no se podrán editar." data-confirm-title="¿Publicar el informe?" data-confirm-label="Publicar"><span class="btn__t">Publicar</span></button></div></form>
     <?php else: ?>
       <p>Publicado <?= $e(Fmt::dateTime($report['published_at'])) ?>. <?= $report['sent_at'] !== null ? 'Enlace enviado ' . $e(Fmt::dateTime($report['sent_at'])) . '.' : 'El enlace no se ha enviado.' ?></p>
       <form method="post" action="/informes/<?= $e($report['id']) ?>/resend"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><div class="q3a"><button class="btn btn--secondary" type="submit"<?= $recipients ? '' : ' disabled' ?>><span class="btn__t">Reenviar el enlace</span></button></div></form>

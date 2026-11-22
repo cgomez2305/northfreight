@@ -39,6 +39,8 @@ return static function (array $ctx): void {
         '/leads/1', '/leads/1/stage', '/leads/1/note', '/leads/1/task', '/leads/1/assign',
         // Fase AM · datos
         '/importar', '/importar/1', '/importar/1/simular', '/leads/1/anonimizar', '/leads/1/fusionar', '/leads/1/enviar',
+        // Fase AM · automatizacion
+        '/ajax/config/recalc', '/config/webhooks/save', '/config/webhooks/test',
     ];
     $uncovered = [];
     foreach ($m1[1] as $p) {

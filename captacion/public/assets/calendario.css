@@ -70,7 +70,7 @@
 .evc__ic{flex:none;width:26px;height:26px;display:grid;place-items:center}
 .evc__ic .ic{width:16px;height:16px}
 .evc__tick{flex:none}
-.tick{width:30px;height:30px;border-radius:50%;border:2px solid var(--line-2);background:var(--surface);display:grid;place-items:center;color:transparent;cursor:pointer;flex:none;padding:0}
+.tick{width:30px;height:30px;border-radius:50%;border:2px solid var(--field);background:var(--surface);display:grid;place-items:center;color:transparent;cursor:pointer;flex:none;padding:0}
 .tick:hover{border-color:var(--ok-dot);color:var(--ok-dot)}
 .tick .ic{width:15px;height:15px;stroke-width:2.6}
 .evc__m{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;color:inherit!important;text-decoration:none!important}

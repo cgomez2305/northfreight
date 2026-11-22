@@ -8,7 +8,7 @@
  var cssV = pk.getAttribute('data-css-v'), cssE = pk.getAttribute('data-css-e'), cssP = null;
  function ready() { return cssP || (cssP = Promise.all([NS.css('peek', cssV), D.querySelector('link[href*="/assets/etiquetas.css"]') ? Promise.resolve() : NS.css('etiquetas', cssE)])); }
  if (W.requestIdleCallback) W.requestIdleCallback(ready); else setTimeout(ready, 1200);
- var body = $('[data-pk-body]', pk), scrim = $('[data-pk-scrim]'), cur = 0, req = 0, sel = null, origin = null;
+ var body = $('[data-pk-body]', pk), scrim = $('[data-pk-scrim]'), cur = 0, req = 0, sel = null, origin = null, relInert = null;
  var sheet = function () { return W.matchMedia('(max-width:1024px)').matches; };
  var idOf = function (el) { return parseInt(el.getAttribute('data-peek'), 10); };
  var find = function (id) { return $('[data-peek="' + id + '"]'); };
@@ -21,18 +21,18 @@
   body.textContent = ''; var d = NS.el('div', 'pk__err'); d.appendChild(NS.el('p', null, msg || 'No se pudo cargar el vistazo.'));
   var b = NS.el('button', 'btn btn--secondary btn--sm', 'Reintentar'); b.type = 'button'; b.addEventListener('click', function () { load(id, true); }); d.appendChild(b); body.appendChild(d);
  }
- function render(j, keep) {
+ function render(j, keep, focusTitle) {
   var t = D.createElement('template'); t.innerHTML = j.html; var top = body.scrollTop; body.textContent = ''; body.appendChild(t.content); cur = j.id;
   NS.ctx = { leadId: j.id, stage: j.stage, name: j.name, stages: j.stages };
   var row = find(j.id), cell = row && $('.k-stage', row); if (cell) cell.innerHTML = j.stage_chip;
-  if (keep) body.scrollTop = top; else { var h = $('#pk-title', pk); if (h) h.focus({ preventScroll: true }); }
+  if (keep) body.scrollTop = top; else if (focusTitle) { var h = $('#pk-title', pk); if (h) h.focus({ preventScroll: true }); }   /* J/K no mueven el foco: la región viva ya anuncia el cambio */
  }
- function load(id, keep) {
+ function load(id, keep, focusTitle) {
   var my = ++req; if (!keep) { body.textContent = ''; body.appendChild(skeleton()); }
   return NS.api('/ajax/peek', { id: id }).then(function (j) {
    if (my !== req) return;
    if (!j.ok) { fail(j.status === 404 ? 'El lead ya no existe.' : j.msg, id); return; }
-   render(j, keep);
+   render(j, keep, focusTitle);
   });
  }
  function open(id, el) {
@@ -40,14 +40,15 @@
   return open2(id, el);
  }
  function open2(id, el) {
-  if (!isOpen()) { origin = el || D.activeElement; pk.hidden = false; void pk.offsetWidth; pk.classList.add('is-open'); if (sheet()) { scrim.hidden = false; void scrim.offsetWidth; scrim.classList.add('is-open'); D.body.style.overflow = 'hidden'; } }
+  var first = !isOpen();
+  if (first) { origin = el || D.activeElement; pk.hidden = false; void pk.offsetWidth; pk.classList.add('is-open'); if (sheet()) { scrim.hidden = false; void scrim.offsetWidth; scrim.classList.add('is-open'); D.body.style.overflow = 'hidden'; if (NS.inertOthers) { if (relInert) relInert(); relInert = NS.inertOthers([pk, scrim]); } } }
   pk.setAttribute('aria-modal', sheet() ? 'true' : 'false');
   var row = el || find(id); if (row) select(row);
   $$('[data-peek].is-open').forEach(function (r) { r.classList.remove('is-open'); }); if (row) row.classList.add('is-open');
-  url(id); return load(id);
+  url(id); return load(id, false, first);
  }
  function close(back) {
-  if (!isOpen()) return; req++; pk.classList.remove('is-open'); scrim.classList.remove('is-open'); D.body.style.overflow = '';
+  if (!isOpen()) return; req++; pk.classList.remove('is-open'); scrim.classList.remove('is-open'); D.body.style.overflow = ''; if (relInert) { relInert(); relInert = null; }
   setTimeout(function () { if (!pk.classList.contains('is-open')) { pk.hidden = true; scrim.hidden = true; } }, 230);
   $$('[data-peek].is-open').forEach(function (r) { r.classList.remove('is-open'); }); url(0); NS.ctx = NS.pageCtx; cur = 0;
   if (back !== false) { var f = (sel && (sel.matches('[data-peek-link]') ? sel : $('a.who, a.kc__n, [data-peek-link]', sel))) || origin; if (f && f.focus) f.focus({ preventScroll: true }); }
@@ -85,6 +86,7 @@
   if (e.ctrlKey || e.metaKey || e.altKey || D.querySelector('dialog[open]')) return;
   if (e.key === 'Escape') { if (isOpen() && !(typing && t.tagName === 'SELECT')) { e.preventDefault(); close(); } return; }
   if (typing) return;
+  if (NS.shortcutsOn && !NS.shortcutsOn()) return;   /* con los atajos de una tecla desactivados solo queda Esc */
   var k = e.key, inBar = t && t.closest && (t.closest('.peek__bar') || t.closest('[data-peek]')), onBody = t === D.body || t === D.documentElement || t === pk || (t && t.id === 'main');
   if (k === 'j' || (k === 'ArrowDown' && isOpen() && inBar)) { e.preventDefault(); step(1); }
   else if (k === 'k' || (k === 'ArrowUp' && isOpen() && inBar)) { e.preventDefault(); step(-1); }
@@ -94,6 +96,12 @@
 
  /* ---- Acciones dentro del vistazo (mismas funciones del servidor que la ficha) ---- */
  function reload() { if (cur) load(cur, true); }
+ /* Guardar vacío: aviso visible y anunciado (role=alert) junto al campo; se quita al escribir. */
+ function emptyErr(field, text) {
+  var old = field.parentNode.querySelector('.pk__e'); if (old) old.remove();
+  var p = NS.el('p', 'field__err pk__e', text); p.setAttribute('role', 'alert'); field.setAttribute('aria-invalid', 'true'); field.parentNode.appendChild(p); field.focus();
+  field.addEventListener('input', function () { if (p.parentNode) p.remove(); field.removeAttribute('aria-invalid'); }, { once: true });
+ }
  body.addEventListener('click', function (e) {
   var t = e.target.closest ? e.target : null; if (!t) return;
   var mv = t.closest('[data-pk-move]');
@@ -101,8 +109,8 @@
   var dn = t.closest('[data-pk-done]'); if (dn) { dn.disabled = true; NS.act(cur, 'task_done', { task_id: parseInt(dn.getAttribute('data-pk-done'), 10) }).then(reload); return; }
   var sv = t.closest('[data-pk-save]'); if (!sv) return;
   var kind = sv.getAttribute('data-pk-save'), fields, field;
-  if (kind === 'note') { field = $('#pk-note', body); fields = { body: field.value }; if (!field.value.trim()) { field.focus(); return; } }
-  else if (kind === 'task') { field = $('#pk-task-t', body); fields = { title: field.value, due: $('#pk-task-d', body).value }; if (!field.value.trim()) { field.focus(); return; } }
+  if (kind === 'note') { field = $('#pk-note', body); fields = { body: field.value }; if (!field.value.trim()) { emptyErr(field, 'Escribe la nota antes de guardarla.'); return; } }
+  else if (kind === 'task') { field = $('#pk-task-t', body); fields = { title: field.value, due: $('#pk-task-d', body).value }; if (!field.value.trim()) { emptyErr(field, 'Escribe el título de la tarea antes de guardarla.'); return; } }
   else { field = $('#pk-call-o', body); fields = { outcome: field.value, minutes: $('#pk-call-m', body).value, note: $('#pk-call-n', body).value }; }
   sv.disabled = true; NS.act(cur, kind, fields).then(function (j) { sv.disabled = false; if (j.ok) reload(); });
  });

@@ -364,20 +364,23 @@ return static function (array $ctx): void {
     T::eq($enr($sg, 'a12_referral')['status'], 'completed', '  y la inscripción queda completada');
     Clock::travel(0);
 
-    // ------------------------------------------------------------------ Sin SMTP: todo queda «registrado»
+    // ------------------------------------------------------------------ Sin SMTP: la secuencia NO avanza como «enviada» (fase AM)
     Fx::noSmtp();
     Db::pdo()->exec("DELETE FROM sequence_enrollments");
     Db::pdo()->exec("DELETE FROM messages");
     @unlink(Storage::dir('mail.log'));
     $ns = $warm(['email' => 'nosmtp@example.com']);
     Sequences::enrollWarm($ns);
+    $stepBefore = (int) $enr($ns)['step'];
     Clock::travel(2 * 86400);
     $b = count($mails());
     $tick();
     Clock::travel(0);
     $ml = (string) @file_get_contents(Storage::dir('mail.log'));
-    T::ok(count($mails()) === $b && str_contains($ml, '[logged: SMTP sin configurar]') && str_contains($ml, 'nosmtp@example.com') && str_contains($ml, 'List-Unsubscribe'), 'sin SMTP el correo queda en storage/mail.log (con destinatario y cabeceras) y no sale a nadie');
-    T::eq(Db::value("SELECT status FROM messages WHERE lead_id = ?", [$ns]), 'logged', '  y en messages queda «logged», no «sent»');
+    $enNs = $enr($ns);
+    T::ok(count($mails()) === $b && (int) $enNs['step'] === $stepBefore && str_contains((string) $enNs['blocked_reason'], 'Sin SMTP') && !str_contains($ml, 'nosmtp@example.com'), 'sin SMTP el paso queda bloqueado («Sin SMTP»), no avanza, no sale a nadie y no se anota como enviado');
+    T::eq((int) Db::value("SELECT COUNT(*) FROM messages WHERE lead_id = ?", [$ns]), 0, '  y en messages no queda ningún «logged» de la secuencia');
+    Db::insert('messages', ['lead_id' => $ns, 'channel' => 'email', 'direction' => 'out', 'body' => 'x', 'template_key' => 'a6_d1', 'subject' => 'Prueba', 'status' => 'logged', 'created_at' => Clock::now()]);   // un envío manual sin SMTP sí queda «registrado»
     $page = $panel->get('/comunicaciones/envios');
     $panelNoSmtp = Panel::start($ctx, 'panel21b');
     Db::run('UPDATE users SET totp_last_step = NULL WHERE id = ?', [$aid]);

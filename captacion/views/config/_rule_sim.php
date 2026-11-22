@@ -18,7 +18,11 @@ if ($sim === null): ?>
     <?php elseif ($st === 'failed'): ?>
       <p class="rp-note rp-note--warn"><?= Ui::icon('alert') ?><span><?= $e($sim['error'] !== '' ? $sim['error'] : 'La simulación no pudo terminar.') ?></span></p>
     <?php else: ?>
+      <?php if (!empty($sim['auto'])): ?>
+      <p class="rp-big rp-big--s"><b><?= $e(Fmt::num((int) $s['matched'])) ?></b><span>de <?= $e(Fmt::num((int) $s['scanned'])) ?> leads habrían activado alguna regla · <?= $e((int) $s['bells']) ?> avisos en la campana · <?= $e((int) $s['hooks']) ?> webhooks · <?= $e((int) $s['alerts']) ?> alertas · <?= $e((int) $s['tasks']) ?> tareas</span></p>
+      <?php else: ?>
       <p class="rp-big rp-big--s"><b><?= $e(Fmt::num((int) $s['changed'])) ?></b><span>de <?= $e(Fmt::num((int) $s['scanned'])) ?> leads cambiarían · <?= $e((int) $s['to_hot']) ?> pasarían a caliente · <?= $e((int) $s['alerts']) ?> alertas · <?= $e((int) $s['tasks']) ?> tareas</span></p>
+      <?php endif; ?>
       <?php if (!empty($s['rows_truncated'])): ?><p class="muted">Se guardaron los primeros <?= $e(Fmt::num((int) ($s['rows'] ?? 0))) ?> leads afectados; las cifras de arriba cuentan todos.</p><?php endif; ?>
       <form method="post" action="/config/rules/simcsv" class="rp-sim__dl"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="sim" value="<?= $e($sim['id']) ?>"><input type="hidden" name="set" value="<?= $e($setId) ?>">
         <button class="btn btn--secondary btn--sm" type="submit"><?= Ui::icon('download') ?>Descargar CSV</button><small class="muted">Código corto y datos de segmentación, sin nombres ni teléfonos.</small></form>

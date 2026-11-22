@@ -39,6 +39,9 @@ final class JobHandlers
             'rule_simulate'           => [RuleSim::class, 'jobStep'],
             'sla_breach'              => [Sla::class, 'jobBreach'],
             'lead_import'             => [LeadImport::class, 'jobStep'],   // fase AM
+            // Fase AM · automatizacion
+            'rules_time'              => [RuleAutomation::class, 'jobTick'],
+            'outbound_webhook'        => [OutboundWebhooks::class, 'deliver'],
         ];
     }
 

@@ -23,7 +23,7 @@ $empty = !$ov['codes'] && !$ov['referrals'];
   <?= Ui::icon($confirmed ? 'check-circle' : 'alert') ?>
   <p><?php if ($confirmed): ?><b>Montos confirmados con NorthStar.</b> Los bonos se aprueban con el monto de cada código.<?php else: ?><b>Monto del bono provisional: pendiente de confirmar con NorthStar.</b> Mientras tanto puedes crear códigos y aprobar bonos con el monto que definas, pero no es una cifra acordada.<?php endif; ?></p>
   <form method="post" action="/referidos/confirm"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="confirmed" value="<?= $confirmed ? '0' : '1' ?>">
-    <button class="btn btn--secondary btn--sm" type="submit"<?= $confirmed ? '' : ' data-confirm="¿NorthStar ya confirmó por escrito los montos de los bonos?"' ?>><?= $confirmed ? 'Volver a provisional' : 'NorthStar ya confirmó' ?></button></form>
+    <button class="btn btn--secondary btn--sm" type="submit"<?= $confirmed ? '' : ' data-confirm-title="¿Montos confirmados?" data-confirm-label="Sí, confirmados" data-confirm="¿NorthStar ya confirmó por escrito los montos de los bonos?"' ?>><?= $confirmed ? 'Volver a provisional' : 'NorthStar ya confirmó' ?></button></form>
 </section>
 
 <?php if ($empty): ?>
@@ -72,12 +72,12 @@ $empty = !$ov['codes'] && !$ov['referrals'];
             <label class="field rrow__amt"><span class="sr">Monto del bono en dólares</span><input type="text" name="bonus_amount" inputmode="decimal" placeholder="Monto $" value="<?= $e($r['bonus_amount'] !== null ? number_format((float) $r['bonus_amount'], 2, '.', '') : '') ?>" autocomplete="off"></label>
             <button class="btn btn--secondary btn--sm" type="submit">Aprobar</button></form>
         <?php elseif ($b === 'approved'): ?>
-          <form method="post" action="/referidos/<?= $e($r['id']) ?>/bonus"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="op" value="pay"><button class="btn btn--secondary btn--sm" type="submit" data-confirm="¿Marcar el bono de <?= $e($money($r['bonus_amount'])) ?> como pagado?">Marcar pagado</button></form>
+          <form method="post" action="/referidos/<?= $e($r['id']) ?>/bonus"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="op" value="pay"><button class="btn btn--secondary btn--sm" type="submit" data-confirm-title="¿Marcar como pagado?" data-confirm-label="Marcar como pagado" data-confirm="¿Marcar el bono de <?= $e($money($r['bonus_amount'])) ?> como pagado?">Marcar pagado</button></form>
         <?php elseif ($b === 'cancelled' && $r['status'] === 'signed'): ?>
           <form method="post" action="/referidos/<?= $e($r['id']) ?>/bonus"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="op" value="reopen"><button class="btn btn--ghost btn--sm" type="submit">Reabrir</button></form>
         <?php endif; ?>
         <?php if (in_array($b, ['pending', 'approved'], true)): ?>
-          <form method="post" action="/referidos/<?= $e($r['id']) ?>/bonus"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="op" value="cancel"><button class="btn btn--ghost btn--sm" type="submit" data-confirm="¿Cancelar este bono?">Cancelar</button></form>
+          <form method="post" action="/referidos/<?= $e($r['id']) ?>/bonus"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="op" value="cancel"><button class="btn btn--ghost btn--sm" type="submit" data-confirm-title="¿Cancelar el bono?" data-confirm-label="Cancelar el bono" data-confirm-danger data-confirm="¿Cancelar este bono?">Cancelar</button></form>
         <?php endif; ?>
       </div>
     </li>

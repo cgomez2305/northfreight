@@ -13,5 +13,8 @@ $tp = $prefs['theme'] ?? 'auto';
     <?php endforeach; ?>
   </div>
 </div>
-<?php if (empty($isViewer)): ?><button class="dd__item" type="button" role="menuitem" data-keys><?= Ui::icon('keyboard') ?>Atajos de teclado<kbd>?</kbd></button><?php endif; ?>
-<form method="post" action="/logout"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><button class="dd__item" type="submit" role="menuitem"><?= Ui::icon('logout') ?>Salir</button></form>
+<?php if (empty($isViewer)): $kon = ($prefs['keys'] ?? 'on') !== 'off'; ?>
+<button class="dd__item" type="button" data-keys><?= Ui::icon('keyboard') ?>Ver los atajos de teclado<kbd>?</kbd></button>
+<button class="dd__item dd__item--sw" type="button" role="switch" aria-checked="<?= $kon ? 'true' : 'false' ?>" data-keys-toggle><?= Ui::icon('zap') ?><span class="dd__sw-t">Atajos de una tecla</span><span class="dd__state" data-keys-state><?= $kon ? 'Activados' : 'Desactivados' ?></span></button>
+<?php endif; ?>
+<form method="post" action="/logout"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><button class="dd__item" type="submit"><?= Ui::icon('logout') ?>Salir</button></form>

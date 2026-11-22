@@ -61,6 +61,7 @@ final class Catalog
     ];
 
     public const EVENT_LABELS = [
+        'rule_notice' => 'Aviso de una regla en la campana',
         'created' => 'Lead recibido', 'reentry' => 'Volvió a escribir', 'reopened' => 'Reabierto por reingreso', 'reentry_signed' => 'Un lead firmado volvió a escribir', 'scored' => 'Puntuación recalculada',
         'fmcsa' => 'Consulta a FMCSA', 'disqualified' => 'Descartado automáticamente', 'alert_sent' => 'Alerta enviada', 'consent_revoked' => 'Consentimiento revocado',
         'stage_changed' => 'Cambio de etapa', 'note_added' => 'Nota añadida', 'note_edited' => 'Nota editada', 'note_deleted' => 'Nota eliminada', 'task_created' => 'Tarea creada',

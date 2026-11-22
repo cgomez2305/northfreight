@@ -35,7 +35,7 @@ $chips = ['ty' => static fn($v) => 'Tipo: ' . ActivityView::GROUPS[$v][0], 'us' 
   <?php if (!$rows): ?>
     <div class="empty empty--sm"><?= Ui::icon('star', 'empty__star ic--star') ?><h3><?= $total === 0 ? 'Aún no hay actividad' : 'Nada coincide con esos filtros' ?></h3><p><?= $total === 0 ? 'Los inicios de sesión, cambios y exportaciones irán apareciendo aquí.' : 'Prueba con otro tipo, otras fechas o menos texto.' ?></p></div>
   <?php else: ?>
-    <div class="tw"><table class="tbl tbl--act">
+    <div class="tw"><table class="tbl tbl--act" aria-label="Registro de actividad">
       <thead><tr><th scope="col">Cuándo</th><th scope="col">Quién</th><th scope="col">Qué</th><th scope="col">Detalle</th><th scope="col">Desde</th></tr></thead>
       <tbody>
         <?php foreach ($rows as $r): $g = ActivityView::groupOf((string) $r['action']); $bad = in_array($r['action'], ['login_failed', 'login_2fa_failed', 'login_blocked', 'reauth_failed', 'reauth_blocked', 'setup_failed'], true); ?>

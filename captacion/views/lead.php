@@ -145,7 +145,7 @@ $assigneeName = $assignedTo > 0 ? ($users[$assignedTo] ?? null) : null;
             <li class="nt">
               <header><span><b><?= $e($n['author'] ?? 'Sistema') ?></b> · <time title="<?= $e(Fmt::dateTime($n['created_at'])) ?>"><?= $e(Fmt::dateTime($n['created_at'])) ?></time><?= $n['updated_at'] !== $n['created_at'] && $n['updated_at'] > $n['created_at'] ? ' · editada' : '' ?></span>
                 <span class="nt__a"><button class="icon-btn icon-btn--sm" type="button" data-toggle="#ne-<?= $e($n['id']) ?>" aria-expanded="false" aria-controls="ne-<?= $e($n['id']) ?>" aria-label="Editar la nota de <?= $e($n['author'] ?? 'Sistema') ?> del <?= $e(Fmt::dateTime($n['created_at'])) ?>"><?= Ui::icon('pencil') ?></button>
-                <form method="post" action="/leads/<?= $e($id) ?>/note-delete"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="note_id" value="<?= $e($n['id']) ?>"><button class="icon-btn icon-btn--sm" type="submit" aria-label="Eliminar la nota de <?= $e($n['author'] ?? 'Sistema') ?> del <?= $e(Fmt::dateTime($n['created_at'])) ?>" data-confirm="Se quitará esta nota de la ficha. Queda en el registro de actividad."><?= Ui::icon('trash') ?></button></form></span></header>
+                <form method="post" action="/leads/<?= $e($id) ?>/note-delete"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="note_id" value="<?= $e($n['id']) ?>"><button class="icon-btn icon-btn--sm" type="submit" aria-label="Eliminar la nota de <?= $e($n['author'] ?? 'Sistema') ?> del <?= $e(Fmt::dateTime($n['created_at'])) ?>" data-confirm="Se quitará esta nota de la ficha. Queda en el registro de actividad." data-confirm-title="¿Eliminar la nota?" data-confirm-label="Eliminar" data-confirm-danger><?= Ui::icon('trash') ?></button></form></span></header>
               <p><?= nl2br($e($n['body'])) ?></p>
               <form class="nt__e" id="ne-<?= $e($n['id']) ?>" method="post" action="/leads/<?= $e($id) ?>/note-edit" hidden>
                 <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="note_id" value="<?= $e($n['id']) ?>">
@@ -268,7 +268,7 @@ $assigneeName = $assignedTo > 0 ? ($users[$assignedTo] ?? null) : null;
         </ul>
         <details class="fine"><summary>Texto aceptado<?= $consents[0]['consent_version'] ? ' (' . $e($consents[0]['consent_version']) . ')' : '' ?></summary><p><?= $e($consents[0]['consent_text']) ?></p></details>
         <?php if ($activeConsents): ?>
-          <form method="post" action="/leads/<?= $e($id) ?>/revoke"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><button class="btn btn--danger-o btn--sm" type="submit" data-confirm="Se revocarán todos los consentimientos de este lead y quedará marcado como STOP: no se le debe llamar, escribir ni enviar SMS."><?= Ui::icon('shield') ?>Revocar consentimiento</button></form>
+          <form method="post" action="/leads/<?= $e($id) ?>/revoke"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><button class="btn btn--danger-o btn--sm" type="submit" data-confirm="Se revocarán todos los consentimientos de este lead y quedará marcado como STOP: no se le debe llamar, escribir ni enviar SMS." data-confirm-title="¿Revocar el consentimiento?" data-confirm-label="Revocar" data-confirm-danger><?= Ui::icon('shield') ?>Revocar consentimiento</button></form>
         <?php endif; ?>
         <?php endif; ?>
       </div>

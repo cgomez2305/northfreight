@@ -32,6 +32,11 @@ $vars = implode(' ', array_map(static fn($k) => '{' . $k . '}', array_keys(Rules
     <label class="ra__f"><span>Vence en (horas)</span><input type="text" inputmode="numeric" name="<?= $e($np) ?>[due_hours]" value="<?= $e($f('due_hours')) ?>" maxlength="3" autocomplete="off"<?= $er('due_hours') !== '' ? ' aria-invalid="true"' : '' ?>></label>
     <label class="ra__f"><span>Prioridad</span><select name="<?= $e($np) ?>[priority]"><?php foreach (Catalog::PRIORITIES as $k => $l): ?><option value="<?= $e($k) ?>"<?= $f('priority') === (string) $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
     <p class="ra__h">Variables: <code><?= $e($vars) ?></code>. Solo se crea para leads nuevos o que cambian, una vez por regla y lead.</p>
+  <?php elseif ($type === 'notify_bell'): ?>
+    <label class="ra__f ra__f--wide"><span>Texto del aviso</span><input type="text" name="<?= $e($np) ?>[text]" value="<?= $e($f('text')) ?>" maxlength="<?= $e(Rules::MAX_TEXT) ?>" autocomplete="off" placeholder="{nombre} lleva horas sin contacto"<?= $er('text') !== '' ? ' aria-invalid="true"' : '' ?>></label>
+    <p class="ra__h">Variables: <code><?= $e($vars) ?></code>. Aparece en la campana de todos los administradores, con el enlace al lead; se marca como leído por persona. Nunca lleva teléfono ni correo.</p>
+  <?php elseif ($type === 'outbound_webhook'): ?>
+    <p class="ra__h">Manda el evento <code>rule.fired</code> al webhook saliente (Configuración &gt; Integraciones): id del lead, código, etapa, temperatura, fuente, puntuación y la regla que actuó. Solo sale si el webhook está activo y suscrito a ese evento.</p>
   <?php elseif ($type === 'tag'): ?>
     <label class="ra__f"><span>Etiqueta</span><input type="text" name="<?= $e($np) ?>[tag]" value="<?= $e($f('tag')) ?>" maxlength="24" autocomplete="off" placeholder="revisar-fmcsa"<?= $er('tag') !== '' ? ' aria-invalid="true"' : '' ?>></label>
     <p class="ra__h">Se ve en el lead como «Etiqueta: …». Se quita sola si la regla deja de coincidir.</p>

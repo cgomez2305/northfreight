@@ -116,7 +116,7 @@ $tip = static fn(string $t): string => Ui::tip($t);
     </div>
   <?php else: ?>
   <div class="tw">
-    <table class="tbl tbl--dash">
+    <table class="tbl tbl--dash" aria-label="Leads recientes">
       <thead><tr><th scope="col">Lead</th><th scope="col">Temp.</th><th scope="col" class="c-n">Pts</th><th scope="col" class="c-stage">Etapa</th><th scope="col" class="c-src">Fuente</th><th scope="col" class="c-when">Recibido</th><th scope="col" class="c-act"><span class="sr">Abrir</span></th></tr></thead>
       <tbody>
       <?php foreach ($rows as $r): $name = Fmt::name($r); $sub = array_filter([Catalog::label(Catalog::PROFILES_SHORT, $r['profile']), $r['state'] ?? null, Ui::equipment($r['equipment_types'], 1)]); ?>

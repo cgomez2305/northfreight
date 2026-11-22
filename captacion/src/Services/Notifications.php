@@ -148,6 +148,10 @@ final class Notifications
                 'meta' => $at === null ? 'Crea la tarea de cron de process_jobs.php' : 'Última pasada ' . Fmt::ago((string) $cron['at']), 'href' => '/#cola',
             ];
         }
+        // Fase AM: avisos que pusieron las reglas de eventos y tiempo (accion «avisar en la campana»); cada uno es su propia clave, asi que se marca leido por separado
+        foreach (Db::all('SELECT n.id, n.lead_id, n.rule_name, n.text, n.created_at FROM rule_notices n JOIN leads l ON l.id = n.lead_id AND l.deleted_at IS NULL WHERE n.created_at > ? ORDER BY n.id DESC LIMIT 10', [Clock::shift(-14 * 86400)]) as $n) {
+            $items[] = ['key' => 'rule_notice:' . (int) $n['id'], 'kind' => 'warn', 'title' => (string) $n['text'], 'meta' => 'Regla «' . $n['rule_name'] . '» · ' . Fmt::ago((string) $n['created_at']), 'href' => '/leads/' . (int) $n['lead_id']];
+        }
         $read = array_column(Db::all('SELECT notif_key FROM notification_reads WHERE user_id = ?', [$userId]), 'notif_key');
         $read = array_flip($read);
         foreach ($items as &$i) {

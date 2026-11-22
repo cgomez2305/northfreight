@@ -15,6 +15,26 @@ final class Ui
         return View::e($v);
     }
 
+    /**
+     * Fase AM: atributos del dialogo de confirmacion de un boton (data-confirm + titulo + etiqueta + rojo solo si es destructivo).
+     * $c = texto, o ['text','title','label','danger'=>true]. Sin danger el boton de confirmar es el primario (publicar, convertir, marcar pagado...).
+     */
+    public static function confirm(string|array $c): string
+    {
+        $a = is_array($c) ? $c : ['text' => $c];
+        $out = ' data-confirm="' . self::e((string) ($a['text'] ?? '')) . '"';
+        if (!empty($a['title'])) {
+            $out .= ' data-confirm-title="' . self::e((string) $a['title']) . '"';
+        }
+        if (!empty($a['label'])) {
+            $out .= ' data-confirm-label="' . self::e((string) $a['label']) . '"';
+        }
+        if (!empty($a['danger'])) {
+            $out .= ' data-confirm-danger';
+        }
+        return $out;
+    }
+
     public static function icon(string $name, string $class = ''): string
     {
         return '<svg class="ic' . ($class !== '' ? ' ' . self::e($class) : '') . '" aria-hidden="true" focusable="false"><use href="#i-' . self::e($name) . '"/></svg>';

@@ -87,10 +87,17 @@ final class LeadIngest
         if (!Db::lock('captacion_ingest', 5)) {
             throw new \RuntimeException('El motor de captacion esta ocupado (GET_LOCK).');
         }
+        // Fase AM: si ya hay una transaccion abierta (ruta Cal.com: WebhookController > Db::transaction > Appointments::apply > leadFor), el bloqueo se suelta
+        // cuando ESA transaccion termina; soltarlo antes del commit dejaba pasar a otra ingesta que no veia el lead recien creado (duplicado).
+        $outer = Db::pdo()->inTransaction();
         try {
             return Db::transaction(static fn() => self::persist($lead, $flags, $source, $ctx, $fm, $fmPending));
         } finally {
-            Db::unlock('captacion_ingest');
+            if ($outer) {
+                Db::onEnd(static fn() => Db::unlock('captacion_ingest'));
+            } else {
+                Db::unlock('captacion_ingest');
+            }
         }
     }
 
@@ -258,6 +265,7 @@ final class LeadIngest
         if (!$quiet) {
             self::enqueueFor($leadId, $scored['temperature'], 1);
             self::slaTask($row + ['id' => $leadId]);
+            OutboundWebhooks::emit('lead.created', $leadId, ['source' => $source], 'created:' . $leadId);   // fase AM
         }
         if ($fmPending) {
             Queue::push('fmcsa_enrich', ['lead_id' => $leadId], $now, 'fmcsa_enrich:' . $leadId . ':' . $lead['usdot']);
@@ -271,6 +279,7 @@ final class LeadIngest
         $now = Clock::now();
         $cfg = Alerts::get();
         if ($temperature === 'hot') {
+            OutboundWebhooks::emit('lead.hot', $leadId, ['attempt' => $attempt], 'hot:' . $leadId . ':' . $attempt);   // fase AM
             if ($cfg['hot_telegram']) {
                 Queue::push('telegram_alert', ['lead_id' => $leadId, 'kind' => 'hot'], $now, 'telegram_alert:' . $leadId . ':' . $attempt);
                 if ($cfg['followup_telegram']) {

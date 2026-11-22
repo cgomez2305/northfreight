@@ -60,6 +60,11 @@ try {
     } catch (Throwable $t) {
         Storage::error('sla tick failed', get_class($t) . ': ' . $t->getMessage());
     }
+    try {
+        \Captacion\Services\RuleAutomation::enqueueTick();   // fase AM: reglas de tiempo (sin primer contacto, tarea vencida), una vez cada 15 minutos (la clave de dedupe lo garantiza)
+    } catch (Throwable $t) {
+        Storage::error('rules time enqueue failed', get_class($t) . ': ' . $t->getMessage());
+    }
     $stats = Queue::runBatch(JobHandlers::all(), Env::int('JOBS_MAX_SECONDS', 50), 20);
     fwrite(STDOUT, 'jobs: ' . json_encode($stats) . "\n");
 } catch (Throwable $t) {

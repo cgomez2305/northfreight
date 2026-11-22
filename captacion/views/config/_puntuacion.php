@@ -26,7 +26,7 @@ $tierRows = static function (string $g, string $tk, array $meta, array $tiers) u
 $tempLabels = ['hot' => 'Calientes', 'warm' => 'Tibios', 'cold' => 'Fríos', 'disqualified' => 'Descartados'];
 $delta = static fn(int $a, int $b): string => $a === $b ? '' : ' <span class="' . ($b > $a ? 'up' : 'down') . '">' . ($b > $a ? '+' : '−') . abs($b - $a) . '</span>';
 $resultBlock = static function (array $p, string $title, string $note) use ($tempLabels, $delta, $e): string {
-    $h = '<div class="pv"><p class="pv__t">' . $e($title) . '</p><table class="pv__t2"><thead><tr><th scope="col">Temperatura</th><th scope="col">Antes</th><th scope="col">Después</th></tr></thead><tbody>';
+    $h = '<div class="pv"><p class="pv__t">' . $e($title) . '</p><table class="pv__t2" aria-label="Leads por temperatura, antes y después"><thead><tr><th scope="col">Temperatura</th><th scope="col">Antes</th><th scope="col">Después</th></tr></thead><tbody>';
     foreach ($tempLabels as $k => $l) {
         $h .= '<tr><th scope="row">' . $l . '</th><td>' . Fmt::num($p['before'][$k]) . '</td><td>' . Fmt::num($p['after'][$k]) . $delta($p['before'][$k], $p['after'][$k]) . '</td></tr>';
     }
@@ -67,7 +67,7 @@ $resultBlock = static function (array $p, string $title, string $note) use ($tem
           <button class="btn btn--secondary" type="submit" formaction="/config/scoring/preview"><?= Ui::icon('refresh') ?>Vista previa</button>
         </div>
         <div class="cfg-actions__b">
-          <button class="btn btn--ghost btn--sm" type="submit" formaction="/config/scoring/reset" name="group" value="all" formnovalidate data-confirm="¿Restablecer pesos de owners, drivers y umbrales a los valores del documento? Los leads existentes no cambian hasta que los recalcules.">Restablecer a los valores del documento</button>
+          <button class="btn btn--ghost btn--sm" type="submit" formaction="/config/scoring/reset" name="group" value="all" formnovalidate data-confirm="¿Restablecer pesos de owners, drivers y umbrales a los valores del documento? Los leads existentes no cambian hasta que los recalcules." data-confirm-title="¿Restablecer la puntuación?" data-confirm-label="Restablecer" data-confirm-danger>Restablecer a los valores del documento</button>
         </div>
       </footer>
     </section>

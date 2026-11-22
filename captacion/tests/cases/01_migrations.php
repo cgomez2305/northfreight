@@ -47,6 +47,7 @@ return static function (array $ctx): void {
     $q2b->exec("INSERT INTO referral_codes (owner_name, code) VALUES ('Ana', 'ANA-1')");
     $q2b->exec("INSERT INTO referrals (referral_code_id, lead_id) VALUES (1, 1)");
     $q2b->exec("INSERT INTO job_postings (title, slug, valid_through, is_active) VALUES ('Driver viejo', 'driver-viejo', '2027-01-01', 1)");
+    $after = static fn(string $from): array => array_values(array_filter(array_map(static fn($f) => basename($f, '.sql'), glob($dir . '/[0-9][0-9][0-9]_*.sql') ?: []), static fn($n) => $n >= $from));   // migraciones desde $from en adelante (sin fijar la ultima: otras fases añaden)
     $newOnes = Migrator::run($q2b, $dir);
     T::eq($newOnes, array_values(array_filter($files, static fn($f) => (int) substr($f, 0, 3) > 5)), 'sobre la base de Q2b se aplican solo las migraciones posteriores a la 005 (006 en adelante)');
     T::eq([$q2b->query('SELECT status FROM referrals WHERE id = 1')->fetchColumn(), $q2b->query("SELECT status FROM job_postings WHERE slug = 'driver-viejo'")->fetchColumn(), (int) $q2b->query('SELECT attempts FROM prospects_fmcsa')->fetchColumn(), $q2b->query('SELECT source FROM prospects_fmcsa')->fetchColumn()],
@@ -97,7 +98,7 @@ return static function (array $ctx): void {
     foreach (array_filter(array_map('trim', preg_split('/;\s*\n/', (string) preg_replace('/^\s*--.*$/m', '', $sql012)) ?: [])) as $stmt) {
         $q5a->exec($stmt);
     }
-    T::eq(count(array_filter($q5a->query('SHOW TABLES')->fetchAll(PDO::FETCH_COLUMN), static fn($t) => str_starts_with($t, 'rule_'))), 5, '  012 ejecutada de nuevo a mano: sigue habiendo 5 tablas (CREATE TABLE IF NOT EXISTS)');
+    T::eq(count(array_filter($q5a->query('SHOW TABLES')->fetchAll(PDO::FETCH_COLUMN), static fn($t) => str_starts_with($t, 'rule_') && $t !== 'rule_notices')), 5, '  012 ejecutada de nuevo a mano: sigue habiendo 5 tablas (CREATE TABLE IF NOT EXISTS)');
     // Invariantes del esquema de reglas
     $q5a->exec("INSERT INTO rule_sets (kind, name) VALUES ('scoring', 'A')");
     $q5a->exec("INSERT INTO rule_versions (set_id, version, status, rules, pub_slot) VALUES (1, 1, 'published', '[]', 1)");

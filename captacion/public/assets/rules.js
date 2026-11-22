@@ -147,6 +147,15 @@
   r.parentNode.insertBefore(c, r.nextSibling); wireGrips(c); c.scrollIntoView({ behavior: (matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'), block: 'center' }); if (nm) nm.focus(); touched();
  }
 
+ /* ---------- Disparador de las reglas de eventos y tiempo: solo se ven los parámetros del evento elegido ---------- */
+ function syncTrigger(tr) {
+  if (!tr) return; var sel = $('[data-rt=type]', tr), ty = sel ? sel.value : '', helps = {};
+  try { helps = JSON.parse(tr.getAttribute('data-helps') || '{}'); } catch (e) { helps = {}; }
+  $$('[data-rt-p]', tr).forEach(function (p) { p.hidden = (p.getAttribute('data-rt-p') || '').split(' ').indexOf(ty) < 0; });
+  var h = $('[data-rt-help]', tr); if (h) h.textContent = helps[ty] || 'Elige qué evento activa la regla.';
+  var hl = $('[data-rt-p~=no_first_contact] small', tr); if (hl) hl.textContent = ty === 'task_overdue' ? '(0 a 720)' : '(1 a 720)';
+ }
+
  /* ---------- Cambios en los campos ---------- */
  rp.addEventListener('change', function (e) {
   var t = e.target; if (!t || !t.getAttribute) return;
@@ -163,6 +172,7 @@
    row('act', anp, { type: t.value }).then(function (el) { if (!el) { t.disabled = false; return; } a.replaceWith(el); var f = $('[data-ra=type]', el); if (f) f.focus(); touched(); });
    return;
   }
+  if (t.getAttribute('data-rt') === 'type') { syncTrigger(t.closest('[data-trigger]')); }
   if (t.getAttribute('data-rb') === 'mode') { var b = t.closest('[data-group],[data-block]'); b.setAttribute('data-mode', t.value); }
   if (t.hasAttribute('data-on')) { t.closest('[data-rule]').classList.toggle('is-off', !t.checked); }
   if (t.matches('[data-impact-scope]')) { schedule(true); return; }
