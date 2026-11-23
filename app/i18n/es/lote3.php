@@ -92,7 +92,7 @@ return [
     'Get approval from the broker before paying a lumper, and keep the receipt.' => 'Pide la aprobación del broker antes de pagar a un lumper y guarda el recibo.',
     'Go to the form' => 'Ir al formulario',
     'Guides for Relay carriers' => 'Guías para carriers de Relay',
-    'Habla con un dispatcher de NorthStar por WhatsApp al +1 863-651-3322 o escribe a nfreightsolutionsllc@gmail.com. Sin formularios primero: cuéntanos de tus camiones.' => 'Habla con un dispatcher de NorthStar por WhatsApp al +1 863-651-3322 o escribe a nfreightsolutionsllc@gmail.com. Sin formularios primero: cuéntanos de tus camiones.',
+    'Habla con un dispatcher de NorthStar por WhatsApp al +1 863-651-3322 o escribe a contact@northstarfreightsolutions.us. Sin formularios primero: cuéntanos de tus camiones.' => 'Habla con un dispatcher de NorthStar por WhatsApp al +1 863-651-3322 o escribe a contact@northstarfreightsolutions.us. Sin formularios primero: cuéntanos de tus camiones.',
     'Hi, I\'d like to talk about dry van dispatch.' => 'Hola, me gustaría hablar sobre dispatch para dry van.',
     'Hi, I\'m an owner-operator and I\'d like to talk about check calls & etas with NorthStar.' => 'Hola, soy owner-operator y me gustaría hablar sobre check calls y ETAs con NorthStar.',
     'Hi, I\'m an owner-operator and I\'d like to talk about evidence on file with NorthStar.' => 'Hola, soy owner-operator y me gustaría hablar sobre la evidencia en archivo con NorthStar.',

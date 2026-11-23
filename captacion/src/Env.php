@@ -17,11 +17,25 @@ final class Env
         return is_string($custom) && $custom !== '' ? $custom : CAPTACION_ROOT . '/config/.env';
     }
 
-    /** Lee el archivo .env (KEY=VALUE, # comentarios, comillas simples o dobles). Devuelve false si no existe. */
+    /** Claves que puede fijar config/mail.env (el buzón SMTP y los destinos de correo, nada más). */
+    private const MAIL_KEYS = '/^(SMTP_(HOST|PORT|USER|PASS|SECURE)|MAIL_TO|MAIL_FROM|PHPMAILER_AUTOLOAD)$/';
+
+    /**
+     * Lee el archivo .env (KEY=VALUE, # comentarios, comillas simples o dobles). Devuelve false si no existe.
+     * Después lee config/mail.env (junto al .env, fuera de git) si existe: solo las claves de correo, y GANA al .env en ellas,
+     * así el buzón se cambia sin reescribir el .env completo.
+     */
     public static function load(?string $file = null): bool
     {
         self::$loaded = true;
         $file ??= self::path();
+        $ok = self::parse($file, null);
+        self::parse(dirname($file) . '/mail.env', self::MAIL_KEYS);
+        return $ok;
+    }
+
+    private static function parse(string $file, ?string $allow): bool
+    {
         if (!is_file($file) || !is_readable($file)) {
             return false;
         }
@@ -34,7 +48,7 @@ final class Env
             [$k, $v] = explode('=', $line, 2);
             $k = trim($k);
             $v = trim($v);
-            if (!preg_match('/^[A-Z][A-Z0-9_]*$/', $k)) {
+            if (!preg_match('/^[A-Z][A-Z0-9_]*$/', $k) || ($allow !== null && !preg_match($allow, $k))) {
                 continue;
             }
             if (strlen($v) >= 2 && ($v[0] === '"' || $v[0] === "'") && substr($v, -1) === $v[0]) {

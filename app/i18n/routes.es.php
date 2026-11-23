@@ -80,7 +80,7 @@ return [
     '/contact/' => [
         'path'       => '/es/contacto/',
         'title'      => 'Contacto NorthStar Freight | Habla con un Dispatcher',
-        'meta'       => 'Habla con un dispatcher de NorthStar por WhatsApp al +1 863-651-3322 o escribe a nfreightsolutionsllc@gmail.com. Sin formularios primero.',
+        'meta'       => 'Habla con un dispatcher de NorthStar por WhatsApp al +1 863-651-3322 o escribe a contact@northstarfreightsolutions.us. Sin formularios primero.',
         'h1'         => 'Habla con un dispatcher',
         'breadcrumb' => 'Contacto',
     ],

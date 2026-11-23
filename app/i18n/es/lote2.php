@@ -212,7 +212,7 @@ return [
     'https://northstarfreight.example/es/back-office-para-camioneros/' => 'https://northstarfreight.example/es/back-office-para-camioneros/',
     'https://northstarfreight.example/es/blog/' => 'https://northstarfreight.example/es/blog/',
     'https://northstarfreight.example/es/blog/cuanto-cuesta-un-servicio-de-dispatch/' => 'https://northstarfreight.example/es/blog/cuanto-cuesta-un-servicio-de-dispatch/',
-    'nfreightsolutionsllc@gmail.com' => 'nfreightsolutionsllc@gmail.com',
+    'contact@northstarfreightsolutions.us' => 'contact@northstarfreightsolutions.us',
     'noindex, nofollow' => 'noindex, nofollow',
     'rate per mile calculator' => 'calculadora de rate per mile',
     'shows what a fair contract covers.' => 'muestra qué cubre un contrato justo.',

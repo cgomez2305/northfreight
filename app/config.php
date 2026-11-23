@@ -14,12 +14,36 @@ if (defined('NS_CONFIG_LOADED')) {
 }
 define('NS_CONFIG_LOADED', true);
 
-// 1) Local primero: así sus define() ganan a los valores por defecto de abajo.
+// 0) Correo (config.mail.php, fuera de git): buzón SMTP y destinos. Devuelve un array CLAVE => valor y GANA a config.local.php
+//    en esas claves (solo SMTP_*, MAIL_TO, MAIL_FROM y EMAIL), así se puede cambiar el buzón sin reescribir config.local.php.
+$ns_mail = __DIR__ . '/config.mail.php';
+$ns_mail_keys = [];
+if (is_file($ns_mail)) {
+    $ns_mail_cfg = require $ns_mail;
+    foreach (is_array($ns_mail_cfg) ? $ns_mail_cfg : [] as $k => $v) {
+        if (is_string($k) && preg_match('/^(SMTP_(HOST|PORT|USER|PASS|SECURE)|MAIL_TO|MAIL_FROM|EMAIL)$/', $k) && (is_string($v) || is_int($v)) && !defined($k)) {
+            define($k, $v);
+            $ns_mail_keys[$k] = true;
+        }
+    }
+    unset($ns_mail_cfg, $k, $v);
+}
+unset($ns_mail);
+
+// 1) Local después: sus define() ganan a los valores por defecto de abajo. Si repite una clave que ya fijó config.mail.php,
+//    PHP avisaría «Constant X already defined»: ese aviso concreto se descarta (manda el archivo de correo); cualquier otro sigue su curso.
 $ns_local = __DIR__ . '/config.local.php';
 if (is_file($ns_local)) {
-    require $ns_local;
+    set_error_handler(static function (int $no, string $str) use ($ns_mail_keys): bool {
+        return preg_match('/^Constant (\w+) already defined/', $str, $m) === 1 && isset($ns_mail_keys[$m[1]]);
+    }, E_WARNING);
+    try {
+        require $ns_local;
+    } finally {
+        restore_error_handler();
+    }
 }
-unset($ns_local);
+unset($ns_local, $ns_mail_keys);
 
 /** Define una constante solo si no la fijó config.local.php. */
 function ns_default(string $name, mixed $value): void
@@ -41,7 +65,7 @@ ns_default('PHONE', '+1 863-651-3322');          // visible como texto
 ns_default('TEL', '+18636513322');                // para href="tel:"
 // Correo visible y de contacto. Se imprime en footer, CTA final, /contact/, legales y pop-up móvil, y llega a JSON-LD y llms.txt: cambiarlo AQUÍ (o con define() en config.local.php)
 // basta para pasar al correo con dominio propio. Literal aparte: la meta de /contact/ en app/routes.php (no se toca sin decisión de SEO).
-ns_default('EMAIL', 'nfreightsolutionsllc@gmail.com');
+ns_default('EMAIL', 'contact@northstarfreightsolutions.us');
 // Remitente (From) de los correos del sitio. Vacío = el buzón SMTP_USER. Con SMTP de Hostinger debe ser el propio buzón autenticado.
 ns_default('MAIL_FROM', '');
 ns_default('WA_BASE', 'https://wa.me/18636513322');

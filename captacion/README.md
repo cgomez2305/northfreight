@@ -251,7 +251,7 @@ Ver `config/.env.example` (comentado). Resumen:
 | `DB_HOST` `DB_PORT` `DB_NAME` `DB_USER` `DB_PASS` | MySQL/MariaDB de Hostinger: host **127.0.0.1**, puerto 3306. |
 | `FMCSA_WEBKEY` | Llave QCMobile (gratuita). Sin ella: `fmcsa_pending`. |
 | `TELEGRAM_BOT_TOKEN` `TELEGRAM_CHAT_ID` | Alertas A2/A3. |
-| `MAIL_TO` `SMTP_HOST` `SMTP_PORT` `SMTP_USER` `SMTP_PASS` `SMTP_SECURE` | Avisos por correo (mismos nombres que `app/config.local.php` del sitio). Sin SMTP: `storage/mail.log`. |
+| `MAIL_TO` `SMTP_HOST` `SMTP_PORT` `SMTP_USER` `SMTP_PASS` `SMTP_SECURE` | Avisos por correo (mismos nombres que `app/config.local.php` del sitio). Sin SMTP: `storage/mail.log`. **Desde 2026-11-23 el buzón vive aparte en `config/mail.env`** (plantilla `config/mail.env.example`, fuera de git): solo se leen ahí las claves de correo y GANAN al `.env`. Buzón en uso: `contact@northstarfreightsolutions.us` (Hostinger, `smtp.hostinger.com:465` ssl); si se cambia su contraseña en hPanel hay que cambiarla en `config/mail.env` y en `app/config.mail.php` del sitio. |
 | Opcionales | `SESSION_IDLE_SECONDS` (28800) · `API_RATE_LIMIT` (120/h) · `INGEST_RATE_LIMIT` (5/h) · `JOBS_MAX_SECONDS` (50) · `BACKUP_MAX_SECONDS` (240, tope de tiempo del volcado) · `REAUTH_SECONDS` (600, vigencia de la confirmación contraseña + 2FA en Configuración y descargas) · `TOTP_ISSUER` · `STORAGE_DIR` (solo pruebas) · `CAPTACION_ENV_FILE` (otra ruta del .env). |
 
 El sitio solo necesita `define('CAPTACION_ENABLED', 1);` en `app/config.local.php` (ver `app/config.local.example.php`). Si se sube `RATE_LIMIT` del sitio por encima de 5, subir también `INGEST_RATE_LIMIT`.
