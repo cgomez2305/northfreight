@@ -69,10 +69,10 @@ $grp = static function (array $rows, string $first, callable $name): string {
   </section>
 </div>
 
-<div class="rep-grid rep-grid--3">
+<div class="rep-grid">
   <section class="card card--table" aria-labelledby="r-pf"><header class="card__h"><h2 class="label" id="r-pf">Por perfil</h2><?= $exp('perfiles', 'Perfiles') ?></header><?= $grp($m['profiles'], 'Perfil', static fn($k) => Catalog::label(Catalog::PROFILES, $k)) ?></section>
   <section class="card card--table" aria-labelledby="r-eq"><header class="card__h"><h2 class="label" id="r-eq">Por equipo</h2><?= $exp('equipos', 'Equipos') ?></header><?= $grp($m['equipment'], 'Equipo', static fn($k) => Catalog::label(Catalog::EQUIPMENT, $k)) ?></section>
-  <section class="card card--table" aria-labelledby="r-st"><header class="card__h"><h2 class="label" id="r-st">Por estado de EE. UU.</h2><?= $exp('estados', 'Estados') ?></header><?= $grp($m['states'], 'Estado', static fn($k) => $k) ?></section>
+  <section class="card card--table rep-span" aria-labelledby="r-st"><header class="card__h"><h2 class="label" id="r-st">Por estado de EE. UU.</h2><?= $exp('estados', 'Estados') ?></header><?= $grp($m['states'], 'Estado', static fn($k) => $k) ?></section>
 </div>
 
 <section class="card card--table" aria-labelledby="r-as">

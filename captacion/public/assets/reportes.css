@@ -85,3 +85,19 @@
 .legend{display:flex;gap:16px;flex-wrap:wrap;font:400 var(--fs-sm)/1.3 var(--f-sans);color:var(--ink-2)}
 .legend li{display:flex;align-items:center;gap:7px}
 @media (max-width:760px){.legend{gap:8px 14px}}
+/* Fase AO: las tablas de Reportes son TABLAS en cuanto caben (> 520 px). panel.css convierte cualquier .tbl en fichas bajo 700 px (pensado para la lista de
+   leads) y aquí dejaba «Páginas de llegada» con los números amontonados encima de la ruta. Filas más bajas: son datos, no fichas de trabajo. */
+.rep-span{grid-column:1/-1}
+.tbl--rep td,.tbl--rep tbody th{height:40px}
+@container (min-width:521px){
+  .tbl.tbl--rep{display:table}
+  .tbl--rep thead{position:static;width:auto;height:auto;overflow:visible;clip:auto;display:table-header-group}
+  .tbl--rep tbody{display:table-row-group}
+  .tbl--rep tfoot{display:table-footer-group}
+  .tbl--rep tr,.tbl--rep tbody tr{display:table-row;padding:0}
+  .tbl--rep td,.tbl--rep th,.tbl--rep tbody th{display:table-cell;padding:8px 10px!important;border-bottom:1px solid var(--line)!important;white-space:nowrap;height:40px}
+  .tbl--rep th:first-child,.tbl--rep td:first-child{padding-left:20px!important;white-space:normal;overflow-wrap:break-word;min-width:18ch}
+  .tbl--rep th:last-child,.tbl--rep td:last-child{padding-right:20px!important}
+  .tbl--rep tbody tr:last-child>*{border-bottom:0!important}
+}
+
