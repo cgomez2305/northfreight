@@ -41,15 +41,15 @@ $taskRow = static function (array $it) use ($e, $csrf, $canWrite, $back, $now): 
       <time class="trow__w<?= $late ? ' is-late' : '' ?>"><?= $when !== null ? $e($when) : '' ?><?php if ($late): ?><small>vencida <?= $e(Fmt::ago((string) $it['due_at'])) ?></small><?php endif; ?></time>
       <?php if ($isTask && $canWrite): ?>
         <div class="dd trow__a" data-dd>
-          <button class="icon-btn icon-btn--sm" type="button" aria-expanded="false" aria-haspopup="menu" aria-controls="tm-<?= $e($it['id']) ?>" aria-label="Acciones de la tarea: <?= $e($it['title']) ?>"><?= Ui::icon('dots') ?></button>
-          <div class="dd__panel" id="tm-<?= $e($it['id']) ?>" role="menu" hidden>
+          <button class="icon-btn icon-btn--sm" type="button" aria-expanded="false" aria-controls="tm-<?= $e($it['id']) ?>" aria-label="Acciones de la tarea: <?= $e($it['title']) ?>"><?= Ui::icon('dots') ?></button>
+          <div class="dd__panel" id="tm-<?= $e($it['id']) ?>" aria-label="Acciones de la tarea" hidden>
             <?php if (!$done): ?>
-              <form method="post" action="/tareas/<?= $e($it['id']) ?>/snooze"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="back" value="<?= $e($back) ?>"><input type="hidden" name="mode" value="1h"><button class="dd__item" type="submit" role="menuitem"><?= Ui::icon('clock') ?>Posponer 1 hora</button></form>
-              <form method="post" action="/tareas/<?= $e($it['id']) ?>/snooze"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="back" value="<?= $e($back) ?>"><input type="hidden" name="mode" value="tomorrow"><button class="dd__item" type="submit" role="menuitem"><?= Ui::icon('calendar') ?>Posponer a mañana</button></form>
-              <button class="dd__item" type="button" role="menuitem" data-snooze="<?= $e($data) ?>"><?= Ui::icon('calendar') ?>Elegir fecha…</button>
+              <form method="post" action="/tareas/<?= $e($it['id']) ?>/snooze"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="back" value="<?= $e($back) ?>"><input type="hidden" name="mode" value="1h"><button class="dd__item" type="submit"><?= Ui::icon('clock') ?>Posponer 1 hora</button></form>
+              <form method="post" action="/tareas/<?= $e($it['id']) ?>/snooze"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="back" value="<?= $e($back) ?>"><input type="hidden" name="mode" value="tomorrow"><button class="dd__item" type="submit"><?= Ui::icon('calendar') ?>Posponer a mañana</button></form>
+              <button class="dd__item" type="button" data-snooze="<?= $e($data) ?>"><?= Ui::icon('calendar') ?>Elegir fecha…</button>
             <?php endif; ?>
-            <button class="dd__item" type="button" role="menuitem" data-edit="<?= $e($data) ?>"><?= Ui::icon('pencil') ?>Editar…</button>
-            <form method="post" action="/tareas/<?= $e($it['id']) ?>/delete"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="back" value="<?= $e($back) ?>"><button class="dd__item dd__item--bad" type="submit" role="menuitem" data-confirm="¿Eliminar la tarea «<?= $e($it['title']) ?>»? Dejará de verse en la lista."><?= Ui::icon('trash') ?>Eliminar</button></form>
+            <button class="dd__item" type="button" data-edit="<?= $e($data) ?>"><?= Ui::icon('pencil') ?>Editar…</button>
+            <form method="post" action="/tareas/<?= $e($it['id']) ?>/delete"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="back" value="<?= $e($back) ?>"><button class="dd__item dd__item--bad" type="submit" data-confirm-title="¿Eliminar la tarea?" data-confirm-label="Eliminar" data-confirm-danger data-confirm="¿Eliminar la tarea «<?= $e($it['title']) ?>»? Dejará de verse en la lista."><?= Ui::icon('trash') ?>Eliminar</button></form>
           </div>
         </div>
       <?php endif; ?>

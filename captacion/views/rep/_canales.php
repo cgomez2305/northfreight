@@ -6,7 +6,7 @@ use Captacion\Services\RepView;
 $c = $m['channels'];
 $cell = static fn($r, string $k, string $none) => $r[$k] !== null ? RepView::money((float) $r[$k]) : '<span class="dd-na">' . $none . '</span>';
 ?>
-<div class="tw"><table class="tbl tbl--rep">
+<div class="tw"><table class="tbl tbl--rep" aria-label="Costo por firmado por canal">
   <thead><tr><th scope="col">Canal</th><th scope="col" class="num-c">Leads</th><th scope="col" class="num-c">Calificados</th><th scope="col" class="num-c">Presentados</th><th scope="col" class="num-c">Firmados</th><th scope="col" class="num-c">Costo</th><th scope="col" class="num-c">Costo por lead</th><th scope="col" class="num-c">Costo por firmado</th></tr></thead>
   <tbody>
     <?php foreach ($c['rows'] as $r): ?>

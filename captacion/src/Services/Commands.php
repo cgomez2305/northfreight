@@ -18,7 +18,7 @@ final class Commands
             return [];
         }
         $screens = [['Dashboard', '/'], ['Leads · Lista', '/leads'], ['Pipeline · Tablero', '/pipeline'], ['Leads · Tabla', '/tabla'], ['Leads · Calendario', '/calendario'], ['Leads · Cronología', '/cronologia'], ['Tareas', '/tareas'], ['Prospectos', '/prospectos'], ['Referidos', '/referidos'], ['Vacantes', '/vacantes'],
-            ['Reportes', '/reportes'], ['Informes', '/informes'], ['Comunicaciones', '/comunicaciones'], ['Configuración', '/config'], ['Actividad', '/actividad']];
+            ['Reportes', '/reportes'], ['Informes', '/informes'], ['Comunicaciones', '/comunicaciones'], ['Configuración', '/config'], ['Actividad', '/actividad'], ['Importar leads (CSV)', '/importar']];
         $v = [];
         foreach ($views as $x) {
             $v[] = [(string) $x['name'], (string) $x['href']];

@@ -2,7 +2,7 @@
 /**
  * Bandeja de leads: filtros (todos desde la URL, con lista blanca), orden, paginacion, conteos por temperatura y filas para exportar.
  * Claves de la URL: t temperatura · pf perfil · src fuente · st etapa · eq equipo · us estado · lg idioma · from/to fechas (ET, AAAA-MM-DD) · q texto · ct=none (sin contactar)
- * · sort (created|score|name|stage) · dir (asc|desc) · page · per (25|50|100). Los datos personales nunca viajan en la URL salvo lo que la persona escribe en q.
+ * · rs (responsable: me | none | id de usuario) · sla=1 (plazo de primer contacto vencido) · sort (created|score|name|stage) · dir (asc|desc) · page · per (25|50|100). Los datos personales nunca viajan en la URL salvo lo que la persona escribe en q.
  */
 
 declare(strict_types=1);
@@ -15,6 +15,14 @@ final class LeadQuery
 {
     public const SORTS = ['created' => 'l.created_at', 'score' => 'l.score', 'name' => 'l.first_name', 'stage' => 'l.stage'];
     public const PER = [25, 50, 100];
+
+    /** Id del usuario que mira (lo fija Responder::user): lo necesita el filtro «Mis leads» (`rs=me`). Sin usuario, `rs=me` no devuelve nada. */
+    private static ?int $me = null;
+
+    public static function forUser(?int $userId): void
+    {
+        self::$me = $userId;
+    }
 
     /** Normaliza los parametros de la URL a un arreglo de filtros validos (lo no valido se descarta). */
     public static function filters(array $in): array
@@ -52,6 +60,12 @@ final class LeadQuery
         }
         if ($s('ct') === 'none') {
             $f['ct'] = 'none';
+        }
+        if ($s('rs') === 'me' || $s('rs') === 'none' || preg_match('/^[1-9]\d{0,9}$/', $s('rs')) === 1) {
+            $f['rs'] = $s('rs');   // AM: responsable del lead (me = el usuario que mira, none = sin asignar, o el id de un usuario)
+        }
+        if ($s('sla') === '1') {
+            $f['sla'] = '1';   // AM: sin primer contacto y con el plazo vencido
         }
         if ($s('nt') === '1') {
             $f['nt'] = '1';   // Q5a: sin ninguna tarea abierta
@@ -159,6 +173,22 @@ final class LeadQuery
         if (isset($f['hs'])) {
             $w[] = "l.stage = 'presented' AND l.handoff_status = 'pending'";
         }
+        if (isset($f['rs'])) {
+            if ($f['rs'] === 'none') {
+                $w[] = 'l.assigned_to IS NULL';
+            } else {
+                $uid = $f['rs'] === 'me' ? (self::$me ?? 0) : (int) $f['rs'];
+                $w[] = $uid > 0 ? 'l.assigned_to = ?' : '1 = 0';
+                if ($uid > 0) {
+                    $p[] = $uid;
+                }
+            }
+        }
+        if (isset($f['sla'])) {
+            [$slaSql, $slaP] = Sla::overdueSql('l');
+            $w[] = $slaSql;
+            array_push($p, ...$slaP);
+        }
         return [implode(' AND ', $w), $p];
     }
 
@@ -171,8 +201,8 @@ final class LeadQuery
         $order = self::SORTS[$paging['sort']] . ' ' . strtoupper($paging['dir']) . ($paging['sort'] === 'name' ? ', l.last_name ' . strtoupper($paging['dir']) : '') . ', l.id DESC';
         $rows = Db::all(
             "SELECT l.id, l.first_name, l.last_name, l.profile, l.state, l.language, l.equipment_types, l.truck_count, l.score, l.temperature, l.stage, l.pipeline, l.source,
-                    l.phone_e164, l.first_contact_at, l.created_at, l.flags
-               FROM leads l WHERE $where ORDER BY $order LIMIT " . (int) $paging['per'] . ' OFFSET ' . (int) (($page - 1) * $paging['per']),
+                    l.phone_e164, l.first_contact_at, l.created_at, l.flags, l.assigned_to, l.stage_changed_at, au.name AS assignee
+               FROM leads l LEFT JOIN users au ON au.id = l.assigned_to WHERE $where ORDER BY $order LIMIT " . (int) $paging['per'] . ' OFFSET ' . (int) (($page - 1) * $paging['per']),
             $params
         );
         foreach ($rows as &$r) {
@@ -201,6 +231,7 @@ final class LeadQuery
         return [
             'sources' => array_column(Db::all('SELECT DISTINCT source FROM leads WHERE deleted_at IS NULL ORDER BY source'), 'source'),
             'states'  => array_column(Db::all('SELECT DISTINCT state FROM leads WHERE deleted_at IS NULL AND state IS NOT NULL ORDER BY state'), 'state'),
+            'admins'  => Assignment::admins(),
         ];
     }
 

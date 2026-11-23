@@ -17,7 +17,7 @@ return static function (array $ctx): void {
     $docroot = $ctx['root'] . '/public';
     $tok = $ctx['env']['INTERNAL_API_TOKEN'];
     $payload = ['profile' => 'owner_operator', 'name' => 'Luis Ortega', 'phone' => '+1 (305) 234-5600', 'email' => 'luis@example.com', 'state' => 'FL', 'language' => 'es', 'cdl_type' => 'standard', 'english_level' => 'yes',
-        'years_experience' => 5, 'equipment_types' => ['reefer'], 'truck_count' => 3, 'source' => 'n8n_whatsapp', 'utm' => ['utm_source' => 'wa'], 'landing_page' => 'whatsapp'];
+        'years_experience' => 5, 'equipment_types' => ['dry-van'], 'truck_count' => 3, 'source' => 'n8n_whatsapp', 'utm' => ['utm_source' => 'wa'], 'landing_page' => 'whatsapp'];
 
     T::reset();
     $port = Infra::phpServer('api-a', $docroot, ['CAPTACION_ENV_FILE' => $mkEnv('api-a', ['API_RATE_LIMIT' => '500'])]);

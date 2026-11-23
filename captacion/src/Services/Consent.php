@@ -78,6 +78,7 @@ final class Consent
                 $flags = Flags::add(Db::decode($row['flags']), $channel === 'all' ? 'stop' : 'stop_' . $channel);
                 Db::update('leads', $id, ['flags' => $flags]);
                 Db::insert('lead_events', ['lead_id' => $id, 'type' => 'consent_revoked', 'payload' => ['channel' => $channel, 'via' => $via, 'revoked' => $n], 'created_at' => Clock::now()]);
+                RuleAutomation::onEvent($id, 'consent_revoked', ['channel' => $channel]);   // fase AM
             });
         }
         return $total;
@@ -117,6 +118,7 @@ final class Consent
                 $total += $n;
                 Db::update('leads', $id, ['flags' => Flags::add(Db::decode($row['flags']), ...array_map(static fn($c) => 'stop_' . $c, $channels))]);
                 Db::insert('lead_events', ['lead_id' => $id, 'type' => 'consent_revoked', 'payload' => ['channel' => implode('+', $channels), 'via' => $via, 'revoked' => $n], 'created_at' => Clock::now()]);
+                RuleAutomation::onEvent($id, 'consent_revoked', ['channel' => implode('+', $channels)]);   // fase AM
             });
         }
         return ['leads' => count($leadIds), 'revoked' => $total];

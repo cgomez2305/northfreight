@@ -4,6 +4,7 @@ use Captacion\Clock;
 use Captacion\Services\Catalog;
 use Captacion\Services\Charts;
 use Captacion\Services\Fmt;
+use Captacion\Services\Sla;
 
 $id = (int) $lead['id'];
 $name = Fmt::name($lead);
@@ -24,6 +25,7 @@ $waText = $lead['language'] === 'es' ? 'Hola ' . $lead['first_name'] . ', te esc
 $flags = (array) $lead['flags'];
 $activeConsents = array_filter($consents, static fn($c) => $c['revoked_at'] === null);
 $stopped = in_array('stop', $flags, true);
+$anon = ($lead['anonymized_at'] ?? null) !== null;   // fase AM: lead anonimizado, sin acciones de contacto
 $groups = ['all' => 'Todo', 'contact' => 'Contacto', 'stage' => 'Etapas', 'note' => 'Notas', 'task' => 'Tareas', 'system' => 'Sistema'];
 $gc = array_fill_keys(array_keys($groups), 0);
 foreach ($timeline as $t) {
@@ -33,7 +35,11 @@ foreach ($timeline as $t) {
 $openTasks = array_filter($tasks, static fn($t) => $t['done_at'] === null);
 $doneTasks = array_filter($tasks, static fn($t) => $t['done_at'] !== null);
 $loc = trim(($lead['city'] ? $lead['city'] . ', ' : '') . ($lead['state'] ?? ''), ', ');
+$sla = Sla::status($lead);
+$assignedTo = $lead['assigned_to'] !== null ? (int) $lead['assigned_to'] : 0;
+$assigneeName = $assignedTo > 0 ? ($users[$assignedTo] ?? null) : null;
 ?>
+<p class="lead__back"><a class="link" href="<?= $e($back) ?>"><?= Ui::icon('chevron-left') ?>Volver a la lista</a></p>
 <article class="lead" aria-labelledby="lead-name" data-lead="<?= $e($id) ?>" data-stage="<?= $e($lead['stage']) ?>" data-name="<?= $e($name) ?>" data-stages="<?= $e(json_encode($stages, JSON_UNESCAPED_UNICODE)) ?>">
 <header class="card lead__head">
   <div class="lead__id">
@@ -45,6 +51,7 @@ $loc = trim(($lead['city'] ? $lead['city'] . ', ' : '') . ($lead['state'] ?? '')
         <span class="chip chip--plain"><?= Ui::icon($lead['profile'] === 'company_driver' ? 'user' : 'truck') ?><?= $e(Catalog::label(Catalog::PROFILES, $lead['profile'])) ?></span>
         <?= Ui::temp($lead['temperature']) ?>
         <?= Ui::stage($lead['stage'], $pipeline) ?>
+        <?php if ($sla !== null): ?><?= Ui::sla($sla) ?><?php endif; ?>
         <?php foreach ($flags as $fl): $red = str_starts_with($fl, 'red:') || str_starts_with($fl, 'stop'); ?><span class="chip <?= $red ? 'chip--bad' : 'chip--plain' ?>"><?= Ui::icon($red ? 'alert' : 'flag') ?><?= $e(Catalog::label(Catalog::FLAGS, $fl)) ?></span><?php endforeach; ?>
       </div>
     </div>
@@ -55,9 +62,9 @@ $loc = trim(($lead['city'] ? $lead['city'] . ', ' : '') . ($lead['state'] ?? '')
 
   <div class="lead__acts">
     <?php if ($phone): ?><a class="btn btn--primary" href="tel:<?= $e($phone) ?>"><span class="btn__t">Llamar</span></a><?php endif; ?>
-    <?php if ($wa): ?><a class="btn btn--secondary" href="https://wa.me/<?= $e($wa) ?>?text=<?= $e(rawurlencode($waText)) ?>" rel="noopener noreferrer" target="_blank"><?= Ui::icon('chat') ?>WhatsApp</a><?php endif; ?>
+    <?php if ($wa): ?><a class="btn btn--secondary" href="https://wa.me/<?= $e($wa) ?>?text=<?= $e(rawurlencode($waText)) ?>" rel="noopener noreferrer" target="_blank"><?= Ui::icon('chat') ?>WhatsApp<span class="sr"> (abre en otra pestaña)</span></a><?php endif; ?>
     <?php if ($lead['email']): ?><a class="btn btn--secondary" href="mailto:<?= $e($lead['email']) ?>"><?= Ui::icon('mail') ?>Correo</a><?php endif; ?>
-    <button class="btn btn--secondary" type="button" data-open="#call-dlg"><?= Ui::icon('history') ?>Registrar llamada</button>
+    <?php if (!$anon): ?><button class="btn btn--secondary" type="button" data-open="#call-dlg"><?= Ui::icon('history') ?>Registrar llamada</button><?php endif; ?>
     <?php if ($lost): ?>
       <form method="post" action="/leads/<?= $e($id) ?>/reopen"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><button class="btn btn--secondary" type="submit"><?= Ui::icon('refresh') ?>Reabrir lead</button></form>
     <?php else: ?>
@@ -71,10 +78,18 @@ $loc = trim(($lead['city'] ? $lead['city'] . ', ' : '') . ($lead['state'] ?? '')
     <div><dt>Ubicación</dt><dd><?= $e($loc !== '' ? $loc : '—') ?></dd></div>
     <div><dt>Idioma</dt><dd><?= $e(Catalog::label(Catalog::LANGS, $lead['language'])) ?></dd></div>
     <div><dt>Prefiere</dt><dd><?= $e(['call' => 'Llamada', 'whatsapp' => 'WhatsApp', 'text' => 'Texto', 'email' => 'Correo'][$lead['contact_pref'] ?? ''] ?? '—') ?><?= $lead['best_time'] ? ' · ' . $e(['morning' => 'mañana', 'afternoon' => 'tarde', 'evening' => 'noche', 'any' => 'cualquier hora'][$lead['best_time']] ?? $lead['best_time']) : '' ?></dd></div>
-    <div><dt>Primer contacto</dt><dd><?= $lead['first_contact_at'] ? $e(Fmt::dateTime($lead['first_contact_at'])) . ' <small class="muted">(' . $e(Fmt::dur(Fmt::secondsBetween($lead['created_at'], $lead['first_contact_at']))) . ' tras llegar)</small>' : '<span class="late">Sin contactar</span>' ?></dd></div>
+    <div><dt>Primer contacto</dt><dd><?= $lead['first_contact_at'] ? $e(Fmt::dateTime($lead['first_contact_at'])) . ' <small class="muted">(' . $e(Fmt::dur(Fmt::secondsBetween($lead['created_at'], $lead['first_contact_at']))) . ' tras llegar)</small>' : '<span class="late">Sin contactar</span>' . ($sla !== null ? ' · ' . Ui::sla($sla) : '') ?></dd></div>
+    <div><dt>Responsable</dt><dd id="responsable">
+      <form class="asg" method="post" action="/leads/<?= $e($id) ?>/assign">
+        <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>">
+        <label class="field"><span class="sr">Responsable de este lead</span>
+          <select name="to"><option value="">Sin asignar</option><?php foreach ($admins as $aid => $aname): ?><option value="<?= $e($aid) ?>"<?= $assignedTo === $aid ? ' selected' : '' ?>><?= $e($aname) ?></option><?php endforeach; ?><?php if ($assignedTo > 0 && !isset($admins[$assignedTo])): ?><option value="<?= $e($assignedTo) ?>" selected><?= $e($assigneeName ?? 'Usuario anterior') ?> (ya no disponible)</option><?php endif; ?></select></label>
+        <button class="btn btn--secondary btn--sm" type="submit">Asignar</button>
+      </form></dd></div>
   </dl>
 </header>
 
+<?php if ($anon) { require __DIR__ . '/_lead_anon_notice.php'; } ?>
 <?php if ($lost): ?>
 <p class="flash flash--bad" role="status"><?= Ui::icon('flag') ?><span><b><?= $e($stages['lost']) ?></b><?= $lead['lost_reason'] ? ' · ' . $e(Catalog::label(Catalog::LOSS_REASONS, $lead['lost_reason'])) : '' ?><?= $lead['lost_at'] ? ' · ' . $e(Fmt::dateTime($lead['lost_at'])) : '' ?>. Puedes reabrirlo si vuelve a mostrar interés.</span></p>
 <?php elseif ($lead['temperature'] === 'disqualified'): ?>
@@ -129,8 +144,8 @@ $loc = trim(($lead['city'] ? $lead['city'] . ', ' : '') . ($lead['state'] ?? '')
           <?php foreach ($notes as $n): ?>
             <li class="nt">
               <header><span><b><?= $e($n['author'] ?? 'Sistema') ?></b> · <time title="<?= $e(Fmt::dateTime($n['created_at'])) ?>"><?= $e(Fmt::dateTime($n['created_at'])) ?></time><?= $n['updated_at'] !== $n['created_at'] && $n['updated_at'] > $n['created_at'] ? ' · editada' : '' ?></span>
-                <span class="nt__a"><button class="icon-btn icon-btn--sm" type="button" data-toggle="#ne-<?= $e($n['id']) ?>" aria-expanded="false" aria-controls="ne-<?= $e($n['id']) ?>" aria-label="Editar nota"><?= Ui::icon('pencil') ?></button>
-                <form method="post" action="/leads/<?= $e($id) ?>/note-delete"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="note_id" value="<?= $e($n['id']) ?>"><button class="icon-btn icon-btn--sm" type="submit" aria-label="Eliminar nota" data-confirm="Se quitará esta nota de la ficha. Queda en el registro de actividad."><?= Ui::icon('trash') ?></button></form></span></header>
+                <span class="nt__a"><button class="icon-btn icon-btn--sm" type="button" data-toggle="#ne-<?= $e($n['id']) ?>" aria-expanded="false" aria-controls="ne-<?= $e($n['id']) ?>" aria-label="Editar la nota de <?= $e($n['author'] ?? 'Sistema') ?> del <?= $e(Fmt::dateTime($n['created_at'])) ?>"><?= Ui::icon('pencil') ?></button>
+                <form method="post" action="/leads/<?= $e($id) ?>/note-delete"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="note_id" value="<?= $e($n['id']) ?>"><button class="icon-btn icon-btn--sm" type="submit" aria-label="Eliminar la nota de <?= $e($n['author'] ?? 'Sistema') ?> del <?= $e(Fmt::dateTime($n['created_at'])) ?>" data-confirm="Se quitará esta nota de la ficha. Queda en el registro de actividad." data-confirm-title="¿Eliminar la nota?" data-confirm-label="Eliminar" data-confirm-danger><?= Ui::icon('trash') ?></button></form></span></header>
               <p><?= nl2br($e($n['body'])) ?></p>
               <form class="nt__e" id="ne-<?= $e($n['id']) ?>" method="post" action="/leads/<?= $e($id) ?>/note-edit" hidden>
                 <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="note_id" value="<?= $e($n['id']) ?>">
@@ -165,6 +180,7 @@ $loc = trim(($lead['city'] ? $lead['city'] . ', ' : '') . ($lead['state'] ?? '')
 
   <div class="lead__side">
     <?php require __DIR__ . '/_lead_q3.php'; ?>
+    <?php require __DIR__ . '/_lead_datos.php'; ?>
     <section class="card" aria-labelledby="h-score">
       <header class="card__h"><h2 class="label" id="h-score">Puntuación desglosada</h2><b class="mono"><?= $e($lead['score']) ?>/100</b></header>
       <div class="card__b">
@@ -252,7 +268,7 @@ $loc = trim(($lead['city'] ? $lead['city'] . ', ' : '') . ($lead['state'] ?? '')
         </ul>
         <details class="fine"><summary>Texto aceptado<?= $consents[0]['consent_version'] ? ' (' . $e($consents[0]['consent_version']) . ')' : '' ?></summary><p><?= $e($consents[0]['consent_text']) ?></p></details>
         <?php if ($activeConsents): ?>
-          <form method="post" action="/leads/<?= $e($id) ?>/revoke"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><button class="btn btn--danger-o btn--sm" type="submit" data-confirm="Se revocarán todos los consentimientos de este lead y quedará marcado como STOP: no se le debe llamar, escribir ni enviar SMS."><?= Ui::icon('shield') ?>Revocar consentimiento</button></form>
+          <form method="post" action="/leads/<?= $e($id) ?>/revoke"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><button class="btn btn--danger-o btn--sm" type="submit" data-confirm="Se revocarán todos los consentimientos de este lead y quedará marcado como STOP: no se le debe llamar, escribir ni enviar SMS." data-confirm-title="¿Revocar el consentimiento?" data-confirm-label="Revocar" data-confirm-danger><?= Ui::icon('shield') ?>Revocar consentimiento</button></form>
         <?php endif; ?>
         <?php endif; ?>
       </div>
@@ -270,7 +286,7 @@ $loc = trim(($lead['city'] ? $lead['city'] . ', ' : '') . ($lead['state'] ?? '')
 
 <div class="leadbar" role="region" aria-label="Acciones rápidas">
   <?php if ($phone): ?><a class="leadbar__b leadbar__b--main" href="tel:<?= $e($phone) ?>"><?= Ui::icon('phone') ?><span>Llamar</span></a><?php endif; ?>
-  <?php if ($wa): ?><a class="leadbar__b" href="https://wa.me/<?= $e($wa) ?>?text=<?= $e(rawurlencode($waText)) ?>" rel="noopener noreferrer" target="_blank"><?= Ui::icon('chat') ?><span>WhatsApp</span></a><?php endif; ?>
+  <?php if ($wa): ?><a class="leadbar__b" href="https://wa.me/<?= $e($wa) ?>?text=<?= $e(rawurlencode($waText)) ?>" rel="noopener noreferrer" target="_blank"><?= Ui::icon('chat') ?><span>WhatsApp<span class="sr"> (abre en otra pestaña)</span></span></a><?php endif; ?>
   <?php if ($lead['email']): ?><a class="leadbar__b" href="mailto:<?= $e($lead['email']) ?>"><?= Ui::icon('mail') ?><span>Correo</span></a><?php endif; ?>
   <?php if ($lost): ?>
     <form method="post" action="/leads/<?= $e($id) ?>/reopen"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><button class="leadbar__b" type="submit"><?= Ui::icon('refresh') ?><span>Reabrir</span></button></form>

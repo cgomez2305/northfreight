@@ -46,8 +46,8 @@ $mark = static fn(string $s): string => (string) preg_replace('/(\[\[[^\]]{1,200
           <p class="muted"><?= $canDeliver ? 'Sale por el SMTP configurado, marcada como PRUEBA.' : 'Sin SMTP: la prueba solo queda registrada en storage/mail.log.' ?></p>
         </form>
         <div class="q3a">
-          <?php if ($tpl['kind'] === 'system'): ?><form method="post" action="/comunicaciones/plantillas/<?= $e($tpl['id']) ?>/restore"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><button class="btn btn--sm btn--ghost" type="submit" data-confirm="Se pierden tus cambios y vuelve el texto de fábrica. ¿Restaurar?"><?= Ui::icon('refresh') ?>Restaurar texto de fábrica</button></form>
-          <?php else: ?><form method="post" action="/comunicaciones/plantillas/<?= $e($tpl['id']) ?>/delete"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><button class="btn btn--sm btn--ghost" type="submit" data-confirm="¿Eliminar esta plantilla?"><?= Ui::icon('trash') ?>Eliminar</button></form><?php endif; ?>
+          <?php if ($tpl['kind'] === 'system'): ?><form method="post" action="/comunicaciones/plantillas/<?= $e($tpl['id']) ?>/restore"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><button class="btn btn--sm btn--ghost" type="submit" data-confirm="Se pierden tus cambios y vuelve el texto de fábrica. ¿Restaurar?" data-confirm-title="¿Restaurar el texto de fábrica?" data-confirm-label="Restaurar" data-confirm-danger><?= Ui::icon('refresh') ?>Restaurar texto de fábrica</button></form>
+          <?php else: ?><form method="post" action="/comunicaciones/plantillas/<?= $e($tpl['id']) ?>/delete"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><button class="btn btn--sm btn--ghost" type="submit" data-confirm="¿Eliminar esta plantilla?" data-confirm-title="¿Eliminar la plantilla?" data-confirm-label="Eliminar" data-confirm-danger><?= Ui::icon('trash') ?>Eliminar</button></form><?php endif; ?>
         </div>
       </div>
     </section>

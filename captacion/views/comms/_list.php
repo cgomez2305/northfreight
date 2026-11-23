@@ -7,7 +7,7 @@ use Captacion\Ui;
 ?>
 <section class="card card--table" aria-labelledby="t-l">
   <header class="card__h"><h2 class="label" id="t-l">Plantillas</h2><span class="muted"><?= $e(count($templates)) ?></span></header>
-  <div class="tw"><table class="tbl tbl--cm">
+  <div class="tw"><table class="tbl tbl--cm" aria-label="Plantillas de correo">
     <thead><tr><th scope="col">Nombre</th><th scope="col">Clave</th><th scope="col">Idioma</th><th scope="col">Estado</th><th scope="col">Editada</th><th scope="col"><span class="sr">Abrir</span></th></tr></thead>
     <tbody>
       <?php foreach ($templates as $t): ?>

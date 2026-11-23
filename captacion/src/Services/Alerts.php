@@ -10,6 +10,7 @@
  *                     un lead muy bueno suma 65 a 70 puntos y casi nunca llega a caliente (70), asi que los mejores quedarian sin alerta por Telegram) y apagado cuando ya la haya
  *   email             avisos por correo (leads tibios y frios, reingresos y, si Telegram esta apagado, los calientes)
  *   mail_to           destinatario del correo; vacio = MAIL_TO del .env
+ *   daily_digest      AM: resumen diario de las 8:00 (zona de visualizacion) por correo y Telegram, solo a administradores (encendido por defecto)
  *   quiet             {enabled, start 'HH:MM', end 'HH:MM'} horario de silencio en la zona de visualizacion: las alertas NO urgentes (Telegram de tibios y correos) se
  *                     retrasan hasta que termina. Las urgentes (A2, A3 y firmado que vuelve a escribir) nunca se retrasan.
  */
@@ -24,7 +25,7 @@ use Captacion\Env;
 final class Alerts
 {
     public const DEFAULTS = [
-        'hot_telegram' => true, 'followup_telegram' => true, 'followup_minutes' => 15, 'warm_telegram' => 'auto', 'email' => true, 'mail_to' => '',
+        'hot_telegram' => true, 'followup_telegram' => true, 'followup_minutes' => 15, 'warm_telegram' => 'auto', 'email' => true, 'mail_to' => '', 'daily_digest' => true,
         'quiet' => ['enabled' => false, 'start' => '22:00', 'end' => '07:00'],
     ];
     public const WARM_MODES = ['auto' => 'Automático (recomendado)', 'on' => 'Siempre', 'off' => 'Nunca'];
@@ -53,6 +54,7 @@ final class Alerts
             'warm_telegram'     => isset(self::WARM_MODES[$s['warm_telegram'] ?? '']) ? $s['warm_telegram'] : $d['warm_telegram'],
             'email'             => (bool) ($s['email'] ?? $d['email']),
             'mail_to'           => is_string($s['mail_to'] ?? null) && filter_var($s['mail_to'], FILTER_VALIDATE_EMAIL) ? $s['mail_to'] : '',
+            'daily_digest'      => (bool) ($s['daily_digest'] ?? $d['daily_digest']),
             'quiet'             => ['enabled' => (bool) ($q['enabled'] ?? false), 'start' => self::time($q['start'] ?? null, '22:00'), 'end' => self::time($q['end'] ?? null, '07:00')],
         ];
     }
@@ -147,7 +149,7 @@ final class Alerts
         $values = [
             'hot_telegram' => ($in['hot_telegram'] ?? '') === '1', 'followup_telegram' => ($in['followup_telegram'] ?? '') === '1',
             'followup_minutes' => is_string($mins) && ctype_digit(trim($mins)) ? (int) $mins : 15, 'warm_telegram' => is_string($warm) && isset(self::WARM_MODES[$warm]) ? $warm : 'auto',
-            'email' => ($in['email'] ?? '') === '1', 'mail_to' => $mailTo,
+            'email' => ($in['email'] ?? '') === '1', 'mail_to' => $mailTo, 'daily_digest' => ($in['am_form'] ?? '') === '1' ? ($in['daily_digest'] ?? '') === '1' : self::get()['daily_digest'],   // sin el marcador del formulario nuevo (am_form) se conserva
             'quiet' => ['enabled' => $qOn, 'start' => preg_match($re, $start) === 1 ? $start : self::get()['quiet']['start'], 'end' => preg_match($re, $end) === 1 ? $end : self::get()['quiet']['end']],
         ];
         return ['ok' => !$err, 'errors' => $err, 'values' => $values];

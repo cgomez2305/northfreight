@@ -36,9 +36,9 @@ final class Scoring
             'complete_fields' => ['name', 'phone', 'email', 'state', 'language', 'years_experience', 'cdl_type', 'english_level'],
         ],
         'scoring.temperature' => ['hot_min' => 70, 'warm_min' => 40],
-        'dispatched_equipment' => ['dry-van', 'reefer', 'flatbed', 'box-truck', 'hotshot', 'power-only'],
+        'dispatched_equipment' => ['dry-van', 'amazon-relay'],
         'hiring_states' => [],
-        'driver_min_years' => 1,
+        'driver_min_years' => 2,
     ];
 
     /** Ajustes vigentes: lo guardado en la tabla settings sobre los DEFAULTS. */

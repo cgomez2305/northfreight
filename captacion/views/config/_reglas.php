@@ -22,10 +22,10 @@ $chipOf = ['published' => ['ok', 'Publicada'], 'published_draft' => ['warm', 'Pu
   </div>
   <div class="rl-state__a">
     <form method="post" action="/config/rules/switch"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="on" value="<?= $rulesOn ? '0' : '1' ?>">
-      <button class="btn btn--secondary btn--sm" type="submit"<?= $locked ? ' disabled' : '' ?><?= $rulesOn ? ' data-confirm="¿Apagar todas las reglas? Dejan de aplicarse a los leads nuevos y a los que cambien; la puntuación vuelve a ser la del documento. Lo publicado no se borra."' : '' ?>><?= Ui::icon($rulesOn ? 'pause' : 'play') ?><?= $rulesOn ? 'Apagar las reglas' : 'Encender las reglas' ?></button></form>
+      <button class="btn btn--secondary btn--sm" type="submit"<?= $locked ? ' disabled' : '' ?><?= $rulesOn ? ' data-confirm-title="¿Apagar las reglas?" data-confirm-label="Apagar" data-confirm-danger data-confirm="¿Apagar todas las reglas? Dejan de aplicarse a los leads nuevos y a los que cambien; la puntuación vuelve a ser la del documento. Lo publicado no se borra."' : '' ?>><?= Ui::icon($rulesOn ? 'pause' : 'play') ?><?= $rulesOn ? 'Apagar las reglas' : 'Encender las reglas' ?></button></form>
     <?php if ($pubCount > 0): ?>
     <form method="post" action="/config/rules/reset"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>">
-      <button class="btn btn--ghost btn--sm" type="submit"<?= $locked ? ' disabled' : '' ?> data-confirm="¿Restablecer a la puntuación del documento? Se retiran TODOS los conjuntos publicados (quedan archivados con su historial). Las puntuaciones ya guardadas no cambian hasta que recalcules."><?= Ui::icon('undo') ?>Restablecer a la puntuación del documento</button></form>
+      <button class="btn btn--ghost btn--sm" type="submit"<?= $locked ? ' disabled' : '' ?> data-confirm-title="¿Restablecer la puntuación?" data-confirm-label="Restablecer" data-confirm-danger data-confirm="¿Restablecer a la puntuación del documento? Se retiran TODOS los conjuntos publicados (quedan archivados con su historial). Las puntuaciones ya guardadas no cambian hasta que recalcules."><?= Ui::icon('undo') ?>Restablecer a la puntuación del documento</button></form>
     <?php endif; ?>
   </div>
 </section>

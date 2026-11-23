@@ -31,6 +31,7 @@ final class ReportesController extends Responder
         $r = Reports::resolve($_GET);
         $cur = Reports::compute($r['from'], $r['to']);
         $prev = Reports::compute($r['prev_from'], $r['prev_to']);
+        $cur['assignees'] = Reports::byAssignee($r['from'], $r['to']);   // AM: nombres de usuarios, solo administradores
         self::page('reportes', $user, 'reportes', [['Reportes', null], [$r['label'], null]], [
             'title' => 'Reportes', 'css' => ['charts', 'viz', 'reportes'], 'range' => $r, 'm' => $cur, 'p' => $prev, 'presets' => Reports::PRESETS, 'tables' => Reports::TABLES,
         ]);
@@ -46,6 +47,9 @@ final class ReportesController extends Responder
         }
         $r = Reports::resolve($_POST);
         $m = Reports::compute($r['from'], $r['to']);
+        if ($table === 'responsables') {
+            $m['assignees'] = Reports::byAssignee($r['from'], $r['to']);
+        }
         ActivityLog::record('report_export', (int) $user['id'], 'report', null, ['table' => $table, 'range' => $r['key'], 'from' => $r['from_in'], 'to' => $r['to_in'], 'rows' => count(Reports::table($table, $m)['rows'])]);
         self::download('reporte-' . $table . '-' . $r['from_in'] . '_' . $r['to_in'] . '.csv', 'text/csv; charset=utf-8', Reports::csv($table, $m));
     }

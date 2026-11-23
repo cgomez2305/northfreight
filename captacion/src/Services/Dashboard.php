@@ -330,6 +330,9 @@ final class Dashboard
                 $yd = array_fill(0, count($years), 0);
                 foreach ($all as $r) {
                     $i = (int) Fmt::et((string) $r['created_at'])->format('Y') - $y0;
+                    if (!isset($yo[$i])) {
+                        continue;   // fecha fuera del rango (p. ej. un lead de API con fecha de manana ya en el año siguiente)
+                    }
                     if ($r['profile'] === 'company_driver') {
                         $yd[$i]++;
                     } else {

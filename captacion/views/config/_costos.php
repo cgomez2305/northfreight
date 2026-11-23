@@ -48,7 +48,7 @@ foreach ($costTable['months'] as $m) {
   <?php if (!$rows): ?>
     <div class="empty empty--sm"><?= Ui::icon('star', 'empty__star ic--star') ?><h3>Sin costos cargados</h3><p>Agrega cuánto gastaste en Meta, Indeed u otros canales y el dashboard calculará el costo por lead.</p></div>
   <?php else: ?>
-    <div class="tw"><table class="tbl tbl--costs">
+    <div class="tw"><table class="tbl tbl--costs" aria-label="Costos mensuales por canal">
       <thead><tr><th scope="col">Mes</th><th scope="col">Fuente</th><th scope="col" class="num-c">Monto</th><th scope="col" class="num-c">Leads</th><th scope="col" class="num-c">Costo por lead</th><th scope="col" class="num-c">Firmados</th><th scope="col" class="num-c">Costo por firmado</th><th scope="col"><span class="sr">Acciones</span></th></tr></thead>
       <tbody>
         <?php $lastP = null; foreach ($rows as $r): ?>
@@ -61,7 +61,7 @@ foreach ($costTable['months'] as $m) {
             <td class="num-c" data-l="Firmados"><?= $e(Fmt::num($r['signed'])) ?></td>
             <td class="num-c" data-l="Costo por firmado"><?= $e($money($r['cps'])) ?></td>
             <td class="c-act"><a class="icon-btn icon-btn--sm" href="/config?tab=costos&amp;edit=<?= $e($r['id']) ?>#co-f" aria-label="Editar el costo de <?= $e(\Captacion\Services\Catalog::source($r['source'])) ?> de <?= $e($monthName($r['period'])) ?>"><?= Ui::icon('pencil') ?></a>
-              <?php if (!$locked): ?><form class="inl" method="post" action="/config/costs/delete"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="id" value="<?= $e($r['id']) ?>"><button class="icon-btn icon-btn--sm" type="submit" aria-label="Eliminar el costo de <?= $e(\Captacion\Services\Catalog::source($r['source'])) ?> de <?= $e($monthName($r['period'])) ?>" data-confirm="¿Eliminar este costo? El costo por lead de ese mes se recalcula sin él."><?= Ui::icon('trash') ?></button></form><?php endif; ?></td>
+              <?php if (!$locked): ?><form class="inl" method="post" action="/config/costs/delete"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="id" value="<?= $e($r['id']) ?>"><button class="icon-btn icon-btn--sm" type="submit" aria-label="Eliminar el costo de <?= $e(\Captacion\Services\Catalog::source($r['source'])) ?> de <?= $e($monthName($r['period'])) ?>" data-confirm="¿Eliminar este costo? El costo por lead de ese mes se recalcula sin él." data-confirm-title="¿Eliminar el costo?" data-confirm-label="Eliminar" data-confirm-danger><?= Ui::icon('trash') ?></button></form><?php endif; ?></td>
           </tr>
           <?php $lastP = $r['period']; ?>
         <?php endforeach; ?>

@@ -150,7 +150,7 @@ return static function (array $ctx): void {
     $a = LeadIngest::handle(['email' => null, 'trucks' => null, 'equipment' => []] + $base, 'web_careers');
     $aid = (int) $a['lead_id'];
     $jobsBefore = $count('jobs', "type = 'telegram_alert' AND payload LIKE '%\"hot\"%'");
-    $r = LeadIngest::handle(['trucks' => '10', 'equipment' => ['reefer'], 'referral_code' => 'AMIGO'] + $base, 'web_careers');
+    $r = LeadIngest::handle(['trucks' => '10', 'equipment' => ['dry-van'], 'referral_code' => 'AMIGO'] + $base, 'web_careers');
     T::ok($r['status'] === 'reentry' && Lead::find($aid)['temperature'] === 'hot' && $jobsBefore === 0 && $count('jobs', "type = 'telegram_alert' AND payload LIKE '%\"hot\"%'") === 1, 'reingreso que sube a caliente: se encola la alerta A2');
     // Reingreso de un descartado sigue siendo descartado (no se pisan CDL/ingles)
     // Regla 2: perdido hace mas de 90 dias -> reabrir

@@ -2,7 +2,7 @@
 /**
  * Normalizacion de telefonos a E.164 con reglas de EE. UU. (NANP: +1 NXX NXX XXXX).
  *
- *  - 10 digitos, o 11 empezando por 1, o "+1" + 10: se valida el plan NANP (codigo de area 2-9XX, sin N11 ni N9X; central 2-9XX sin N11; no todos los digitos iguales).
+ *  - 10 digitos, o 11 empezando por 1, o "+1" + 10: se valida el plan NANP (codigo de area 2-9XX, sin N11; central 2-9XX sin N11; no todos los digitos iguales).
  *  - "+" con otro codigo de pais: se acepta como internacional (8 a 15 digitos, sin 0 inicial) y se devuelve 'intl' => true. No se valida el plan de ese pais.
  *  - Se ignoran separadores " ()-." y una extension final ("x12", "ext 12", "#12"). Cualquier otro caracter = invalido.
  */
@@ -62,7 +62,7 @@ final class Phone
         if ($area[0] < '2' || $exch[0] < '2') {
             return $fail('nanp_leading_digit');
         }
-        if (substr($area, 1) === '11' || $area[1] === '9') {
+        if (substr($area, 1) === '11') {   // solo N11; los N9X (209, 239, 409, 469, 619, 909, 919, 979...) estan asignados y son reales
             return $fail('nanp_area_code');
         }
         if (substr($exch, 1) === '11') {

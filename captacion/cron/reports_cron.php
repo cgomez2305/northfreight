@@ -6,6 +6,7 @@
  * Decide por la hora de Nueva York (con cambio de hora incluido):
  *   - lunes desde las 8:00 a. m. (con recuperacion hasta el martes 23:59): resumen semanal por correo a Carlos, de la semana anterior;
  *   - dias 1 a 5 de cada mes (desde la 1:00 a. m. del dia 1): genera el informe del mes anterior como BORRADOR y avisa a Carlos.
+ * Ademas (fase AM) el resumen diario de las 8:00 en la zona de visualizacion (DailyDigest, solo administradores; --now sirve tambien para ensayarlo).
  * Idempotente (tabla `reports` con clave unica y marcas de envio): correrlo varias veces no duplica nada. --now=AAAA-MM-DDTHH:MM (hora ET) solo para ensayar.
  * Solo CLI. flock para no solaparse.
  */
@@ -38,6 +39,13 @@ foreach ($argv as $a) {
 try {
     $r = ReportJobs::tick($now);
     Settings::set('cron.reports', ['at' => gmdate('Y-m-d H:i:s'), 'weekly' => $r['weekly'], 'monthly' => $r['monthly']]);
+    // AM: resumen diario de las 8:00 (zona de visualizacion; idempotente por dia; interruptor en Configuracion > Alertas)
+    try {
+        $r['digest'] = \Captacion\Services\DailyDigest::tick($now);
+    } catch (Throwable $t) {
+        Storage::error('daily digest failed', get_class($t) . ': ' . $t->getMessage());
+        $r['digest'] = ['sent' => false, 'reason' => 'error'];
+    }
     fwrite(STDOUT, json_encode($r, JSON_UNESCAPED_UNICODE) . "\n");
 } catch (Throwable $t) {
     Storage::error('reports_cron failed', get_class($t) . ': ' . $t->getMessage());

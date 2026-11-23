@@ -187,6 +187,21 @@ final class Prospects
         ];
     }
 
+    /**
+     * Fase AM: 'Y-m-d' o 'Y-m-d\TH:i' escritos en ET (America/New_York, SIEMPRE: las reglas de llamada son por ET) a 'Y-m-d H:i:s' UTC.
+     * Antes se usaba Fmt::fromEtInput, que interpreta en la zona de visualizacion de Configuracion: si no era ET, el dia y las 9:00 se corrian.
+     */
+    public static function etToUtc(string $v, bool $endOfDay = false): ?string
+    {
+        $v = trim($v);
+        if (preg_match('/^(\d{4})-(\d{2})-(\d{2})(?:[T ](\d{2}):(\d{2}))?$/', $v, $m) !== 1 || !checkdate((int) $m[2], (int) $m[3], (int) $m[1])) {
+            return null;
+        }
+        $time = isset($m[4]) ? $m[4] . ':' . $m[5] . ':00' : ($endOfDay ? '23:59:59' : '00:00:00');
+        $d = \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $m[1] . '-' . $m[2] . '-' . $m[3] . ' ' . $time, new \DateTimeZone('America/New_York'));
+        return $d === false ? null : gmdate('Y-m-d H:i:s', $d->getTimestamp());
+    }
+
     public static function etDay(int $ts): string
     {
         return ProspectImport::etDate($ts);
@@ -195,7 +210,7 @@ final class Prospects
     /** Seguimientos de hoy o vencidos (campana). @return array{n:int,max_id:int} */
     public static function followupsDue(int $now): array
     {
-        $end = Fmt::fromEtInput(self::etDay($now), true) ?? Clock::at($now);
+        $end = self::etToUtc(self::etDay($now), true) ?? Clock::at($now);
         $r = Db::one("SELECT COUNT(*) AS n, COALESCE(MAX(id), 0) AS m FROM prospects_fmcsa WHERE deleted_at IS NULL AND do_not_call = 0 AND converted_lead_id IS NULL
             AND status IN ('no_answer', 'talked', 'interested') AND next_call_at IS NOT NULL AND next_call_at <= ?", [$end]);
         return ['n' => (int) ($r['n'] ?? 0), 'max_id' => (int) ($r['m'] ?? 0)];
@@ -210,7 +225,7 @@ final class Prospects
         while (in_array((int) $d->format('N'), [6, 7], true)) {
             $d = $d->modify('+1 day');
         }
-        return Fmt::fromEtInput($d->format('Y-m-d') . 'T09:00') ?? Clock::at($now + 86400);
+        return self::etToUtc($d->format('Y-m-d') . 'T09:00') ?? Clock::at($now + 86400);
     }
 
     /**
@@ -226,7 +241,7 @@ final class Prospects
         $note = mb_substr($note, 0, 500);
         $next = null;
         if (is_string($nextDate) && trim($nextDate) !== '') {
-            $next = Fmt::fromEtInput(trim($nextDate) . 'T09:00');
+            $next = self::etToUtc(trim($nextDate) . 'T09:00');
             if ($next === null) {
                 return self::fail('La fecha del siguiente intento no es válida.');
             }

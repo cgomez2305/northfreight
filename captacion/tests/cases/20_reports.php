@@ -197,7 +197,8 @@ return static function (array $ctx): void {
     T::ok($snap['cur']['received'] === 12 && $snap['cur']['signed'] === 4 && $snap['label'] === Reports::monthName($M) && isset($snap['prev']), '  la instantánea guarda las métricas del mes y las del mes anterior');
     $acts = json_decode((string) $rep['actions'], true);
     T::ok(count($acts) === 3 && !array_filter($acts, static fn($a) => trim((string) $a) === ''), 'trae tres acciones sugeridas (reglas simples, no vacías)');
-    T::ok(str_contains($acts[0], 'caliente') && str_contains($acts[0], 'sin contactar'), '  la primera señala los leads calientes sin contactar (hay 3 en la base)');
+    T::ok(str_contains($snap['internal_actions'][0], 'caliente') && str_contains($snap['internal_actions'][0], 'sin contactar'), '  la primera sugerencia INTERNA (solo admin) señala los leads calientes sin contactar (hay 3 en la base)');
+    T::ok(!preg_match('/caliente|sin contactar|tarea|Configuración/iu', implode(' ', $acts)), '  y las acciones publicables no llevan texto operativo interno (fase AM)');
     $g2 = ReportJobs::generateMonthly($M, $aid, $now);
     T::ok($g2['ok'] && !$g2['created'] && (int) $g2['id'] === (int) $rep['id'] && (int) Db::value("SELECT COUNT(*) FROM reports WHERE kind = 'monthly'") === 1, 'generar otra vez el mismo mes: idempotente (no duplica)');
     T::ok(!ReportJobs::generateMonthly(Fmt::et($now)->format('Y-m'), $aid, $now)['ok'] && !ReportJobs::generateMonthly('2026-13', $aid, $now)['ok'] && !ReportJobs::generateMonthly('2099-01', $aid, $now)['ok'], 'el mes en curso, uno futuro o uno ilegible no se generan');
@@ -308,7 +309,7 @@ return static function (array $ctx): void {
     $c0 = count($mails());
     $out = Infra::cli([$ctx['root'] . '/cron/reports_cron.php', '--now=2026-12-07T09:00'], ['CAPTACION_ENV_FILE' => $envFile]);
     $out2 = Infra::cli([$ctx['root'] . '/cron/reports_cron.php', '--now=2026-12-07T09:30'], ['CAPTACION_ENV_FILE' => $envFile]);
-    T::ok($out['code'] === 0 && str_contains($out['out'], 'enviado 2026-W49') && $out2['code'] === 0 && str_contains($out2['out'], 'ya enviado') && count($mails()) === $c0 + 1, 'cron/reports_cron.php por CLI: envía una vez y la segunda pasada no repite');
+    T::ok($out['code'] === 0 && str_contains($out['out'], 'enviado 2026-W49') && $out2['code'] === 0 && str_contains($out2['out'], 'ya enviado') && count($mails()) === $c0 + 2, 'cron/reports_cron.php por CLI: envía una vez y la segunda pasada no repite (el +2 es el resumen semanal y el resumen diario de las 8:00 de AM, que también va una sola vez)');
     T::ok(Settings::get('cron.reports') !== null || (int) Db::value("SELECT COUNT(*) FROM settings WHERE `key` = 'cron.reports'") === 1, '  y deja la marca de la última pasada');
     Infra::stop('panel20');
     Infra::stop('smtp20');

@@ -33,8 +33,50 @@ final class ReportJobs
 
     // --- Acciones sugeridas (reglas simples y honestas) --------------------------------------------------------------------------------
 
-    /** Hasta 3 acciones calculadas con datos reales; si no hay nada que senalar, acciones generales de mantenimiento. @return list<string> */
+    /**
+     * Fase AM: las sugerencias se separan en dos categorias.
+     *  - INTERNAS (`suggestInternal`): trabajo operativo del equipo de captacion (leads calientes sin contactar, tareas vencidas, costos por cargar, tiempo de respuesta,
+     *    recordatorios de mantenimiento). Solo las ve el admin: van en el resumen semanal por correo y en el borrador del informe como «sugerencias internas»; NUNCA se publican.
+     *  - PARA EL CLIENTE (`suggestForClient`): solo lo que se desprende de agregados que NorthStar ya ve en el informe (canales, captacion, presentados sin respuesta). Estas son
+     *    las unicas que se precargan en las acciones PUBLICABLES del informe mensual.
+     */
     public static function suggest(array $cur, ?array $prev, int $now): array
+    {
+        return self::suggestInternal($cur, $prev, $now);
+    }
+
+    /** Acciones aptas para el lector: sin texto operativo interno. @return list<string> hasta 3 */
+    public static function suggestForClient(array $cur, ?array $prev, int $now): array
+    {
+        $out = [];
+        $stale = (int) Db::value("SELECT COUNT(*) FROM leads WHERE deleted_at IS NULL AND stage = 'presented' AND handed_off_at IS NOT NULL AND handed_off_at < ?", [Clock::at($now - 7 * 86400)]);
+        if ($stale > 0) {
+            $out[] = 'Responder sobre ' . $stale . ' lead' . ($stale === 1 ? '' : 's') . ' presentado' . ($stale === 1 ? '' : 's') . ' hace más de 7 días para saber si firmaron o no.';
+        }
+        $rows = array_values(array_filter($cur['channels']['rows'], static fn($r) => $r['leads'] > 0));
+        if ($rows) {
+            usort($rows, static fn($a, $b) => [$b['signed'], $b['leads']] <=> [$a['signed'], $a['leads']]);
+            if ($rows[0]['signed'] > 0) {
+                $out[] = 'Reforzar ' . $rows[0]['label'] . ': ' . $rows[0]['signed'] . ' firmado' . ($rows[0]['signed'] === 1 ? '' : 's') . ' de ' . $rows[0]['leads'] . ' lead' . ($rows[0]['leads'] === 1 ? '' : 's') . ' recibidos.';
+            }
+            foreach (array_reverse($rows) as $r) {
+                if ($r['leads'] >= 5 && $r['signed'] === 0) {
+                    $out[] = 'Revisar ' . $r['label'] . ': ' . $r['leads'] . ' leads y ningún firmado.';
+                    break;
+                }
+            }
+        }
+        if ($prev !== null && $prev['received'] >= 10 && $cur['received'] < $prev['received'] * 0.7) {
+            $out[] = 'Revisar por qué bajó la captación: ' . $cur['received'] . ' leads frente a ' . $prev['received'] . ' del periodo anterior.';
+        }
+        $out[] = 'Responder cada semana sobre los leads presentados que siguen sin respuesta de NorthStar.';
+        $out[] = 'Mantener el ritmo de captación del mes y la calidad de los leads presentados.';
+        $out[] = 'Compartir con el equipo qué canales trajeron firmados para decidir dónde reforzar.';
+        return array_slice(array_values(array_unique($out)), 0, 3);
+    }
+
+    /** INTERNAS: hasta 3 acciones calculadas con datos reales; si no hay nada que senalar, acciones generales de mantenimiento. Solo admin. @return list<string> */
+    public static function suggestInternal(array $cur, ?array $prev, int $now): array
     {
         $out = [];
         $hot = Db::one("SELECT COUNT(*) AS n, MIN(created_at) AS oldest FROM leads WHERE deleted_at IS NULL AND temperature = 'hot' AND first_contact_at IS NULL AND stage = 'new'");
@@ -112,11 +154,12 @@ final class ReportJobs
         $cur = Reports::compute($from, $to);
         $prev = Reports::compute($pfrom, $from);
         $prevPeriod = self::et($pfrom)->format('Y-m');
-        $metrics = ['version' => 1, 'period' => $period, 'label' => Reports::monthName($period), 'prev_period' => $prevPeriod, 'prev_label' => Reports::monthName($prevPeriod), 'cur' => $cur, 'prev' => $prev, 'generated_at' => Clock::at($now)];
+        $metrics = ['version' => 1, 'period' => $period, 'label' => Reports::monthName($period), 'prev_period' => $prevPeriod, 'prev_label' => Reports::monthName($prevPeriod), 'cur' => $cur, 'prev' => $prev, 'generated_at' => Clock::at($now),
+            'internal_actions' => self::suggestInternal($cur, $prev, $now)];   // solo admin (InformesController las quita para el lector); nunca se publican
         $ident = 'INF-' . str_replace('-', '-', $period);
         $st = Db::run(
             "INSERT IGNORE INTO reports (kind, period, ident, metrics, actions, status, generated_by, created_at) VALUES ('monthly', ?, ?, ?, ?, 'draft', ?, ?)",
-            [$period, $ident, json_encode($metrics, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), json_encode(self::suggest($cur, $prev, $now), JSON_UNESCAPED_UNICODE), $userId, Clock::at($now)]
+            [$period, $ident, json_encode($metrics, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), json_encode(self::suggestForClient($cur, $prev, $now), JSON_UNESCAPED_UNICODE), $userId, Clock::at($now)]
         );
         $row = self::findMonthly($period);
         if ($st->rowCount() !== 1 || $row === null) {
@@ -267,7 +310,7 @@ final class ReportJobs
         $metrics = [
             'version' => 1, 'week' => $key, 'from' => gmdate('c', $weekStart), 'to' => gmdate('c', $to), 'received' => $cur['received'], 'prev_received' => $prev['received'], 'hotwarm' => $cur['hotwarm'],
             'signed' => $cur['signed'], 'signed_in_period' => $cur['signed_in_period'], 'presented' => $cur['presented'], 'hot_waiting' => (int) $hot['n'], 'hot_oldest' => $hot['oldest'], 'overdue_tasks' => $late,
-            'best_channel' => $best, 'worst_channel' => $worst, 'actions' => self::suggest($cur, $prev, $now),
+            'best_channel' => $best, 'worst_channel' => $worst, 'actions' => self::suggestInternal($cur, $prev, $now),
         ];
         Db::run("INSERT IGNORE INTO reports (kind, period, ident, metrics, actions, status, created_at) VALUES ('weekly', ?, ?, ?, ?, 'draft', ?)", [$key, 'RES-' . $key, json_encode($metrics, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES), json_encode($metrics['actions'], JSON_UNESCAPED_UNICODE), Clock::at($now)]);
         return Db::one("SELECT * FROM reports WHERE kind = 'weekly' AND period = ?", [$key]);

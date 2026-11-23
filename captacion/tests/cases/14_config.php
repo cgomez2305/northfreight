@@ -252,7 +252,7 @@ return static function (array $ctx): void {
     ScoringConfig::reset('all', $uid);
     T::ok(Scoring::settings()['scoring.temperature'] === Scoring::DEFAULTS['scoring.temperature'] && !ScoringConfig::reset('zzz', $uid)['ok'], 'restablecer «todo» y un grupo inexistente se rechaza');
     // provisionales
-    $pv = ScoringConfig::validateProvisional(['dispatched_equipment' => ['reefer', 'dry-van'], 'hiring_states' => 'fl, tx;GA', 'driver_min_years' => '2', 'confirmed' => ['driver_min_years']]);
+    $pv = ScoringConfig::validateProvisional(['dispatched_equipment' => ['reefer', 'dry-van'], 'hiring_states' => 'fl, tx;GA', 'driver_min_years' => '3', 'confirmed' => ['driver_min_years']]);
     T::ok($pv['ok'] && $pv['values']['hiring_states'] === ['FL', 'TX', 'GA'] && $pv['values']['provisional'] === ['dispatched_equipment', 'hiring_states', 'scoring.driver.experience'], 'provisionales: valida, normaliza estados y calcula lo que sigue pendiente');
     foreach ([['hiring_states' => 'ZZ'], ['driver_min_years' => '11'], ['driver_min_years' => 'x'], ['dispatched_equipment' => ['cohete']]] as $b) {
         T::ok(!ScoringConfig::validateProvisional($b + ['driver_min_years' => '1', 'hiring_states' => '', 'dispatched_equipment' => []])['ok'], 'provisionales: rechaza ' . json_encode($b));
@@ -495,7 +495,9 @@ return static function (array $ctx): void {
     T::ok($r['status'] === 303 && Scoring::settings()['scoring.owner']['cdl_standard'] === 22, 'guardar puntuacion por HTTP');
     $r = $short->post('/config/scoring/recalc', ['_csrf' => $short->csrf]);
     T::ok(!ScoringConfig::running(), 'recalcular sin marcar la confirmacion: no arranca');
+    Settings::clear();
     $r = $short->post('/config/scoring/recalc', ['_csrf' => $short->csrf, 'confirm' => '1']);
+    Settings::clear();
     T::ok(ScoringConfig::running() && (int) Db::value("SELECT COUNT(*) FROM jobs WHERE type = 'rescore_batch'") === 1, 'recalcular confirmado por HTTP: arranca el job');
     $r = $short->post('/config/scoring/reset', ['_csrf' => $short->csrf, 'group' => 'all']);
     Settings::clear();

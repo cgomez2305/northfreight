@@ -3,6 +3,7 @@ use Captacion\Clock;
 use Captacion\Services\Catalog;
 use Captacion\Services\Fmt;
 use Captacion\Services\LeadTable;
+use Captacion\Services\Sla;
 use Captacion\Ui;
 
 /**
@@ -16,13 +17,24 @@ $sortBase = ['sort' => $paging['sort'] !== 'when' ? $paging['sort'] : null, 'dir
 $qsAll = static fn(array $over = []): string => Ui::qs(array_merge($base, $sortBase, $over));
 $nFilters = count(array_diff_key($f, ['t' => 1]));
 $sortLink = static function (string $key, string $label) use ($paging, $base, $e): string {
+    $fullText = LeadTable::COLUMNS[$key] ?? $label;
+    $text = $fullText !== $label && isset(LeadTable::COLUMNS[$key]) ? '<span aria-hidden="true">' . $e($label) . '</span><span class="sr">' . $e($fullText) . '</span>' : $e($label);   // corta a la vista, completa para el lector
     $on = $paging['sort'] === $key;
     $dir = $on && $paging['dir'] === 'desc' ? 'asc' : 'desc';
     $href = '/tabla' . Ui::qs(array_merge($base, ['sort' => $key !== 'when' || $dir !== 'desc' ? $key : null, 'dir' => $dir !== 'desc' ? $dir : null]));
     $full = LeadTable::COLUMNS[$key] ?? 'Lead';
-    return '<a class="sort' . ($on ? ' is-on' : '') . '" href="' . $e($href) . '"' . ($on ? ' aria-label="Ordenado por ' . $e($full) . ($paging['dir'] === 'asc' ? ', ascendente' : ', descendente') . '. Cambiar el orden"' : ' aria-label="Ordenar por ' . $e($full) . '"') . '>' . $e($label)
+    return '<a class="sort' . ($on ? ' is-on' : '') . '" href="' . $e($href) . '"' . ($on ? ' aria-label="Ordenado por ' . $e($full) . ($paging['dir'] === 'asc' ? ', ascendente' : ', descendente') . '. Cambiar el orden"' : ' aria-label="Ordenar por ' . $e($full) . '"') . '>' . $text
         . '<span class="sort__a" aria-hidden="true">' . ($on ? ($paging['dir'] === 'asc' ? '↑' : '↓') : '') . '</span></a>';
 };
+$ariaSort = static fn(string $key): string => ' aria-sort="' . ($paging['sort'] === $key ? ($paging['dir'] === 'asc' ? 'ascending' : 'descending') : 'none') . '"';
+$head = static function (string $c) use ($e): string {   // cabecera corta a la vista y completa para el lector de pantalla
+    $short = LeadTable::HEAD[$c];
+    $full = LeadTable::COLUMNS[$c] ?? $short;
+    return $short === $full ? $e($short) : '<span aria-hidden="true">' . $e($short) . '</span><span class="sr">' . $e($full) . '</span>';
+};
+// «Volver a la lista» de la ficha: esta misma tabla con sus filtros, orden, página y vista guardada
+$backTo = '/tabla' . $qsAll(['page' => $list['page'] > 1 ? $list['page'] : null, 'v' => isset($activeView) ? $activeView['view']['id'] : null]);
+$leadHref = static fn(int $id): string => '/leads/' . $id . '?back=' . rawurlencode($backTo);
 $tabs = ['' => 'Todos', 'hot' => 'Calientes', 'warm' => 'Tibios', 'cold' => 'Fríos', 'disqualified' => 'Descartados'];
 $isEmptyDb = $grandTotal === 0;
 $ago = static fn(?string $v): string => $v === null ? '<span class="muted">—</span>' : '<span title="' . $e(Fmt::dateTime($v)) . '">' . $e(Fmt::ago($v)) . '</span>';
@@ -41,6 +53,7 @@ $cell = static function (string $c, array $r) use ($e, $nextTasks, $ago): string
         case 'pts': return Ui::score((int) $r['score'], $r['temperature']);
         case 'temp': return Ui::temp($r['temperature']);
         case 'stage': return Ui::stage($r['stage'], $r['pipeline']);
+        case 'resp': return !empty($r['assignee']) ? '<span class="rsp">' . Ui::avatar((string) $r['assignee'], 'sm') . '<span>' . $e($r['assignee']) . '</span></span>' : '<span class="muted">Sin asignar</span>';
         case 'src': return $e(Catalog::source($r['source']));
         case 'contact': return $ago($r['first_contact_at']);
         case 'when': return $ago($r['created_at']);
@@ -85,7 +98,7 @@ $numCols = ['trucks' => 1, 'exp' => 1, 'pts' => 1];
 
 <nav class="ptabs" aria-label="Temperatura">
   <?php foreach ($tabs as $k => $label): $on = ($f['t'] ?? '') === $k; $n = $k === '' ? $counts['all'] : $counts[$k]; ?>
-    <a class="ptab<?= $on ? ' is-on' : '' ?><?= $k !== '' ? ' ptab--' . ($k === 'disqualified' ? 'dq' : $k) : '' ?>" href="/tabla<?= $e(Ui::qs(array_merge(array_diff_key($base, ['t' => 1]), $sortBase, $k !== '' ? ['t' => $k] : []))) ?>"<?= $on ? ' aria-current="true"' : '' ?>><?= $k !== '' ? '<i class="dot"></i>' : '' ?><?= $e($label) ?><span class="ptab__n"><?= $e(Fmt::num($n)) ?></span></a>
+    <a class="ptab<?= $on ? ' is-on' : '' ?><?= $k !== '' ? ' ptab--' . ($k === 'disqualified' ? 'dq' : $k) : '' ?>" href="/tabla<?= $e(Ui::qs(array_merge(array_diff_key($base, ['t' => 1]), $sortBase, $k !== '' ? ['t' => $k] : []))) ?>"<?= $on ? ' aria-current="page"' : '' ?>><?= $k !== '' ? '<i class="dot"></i>' : '' ?><?= $e($label) ?><span class="ptab__n"><?= $e(Fmt::num($n)) ?></span></a>
   <?php endforeach; ?>
 </nav>
 
@@ -102,9 +115,9 @@ $numCols = ['trucks' => 1, 'exp' => 1, 'pts' => 1];
       <caption class="sr">Leads (<?= $e($list['total']) ?>), ordenados por <?= $e(mb_strtolower(LeadTable::COLUMNS[$paging['sort']] ?? 'nombre')) ?><?= $paging['dir'] === 'asc' ? ', de menor a mayor' : ', de mayor a menor' ?>. Desplázate en horizontal para ver todas las columnas.</caption>
       <thead><tr>
         <th scope="col" class="c-chk"><input type="checkbox" data-all aria-label="Seleccionar todos los de esta página"></th>
-        <th scope="col" class="c-name"><?= $sortLink('name', 'Lead') ?></th>
+        <th scope="col" class="c-name"<?= $ariaSort('name') ?>><?= $sortLink('name', 'Lead') ?></th>
         <?php foreach ($tcols as $c): ?>
-          <th scope="col" class="tc tc-<?= $e($c) ?><?= isset($numCols[$c]) ? ' tc--n' : '' ?>"><?= isset(LeadTable::SORTS[$c]) ? $sortLink($c, LeadTable::HEAD[$c]) : $e(LeadTable::HEAD[$c]) ?></th>
+          <th scope="col" class="tc tc-<?= $e($c) ?><?= isset($numCols[$c]) ? ' tc--n' : '' ?>"<?= isset(LeadTable::SORTS[$c]) ? $ariaSort($c) : '' ?>><?= isset(LeadTable::SORTS[$c]) ? $sortLink($c, LeadTable::HEAD[$c]) : $head($c) ?></th>
         <?php endforeach; ?>
         <th scope="col" class="c-act"><span class="sr">Llamar</span></th>
       </tr></thead>
@@ -112,7 +125,7 @@ $numCols = ['trucks' => 1, 'exp' => 1, 'pts' => 1];
       <?php foreach ($rows as $r): $name = Fmt::name($r); ?>
         <tr data-peek="<?= $e($r['id']) ?>"<?= $r['temperature'] === 'hot' && $r['first_contact_at'] === null && $r['stage'] === 'new' ? ' class="is-urgent"' : '' ?>>
           <td class="c-chk"><input type="checkbox" name="ids[]" value="<?= $e($r['id']) ?>" aria-label="Seleccionar a <?= $e($name) ?>"></td>
-          <th scope="row" class="c-name"><a class="who" href="/leads/<?= $e($r['id']) ?>"><?= Ui::avatar($name, 'md') ?><span><b><?= $e($name) ?></b><small class="mono"><?= $e(Fmt::code((int) $r['id'])) ?></small></span></a></th>
+          <th scope="row" class="c-name"><a class="who" href="<?= $e($leadHref((int) $r['id'])) ?>"><?= Ui::avatar($name, 'md') ?><span><b><?= $e($name) ?></b><small class="mono"><?= $e(Fmt::code((int) $r['id'])) ?></small><?php $rsla = Sla::status($r); if ($rsla !== null): ?><span class="who__sla"><?= Ui::sla($rsla) ?></span><?php endif; ?></span></a></th>
           <?php foreach ($tcols as $c): ?><td class="tc tc-<?= $e($c) ?><?= isset($numCols[$c]) ? ' tc--n' : '' ?>"><?= $cell($c, $r) ?></td><?php endforeach; ?>
           <td class="c-act"><?php if ($r['phone_e164']): ?><a class="icon-btn icon-btn--sm" href="tel:<?= $e($r['phone_e164']) ?>" aria-label="Llamar a <?= $e($name) ?>"><?= Ui::icon('phone') ?></a><?php endif; ?></td>
         </tr>

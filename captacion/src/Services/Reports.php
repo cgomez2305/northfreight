@@ -340,7 +340,73 @@ final class Reports
 
     // --- Exportacion --------------------------------------------------------------------------------------------------------------------
 
-    public const TABLES = ['embudo' => 'Embudo', 'canales' => 'Canales y costos', 'paginas' => 'Páginas de llegada', 'perfiles' => 'Perfiles', 'equipos' => 'Equipos', 'estados' => 'Estados', 'perdidas' => 'Motivos de pérdida'];
+    public const TABLES = ['embudo' => 'Embudo', 'canales' => 'Canales y costos', 'paginas' => 'Páginas de llegada', 'perfiles' => 'Perfiles', 'equipos' => 'Equipos', 'estados' => 'Estados', 'perdidas' => 'Motivos de pérdida', 'responsables' => 'Por responsable'];
+
+    /**
+     * AM: metricas por responsable de los leads RECIBIDOS en [$from, $to) (los sin responsable van en una fila «Sin asignar»). SOLO para administradores: lleva nombres de usuarios,
+     * por eso NO forma parte de compute() (que alimenta los informes mensuales guardados y la proyeccion del lector) y /resultados e /informes no la usan.
+     *  - Contactados: con primer contacto. Mediana: de la llegada al primer contacto. «Dentro del plazo»: de los leads cuyo plazo de primer contacto (llegada + Sla::minutes, el ajuste
+     *    VIGENTE, no el de entonces) ya termino, cuantos se contactaron a tiempo (los perdidos y descartados sin contacto no cuentan; los que aun estan a tiempo, tampoco).
+     *  - Calificados / presentados / firmados: etapa mas lejana alcanzada (igual que el embudo). Tareas vencidas: abiertas AHORA de los leads que tiene asignados hoy (sin filtro de fechas).
+     * @return list<array{key:int,label:string,leads:int,contacted:int,median:?int,sla_ok:int,sla_total:int,sla_pct:?float,qualified:int,presented:int,signed:int,overdue:int}>
+     */
+    public static function byAssignee(int $from, int $to, ?int $now = null): array
+    {
+        $now ??= Clock::time();
+        $window = Sla::minutes() * 60;
+        $leads = Db::all(
+            'SELECT id, assigned_to, stage, temperature, first_contact_at, handed_off_at, signed_at, created_at FROM leads WHERE deleted_at IS NULL AND created_at >= ? AND created_at < ?',
+            [Fmt::utc($from), Fmt::utc($to)]
+        );
+        $maxEvent = [];
+        foreach (array_chunk(array_map(static fn($l) => (int) $l['id'], $leads), 800) as $chunk) {
+            foreach (Db::all("SELECT lead_id, payload FROM lead_events WHERE type = 'stage_changed' AND lead_id IN (" . implode(',', array_fill(0, count($chunk), '?')) . ')', $chunk) as $e) {
+                $maxEvent[(int) $e['lead_id']] = max($maxEvent[(int) $e['lead_id']] ?? 0, self::RANK[(string) (Db::decode($e['payload'])['to'] ?? '')] ?? 0);
+            }
+        }
+        $g = [];
+        foreach ($leads as $l) {
+            $k = $l['assigned_to'] !== null ? (int) $l['assigned_to'] : 0;
+            $b = &$g[$k];
+            $b ??= ['key' => $k, 'leads' => 0, 'contacted' => 0, 'resp' => [], 'sla_ok' => 0, 'sla_total' => 0, 'qualified' => 0, 'presented' => 0, 'signed' => 0, 'overdue' => 0];
+            $rank = max(self::RANK[$l['stage']] ?? 1, $maxEvent[(int) $l['id']] ?? 1, $l['first_contact_at'] !== null ? 2 : 1, $l['handed_off_at'] !== null ? 5 : 1, $l['signed_at'] !== null ? 6 : 1);
+            $b['leads']++;
+            $b['qualified'] += $rank >= 3 ? 1 : 0;
+            $b['presented'] += $rank >= 5 ? 1 : 0;
+            $b['signed'] += $rank >= 6 ? 1 : 0;
+            $created = (int) Clock::parse((string) $l['created_at']);
+            if ($l['first_contact_at'] !== null) {
+                $b['contacted']++;
+                $secs = (int) Clock::parse((string) $l['first_contact_at']) - $created;
+                if ($secs >= 0) {
+                    $b['resp'][] = $secs;
+                }
+                $b['sla_total']++;
+                $b['sla_ok'] += $secs <= $window ? 1 : 0;
+            } elseif ($l['stage'] !== 'lost' && $l['temperature'] !== 'disqualified' && $now > $created + $window) {
+                $b['sla_total']++;   // sin contactar y con el plazo vencido: cuenta como fuera de plazo
+            }
+            unset($b);
+        }
+        foreach (Db::all('SELECT l.assigned_to AS u, COUNT(*) AS n FROM tasks t JOIN leads l ON l.id = t.lead_id WHERE t.deleted_at IS NULL AND t.done_at IS NULL AND t.due_at IS NOT NULL AND t.due_at < ? AND l.deleted_at IS NULL GROUP BY l.assigned_to', [Clock::at($now)]) as $t) {
+            $k = $t['u'] !== null ? (int) $t['u'] : 0;
+            if (isset($g[$k])) {
+                $g[$k]['overdue'] = (int) $t['n'];
+            }
+        }
+        $names = [];
+        foreach (Db::all('SELECT id, name FROM users') as $u) {
+            $names[(int) $u['id']] = (string) $u['name'];
+        }
+        $out = [];
+        foreach ($g as $k => $b) {
+            $out[] = ['key' => $k, 'label' => $k === 0 ? 'Sin asignar' : ($names[$k] ?? 'Usuario #' . $k), 'leads' => $b['leads'], 'contacted' => $b['contacted'], 'median' => Dashboard::median($b['resp']),
+                'sla_ok' => $b['sla_ok'], 'sla_total' => $b['sla_total'], 'sla_pct' => $b['sla_total'] > 0 ? round($b['sla_ok'] / $b['sla_total'] * 100, 1) : null,
+                'qualified' => $b['qualified'], 'presented' => $b['presented'], 'signed' => $b['signed'], 'overdue' => $b['overdue']];
+        }
+        usort($out, static fn($a, $b) => [$a['key'] === 0 ? 1 : 0, -$a['leads'], $a['label']] <=> [$b['key'] === 0 ? 1 : 0, -$b['leads'], $b['label']]);
+        return $out;
+    }
 
     /** @return array{header:list<string>,rows:list<list<mixed>>} */
     public static function table(string $name, array $m): array
@@ -364,6 +430,8 @@ final class Reports
                 return $t;
             })(),
             'estados'  => $grp($m['states'], 'Estado'),
+            'responsables' => ['header' => ['Responsable', 'Leads asignados', 'Contactados', 'Mediana a primer contacto (min)', 'Dentro del plazo (%)', 'Calificados', 'Presentados', 'Firmados', 'Tareas vencidas'],
+                'rows' => array_map(static fn($r) => [$r['label'], $r['leads'], $r['contacted'], $r['median'] !== null ? round($r['median'] / 60, 1) : '', $p($r['sla_pct']), $r['qualified'], $r['presented'], $r['signed'], $r['overdue']], $m['assignees'] ?? [])],
             'perdidas' => ['header' => ['Motivo', 'Leads perdidos', '% de las pérdidas'], 'rows' => array_map(static fn($r) => [$r['label'], $r['n'], $p($r['pct'])], $m['loss']['rows'])],
             default    => ['header' => [], 'rows' => []],
         };

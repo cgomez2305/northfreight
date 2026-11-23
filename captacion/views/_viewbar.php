@@ -72,7 +72,7 @@ $hasFilters = count($f) > 0 || $sortQ || $plQ;
               <a class="vitem<?= $on ? ' is-on' : '' ?>" href="<?= $e(SavedViews::href($v, $screen)) ?>"><?= Ui::icon('star') ?><span><?= $e($v['name']) ?></span></a>
               <form method="post" action="/vistas/<?= $e($v['id']) ?>/<?= $v['pinned'] ? 'unpin' : 'pin' ?>"><?= $hid() ?><button class="icon-btn icon-btn--sm<?= $v['pinned'] ? ' is-pin' : '' ?>" type="submit" aria-pressed="<?= $v['pinned'] ? 'true' : 'false' ?>" aria-label="<?= $v['pinned'] ? 'Quitar de la barra lateral' : 'Fijar en la barra lateral' ?>: <?= $e($v['name']) ?>"><?= Ui::icon('pin') ?></button></form>
               <button class="icon-btn icon-btn--sm" type="button" data-view-rename="<?= $e($v['id']) ?>" data-name="<?= $e($v['name']) ?>" aria-label="Renombrar la vista <?= $e($v['name']) ?>"><?= Ui::icon('pencil') ?></button>
-              <form method="post" action="/vistas/<?= $e($v['id']) ?>/delete"><?= $hid() ?><button class="icon-btn icon-btn--sm" type="submit" data-confirm="¿Eliminar la vista «<?= $e($v['name']) ?>»? Los leads no se tocan." aria-label="Eliminar la vista <?= $e($v['name']) ?>"><?= Ui::icon('trash') ?></button></form>
+              <form method="post" action="/vistas/<?= $e($v['id']) ?>/delete"><?= $hid() ?><button class="icon-btn icon-btn--sm" type="submit" data-confirm-title="¿Eliminar la vista?" data-confirm-label="Eliminar" data-confirm-danger data-confirm="¿Eliminar la vista «<?= $e($v['name']) ?>»? Los leads no se tocan." aria-label="Eliminar la vista <?= $e($v['name']) ?>"><?= Ui::icon('trash') ?></button></form>
             </li>
           <?php endforeach; ?>
         </ul>

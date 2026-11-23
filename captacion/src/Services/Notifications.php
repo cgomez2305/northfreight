@@ -32,6 +32,16 @@ final class Notifications
                 'href' => '/leads?t=hot&ct=none',
             ];
         }
+        // AM: leads con el plazo de primer contacto vencido que le tocan a este usuario (los suyos y los que no tienen responsable)
+        $sla = Sla::overdueFor($userId);
+        if ($sla['n'] > 0) {
+            $secs = $sla['oldest'] !== null ? max(0, Clock::time() - (int) Clock::parse((string) $sla['oldest']) - Sla::minutes() * 60) : null;
+            $items[] = [
+                'key' => 'sla_overdue:' . $sla['n'] . ':' . $sla['max_id'], 'kind' => 'hot',
+                'title' => $sla['n'] === 1 ? '1 lead con el plazo de primer contacto vencido' : $sla['n'] . ' leads con el plazo de primer contacto vencido',
+                'meta' => $secs !== null ? 'El más antiguo venció hace ' . Fmt::dur($secs) : 'Sin primer contacto', 'href' => '/leads?sla=1',
+            ];
+        }
         $failed = (int) Db::value("SELECT COUNT(*) FROM jobs WHERE status = 'failed'");
         if ($failed > 0) {
             $last = Db::one("SELECT id, type, last_error FROM jobs WHERE status = 'failed' ORDER BY id DESC LIMIT 1");
@@ -137,6 +147,10 @@ final class Notifications
                 'key' => 'cron_stale:' . ($at === null ? 'never' : 'late'), 'kind' => 'warn', 'title' => $at === null ? 'El cron de la cola nunca se ha ejecutado' : 'El cron de la cola no corre',
                 'meta' => $at === null ? 'Crea la tarea de cron de process_jobs.php' : 'Última pasada ' . Fmt::ago((string) $cron['at']), 'href' => '/#cola',
             ];
+        }
+        // Fase AM: avisos que pusieron las reglas de eventos y tiempo (accion «avisar en la campana»); cada uno es su propia clave, asi que se marca leido por separado
+        foreach (Db::all('SELECT n.id, n.lead_id, n.rule_name, n.text, n.created_at FROM rule_notices n JOIN leads l ON l.id = n.lead_id AND l.deleted_at IS NULL WHERE n.created_at > ? ORDER BY n.id DESC LIMIT 10', [Clock::shift(-14 * 86400)]) as $n) {
+            $items[] = ['key' => 'rule_notice:' . (int) $n['id'], 'kind' => 'warn', 'title' => (string) $n['text'], 'meta' => 'Regla «' . $n['rule_name'] . '» · ' . Fmt::ago((string) $n['created_at']), 'href' => '/leads/' . (int) $n['lead_id']];
         }
         $read = array_column(Db::all('SELECT notif_key FROM notification_reads WHERE user_id = ?', [$userId]), 'notif_key');
         $read = array_flip($read);
