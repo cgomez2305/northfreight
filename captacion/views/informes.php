@@ -35,7 +35,7 @@ use Captacion\Ui;
   <div class="card__b">
     <form class="rep-range" method="post" action="/informes/generate" novalidate>
       <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>">
-      <label class="field"><span>Mes (solo meses ya terminados)</span><input type="month" name="period" value="<?= $e($genDefault) ?>" max="<?= $e($genDefault) ?>" min="2020-01" required></label>
+      <label class="field"><span>Mes (solo meses ya terminados)</span><input type="month" lang="es" name="period" value="<?= $e($genDefault) ?>" max="<?= $e($genDefault) ?>" min="2020-01" required></label>
       <button class="btn btn--primary" type="submit"><span class="btn__t">Generar ahora</span></button>
     </form>
     <p class="muted rep-pad">Crea el informe como borrador con los datos de ese mes. Si ya existe, te lleva a él (no se duplica).</p>

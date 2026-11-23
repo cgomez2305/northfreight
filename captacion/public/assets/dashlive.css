@@ -36,3 +36,4 @@
   .seg__pill{transition:none}
 }
 .btn:active{transform:scale(.98)}
+.grid--3{align-items:start}

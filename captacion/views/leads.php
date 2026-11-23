@@ -39,9 +39,11 @@ $isEmptyDb = $grandTotal === 0;
       <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="scope" value="filters"><input type="hidden" name="qs" value="<?= $e(ltrim($qsAll(), '?')) ?>">
       <button class="btn btn--secondary" type="submit"><span class="btn__t">Exportar CSV</span></button>
     </form>
-    <button class="btn btn--primary" type="button" data-new-lead><span class="btn__t">Nuevo lead</span></button>
   <?php endif; ?>
     <?php if (!empty($isAdmin)): ?><a class="btn btn--secondary" href="/importar"><?= Ui::icon('inbox') ?>Importar CSV</a><?php endif; ?>
+  <?php if (!$isEmptyDb): ?>
+    <button class="btn btn--primary" type="button" data-new-lead><span class="btn__t">Nuevo lead</span></button>
+  <?php endif; ?>
   </div>
 </div>
 

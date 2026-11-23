@@ -38,7 +38,7 @@ $act = static function (string $action, int $id, string $label, string $cls, str
     <div class="tw"><table class="tbl tbl--users" aria-label="Personas con acceso al panel"><thead><tr><th scope="col">Persona</th><th scope="col">Estado</th><th scope="col">Último acceso</th><th scope="col"><span class="sr">Acciones</span></th></tr></thead><tbody>
       <?php foreach ($viewers as $v):
         $pending = $v['totp_confirmed_at'] === null;
-        $state = (int) $v['is_active'] !== 1 ? ['Desactivada', 'hot'] : ($pending ? ['Invitación pendiente', 'plain'] : ['Activa', 'warm']);
+        $state = (int) $v['is_active'] !== 1 ? ['Desactivada', 'hot'] : ($pending ? ['Invitación pendiente', 'plain'] : ['Activa', 'ok']);
       ?>
         <tr><th scope="row" class="c-n"><span class="who"><?= Ui::avatar((string) $v['name']) ?><span><b><?= $e($v['name']) ?></b><small><?= $e($v['email']) ?></small></span></span></th>
           <td data-l="Estado"><span class="chip chip--<?= $e($state[1]) ?>"><i class="dot"></i><?= $e($state[0]) ?></span><?php if ($pending && $v['invite_until'] !== null && (int) $v['is_active'] === 1): ?><small class="muted"> · vale hasta <?= $e(Fmt::dateTime($v['invite_until'])) ?></small><?php endif; ?></td>

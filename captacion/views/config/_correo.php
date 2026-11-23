@@ -7,7 +7,7 @@ $em = static fn(string $k) => isset($errors[$k]) ? '<small class="num__e" id="em
 $monthly = is_array($mail['monthly_to']) ? implode("\n", $mail['monthly_to']) : (string) $mail['monthly_to'];
 ?>
 <p class="cfg-intro">Remitente, pie legal y topes de las secuencias de correo (A6 para leads tibios, A12 referidos), y los destinatarios de los informes. Reglas CAN-SPAM: pie con la dirección física, baja de un clic y solo a quien dio consentimiento de correo.</p>
-<?php foreach ($mailWarn as $w): ?><p class="flash flash--<?= $w['level'] === 'bad' ? 'bad' : ($w['level'] === 'warn' ? 'warn' : 'ok') ?>" role="status"><?= Ui::icon($w['level'] === 'info' ? 'info' : 'alert') ?><?= $e($w['text']) ?></p><?php endforeach; ?>
+<?php foreach ($mailWarn as $w): ?><p class="flash flash--<?= $w['level'] === 'bad' ? 'bad' : ($w['level'] === 'warn' ? 'warn' : 'info') ?>" role="status"><?= Ui::icon($w['level'] === 'info' ? 'info' : 'alert') ?><?= $e($w['text']) ?></p><?php endforeach; ?>
 <form method="post" action="/config/mail/save" class="cfg-form" novalidate>
   <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>">
   <fieldset class="cfg-fs"<?= $locked ? ' disabled' : '' ?>>

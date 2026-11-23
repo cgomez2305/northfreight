@@ -171,7 +171,7 @@ $cronAt = is_array($cron) ? ($cron['at'] ?? null) : null;
             <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="back" value="<?= $e($back) ?>">
             <div class="pc__fields">
               <label class="field"><span>Nota (opcional)</span><input type="text" name="note" maxlength="500" autocomplete="off" placeholder="Qué dijo, a qué hora volver a llamar…"></label>
-              <label class="field"><span>Siguiente intento (ET, opcional)</span><input type="date" name="next" min="<?= $e($todayEt) ?>"></label>
+              <label class="field"><span>Siguiente intento (ET, opcional)</span><input type="date" lang="es" name="next" min="<?= $e($todayEt) ?>"></label>
             </div>
             <div class="pc__btns" role="group" aria-label="Registrar el resultado de la llamada a <?= $e($name) ?>">
               <?php foreach (Prospects::RESULTS as $k => $label): ?>

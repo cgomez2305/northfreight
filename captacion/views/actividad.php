@@ -23,8 +23,8 @@ $chips = ['ty' => static fn($v) => 'Tipo: ' . ActivityView::GROUPS[$v][0], 'us' 
 <form class="act-f card" method="get" action="/actividad">
   <label class="field"><span>Tipo</span><select name="ty"><option value="">Todos</option><?php foreach (ActivityView::GROUPS as $k => [$l]): ?><option value="<?= $e($k) ?>"<?= ($f['ty'] ?? '') === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
   <label class="field"><span>Usuario</span><select name="us"><option value="">Todos</option><?php foreach ($users as $u): ?><option value="<?= $e($u['id']) ?>"<?= ($f['us'] ?? '') === (string) $u['id'] ? ' selected' : '' ?>><?= $e($u['name']) ?></option><?php endforeach; ?></select></label>
-  <label class="field"><span>Desde (<?= $e(Fmt::zone()) ?>)</span><input type="date" name="from" value="<?= $e($f['from'] ?? '') ?>"></label>
-  <label class="field"><span>Hasta (<?= $e(Fmt::zone()) ?>)</span><input type="date" name="to" value="<?= $e($f['to'] ?? '') ?>"></label>
+  <label class="field"><span>Desde (<?= $e(Fmt::zone()) ?>)</span><input type="date" lang="es" name="from" value="<?= $e($f['from'] ?? '') ?>"></label>
+  <label class="field"><span>Hasta (<?= $e(Fmt::zone()) ?>)</span><input type="date" lang="es" name="to" value="<?= $e($f['to'] ?? '') ?>"></label>
   <label class="field act-f__q"><span>Buscar</span><span class="inp"><?= Ui::icon('search') ?><input type="search" name="q" value="<?= $e($f['q'] ?? '') ?>" placeholder="Acción, IP, lead #, usuario…" maxlength="100"></span></label>
   <div class="act-f__a"><button class="btn btn--secondary" type="submit"><?= Ui::icon('filter') ?>Filtrar</button><?php if ($nFilters): ?><a class="btn btn--ghost" href="/actividad"><?= Ui::icon('x') ?>Quitar</a><?php endif; ?></div>
 </form>
@@ -69,7 +69,7 @@ $chips = ['ty' => static fn($v) => 'Tipo: ' . ActivityView::GROUPS[$v][0], 'us' 
       <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>">
       <fieldset class="cfg-fs"<?= $locked ? ' disabled' : '' ?>>
         <label class="field"><span>Días de retención (30 a 3650)</span><input type="text" name="days" value="<?= $e($retention) ?>" inputmode="numeric" maxlength="4" autocomplete="off" required></label>
-        <button class="btn btn--primary" type="submit"><span class="btn__t">Guardar retención</span></button>
+        <button class="btn btn--secondary" type="submit"><span class="btn__t">Guardar retención</span></button>
       </fieldset>
     </form>
   </div>

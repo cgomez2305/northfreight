@@ -12,7 +12,9 @@
 .cfg-card{overflow:visible}
 .cfg-fs{border:0;padding:0;margin:0;min-width:0;display:flex;flex-direction:column;gap:16px}
 .cfg-fs[disabled] input,.cfg-fs[disabled] select,.cfg-fs[disabled] textarea{background-color:var(--sunk);color:var(--ink-2);-webkit-text-fill-color:var(--ink-2);opacity:1;cursor:not-allowed}
-.cfg-fs[disabled] .btn,.cfg-fs[disabled] .tgl{opacity:.55;cursor:not-allowed}
+.cfg-fs[disabled] ::placeholder{-webkit-text-fill-color:var(--ink-3);color:var(--ink-3);font-style:italic;opacity:1}
+.cfg-fs[disabled] .btn,.cfg-fs[disabled] .tgl input{opacity:.55;cursor:not-allowed}
+.cfg-fs[disabled] .tgl{cursor:not-allowed}
 .cfg-fs[disabled] .btn *{cursor:not-allowed}
 .cfg-form{display:flex;flex-direction:column;gap:16px}
 .cfg-h3{font:600 var(--fs-lg)/1.2 var(--f-sans);margin:24px 0 8px}
@@ -32,12 +34,12 @@
 .cfg-ok .link{color:var(--ink);font-weight:500;text-decoration:underline}
 .num.has-err .num__in,.field.has-err input,.field.has-err select,.field.has-err textarea{border-color:var(--bad-dot)}
 .num__e{color:var(--bad);font-size:var(--fs-sm);font-weight:500;line-height:1.3}
-.chip--warm-o{background:var(--warn-bg);color:var(--warn)}
 .chip--new{background:var(--accent-tint);color:var(--accent-ink);height:20px;padding:0 8px;border-radius:var(--r-pill);font-size:var(--fs-xs);font-weight:500;margin-left:6px}
 .up{color:var(--ok);font-weight:500}
 .down{color:var(--bad);font-weight:500}
 .eqgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
-.check--box{padding:0 12px;min-height:44px;align-items:center;border:1px solid var(--line-2);border-radius:var(--r-in);background:var(--surface)}
+.check--box{padding:10px 12px;min-height:44px;height:auto;align-items:center;border:1px solid var(--line-2);border-radius:var(--r-in);background:var(--surface)}
+.check--box input{flex:none;margin-top:0}
 .check--box:has(input:checked){background:var(--accent-tint);border-color:var(--accent-line)}
 .warm{border:0;padding:8px 0 0;margin:0;min-width:0}
 .warm legend{padding:0;font-weight:500;margin-bottom:8px}
@@ -67,7 +69,7 @@
 /* interruptores (Alertas, Entrega, Correo, Prospectos) y opciones de un solo valor */
 .tgl{display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--line);cursor:pointer}
 .tgl:last-child{border:0}
-.tgl input{-webkit-appearance:none;appearance:none;flex:none;width:36px;height:20px;margin:1px 0 0;border-radius:var(--r-pill);background:var(--field);position:relative;cursor:pointer;transition:background .15s}
+.tgl input{-webkit-appearance:none;appearance:none;flex:none;width:36px;height:20px;margin:1px 0 0;border-radius:var(--r-pill);background:var(--field);box-shadow:inset 0 0 0 1px var(--line-2);position:relative;cursor:pointer;transition:background .15s}
 .tgl input::after{content:"";position:absolute;left:2px;top:2px;width:16px;height:16px;border-radius:50%;background:var(--surface);transition:transform .15s}
 .tgl input:checked{background:var(--accent)}
 .tgl input:checked::after{transform:translateX(16px)}

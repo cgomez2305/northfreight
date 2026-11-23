@@ -74,12 +74,13 @@ $numCols = ['trucks' => 1, 'exp' => 1, 'pts' => 1];
   </div>
   <?php if (!$isEmptyDb): ?>
   <div class="page-head__a">
-    <button class="btn btn--primary" type="button" data-new-lead>Nuevo lead</button>
     <button class="btn btn--secondary filters-toggle" type="button" data-toggle="#filters" aria-expanded="<?= $nFilters > 0 ? 'true' : 'false' ?>" aria-controls="filters"><?= Ui::icon('filter') ?>Filtros<?= $nFilters > 0 ? ' <b class="badge">' . $e($nFilters) . '</b>' : '' ?></button>
     <form method="post" action="/tabla/export">
       <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="scope" value="filters"><input type="hidden" name="qs" value="<?= $e(ltrim($qsAll(), '?')) ?>">
       <button class="btn btn--secondary" type="submit"><span class="btn__t">Exportar CSV</span></button>
     </form>
+    <?php if (!empty($isAdmin)): ?><a class="btn btn--secondary" href="/importar"><?= Ui::icon('inbox') ?>Importar CSV</a><?php endif; ?>
+    <button class="btn btn--primary" type="button" data-new-lead>Nuevo lead</button>
   </div>
   <?php endif; ?>
 </div>

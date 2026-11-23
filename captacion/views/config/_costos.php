@@ -31,7 +31,7 @@ foreach ($costTable['months'] as $m) {
           <label class="field<?= isset($errors['source']) ? ' has-err' : '' ?>"><span>Fuente</span>
             <select name="source" required<?= isset($errors['source']) ? ' aria-invalid="true"' : '' ?>><option value="">Elige una fuente…</option><?php foreach ($sources as $k => $l): ?><option value="<?= $e($k) ?>"<?= $f['source'] === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select>
             <?php if (isset($errors['source'])): ?><small class="num__e"><?= $e($errors['source']) ?></small><?php endif; ?></label>
-          <label class="field<?= isset($errors['period']) ? ' has-err' : '' ?>"><span>Mes</span><input type="month" name="period" value="<?= $e($f['period']) ?>" min="2020-01" max="<?= $e($maxPeriod) ?>" required<?= isset($errors['period']) ? ' aria-invalid="true"' : '' ?>>
+          <label class="field<?= isset($errors['period']) ? ' has-err' : '' ?>"><span>Mes</span><input type="month" lang="es" name="period" value="<?= $e($f['period']) ?>" min="2020-01" max="<?= $e($maxPeriod) ?>" required<?= isset($errors['period']) ? ' aria-invalid="true"' : '' ?>>
             <?php if (isset($errors['period'])): ?><small class="num__e"><?= $e($errors['period']) ?></small><?php endif; ?></label>
           <label class="field<?= isset($errors['amount']) ? ' has-err' : '' ?>"><span>Monto (USD)</span><input type="text" name="amount" value="<?= $e($f['amount']) ?>" inputmode="decimal" placeholder="350.00" maxlength="12" autocomplete="off" required<?= isset($errors['amount']) ? ' aria-invalid="true"' : '' ?>>
             <?php if (isset($errors['amount'])): ?><small class="num__e"><?= $e($errors['amount']) ?></small><?php endif; ?></label>

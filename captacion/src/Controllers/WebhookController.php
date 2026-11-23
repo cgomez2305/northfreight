@@ -34,7 +34,7 @@ final class WebhookController extends Responder
         set_exception_handler(static function (\Throwable $t) use ($source): void {
             Storage::error('webhook ' . $source . ' ' . get_class($t), $t->getMessage() . ' @' . basename($t->getFile()) . ':' . $t->getLine());
             try {
-                Integrations::webhook($source, 'err', 'Error interno: ' . get_class($t));
+                Integrations::webhook($source, 'err', 'Error interno al procesar el evento: revisa storage/error.log');
             } catch (\Throwable) {
             }
             if (!headers_sent()) {

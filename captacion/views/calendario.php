@@ -46,7 +46,7 @@ $card = static function (array $ev) use ($e, $lbl, $href, $hm, $csrf, $canWrite,
             <form method="post" action="/tareas/<?= $e($ev['task_id']) ?>/snooze" data-cal-snooze="1h"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="back" value="<?= $e($backUrl) ?>"><input type="hidden" name="mode" value="1h"><input type="hidden" name="task_id" value="<?= $e($ev['task_id']) ?>"><button class="dd__item" type="submit"><?= Ui::icon('clock') ?>Posponer 1 hora</button></form>
             <form method="post" action="/tareas/<?= $e($ev['task_id']) ?>/snooze" data-cal-snooze="tomorrow"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="back" value="<?= $e($backUrl) ?>"><input type="hidden" name="mode" value="tomorrow"><input type="hidden" name="task_id" value="<?= $e($ev['task_id']) ?>"><button class="dd__item" type="submit"><?= Ui::icon('calendar') ?>Posponer a mañana</button></form>
             <form method="post" action="/calendario/move" class="evm__d" data-cal-move><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="back" value="<?= $e($backUrl) ?>"><input type="hidden" name="task_id" value="<?= $e($ev['task_id']) ?>">
-              <label class="field"><span>Mover a otro día</span><input type="date" name="ymd" value="<?= $e(Fmt::et((string) $ev['at'])->format('Y-m-d')) ?>" required></label>
+              <label class="field"><span>Mover a otro día</span><input type="date" lang="es" name="ymd" value="<?= $e(Fmt::et((string) $ev['at'])->format('Y-m-d')) ?>" required></label>
               <button class="btn btn--secondary btn--sm" type="submit">Mover</button></form>
           </div>
         </details>
@@ -102,7 +102,7 @@ $addHref = static fn(string $ymd): string => $q(['nueva' => $ymd]) . '#nueva';
       <h3 class="h2">Nueva tarea · <?= $e(Fmt::weekdayLong((int) (new DateTimeImmutable($newDay, Fmt::tz()))->format('N'))) ?> <?= $e((int) substr($newDay, 8, 2)) ?> de <?= $e(Fmt::monthLong((int) substr($newDay, 5, 2))) ?></h3>
       <label class="field"><span>Qué hay que hacer</span><input type="text" name="title" required maxlength="190" placeholder="Llamar para confirmar documentos"></label>
       <div class="dlg__row">
-        <label class="field"><span>Para (hora <?= $e($tz) ?>)</span><input type="datetime-local" name="due" value="<?= $e($newDay . 'T' . $startTime) ?>"></label>
+        <label class="field"><span>Para (hora <?= $e($tz) ?>)</span><input type="datetime-local" lang="es" name="due" value="<?= $e($newDay . 'T' . $startTime) ?>"></label>
         <label class="field"><span>Prioridad</span><select name="priority"><?php foreach ($prios as $k => $l): ?><option value="<?= $e($k) ?>"<?= $k === 2 ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
       </div>
       <div class="dlg__a"><a class="btn btn--ghost" href="<?= $e($q(['nueva' => null])) ?>">Cancelar</a><button class="btn btn--primary" type="submit"><span class="btn__t">Crear tarea</span></button></div>
@@ -172,7 +172,7 @@ $addHref = static fn(string $ymd): string => $q(['nueva' => $ymd]) . '#nueva';
       <input type="hidden" name="lead_id" value="" data-lp-id><p class="lp__sel" data-lp-sel hidden><span data-lp-name></span><button type="button" class="link" data-lp-clear>Quitar</button></p>
       <ul class="lp__list" id="lp-cal" role="listbox" aria-label="Resultados" data-lp-list hidden></ul></div>
     <div class="dlg__row">
-      <label class="field"><span>Para (hora <?= $e($tz) ?>)</span><input type="datetime-local" name="due" required></label>
+      <label class="field"><span>Para (hora <?= $e($tz) ?>)</span><input type="datetime-local" lang="es" name="due" required></label>
       <label class="field"><span>Prioridad</span><select name="priority"><?php foreach ($prios as $k => $l): ?><option value="<?= $e($k) ?>"<?= $k === 2 ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
     </div>
     <div class="dlg__a"><button class="btn btn--ghost" type="button" data-close>Cancelar</button><button class="btn btn--primary" type="submit"><span class="btn__t">Crear tarea</span></button></div>

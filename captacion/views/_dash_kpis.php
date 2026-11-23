@@ -20,7 +20,11 @@ $respText = $resp['median'] !== null ? Fmt::dur($resp['median']) : '';
     <header class="kpi__h"><span class="label">Calificados</span><?= Ui::tip('Porcentaje de leads calientes y tibios sobre el total recibido en ' . $d['window_label'] . '. La comparación en puntos exige ' . \Captacion\Services\Dashboard::MIN_BASE . ' leads o más en cada periodo.') ?></header>
     <div class="kpi__m">
       <?php if ($qual['of'] > 0): ?>
+        <?php if ($qual['of'] >= \Captacion\Services\Dashboard::MIN_BASE): ?>
         <?= Ui::big(Fmt::num($qual['pct'], 1) . '%', 'kpi__v', ['v' => round($qual['pct'], 1), 'dec' => 1, 'suf' => '%']) ?>
+        <?php else: /* base minima (README §24): con pocos leads un porcentaje engaña, se muestra el conteo */ ?>
+        <?= Ui::big((string) $qual['n'], 'kpi__v', ['v' => $qual['n'], 'dec' => 0, 'suf' => '']) ?>
+        <?php endif; ?>
         <div class="kpi__z"><?= Ui::ticks((int) round($qual['pct'] / 100 * 28), 28, 'Calificados: ' . $qual['n'] . ' de ' . $qual['of'], 'tk--q') ?><span class="kpi__c"><b><?= $e($qual['n']) ?></b> de <?= $e($qual['of']) ?></span></div>
       <?php else: ?>
         <p class="kpi__v"><span class="kpi__na">—</span></p>

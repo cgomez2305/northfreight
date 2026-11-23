@@ -54,7 +54,10 @@ final class Templates
     public static function all(): array
     {
         self::ensure();
-        return Db::all('SELECT * FROM email_templates ORDER BY (kind = \'system\') DESC, tkey, lang');
+        $rows = Db::all('SELECT * FROM email_templates ORDER BY (kind = \'system\') DESC, tkey, lang');
+        // orden natural (a5, a6_d1, a6_d3, a6_d7, a6_d14, a11, a12): el de MariaDB pone a11 antes que a5 y d14 antes que d3
+        usort($rows, static fn(array $x, array $y): int => [$y['kind'] === 'system', 0] <=> [$x['kind'] === 'system', 0] ?: strnatcasecmp((string) $x['tkey'], (string) $y['tkey']) ?: strcmp((string) $x['lang'], (string) $y['lang']));
+        return $rows;
     }
 
     // --- Variables y marcadores -----------------------------------------------------------------------------------------

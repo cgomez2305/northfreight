@@ -1004,3 +1004,14 @@ Suite tras integrar: 3.739 pruebas, 0 fallos (dos pasadas completas seguidas). C
 
 Pendiente: Firefox/Safari y lector de pantalla real (popovers, `inert`), fijar la IP resuelta con `CURLOPT_RESOLVE` contra DNS rebinding en los webhooks salientes y de entrega, la anonimización no alcanza lo ya enviado fuera del panel (NorthStar, n8n, webhooks) ni las copias de 30 días ni los JSONL del sitio, y desde Calendario, Cronología y las tarjetas cargadas por «Ver más» la ficha no recibe `?back=`.
 
+
+## 28. Revisión visual (fase AO)
+
+Corrección de los defectos de una revisión en tema oscuro (1440 y 390 px). Pruebas en `tests/cases/46_revision_visual.php`.
+
+- **Chips**: `.chip--ok` y `.chip--warm-o` viven una sola vez en `panel.css` junto a `.chip--bad`/`.chip--plain` (relleno y radio); se quitaron los duplicados de `referidos`, `vacantes`, `prospectos`, `config` y `cfg-reglas`. «Activa» (usuarios) lleva punto verde.
+- **Leads**: umbrales de columnas recalculados con «Responsable» (el icono de llamar ya no se corta de 800 a 1920 px; medido). Cabecera: Exportar · Importar · Nuevo lead (primario, último); Tabla igual. «Aplicar» (filtros y columnas), «Confirmar» (reautenticación) y «Guardar retención» pasan a secundarios.
+- **Reportes**: KPI en flex (reparten el ancho, sin hueco 4+3); la ficha móvil de las tablas solo en contenedores ≤ 520 px; nota de «Por responsable» alineada. Se corrigió un aviso real de PHP: `rep/_tendencia.php` usaba `$cnote` sin definirlo en `/reportes`.
+- **Config**: aviso provisional en un `<span>`, texto de Amazon Relay corregido (viene marcado), interruptores apagados con aro de 1 px y opacidad solo en el input, placeholders distinguibles con la edición bloqueada, casillas de n8n con alto automático, URL de webhook como campo de solo lectura, aviso del día 7 neutro en Correo. El webhook ya no guarda «Error interno: PDOException» sino un texto amable (el fallo de Twilio de la demo no se reproduce: `SmsInbound` funciona con la base actual; era un estado guardado).
+- **Otros**: icono en «Nueva tarea», «Volver a la lista» en una línea, nombre de plantilla primero en móvil, plantillas en orden natural (`Templates::all`), `lang="es"` en los 25 inputs de fecha, mes y hora, segmentados sin partir el texto, calendario sin ayuda de teclado en táctil, Vacantes con rejilla fija y punto de estado alineado, Referidos con rejilla fija, importar con selector de archivo estilizado (el texto «Choose File» lo pone el navegador), barra lateral que lleva lo activo a la vista y marca con un filete que hay más debajo, Dashboard: «Calificados» muestra el conteo (no el porcentaje) con menos de 5 leads.
+- **No reproducido o no hecho**: duplicado de `.pg` (solo hay una definición); la bola del interruptor sigue en `--surface` (con `--ink-3` sobre el riel `--field` no se vería).
