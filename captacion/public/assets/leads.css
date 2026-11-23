@@ -8,13 +8,6 @@
 .who small{color:var(--ink-3);font-weight:400;font-size:var(--fs-xs)}
 .sort{color:inherit;display:inline-flex;gap:4px;text-decoration:none!important}
 .sort:hover,.sort.is-on{color:var(--ink)}
-.pg ul{display:flex;gap:4px;align-items:center}
-.pg__n{min-width:32px;height:32px;display:inline-grid;place-items:center;padding:0 8px;border:1px solid transparent;border-radius:var(--r-ctl);font:500 var(--fs-sm) var(--f-sans);font-variant-numeric:tabular-nums;color:var(--ink-2);background:none;text-decoration:none!important}
-a.pg__n:hover{background:var(--sunk)}
-.pg__n.is-on{background:var(--surface);color:var(--ink);border-color:var(--line-2)}
-.pg__n.is-off{opacity:.4}
-.pg__gap{color:var(--ink-3);padding:0 4px}
-.pg .ic{width:16px;height:16px}
 .steps{display:flex;flex-direction:column;gap:12px;margin-top:10px;text-align:left;width:min(560px,100%)}
 .steps li{display:flex;gap:14px;padding:14px;border:1px solid var(--line);border-radius:var(--r-in)}
 .steps b{display:block;color:var(--ink)}

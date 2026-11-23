@@ -174,7 +174,7 @@ return static function (array $ctx): void {
 
     // --- tema por usuario, sin parpadeo (atributo en <html> desde el servidor + script con nonce)
     $page = $s->get('/');
-    T::ok(preg_match('/<html lang="es" data-theme-pref="auto" data-side="open" data-density="comfortable" data-keys="on">/', $page['body']) === 1 && str_contains($page['body'], 'name="color-scheme" content="light dark"') && preg_match('/<script nonce="[^"]+">\(function\(d,w\)\{var h=d\.documentElement/', $page['body']) === 1, 'tema: <html> trae la preferencia del usuario y un script con nonce que fija data-theme antes de pintar');
+    T::ok(preg_match('/<html lang="es" data-theme-pref="auto" data-side="open" data-density="comfortable" data-kbd="on">/', $page['body']) === 1 && str_contains($page['body'], 'name="color-scheme" content="light dark"') && preg_match('/<script nonce="[^"]+">\(function\(d,w\)\{var h=d\.documentElement/', $page['body']) === 1, 'tema: <html> trae la preferencia del usuario y un script con nonce que fija data-theme antes de pintar');
     T::eq($s->ajax('/ajax/prefs', ['key' => 'theme', 'value' => 'dark'])['status'], 200, 'tema: guardar «oscuro» por /ajax/prefs');
     $page = $s->get('/leads');
     T::ok(str_contains($page['body'], 'data-theme-pref="dark"') && Prefs::get($uid, 'theme') === 'dark' && Prefs::get($oid, 'theme') === 'auto', '  la preferencia persiste en la base, se aplica al recargar y no afecta al otro usuario');

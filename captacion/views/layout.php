@@ -8,7 +8,7 @@ $shell = !empty($shell);
 $brand = '<a class="brand" href="' . (!empty($isViewer) ? '/resultados' : '/') . '" aria-label="NorthStar Captación, ir al inicio" data-tip="NorthStar Captación"><img class="brand__mark" src="/assets/isotype.svg" width="26" height="26" alt=""><span class="brand__txt"><b>NorthStar</b><small>Captación</small></span>' . Ui::icon('chevrons') . '</a>';
 ?>
 <!doctype html>
-<html lang="es"<?= isset($prefs) ? ' data-theme-pref="' . $e($prefs['theme']) . '" data-side="' . $e($prefs['side']) . '" data-density="' . $e($prefs['density']) . '"' . (empty($isViewer) ? ' data-keys="' . $e($prefs['keys'] ?? 'on') . '"' : '') : '' ?>>
+<html lang="es"<?= isset($prefs) ? ' data-theme-pref="' . $e($prefs['theme']) . '" data-side="' . $e($prefs['side']) . '" data-density="' . $e($prefs['density']) . '"' . (empty($isViewer) ? ' data-kbd="' . $e($prefs['keys'] ?? 'on') . '"' : '') : '' ?>>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
