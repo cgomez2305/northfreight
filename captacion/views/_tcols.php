@@ -21,6 +21,6 @@ $off = array_values(array_diff(array_keys(LeadTable::COLUMNS), $tcols));
         <li class="is-off"><label class="check check--c"><input type="checkbox" name="col[]" value="<?= $e($k) ?>"><span><?= $e(LeadTable::COLUMNS[$k]) ?></span></label></li>
       <?php endforeach; ?>
     </ul>
-    <div class="tcm__a"><button class="btn btn--primary btn--sm" type="submit"><span class="btn__t">Aplicar</span></button><button class="btn btn--ghost btn--sm" type="submit" name="reset" value="1">Restablecer</button></div>
+    <div class="tcm__a"><button class="btn btn--secondary btn--sm" type="submit"><span class="btn__t">Aplicar</span></button><button class="btn btn--ghost btn--sm" type="submit" name="reset" value="1">Restablecer</button></div>
   </form>
 </details>

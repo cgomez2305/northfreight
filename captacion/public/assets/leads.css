@@ -18,17 +18,20 @@
 .sort__a{width:8px}
 .perpage{display:flex;align-items:center;gap:8px;font-size:var(--fs-sm);color:var(--ink-3)}
 .perpage select{min-height:32px;padding:0 30px 0 8px;border:1px solid var(--field);border-radius:var(--r-ctl);background-color:var(--surface)}
-@container (max-width:1240px){
+@container (max-width:1360px){
   .tbl--leads .c-src{display:none}
 }
-@container (max-width:1100px){
+@container (max-width:1220px){
   .tbl--leads .c-eq{display:none}
 }
-@container (max-width:900px){
+@container (max-width:1060px){
   .tbl--leads .c-prof{display:none}
 }
-@container (max-width:860px){
+@container (max-width:980px){
   .tbl--leads .c-st{display:none}
+}
+@container (max-width:860px){
+  .tbl--leads .c-resp{display:none}
 }
 @container (max-width:700px){
   .tbl--leads tbody tr{padding-left:52px}

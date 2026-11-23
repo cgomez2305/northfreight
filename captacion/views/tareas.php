@@ -65,7 +65,7 @@ $taskRow = static function (array $it) use ($e, $csrf, $canWrite, $back, $now): 
   </div>
   <?php if ($canWrite): ?>
   <div class="page-head__a">
-    <button class="btn btn--primary" type="button" data-open="#task-new"><span class="btn__t">Nueva tarea</span></button>
+    <button class="btn btn--primary" type="button" data-open="#task-new"><?= Ui::icon('plus') ?><span class="btn__t">Nueva tarea</span></button>
   </div>
   <?php endif; ?>
 </div>
@@ -137,7 +137,7 @@ $leadPicker = static function (string $id) use ($e): string {
     <label class="field"><span>Qué hay que hacer</span><input type="text" name="title" required maxlength="190" placeholder="Llamar para confirmar documentos"></label>
     <?= $leadPicker('lp-new') ?>
     <div class="dlg__row">
-      <label class="field"><span>Para (hora <?= $e(Fmt::zone()) ?>)</span><input type="datetime-local" name="due"></label>
+      <label class="field"><span>Para (hora <?= $e(Fmt::zone()) ?>)</span><input type="datetime-local" lang="es" name="due"></label>
       <label class="field"><span>Prioridad</span><select name="priority"><?php foreach (Catalog::PRIORITIES as $k => $l): ?><option value="<?= $e($k) ?>"<?= $k === 2 ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
     </div>
     <div class="dlg__a"><button class="btn btn--ghost" type="button" data-close>Cancelar</button><button class="btn btn--primary" type="submit"><span class="btn__t">Crear tarea</span></button></div>
@@ -150,7 +150,7 @@ $leadPicker = static function (string $id) use ($e): string {
     <label class="field"><span>Qué hay que hacer</span><input type="text" name="title" required maxlength="190"></label>
     <?= $leadPicker('lp-edit') ?>
     <div class="dlg__row">
-      <label class="field"><span>Para (hora <?= $e(Fmt::zone()) ?>)</span><input type="datetime-local" name="due"></label>
+      <label class="field"><span>Para (hora <?= $e(Fmt::zone()) ?>)</span><input type="datetime-local" lang="es" name="due"></label>
       <label class="field"><span>Prioridad</span><select name="priority"><?php foreach (Catalog::PRIORITIES as $k => $l): ?><option value="<?= $e($k) ?>"><?= $e($l) ?></option><?php endforeach; ?></select></label>
     </div>
     <div class="dlg__a"><button class="btn btn--ghost" type="button" data-close>Cancelar</button><button class="btn btn--primary" type="submit"><span class="btn__t">Guardar cambios</span></button></div>
@@ -161,7 +161,7 @@ $leadPicker = static function (string $id) use ($e): string {
     <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="back" value="<?= $e($back) ?>"><input type="hidden" name="mode" value="date">
     <div class="dlg__h"><h2 class="dlg__t" id="task-snooze-t">Posponer tarea</h2><button class="icon-btn icon-btn--sm" type="button" data-close aria-label="Cerrar"><?= Ui::icon('x') ?></button></div>
     <p class="dlg__m" data-snooze-title></p>
-    <label class="field"><span>Nueva fecha y hora (<?= $e(Fmt::zone()) ?>)</span><input type="datetime-local" name="date" required></label>
+    <label class="field"><span>Nueva fecha y hora (<?= $e(Fmt::zone()) ?>)</span><input type="datetime-local" lang="es" name="date" required></label>
     <div class="dlg__a"><button class="btn btn--ghost" type="button" data-close>Cancelar</button><button class="btn btn--primary" type="submit"><span class="btn__t">Posponer</span></button></div>
   </form>
 </dialog>

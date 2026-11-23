@@ -22,8 +22,9 @@ $n = static fn($v): string => number_format((int) $v, 0, ',', '.');
   <div class="card__b">
     <form class="dimp__up" method="post" action="/importar" enctype="multipart/form-data">
       <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>">
-      <label class="field dimp__file"><span>Archivo CSV</span><input type="file" name="csv" accept=".csv,.txt,text/csv,text/plain" required><small>UTF-8 o Windows-1252. El separador se detecta solo (coma, punto y coma, tabulador o barra vertical). La primera fila son los encabezados.</small></label>
+      <label class="field dimp__file"><span>Archivo CSV</span><input type="file" lang="es" name="csv" accept=".csv,.txt,text/csv,text/plain" required aria-describedby="imp-hint"></label>
       <button class="btn btn--primary" type="submit"><span class="btn__t">Subir y revisar</span></button>
+      <small class="dimp__hint muted" id="imp-hint">UTF-8 o Windows-1252. El separador se detecta solo (coma, punto y coma, tabulador o barra vertical). La primera fila son los encabezados.</small>
     </form>
     <p class="foot-note">El archivo se guarda en el servidor solo mientras dura la importación y se borra al terminar. La fuente de los leads será «Importación CSV» y llevarán una etiqueta con el nombre del archivo. Sin alertas de Telegram por cada uno.</p>
   </div>

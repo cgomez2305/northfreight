@@ -6,6 +6,7 @@ $t = $m['trend'];
 $empty = array_sum($t['received']) + array_sum($t['signed']) === 0;
 $title = $t['unit'] === 'day' ? 'Leads recibidos y firmados por día' : 'Leads recibidos y firmados por semana';
 ?>
+<?php $cnote = $cnote ?? ['note' => null, 'avg' => null, 'avgu' => '', 'prev' => '']; /* /reportes no calcula la anotacion: sin ella no hay avisos de variable indefinida */ ?>
 <?php if ($empty): ?>
   <div class="empty empty--sm"><svg class="empty__star" aria-hidden="true"><use href="#i-star"/></svg><h3>Sin leads ni firmas en el rango</h3><p>Cuando lleguen, aquí verás su evolución por <?= $t['unit'] === 'day' ? 'día' : 'semana' ?>, con el pico señalado.</p></div>
 <?php else: ?>

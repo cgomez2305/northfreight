@@ -4,7 +4,6 @@
 .steps b{display:block;color:var(--ink)}
 .steps p{font-size:var(--fs-sm);max-width:none}
 .steps__n{width:28px;height:28px;border-radius:50%;background:var(--surface);color:var(--ink-2);display:grid;place-items:center;font:500 var(--fs-sm) var(--f-sans);font-variant-numeric:tabular-nums;flex:none}
-.chip--ok{background:var(--ok-bg);color:var(--ok)}
 .rbanner{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 16px;border-radius:var(--r-in);background:var(--warn-bg);color:var(--ink)}
 .rbanner .ic{color:var(--warn)}
 .rbanner.is-ok{background:var(--ok-bg)}
@@ -15,7 +14,7 @@
 .rkpi b{font:500 var(--fs-num)/1 var(--f-sans);font-variant-numeric:tabular-nums;letter-spacing:-.02em;color:var(--ink)}
 .rkpi li.is-warn{border-color:var(--warn-dot)}
 .rrows{display:flex;flex-direction:column}
-.rrow{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1.1fr) auto;gap:10px 18px;align-items:center;padding:14px 20px;border-top:1px solid var(--line)}
+.rrow{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1.1fr) 340px;gap:10px 18px;align-items:center;padding:14px 20px;border-top:1px solid var(--line)}
 .rrow.is-off{background:var(--sunk)}
 .rrow__w{display:flex;flex-direction:column;gap:4px;min-width:0}
 .rrow__w small{color:var(--ink-3);overflow-wrap:anywhere}

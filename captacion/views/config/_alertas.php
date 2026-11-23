@@ -64,8 +64,8 @@ $em = static fn(string $k) => isset($errors[$k]) ? '<small class="num__e" id="ea
       <div class="card__b al-list">
         <label class="tgl"><input type="checkbox" name="quiet_enabled" value="1" data-quiet<?= $q['enabled'] ? ' checked' : '' ?>><span class="tgl__t"><b>Silenciar alertas no urgentes</b><small>El Telegram de tibios y los correos esperan a que termine el silencio. Hora de <?= $e(Fmt::zone()) ?>.</small></span></label>
         <div class="dlg__row al-q<?= isset($errors['quiet']) ? ' has-err' : '' ?>">
-          <label class="field"><span>Desde</span><input type="time" name="quiet_start" value="<?= $e($q['start']) ?>"<?= $fe('quiet') ?>></label>
-          <label class="field"><span>Hasta</span><input type="time" name="quiet_end" value="<?= $e($q['end']) ?>"<?= $fe('quiet') ?>></label>
+          <label class="field"><span>Desde</span><input type="time" lang="es" name="quiet_start" value="<?= $e($q['start']) ?>"<?= $fe('quiet') ?>></label>
+          <label class="field"><span>Hasta</span><input type="time" lang="es" name="quiet_end" value="<?= $e($q['end']) ?>"<?= $fe('quiet') ?>></label>
         </div>
         <?= $em('quiet') ?>
       </div>

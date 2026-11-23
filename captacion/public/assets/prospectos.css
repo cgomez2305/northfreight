@@ -17,7 +17,6 @@
 .filters--p{grid-template-columns:minmax(0,2fr) repeat(3,minmax(0,1fr)) auto}
 .field--q{grid-column:auto}
 .filters__a{display:flex;gap:8px;align-items:center}
-.chip--ok{background:var(--ok-bg);color:var(--ok)}
 .rules{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-in);padding:0 16px}
 .rules summary{display:flex;align-items:center;gap:10px;min-height:46px;cursor:pointer;font-weight:500;color:var(--ink);list-style:none;flex-wrap:wrap}
 .rules summary::-webkit-details-marker{display:none}

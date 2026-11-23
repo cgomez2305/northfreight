@@ -5,6 +5,13 @@
  var CSRF = (D.currentScript && D.currentScript.getAttribute('data-csrf')) || '';
  var mac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
  $$('[data-mod]').forEach(function (k) { if (mac) k.textContent = '⌘'; });
+ /* barra lateral: lleva el elemento activo a la vista y marca con un filete inferior que hay mas debajo (sin degradados) */
+ $$('.side__nav').forEach(function (nav) {
+ var on = $('[aria-current="page"]', nav);
+ if (on && on.scrollIntoView) on.scrollIntoView({ block: 'nearest' });
+ function more() { nav.classList.toggle('has-more', nav.scrollHeight - nav.clientHeight - nav.scrollTop > 4); }
+ more(); nav.addEventListener('scroll', more, { passive: true }); window.addEventListener('resize', more);
+ });
  var openDd = null;
  function closeDd(focus) { if (!openDd) return; var b = $('button[aria-expanded]', openDd); b.setAttribute('aria-expanded', 'false'); $('.dd__panel', openDd).hidden = true; if (focus) b.focus(); openDd = null; }
  $$('[data-dd]').forEach(function (dd) {

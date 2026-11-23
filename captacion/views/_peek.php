@@ -128,7 +128,7 @@ $lost = $lead['stage'] === 'lost';
     <details class="pk__f" data-pk-form="task">
       <summary><?= Ui::icon('calendar') ?>Nueva tarea</summary>
       <label class="field"><span>Qué hay que hacer</span><input type="text" id="pk-task-t" maxlength="190" placeholder="Ej. Pedir copia del seguro"></label>
-      <label class="field"><span>Para (hora <?= $e(Fmt::zone()) ?>)</span><input type="datetime-local" id="pk-task-d"></label>
+      <label class="field"><span>Para (hora <?= $e(Fmt::zone()) ?>)</span><input type="datetime-local" lang="es" id="pk-task-d"></label>
       <button class="btn btn--primary btn--sm" type="button" data-pk-save="task"><span class="btn__t">Crear tarea</span></button>
     </details>
     <details class="pk__f" data-pk-form="call">

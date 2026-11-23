@@ -1,7 +1,7 @@
 /* NorthStar Captación · reportes, resultados e informes (/reportes, /resultados, /informes). Encima de panel.css + charts.css (y viz.css en /resultados). Sin estilos en línea (CSP): clases y variables. Incluye la hoja de impresión. */
 /* Q5a: reglas que estaban en panel.css y solo usa esta pantalla */
-.rk{display:grid;grid-template-columns:repeat(auto-fit,minmax(236px,1fr));gap:12px}
-.rk__c{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);padding:16px 20px 20px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.rk{display:flex;flex-wrap:wrap;gap:12px}
+.rk__c{flex:1 1 236px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);padding:16px 20px 20px;display:flex;flex-direction:column;gap:6px;min-width:0}
 .rk__v{font:500 var(--fs-num)/1 var(--f-sans);font-variant-numeric:tabular-nums;letter-spacing:-.02em;overflow-wrap:anywhere}
 .rk__v--na{font-size:var(--fs-xl);line-height:1.15;color:var(--ink-2)}
 .rk__d{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:var(--fs-sm);color:var(--ink-3)}
@@ -52,7 +52,7 @@
   .fn__r .hb{grid-column:1/-1;grid-row:2}
   .rep-range .field{width:100%}
 }
-@container (max-width:700px){
+@container (max-width:520px){
   .tbl--rep tbody tr,.tbl--rep tfoot tr{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;padding:12px 16px;border-bottom:1px solid var(--line)}
   .tbl--rep tbody th.c-n,.tbl--rep tfoot th.c-n{order:-1;grid-column:1/-1;font:500 var(--fs-md) var(--f-sans)}
   .tbl--rep tbody td,.tbl--rep tfoot td{display:flex;justify-content:space-between;gap:8px;font-size:var(--fs-sm);text-align:right}
@@ -72,7 +72,7 @@
   .kpis--rs{grid-template-columns:repeat(3,1fr);gap:8px}
   .kpis--rs .kpi,.kpis--rs .kpi:nth-child(n+4),.kpis--rs .kpi:last-child{grid-column:auto}
   .info,.lc__tip,.lc__cross{display:none!important}
-  .rk{grid-template-columns:repeat(3,1fr);gap:8px}
+  .rk{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
   .rep-grid,.rep-grid--3{grid-template-columns:1fr 1fr;gap:10px}
   .h1{font-size:28px}
   a{color:inherit;text-decoration:none}

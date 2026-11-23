@@ -95,7 +95,7 @@ $hasErr = (bool) $errors;
             <label class="rp-scope"><span class="sr">Alcance de la simulación</span><select name="sim_scope" data-sim-scope>
               <?php foreach (['last:500' => 'Últimos 500 leads', 'last:1000' => 'Últimos 1.000 leads', 'last:5000' => 'Últimos 5.000 leads', 'last:20000' => 'Últimos 20.000 leads', 'days:30' => 'Últimos 30 días', 'days:90' => 'Últimos 90 días', 'days:365' => 'Últimos 365 días', 'range' => 'Rango de fechas…'] as $v => $l): ?><option value="<?= $e($v) ?>"<?= $simScope === $v ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?>
             </select></label>
-            <span class="rp-range" data-sim-range<?= $simScope === 'range' ? '' : ' hidden' ?>><label><span class="sr">Desde</span><input type="date" name="sim_from" value="<?= $e($_POST['sim_from'] ?? '') ?>"></label><i aria-hidden="true">a</i><label><span class="sr">Hasta</span><input type="date" name="sim_to" value="<?= $e($_POST['sim_to'] ?? '') ?>"></label></span>
+            <span class="rp-range" data-sim-range<?= $simScope === 'range' ? '' : ' hidden' ?>><label><span class="sr">Desde</span><input type="date" lang="es" name="sim_from" value="<?= $e($_POST['sim_from'] ?? '') ?>"></label><i aria-hidden="true">a</i><label><span class="sr">Hasta</span><input type="date" lang="es" name="sim_to" value="<?= $e($_POST['sim_to'] ?? '') ?>"></label></span>
           </div>
           <div data-sim-out aria-live="polite"><?= \Captacion\View::render('config/_rule_sim', ['sim' => $sim, 'csrf' => $csrf, 'setId' => $set['id'], 'e' => $e], false) ?></div>
         </div>

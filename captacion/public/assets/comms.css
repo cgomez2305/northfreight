@@ -23,6 +23,7 @@
 @media (max-width:1100px){.cm-edit{grid-template-columns:1fr}.cm-seqs{grid-template-columns:1fr}}
 @media (max-width:760px){
   .tbl--cm thead{display:none}
+  .tbl--cm tbody th.c-n{order:-1}
   .tbl--cm tbody tr{display:grid;gap:5px;padding:12px 16px;border-bottom:1px solid var(--line)}
   .tbl--cm td,.tbl--cm tbody th{white-space:normal;border:0;padding:0}
   .tbl--cm td[data-l]::before{content:attr(data-l) ": ";color:var(--ink-3);font-size:12px}
