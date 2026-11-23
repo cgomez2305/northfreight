@@ -278,11 +278,11 @@
 
  /* ---------- Atajos ---------- */
  function openKeys() { if (kd && kd.showModal && !kd.open) uxReady.then(function () { if (!kd.open) kd.showModal(); }); }
- $$('[data-keys]').forEach(function (b) { b.addEventListener('click', function () { $$('[data-dd] [aria-expanded=true]').forEach(function (x) { x.click(); }); openKeys(); }); });
- NS.shortcutsOn = function () { return H.getAttribute('data-keys') !== 'off'; };
+ $$('button[data-keys]').forEach(function (b) { b.addEventListener('click', function () { $$('[data-dd] [aria-expanded=true]').forEach(function (x) { x.click(); }); openKeys(); }); });
+ NS.shortcutsOn = function () { return H.getAttribute('data-kbd') !== 'off'; };
  $$('[data-keys-toggle]').forEach(function (b) {
   b.addEventListener('click', function () {
-   var on = b.getAttribute('aria-checked') !== 'true'; b.setAttribute('aria-checked', on ? 'true' : 'false'); H.setAttribute('data-keys', on ? 'on' : 'off');
+   var on = b.getAttribute('aria-checked') !== 'true'; b.setAttribute('aria-checked', on ? 'true' : 'false'); H.setAttribute('data-kbd', on ? 'on' : 'off');
    var st = $('[data-keys-state]', b); if (st) st.textContent = on ? 'Activados' : 'Desactivados';
    api('/ajax/prefs', { key: 'keys', value: on ? 'on' : 'off' }); NS.toast(on ? 'Atajos de una tecla activados.' : 'Atajos de una tecla desactivados. Siguen Ctrl/⌘ K y Esc.');
   });

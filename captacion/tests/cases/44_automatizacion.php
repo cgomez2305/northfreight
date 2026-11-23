@@ -243,10 +243,10 @@ return static function (array $ctx): void {
     T::ok(str_contains($uxJs, "li.setAttribute('role', 'presentation')") && str_contains($tareasJs, "li.setAttribute('role', 'presentation')") && str_contains($tareasJs, 'aria-activedescendant') && str_contains($tareasJs, 'b.tabIndex = -1')
         && str_contains($tareasJs, "$('[data-lp-clear]', root)"), 'B9 listbox con li role=presentation, combobox con aria-activedescendant, opciones no tabulables y foco a «Quitar»');
     T::ok(str_contains($uxJs, 'searching = true') && str_contains($uxJs, 'if (searching) return;') && str_contains($uxJs, "q ? ['Leads', 'Acciones'"), 'B10 con una búsqueda en vuelo Enter no ejecuta y, con texto, los leads van antes que las acciones');
-    T::ok(str_contains($um['body'], 'data-keys-toggle') && str_contains($um['body'], 'role="switch"') && str_contains($um['body'], 'data-keys="on"'), 'B11 el menú de usuario trae el interruptor «Atajos de una tecla» (activados por defecto)');
+    T::ok(str_contains($um['body'], 'data-keys-toggle') && str_contains($um['body'], 'role="switch"') && str_contains($um['body'], 'data-kbd="on"'), 'B11 el menú de usuario trae el interruptor «Atajos de una tecla» (activados por defecto)');
     $kp = $panel->ajax('/ajax/prefs', ['key' => 'keys', 'value' => 'off']);
     $after = $panel->get('/tareas');
-    T::ok($kp['status'] === 200 && str_contains($after['body'], 'data-keys="off"') && str_contains($after['body'], 'aria-checked="false"'), '  guardado en user_prefs: desactivados, la página sale con data-keys="off"');
+    T::ok($kp['status'] === 200 && str_contains($after['body'], 'data-kbd="off"') && str_contains($after['body'], 'aria-checked="false"'), '  guardado en user_prefs: desactivados, la página sale con data-keys="off"');
     T::eq($panel->ajax('/ajax/prefs', ['key' => 'keys', 'value' => 'quizas'])['status'], 422, '  un valor que no es on/off se rechaza');
     $panel->ajax('/ajax/prefs', ['key' => 'keys', 'value' => 'on']);
     T::ok(str_contains($uxJs, 'NS.shortcutsOn') && str_contains($read('public/assets/peek.js'), 'NS.shortcutsOn'), '  con ellos desactivados solo funcionan Ctrl/⌘ K y Esc (ux.js y peek.js lo respetan)');

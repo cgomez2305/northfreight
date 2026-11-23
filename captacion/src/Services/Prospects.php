@@ -60,7 +60,7 @@ final class Prospects
         $ag = (int) $s('ag', 3);
         return [
             'tab' => isset(self::TABS[$tab]) ? $tab : 'today', 'q' => $s('q', 100), 'us' => isset(UsStates::NAMES[$us]) ? $us : '', 'fl' => isset(self::FLEETS[$s('fl', 3)]) ? $s('fl', 3) : '',
-            'ag' => isset(self::AGES[$ag]) ? $ag : 0, 'ph' => $s('ph', 4) === 'mail' ? 'mail' : '',
+            'ag' => isset(self::AGES[$ag]) ? $ag : 0, 'ph' => $s('ph', 4) === 'mail' ? 'mail' : '', 'now' => $s('now', 1) === '1' ? '1' : '',
         ];
     }
 
@@ -109,6 +109,11 @@ final class Prospects
         if ($f['ph'] === 'mail') {
             $w[] = 'p.email IS NOT NULL';
         }
+        if (($f['now'] ?? '') === '1') {   // solo los que se pueden llamar AHORA: estado en horario (8 a. m. a 9 p. m. local en todas sus zonas) y con teléfono
+            $ok = self::callableStates($now);
+            $w[] = $ok ? 'p.phone IS NOT NULL AND p.state IN (' . implode(',', array_fill(0, count($ok), '?')) . ')' : '1 = 0';
+            $params = array_merge($params, $ok);
+        }
         if ($f['q'] !== '') {
             $q = $f['q'];
             $digits = preg_replace('/\D/', '', $q) ?? '';
@@ -149,15 +154,39 @@ final class Prospects
         $pages = max(1, (int) ceil($total / $per));
         $page = max(1, min($page, $pages));
         $order = $f['tab'] === 'today' ? "(p.status = 'no_answer') DESC, p.authority_granted_at DESC, p.completeness DESC, p.id ASC" : 'p.authority_granted_at DESC, p.completeness DESC, p.id ASC';
+        $op = [];
         if (in_array($f['tab'], ['talked', 'interested'], true)) {
             $order = 'p.last_call_at DESC, p.id DESC';
+        } elseif (($ok = self::callableStates($now)) !== []) {
+            // en las pestañas por llamar, primero los que se pueden llamar YA (hora local permitida y con teléfono): se trabaja la lista de arriba abajo sin saltar filas bloqueadas
+            $order = '(p.phone IS NOT NULL AND p.state IN (' . implode(',', array_fill(0, count($ok), '?')) . ')) DESC, ' . $order;
+            $op = $ok;
         }
-        $rows = Db::all("SELECT p.* FROM prospects_fmcsa p WHERE $sql ORDER BY $order LIMIT " . (int) $per . ' OFFSET ' . (int) (($page - 1) * $per), $p);
+        $rows = Db::all("SELECT p.* FROM prospects_fmcsa p WHERE $sql ORDER BY $order LIMIT " . (int) $per . ' OFFSET ' . (int) (($page - 1) * $per), array_merge($p, $op));
         foreach ($rows as &$r) {
             $r['cargo'] = Db::decode($r['cargo']);
         }
         unset($r);
         return ['rows' => $rows, 'total' => $total, 'pages' => $pages, 'page' => $page];
+    }
+
+    /** Cuántos de la pestaña actual (con sus filtros) se pueden llamar ahora mismo. */
+    public static function callableCount(array $f, int $now): int
+    {
+        [$sql, $p] = self::where(['now' => '1'] + $f, $now);
+        return (int) Db::value("SELECT COUNT(*) FROM prospects_fmcsa p WHERE $sql", $p);
+    }
+
+    /** Estados (EE. UU.) donde AHORA es hora permitida para llamar en todas sus zonas. @return list<string> */
+    public static function callableStates(int $now): array
+    {
+        $out = [];
+        foreach (array_keys(UsTimeZones::ZONES) as $st) {
+            if (UsTimeZones::check($st, $now)['allowed']) {
+                $out[] = $st;
+            }
+        }
+        return $out;
     }
 
     /** Historial de llamadas de varios prospectos: id => lista (mas reciente primero). */
