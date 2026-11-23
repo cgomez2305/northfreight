@@ -88,7 +88,7 @@ $equip = [
     <div class="cr-fee">
       <div class="cr-fee__text">
         <p class="t-body c-slate">Scope is agreed before we start, so you always know what the desk handles and what it costs.</p>
-        <p class="t-body c-slate">Amazon Relay dispatch is a flat fee per truck, between $20 and $40 per truck depending on how many trucks you run. Dry van and booking outside Amazon is currently 5% of the truck’s gross for the week. Billing is weekly and you can cancel by settling your last payment. <a href="<?= e(wa($route['wa'])) ?>" rel="noopener">Message the desk on WhatsApp</a> to get your numbers.</p>
+        <p class="t-body c-slate">Amazon Relay dispatch is a flat fee per truck, between $20 and $40 per truck depending on how many trucks you run. Dry van and booking outside Amazon is currently 5% of the truck’s gross for the week. These figures are estimates, not fixed prices: your final rate also depends on how you reach us, for example by referral or through an ad campaign. Billing is weekly and you can cancel by settling your last payment. <a href="<?= e(wa($route['wa'])) ?>" rel="noopener">Message the desk on WhatsApp</a> to get your numbers.</p>
       </div>
       <div class="cr-rows">
         <?php

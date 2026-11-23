@@ -53,9 +53,9 @@ ns_default('DOMAIN', 'northstarfreight.example');
 // Solo se emiten en JSON-LD (Organization) y en el footer cuando están definidas. Ver app/config.local.example.php.
 ns_default('LEGAL_NAME', 'NorthStar Freight Solutions LLC');   // nombre legal (confirmado por el cliente, fase S). Llega a JSON-LD legalName. No es secreto.
 ns_default('CREDIT_URL', 'https://clikrank.com/');   // crédito del footer «Developed by ClikRank ♥» (enlace nofollow). Vacío = sin crédito. Confirmar la URL con Carlos.
-ns_default('ADDRESS', []);         // OMITIDA a propósito (decisión del cliente, fase S: no se publica dirección). ['street'=>'', 'city'=>'', 'region'=>'', 'postal'=>'', 'country'=>'US']
+ns_default('ADDRESS', ['street' => '30 N Gould St, Ste N', 'city' => 'Sheridan', 'region' => 'WY', 'postal' => '82801', 'country' => 'US']);   // Carlos, 2026-11-23: «sí utilizamos esa para todo» (es la dirección del agente registrado en Sheridan, WY). Se imprime en el footer (NAP), en el JSON-LD y en los textos legales; los correos del CRM la llevan por ley (Configuración > Correo, a mano). Para ocultarla: define('ADDRESS', []) en config.local.php
 ns_default('SAME_AS', ['https://www.instagram.com/northstarfreightsolutionsllc']);   // perfiles oficiales (cliente, 2026-11-20: Instagram; sin LinkedIn, Facebook ni YouTube todavía)
-ns_default('FOUNDING_DATE', '');   // PENDIENTE (fecha exacta). 'YYYY' o 'YYYY-MM-DD'. Solo se sabe que opera desde el 1 de junio de 2026: no se publica sin confirmar.
+ns_default('FOUNDING_DATE', '');   // PENDIENTE: Carlos (2026-11-23): registrada el 30 de septiembre (falta el AÑO) y trabajando desde el 1 de junio de 2024 para oficializarse. 'YYYY' o 'YYYY-MM-DD'. No se publica hasta tener el año de registro.
 // robots.txt de producción: bots de ENTRENAMIENTO de IA (GPTBot, ClaudeBot, Google-Extended, Applebot-Extended, CCBot).
 // 'allow' (defecto) | 'block'. Los bots de búsqueda/respuesta de IA (OAI-SearchBot, PerplexityBot…) siempre quedan permitidos.
 ns_default('AI_TRAINING_BOTS', 'allow');

@@ -38,7 +38,7 @@ return [
         ],
         [
             'q' => 'What does it cost?',
-            'a' => 'Amazon Relay dispatch is a flat fee per truck, between $20 and $40 per truck depending on how many trucks you run. Dry van and booking outside Amazon is currently 5% of the truck\'s gross for the week. Billing is weekly. Scope is agreed before we start, so you always know what the desk handles.',
+            'a' => 'Amazon Relay dispatch is a flat fee per truck, between $20 and $40 per truck depending on how many trucks you run. Dry van and booking outside Amazon is currently 5% of the truck\'s gross for the week. These figures are estimates, not fixed prices: your final rate also depends on how you reach us, for example by referral or through an ad campaign. Billing is weekly. Scope is agreed before we start, so you always know what the desk handles.',
         ],
         [
             'q' => 'What do I need to apply?',
@@ -65,7 +65,7 @@ return [
         ],
         [
             'q' => 'How much does a dispatcher charge an owner-operator?',
-            'a' => 'Amazon Relay dispatch is a flat fee per truck, between $20 and $40 per truck depending on how many trucks you run. Dry van and booking outside Amazon is currently 5% of the truck\'s gross for the week. Billing is weekly. Scope is agreed before we start.',
+            'a' => 'Amazon Relay dispatch is a flat fee per truck, between $20 and $40 per truck depending on how many trucks you run. Dry van and booking outside Amazon is currently 5% of the truck\'s gross for the week. These figures are estimates, not fixed prices: your final rate also depends on how you reach us, for example by referral or through an ad campaign. Billing is weekly. Scope is agreed before we start.',
         ],
         [
             'q' => 'Who decides which loads I run?',
@@ -98,7 +98,7 @@ return [
         [
             'q' => 'How much does a truck dispatch service cost?',
             'topic' => 0,
-            'a' => 'Amazon Relay dispatch is a flat fee per truck, between $20 and $40 per truck depending on how many trucks you run. Dry van and booking outside Amazon is currently 5% of the truck\'s gross for the week. Billing is weekly. Scope is agreed before we start, so you always know what the desk handles.',
+            'a' => 'Amazon Relay dispatch is a flat fee per truck, between $20 and $40 per truck depending on how many trucks you run. Dry van and booking outside Amazon is currently 5% of the truck\'s gross for the week. These figures are estimates, not fixed prices: your final rate also depends on how you reach us, for example by referral or through an ad campaign. Billing is weekly. Scope is agreed before we start, so you always know what the desk handles.',
         ],
         [
             'q' => 'Do you dispatch Amazon Relay loads?',
@@ -131,7 +131,7 @@ return [
     'owner' => [
         [
             'q' => 'How much does a dispatcher charge an owner-operator?',
-            'a' => 'Amazon Relay dispatch is a flat fee per truck, between $20 and $40 per truck depending on how many trucks you run. Dry van and booking outside Amazon is currently 5% of the truck\'s gross for the week. Billing is weekly. Scope is agreed before we start.',
+            'a' => 'Amazon Relay dispatch is a flat fee per truck, between $20 and $40 per truck depending on how many trucks you run. Dry van and booking outside Amazon is currently 5% of the truck\'s gross for the week. These figures are estimates, not fixed prices: your final rate also depends on how you reach us, for example by referral or through an ad campaign. Billing is weekly. Scope is agreed before we start.',
         ],
         [
             'q' => 'Do I have to take every load you find?',
@@ -151,7 +151,7 @@ return [
         ],
         [
             'q' => 'Do you need access to my Relay account?',
-            'a' => 'Access is set up with you during onboarding, using the credentials and permissions you provide. Scope is agreed before we start.',
+            'a' => 'You invite us from your own Amazon Relay account, through Amazon\'s own administration protocol, so we never handle your login credentials. Scope is agreed before we start.',
         ],
         [
             'q' => 'Can you help a new Relay carrier?',
@@ -172,7 +172,7 @@ return [
         ],
         [
             'q' => 'Do you book backhauls?',
-            'a' => '{{ph:confirm}}.',
+            'a' => 'Yes. We book backhauls so your truck does not come back empty.',
         ],
         [
             'q' => 'How do I get updates?',
