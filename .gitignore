@@ -13,6 +13,8 @@
 
 # Configuración local con credenciales (usar app/config.local.example.php como plantilla)
 /app/config.local.php
+# Interruptor de lanzamiento (ENV), solo en el servidor
+/app/config.launch.php
 
 # Sistema / editores
 .DS_Store

@@ -30,6 +30,19 @@ if (is_file($ns_mail)) {
 }
 unset($ns_mail);
 
+// 0b) Interruptor de lanzamiento (config.launch.php, fuera de git; fase AF). Devuelve ['ENV' => 'production'] y GANA a config.local.php solo en la
+//     clave ENV, así se pasa de staging a producción (o se vuelve) sin reescribir config.local.php, que lleva secretos. Borrar el archivo = staging.
+$ns_launch = __DIR__ . '/config.launch.php';
+if (is_file($ns_launch) && !defined('ENV')) {
+    $ns_launch_cfg = require $ns_launch;
+    if (is_array($ns_launch_cfg) && in_array($ns_launch_cfg['ENV'] ?? null, ['production', 'staging'], true)) {
+        define('ENV', $ns_launch_cfg['ENV']);
+        $ns_mail_keys['ENV'] = true;   // el «Constant ENV already defined» de config.local.php se descarta
+    }
+    unset($ns_launch_cfg);
+}
+unset($ns_launch);
+
 // 1) Local después: sus define() ganan a los valores por defecto de abajo. Si repite una clave que ya fijó config.mail.php,
 //    PHP avisaría «Constant X already defined»: ese aviso concreto se descarta (manda el archivo de correo); cualquier otro sigue su curso.
 $ns_local = __DIR__ . '/config.local.php';
