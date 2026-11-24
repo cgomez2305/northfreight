@@ -97,7 +97,7 @@ details[open] > summary > .blog-plus { transform: rotate(45deg); }
 .blog-prose .blog-stat { display: flex; flex-direction: column; gap: 6px; margin: 0; }
 .blog-stat__k { font-family: var(--font-mono); text-transform: uppercase; letter-spacing: .1em; font-size: 11px; color: var(--text-3); }
 .blog-stat__v { font-size: 40px; line-height: 1; color: var(--text); }
-.blog-stat__v--hl { color: var(--cyan); }
+.blog-stat__v--hl { color: var(--cyan-light); }
 /* Caja "Talk to the desk" */
 .blog-callout { margin: 36px 0; background: var(--panel-2); border: 1px solid var(--cyan-line); border-radius: var(--r-card); color: var(--text); padding: clamp(22px, 3vw, 32px); display: flex; flex-wrap: wrap; gap: 20px; align-items: center; justify-content: space-between; }
 .blog-callout__text { flex: 1 1 300px; display: flex; flex-direction: column; gap: 8px; }

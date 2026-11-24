@@ -87,10 +87,17 @@ final class LeadIngest
         if (!Db::lock('captacion_ingest', 5)) {
             throw new \RuntimeException('El motor de captacion esta ocupado (GET_LOCK).');
         }
+        // Fase AM: si ya hay una transaccion abierta (ruta Cal.com: WebhookController > Db::transaction > Appointments::apply > leadFor), el bloqueo se suelta
+        // cuando ESA transaccion termina; soltarlo antes del commit dejaba pasar a otra ingesta que no veia el lead recien creado (duplicado).
+        $outer = Db::pdo()->inTransaction();
         try {
             return Db::transaction(static fn() => self::persist($lead, $flags, $source, $ctx, $fm, $fmPending));
         } finally {
-            Db::unlock('captacion_ingest');
+            if ($outer) {
+                Db::onEnd(static fn() => Db::unlock('captacion_ingest'));
+            } else {
+                Db::unlock('captacion_ingest');
+            }
         }
     }
 
@@ -99,6 +106,11 @@ final class LeadIngest
     {
         $quiet = !empty($ctx['quiet']);
         $now = Clock::now();
+        foreach ((array) ($ctx['flags'] ?? []) as $extra) {   // fase AM: etiquetas de origen (p. ej. tag:import-archivo de la importacion CSV)
+            if (is_string($extra) && $extra !== '') {
+                $flags[] = $extra;
+            }
+        }
         if ($lead['referral_code'] !== null) {
             $refRow = Referrals::find($lead['referral_code']);
             $lead['referral_code'] = $refRow !== null ? (string) $refRow['code'] : null;   // codigo inexistente o desactivado: se ignora sin error y sin puntos de referido; si existe, se guarda en su forma canonica
@@ -149,6 +161,10 @@ final class LeadIngest
             $mflags = Flags::add($mflags, 'fmcsa_pending');
         }
         $mflags = Flags::add($mflags, ...array_values(array_diff($flags, ['phone_invalid'])));
+        $sup = Suppression::check($merged['phone_e164'] ?? null, $merged['email'] ?? null);   // fase AM: lista de supresion (STOP de desconocidos y borrados a peticion)
+        if ($sup['reason'] !== null) {
+            $mflags = Flags::add($mflags, ...$sup['flags']);
+        }
         $mflags = Flags::derive($mflags, $merged);
         $scored = RuleRunner::score(['flags' => $mflags] + $merged);   // puntuacion base del documento + reglas PUBLICADAS (sin reglas, identica a Scoring::score)
         $mflags = RuleEffects::flags($mflags, $scored['effects'] ?? null);
@@ -160,7 +176,10 @@ final class LeadIngest
         }
 
         if ($lead['consent']['given']) {
-            Consent::record($leadId, $lead['consent'], $lead['consent']['channels'] ?? Consent::FORM_CHANNELS);
+            Consent::record($leadId, $lead['consent'], array_values(array_diff($lead['consent']['channels'] ?? Consent::FORM_CHANNELS, $sup['drop'])));
+        }
+        if ($sup['reason'] !== null) {
+            self::event($leadId, 'suppressed', ['reason' => $sup['reason'], 'blocked' => $sup['drop'], 'consent_offered' => (bool) $lead['consent']['given']]);
         }
         $daysLost = $reopen ? (int) floor((Clock::time() - (int) Clock::parse((string) $existing['lost_at'])) / 86400) : null;
         self::event($leadId, $reopen ? 'reopened' : 'reentry', [
@@ -179,6 +198,7 @@ final class LeadIngest
         if (!$quiet) {
             if ($reopen) {
                 self::enqueueFor($leadId, $scored['temperature'], $attempt);
+                self::slaTask($merged + ['id' => $leadId]);
             } else {
                 if ($scored['temperature'] === 'hot' && $existing['temperature'] !== 'hot') {
                     self::enqueueFor($leadId, 'hot', $attempt);
@@ -199,18 +219,23 @@ final class LeadIngest
             $flags[] = 'fmcsa_pending';
         }
         $lead['source'] = $source;
+        $sup = Suppression::check($lead['phone_e164'], $lead['email']);   // fase AM: lista de supresion
+        if ($sup['reason'] !== null) {
+            $flags = array_merge($flags, $sup['flags']);
+        }
         $flags = Flags::derive($flags, $lead);
         $scored = RuleRunner::score($lead + ['flags' => $flags, 'stage' => 'new']);   // base del documento + reglas publicadas (sin reglas, identica a Scoring::score)
         $flags = RuleEffects::flags($flags, $scored['effects'] ?? null);
 
         $row = $lead;
         unset($row['consent']);
+        $assignee = $quiet ? null : self::autoAssignee();   // AM: reparto automatico opcional (apagado por defecto); las altas quiet (importaciones, alta manual) no se reparten
         $row += [
             'score' => $scored['score'], 'temperature' => $scored['temperature'], 'score_breakdown' => $scored['breakdown'], 'disqualified_reason' => $scored['disqualified_reason'],
             'pipeline' => $lead['profile'] === 'company_driver' ? 'B' : 'A', 'stage' => 'new', 'attempt' => 1,
             'fmcsa_data' => $fm, 'fmcsa_checked_at' => $fm !== null ? $now : null, 'flags' => $flags,
             'updated_at' => $now,
-        ];
+        ] + ($assignee !== null ? ['assigned_to' => $assignee] : []);
         $leadId = Db::insert('leads', $row);
         if ($lead['referral_code'] !== null) {
             Referrals::attach($leadId, $lead['referral_code']);
@@ -222,7 +247,10 @@ final class LeadIngest
             'consent_given' => $lead['consent']['given'], 'flags' => $flags,
         ], $lead['created_at']);
         if ($lead['consent']['given']) {
-            Consent::record($leadId, $lead['consent'], $lead['consent']['channels'] ?? Consent::FORM_CHANNELS);
+            Consent::record($leadId, $lead['consent'], array_values(array_diff($lead['consent']['channels'] ?? Consent::FORM_CHANNELS, $sup['drop'])));
+        }
+        if ($sup['reason'] !== null) {
+            self::event($leadId, 'suppressed', ['reason' => $sup['reason'], 'blocked' => $sup['drop'], 'consent_offered' => (bool) $lead['consent']['given']]);
         }
         if ($fm !== null) {
             self::event($leadId, 'fmcsa', self::fmcsaSummary($fm));
@@ -231,8 +259,13 @@ final class LeadIngest
         if ($scored['temperature'] === 'disqualified') {
             self::event($leadId, 'disqualified', ['reasons' => $scored['breakdown']['disqualified']]);
         }
+        if ($assignee !== null) {
+            self::event($leadId, 'assigned', array_filter(['to' => $assignee, 'to_name' => Assignment::name($assignee), 'auto' => true]));
+        }
         if (!$quiet) {
             self::enqueueFor($leadId, $scored['temperature'], 1);
+            self::slaTask($row + ['id' => $leadId]);
+            OutboundWebhooks::emit('lead.created', $leadId, ['source' => $source], 'created:' . $leadId);   // fase AM
         }
         if ($fmPending) {
             Queue::push('fmcsa_enrich', ['lead_id' => $leadId], $now, 'fmcsa_enrich:' . $leadId . ':' . $lead['usdot']);
@@ -246,6 +279,7 @@ final class LeadIngest
         $now = Clock::now();
         $cfg = Alerts::get();
         if ($temperature === 'hot') {
+            OutboundWebhooks::emit('lead.hot', $leadId, ['attempt' => $attempt], 'hot:' . $leadId . ':' . $attempt);   // fase AM
             if ($cfg['hot_telegram']) {
                 Queue::push('telegram_alert', ['lead_id' => $leadId, 'kind' => 'hot'], $now, 'telegram_alert:' . $leadId . ':' . $attempt);
                 if ($cfg['followup_telegram']) {
@@ -269,6 +303,27 @@ final class LeadIngest
         }
     }
 
+    /** Responsable del reparto automatico (AM) o null; nunca rompe la alta del lead. */
+    private static function autoAssignee(): ?int
+    {
+        try {
+            return Assignment::pickNext();
+        } catch (\Throwable $t) {
+            Storage::error('auto assign failed', get_class($t) . ': ' . $t->getMessage());
+            return null;
+        }
+    }
+
+    /** Tarea «Primer contacto con …» (AM, solo con sla.auto_task); nunca rompe la alta del lead. */
+    private static function slaTask(array $lead): void
+    {
+        try {
+            Sla::ensureTask($lead);
+        } catch (\Throwable $t) {
+            Storage::error('sla task failed', get_class($t) . ': ' . $t->getMessage());
+        }
+    }
+
     /** Aviso por correo (no urgente: respeta el horario de silencio). No hace nada si el correo esta apagado en Alertas. */
     private static function pushEmail(int $leadId, string $kind, ?string $dedupe): void
     {
@@ -286,8 +341,8 @@ final class LeadIngest
     {
         return Db::transaction(static function () use ($leadId, $reason, $enqueue) {
             $lead = Lead::find($leadId, true);
-            if ($lead === null) {
-                return null;
+            if ($lead === null || ($lead['anonymized_at'] ?? null) !== null) {
+                return null;   // fase AM: un lead anonimizado conserva su puntuacion historica; recalcularla sin sus datos falsearia las estadisticas
             }
             $flags = Flags::derive($lead['flags'], $lead);
             $scored = RuleRunner::score(['flags' => $flags] + $lead);   // base del documento + reglas publicadas (sin reglas, identica a Scoring::score)

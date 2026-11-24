@@ -79,6 +79,28 @@ final class Timeline
                 $title = $kinds[$p['kind'] ?? 'hot'] ?? 'Alerta enviada';
                 $detail = 'Por ' . ucfirst((string) ($p['channel'] ?? 'telegram')) . '.' . (($p['kind'] ?? '') === 'rule' && !empty($p['rule']) ? ' Regla: ' . mb_substr((string) $p['rule'], 0, 80) . '.' : '');
                 break;
+            case 'assigned':
+                $icon = 'user';
+                $tone = 'accent';
+                $to = isset($p['to_name']) ? (string) $p['to_name'] : null;
+                $title = $to !== null ? 'Responsable: ' . $to : 'Lead sin responsable';
+                $bits = [];
+                if (!empty($p['from_name'])) {
+                    $bits[] = 'Antes: ' . (string) $p['from_name'];
+                }
+                if (!empty($p['auto'])) {
+                    $bits[] = 'Reparto automático';
+                }
+                if (!empty($p['undo'])) {
+                    $bits[] = 'Deshecho a petición';
+                }
+                $detail = implode(' · ', $bits);
+                break;
+            case 'sla_breached':
+                $icon = 'clock';
+                $tone = 'bad';
+                $detail = 'Sin primer contacto tras ' . (int) ($p['minutes'] ?? 0) . ' min · aviso por ' . ucfirst((string) ($p['channel'] ?? 'telegram')) . '.';
+                break;
             case 'a3_cancelled':
                 $icon = 'bell';
                 $detail = (string) ($p['why'] ?? '');
@@ -217,6 +239,31 @@ final class Timeline
                 $icon = 'shield';
                 $tone = 'bad';
                 $detail = 'Canal: ' . ($p['channel'] ?? 'all') . ' · vía ' . ($p['via'] ?? '—');
+                break;
+            case 'anonymized':
+                $icon = 'shield';
+                $tone = 'bad';
+                $detail = 'Datos personales eliminados. Se conservan fechas, fuente, etapa y puntuación.';
+                break;
+            case 'merged':
+                $icon = 'users';
+                $tone = 'accent';
+                $detail = !empty($p['into']) ? 'Este lead se fusionó en el #' . (int) $p['into'] . '.' : (!empty($p['from']) ? 'Se fusionó el lead #' . (int) $p['from'] . ' en este.' : '');
+                break;
+            case 'suppressed':
+                $icon = 'shield';
+                $tone = 'bad';
+                $detail = (($p['reason'] ?? '') === 'erasure' ? 'Borrado a petición: sin consentimiento ni contacto.' : 'STOP por SMS anterior: sin consentimiento de SMS ni WhatsApp.') . (!empty($p['consent_offered']) ? ' El consentimiento que venía marcado no se guardó.' : '');
+                break;
+            case 'template_sent':
+                $icon = 'mail';
+                $tone = 'slate';
+                $detail = 'Plantilla «' . mb_substr((string) ($p['tkey'] ?? ''), 0, 60) . '» por correo (' . ($p['status'] ?? '') . ')';
+                break;
+            case 'whatsapp_opened':
+                $icon = 'chat';
+                $tone = 'slate';
+                $detail = 'Plantilla «' . mb_substr((string) ($p['tkey'] ?? ''), 0, 60) . '». Se abrió WhatsApp desde el panel; el panel no puede saber si se envió.';
                 break;
         }
         $group = Catalog::EVENT_GROUPS[$type] ?? ('system');

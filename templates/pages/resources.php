@@ -67,27 +67,27 @@ partial('hero', [
 ?>
 <section class="section" aria-labelledby="res-tools">
   <div class="container stack">
-    <?php partial('section-head', ['eyebrow' => 'Free tools', 'title' => 'Run the numbers before you book', 'id' => 'res-tools']); ?>
+    <?php partial('section-head', [ 'title' => 'Run the numbers before you book', 'id' => 'res-tools']); ?>
     <div class="rlist"><?php $rows($tools); ?></div>
   </div>
 </section>
 <section class="section co-quick" aria-labelledby="res-quick">
   <div class="container stack">
-    <?php partial('section-head', ['eyebrow' => 'Try it', 'title' => 'Does the load pay? Try it here', 'id' => 'res-quick', 'lead' => 'Example values are filled in. Change them to your own load and read the result.']); ?>
+    <?php partial('section-head', [ 'title' => 'Does the load pay? Try it here', 'id' => 'res-quick', 'lead' => 'Example values are filled in. Change them to your own load and read the result.']); ?>
     <?php partial('minicalc', ['id' => 'res-rpm', 'cls' => 'mcalc--wide']); ?>
   </div>
 </section>
 <?php if ($hasTemplates): ?>
 <section class="section section--surface" aria-labelledby="res-templates">
   <div class="container stack">
-    <?php partial('section-head', ['eyebrow' => 'Templates', 'title' => 'Paperwork, ready to use', 'id' => 'res-templates']); ?>
+    <?php partial('section-head', [ 'title' => 'Paperwork, ready to use', 'id' => 'res-templates']); ?>
     <div class="rlist"><?php $rows($templates); ?></div>
   </div>
 </section>
 <?php endif; ?>
 <section class="section<?= $hasTemplates ? '' : ' section--surface' ?>" aria-labelledby="res-learn">
   <div class="container stack">
-    <?php partial('section-head', ['eyebrow' => 'Learn', 'title' => 'Guides written by dispatchers', 'id' => 'res-learn']); ?>
+    <?php partial('section-head', [ 'title' => 'Guides written by dispatchers', 'id' => 'res-learn']); ?>
     <div class="rlist"><?php $rows($learn); ?></div>
   </div>
 </section>
@@ -95,7 +95,6 @@ partial('hero', [
   <div class="container">
     <div class="co-band">
       <div class="co-band__main">
-        <span class="t-eyebrow">Need it done, not just a template?</span>
         <h2 class="t-h2-s co-band__title" id="res-band">Let the desk handle your paperwork</h2>
         <p class="co-band__text">Rate cons, BOLs, PODs and settlements organized per load by the same team that books and tracks it.</p>
       </div>

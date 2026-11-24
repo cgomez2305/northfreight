@@ -21,16 +21,28 @@ namespace Captacion\Services;
 final class Rules
 {
     public const VERSION = 1;
-    public const KINDS = ['scoring' => 'Puntuación', 'alerts' => 'Alertas', 'routing_tasks' => 'Tareas y etiquetas'];
+    public const KINDS = ['scoring' => 'Puntuación', 'alerts' => 'Alertas', 'routing_tasks' => 'Tareas y etiquetas', 'automation' => 'Eventos y tiempo'];
     public const KIND_HELP = [
         'scoring'       => 'Suman o restan puntos a la puntuación base del documento, o suben la temperatura mínima.',
         'alerts'        => 'Avisan por Telegram cuando un lead cumple una condición.',
         'routing_tasks' => 'Crean tareas, ponen etiquetas o mandan el lead a la cola de revisión.',
+        'automation'    => 'Reaccionan a un evento (cambio de etapa, consentimiento revocado) o al paso del tiempo (sin primer contacto, tarea vencida): avisan en la campana, mandan un webhook, avisan por Telegram o crean una tarea. Nunca cambian la etapa ni asignan responsable.',
     ];
-    public const KIND_ACTIONS = ['scoring' => ['add_points', 'min_temperature'], 'alerts' => ['telegram_alert'], 'routing_tasks' => ['create_task', 'tag', 'review_queue']];
+    public const KIND_ACTIONS = ['scoring' => ['add_points', 'min_temperature'], 'alerts' => ['telegram_alert'], 'routing_tasks' => ['create_task', 'tag', 'review_queue'], 'automation' => ['notify_bell', 'outbound_webhook', 'telegram_alert', 'create_task']];
     public const ACTIONS = [
         'add_points' => 'Sumar o restar puntos', 'min_temperature' => 'Fijar temperatura mínima', 'telegram_alert' => 'Avisar por Telegram',
         'create_task' => 'Crear una tarea', 'tag' => 'Poner una etiqueta', 'review_queue' => 'Enviar a la cola de revisión',
+        'notify_bell' => 'Avisar en la campana', 'outbound_webhook' => 'Enviar webhook saliente',
+    ];
+
+    /** Disparadores de los conjuntos «Eventos y tiempo» (fase AM). Los de tiempo (TIME_TRIGGERS) los evalua un job recurrente cada 15 minutos; los de evento, en el momento en que ocurren. */
+    public const TRIGGERS = ['stage_change' => 'Cambia de etapa', 'no_first_contact' => 'Pasan horas sin primer contacto', 'task_overdue' => 'Una tarea de un lead vence', 'consent_revoked' => 'Se revoca un consentimiento'];
+    public const TIME_TRIGGERS = ['no_first_contact', 'task_overdue'];
+    public const TRIGGER_HELP = [
+        'stage_change'     => 'Se evalúa al instante, cada vez que el lead entra en la etapa elegida (o en cualquiera si la dejas vacía).',
+        'no_first_contact' => 'Leads en «Nuevo» sin primer contacto desde hace al menos N horas. Se revisa cada 15 minutos y actúa una sola vez por lead e intento.',
+        'task_overdue'     => 'Tareas abiertas de un lead que llevan vencidas al menos N horas (0 = apenas vencen). Se revisa cada 15 minutos y actúa una sola vez por tarea.',
+        'consent_revoked'  => 'Se evalúa al instante cuando se revoca el consentimiento (de un canal o de todos).',
     ];
 
     public const MAX_SETS = 12;
@@ -231,13 +243,57 @@ final class Rules
         if ($name === '') {
             $err["$p.name"] = 'Ponle un nombre a la regla.';
         }
-        $when = self::block($r['when'] ?? null, "$p.when", $err, true);
+        $auto = $kind === 'automation';
+        $when = self::block($r['when'] ?? null, "$p.when", $err, !$auto);   // con un disparador, las condiciones son opcionales (el evento ya es la condicion)
         $except = self::block($r['except'] ?? null, "$p.except", $err, false);
         $then = self::actions($r['then'] ?? null, $kind, "$p.then", $err);
-        return [
+        $out = [
             'id' => $id, 'name' => $name, 'enabled' => self::bool($r['enabled'] ?? false), 'stop' => self::bool($r['stop'] ?? false), 'example' => self::bool($r['example'] ?? false),
             'when' => $when ?? ['mode' => 'all', 'items' => []], 'except' => $except, 'then' => $then,
         ];
+        if ($auto) {
+            $out = ['trigger' => self::trigger($r['trigger'] ?? null, "$p.trigger", $err)] + $out;
+        }
+        return $out;
+    }
+
+    /** Disparador de una regla de «Eventos y tiempo». @return array{type:string,to?:string,hours?:int,channel?:string} */
+    private static function trigger(mixed $t, string $p, array &$err): array
+    {
+        $t = is_array($t) ? $t : [];
+        $type = self::str($t['type'] ?? '', 20);
+        if (!isset(self::TRIGGERS[$type])) {
+            $err["$p.type"] = 'Elige qué evento activa la regla.';
+            return ['type' => 'stage_change', 'to' => ''];
+        }
+        switch ($type) {
+            case 'stage_change':
+                $to = strtolower(self::str($t['to'] ?? '', 20));
+                if ($to !== '' && !isset(self::options('stage')[$to])) {
+                    $err["$p.to"] = 'No reconozco esa etapa.';
+                    $to = '';
+                }
+                return ['type' => $type, 'to' => $to];
+            case 'consent_revoked':
+                $ch = strtolower(self::str($t['channel'] ?? '', 6));
+                if ($ch !== '' && !isset(self::CONSENT[$ch])) {
+                    $err["$p.channel"] = 'Elige Llamada, SMS, Correo o cualquiera.';
+                    $ch = '';
+                }
+                return ['type' => $type, 'channel' => $ch];
+            default:   // no_first_contact (1 a 720 h) y task_overdue (0 a 720 h)
+                $raw = is_scalar($t['hours'] ?? null) ? trim((string) $t['hours']) : '';
+                $min = $type === 'no_first_contact' ? 1 : 0;
+                $h = preg_match('/^\d{1,3}$/', $raw) === 1 ? (int) $raw : -1;
+                if ($raw === '' && $min === 0) {
+                    $h = 0;
+                }
+                if ($h < $min || $h > 720) {
+                    $err["$p.hours"] = 'Escribe de ' . $min . ' a 720 horas.';
+                    $h = max($min, min(720, $h));
+                }
+                return ['type' => $type, 'hours' => $h];
+        }
     }
 
     /** @return array{mode:string,items:list<array>}|null */
@@ -516,6 +572,17 @@ final class Rules
                 }
                 $pr = (int) ($x['priority'] ?? 2);
                 return ['type' => $type, 'title' => $title, 'due_hours' => $h, 'priority' => isset(Catalog::PRIORITIES[$pr]) ? $pr : 2];
+            case 'notify_bell':
+                $text = self::str($x['text'] ?? '', self::MAX_TEXT + 1);
+                if (mb_strlen($text) > self::MAX_TEXT) {
+                    $err["$q.text"] = 'Máximo ' . self::MAX_TEXT . ' caracteres.';
+                    $text = mb_substr($text, 0, self::MAX_TEXT);
+                } else {
+                    self::checkTemplate($text, "$q.text", $err, self::MAX_TEXT);
+                }
+                return ['type' => $type, 'text' => $text];
+            case 'outbound_webhook':
+                return ['type' => 'outbound_webhook'];
             case 'tag':
                 $tag = self::slug((string) ($x['tag'] ?? ''));
                 if ($tag === '' || strlen($tag) > 24) {
@@ -548,10 +615,14 @@ final class Rules
     public static function blank(string $kind): array
     {
         $then = match ($kind) {
+            'automation'    => [['type' => 'notify_bell', 'text' => '']],
             'alerts'        => [['type' => 'telegram_alert', 'urgency' => 'normal', 'text' => '']],
             'routing_tasks' => [['type' => 'review_queue']],
             default         => [['type' => 'add_points', 'points' => 5, 'cap' => null]],
         };
+        if ($kind === 'automation') {
+            return ['trigger' => ['type' => 'stage_change', 'to' => ''], 'id' => '', 'name' => '', 'enabled' => false, 'stop' => false, 'example' => false, 'when' => ['mode' => 'all', 'items' => []], 'except' => null, 'then' => $then];
+        }
         return ['id' => '', 'name' => '', 'enabled' => false, 'stop' => false, 'example' => false,
             'when' => ['mode' => 'all', 'items' => [['field' => 'profile', 'op' => 'is', 'value' => 'owner_operator']]], 'except' => null, 'then' => $then];
     }

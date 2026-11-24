@@ -85,7 +85,7 @@ return [
     '/contact/' => [
         'path'       => '/es/contacto/',
         'title'      => 'Contacto NorthStar Freight | Habla con un dispatcher',
-        'meta'       => 'Habla con un dispatcher de NorthStar por WhatsApp al +1 863-651-3322 o escribe a nfreightsolutionsllc@gmail.com. Sin formularios primero.',
+        'meta'       => 'Habla con un dispatcher de NorthStar por WhatsApp al +1 863-651-3322 o escribe a contact@northstarfreightsolutions.us. Sin formularios primero.',
         'h1'         => 'Habla con un dispatcher',
         'breadcrumb' => 'Contacto',
     ],
@@ -115,7 +115,7 @@ return [
     ],
     '/resources/rate-per-mile-calculator/' => [
         'path'       => '/es/recursos/calculadora-tarifa-por-milla/',
-        'title'      => 'Calculadora de Tarifa por Milla (RPM) | NorthStar',
+        'title'      => 'Calculadora de tarifa por milla (RPM) | NorthStar',
         'meta'       => 'Calculadora gratis de tarifa por milla: RPM cargado y total, costo de combustible y lo que te queda del viaje. Sabe si una carga paga antes de reservarla.',
         'h1'         => 'Calculadora de tarifa por milla',
         'h1_hl'      => 'Calculadora de {hl}tarifa por milla{/hl}',

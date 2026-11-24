@@ -2,6 +2,7 @@
 use Captacion\Ui;
 use Captacion\Services\Catalog;
 use Captacion\Services\Fmt;
+use Captacion\Services\Sla;
 use Captacion\Services\UsStates;
 
 $rows = $list['rows'];
@@ -9,12 +10,20 @@ $base = $f;                                    // filtros vigentes (sin orden ni
 $sortBase = ['sort' => $paging['sort'] !== 'created' ? $paging['sort'] : null, 'dir' => $paging['dir'] !== 'desc' ? $paging['dir'] : null, 'per' => $paging['per'] !== 25 ? $paging['per'] : null];
 $qsAll = static fn(array $over = []): string => Ui::qs(array_merge($base, $sortBase, $over));
 $nFilters = count(array_diff_key($f, ['t' => 1]));
-$sortLink = static function (string $key, string $label) use ($paging, $base, $e): string {
+$sortLink = static function (string $key, string $label, ?string $full = null) use ($paging, $base, $e): string {
     $on = $paging['sort'] === $key;
     $dir = $on && $paging['dir'] === 'desc' ? 'asc' : 'desc';
     $href = '/leads' . Ui::qs(array_merge($base, ['sort' => $key !== 'created' || $dir !== 'desc' ? $key : null, 'dir' => $dir !== 'desc' ? $dir : null]));
-    return '<a class="sort' . ($on ? ' is-on' : '') . '" href="' . $e($href) . '"' . ($on ? ' aria-label="Ordenado por ' . $e($label) . ($paging['dir'] === 'asc' ? ', ascendente' : ', descendente') . '"' : '') . '>' . $e($label) . '<span class="sort__a" aria-hidden="true">' . ($on ? ($paging['dir'] === 'asc' ? '↑' : '↓') : '') . '</span></a>';
+    return '<a class="sort' . ($on ? ' is-on' : '') . '" href="' . $e($href) . '"' . ($on ? ' aria-label="Ordenado por ' . $e($full ?? $label) . ($paging['dir'] === 'asc' ? ', ascendente' : ', descendente') . '"' : '') . '>' . $e($label) . '<span class="sort__a" aria-hidden="true">' . ($on ? ($paging['dir'] === 'asc' ? '↑' : '↓') : '') . '</span></a>';
 };
+$ariaSort = static fn(string $key): string => ' aria-sort="' . ($paging['sort'] === $key ? ($paging['dir'] === 'asc' ? 'ascending' : 'descending') : 'none') . '"';
+$abbr = static fn(string $short, string $full): string => '<span aria-hidden="true">' . $e($short) . '</span><span class="sr">' . $e($full) . '</span>';
+$sortAbbr = static function (string $key, string $short, string $full) use ($sortLink, $abbr): string {   // enlace de orden con la forma corta a la vista y la completa para el lector de pantalla
+    return str_replace('>' . $short . '<span class="sort__a"', '>' . $abbr($short, $full) . '<span class="sort__a"', $sortLink($key, $short, $full));
+};
+// «Volver a la lista» de la ficha: esta misma lista con su modo, filtros, orden, página y vista guardada
+$backTo = '/leads' . $qsAll(['page' => $list['page'] > 1 ? $list['page'] : null, 'v' => isset($activeView) ? $activeView['view']['id'] : null]);
+$leadHref = static fn(int $id): string => '/leads/' . $id . '?back=' . rawurlencode($backTo);
 $tabs = ['' => 'Todos', 'hot' => 'Calientes', 'warm' => 'Tibios', 'cold' => 'Fríos', 'disqualified' => 'Descartados'];
 $isEmptyDb = $grandTotal === 0;
 ?>
@@ -23,16 +32,19 @@ $isEmptyDb = $grandTotal === 0;
     <h1 class="h1">Leads</h1>
     <p class="sub"><?= $isEmptyDb ? 'Aquí aparecerán los leads de owner-operators, carriers y company drivers.' : $e(Fmt::num($list['total'])) . ' lead' . ($list['total'] === 1 ? '' : 's') . ($nFilters + (isset($f['t']) ? 1 : 0) > 0 ? ' con los filtros actuales' : ' en total') ?></p>
   </div>
-  <?php if (!$isEmptyDb): ?>
   <div class="page-head__a">
+  <?php if (!$isEmptyDb): ?>
     <button class="btn btn--secondary filters-toggle" type="button" data-toggle="#filters" aria-expanded="<?= $nFilters > 0 ? 'true' : 'false' ?>" aria-controls="filters"><?= Ui::icon('filter') ?>Filtros<?= $nFilters > 0 ? ' <b class="badge">' . $e($nFilters) . '</b>' : '' ?></button>
     <form method="post" action="/leads/export">
       <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="scope" value="filters"><input type="hidden" name="qs" value="<?= $e(ltrim($qsAll(), '?')) ?>">
       <button class="btn btn--secondary" type="submit"><span class="btn__t">Exportar CSV</span></button>
     </form>
-    <button class="btn btn--primary" type="button" data-new-lead><span class="btn__t">Nuevo lead</span></button>
-  </div>
   <?php endif; ?>
+    <?php if (!empty($isAdmin)): ?><a class="btn btn--secondary" href="/importar"><?= Ui::icon('inbox') ?>Importar CSV</a><?php endif; ?>
+  <?php if (!$isEmptyDb): ?>
+    <button class="btn btn--primary" type="button" data-new-lead><span class="btn__t">Nuevo lead</span></button>
+  <?php endif; ?>
+  </div>
 </div>
 
 <?php if ($isEmptyDb): ?>
@@ -52,7 +64,7 @@ $isEmptyDb = $grandTotal === 0;
 
 <nav class="ptabs" aria-label="Temperatura">
   <?php foreach ($tabs as $k => $label): $on = ($f['t'] ?? '') === $k; $n = $k === '' ? $counts['all'] : $counts[$k]; ?>
-    <a class="ptab<?= $on ? ' is-on' : '' ?><?= $k !== '' ? ' ptab--' . ($k === 'disqualified' ? 'dq' : $k) : '' ?>" href="/leads<?= $e(Ui::qs(array_merge(array_diff_key($base, ['t' => 1]), $sortBase, $k !== '' ? ['t' => $k] : []))) ?>"<?= $on ? ' aria-current="true"' : '' ?>><?= $k !== '' ? '<i class="dot"></i>' : '' ?><?= $e($label) ?><span class="ptab__n"><?= $e(Fmt::num($n)) ?></span></a>
+    <a class="ptab<?= $on ? ' is-on' : '' ?><?= $k !== '' ? ' ptab--' . ($k === 'disqualified' ? 'dq' : $k) : '' ?>" href="/leads<?= $e(Ui::qs(array_merge(array_diff_key($base, ['t' => 1]), $sortBase, $k !== '' ? ['t' => $k] : []))) ?>"<?= $on ? ' aria-current="page"' : '' ?>><?= $k !== '' ? '<i class="dot"></i>' : '' ?><?= $e($label) ?><span class="ptab__n"><?= $e(Fmt::num($n)) ?></span></a>
   <?php endforeach; ?>
 </nav>
 
@@ -68,20 +80,21 @@ $isEmptyDb = $grandTotal === 0;
       <caption class="sr">Leads (<?= $e($list['total']) ?>), ordenados por <?= $e(['created' => 'fecha de llegada', 'score' => 'puntuación', 'name' => 'nombre', 'stage' => 'etapa'][$paging['sort']]) ?></caption>
       <thead><tr>
         <th scope="col" class="c-chk"><input type="checkbox" data-all aria-label="Seleccionar todos los de esta página"></th>
-        <th scope="col"><?= $sortLink('name', 'Lead') ?></th><th scope="col" class="c-prof k-prof">Perfil</th><th scope="col" class="c-st k-st">Est.</th><th scope="col" class="c-eq k-eq">Equipo</th>
-        <th scope="col" class="c-n k-pts"><?= $sortLink('score', 'Pts') ?></th><th scope="col" class="k-temp">Temp.</th><th scope="col" class="c-stage k-stage"><?= $sortLink('stage', 'Etapa') ?></th><th scope="col" class="c-src k-src">Fuente</th><th scope="col" class="c-when k-when"><?= $sortLink('created', 'Recibido') ?></th><th scope="col" class="c-tk k-task">Próxima tarea</th><th scope="col" class="c-act"><span class="sr">Llamar</span></th>
+        <th scope="col"<?= $ariaSort('name') ?>><?= $sortLink('name', 'Lead') ?></th><th scope="col" class="c-prof k-prof">Perfil</th><th scope="col" class="c-st k-st"><?= $abbr('Est.', 'Estado') ?></th><th scope="col" class="c-eq k-eq">Equipo</th>
+        <th scope="col" class="c-n k-pts"<?= $ariaSort('score') ?>><?= $sortAbbr('score', 'Pts', 'Puntos') ?></th><th scope="col" class="k-temp"><?= $abbr('Temp.', 'Temperatura') ?></th><th scope="col" class="c-stage k-stage"<?= $ariaSort('stage') ?>><?= $sortLink('stage', 'Etapa') ?></th><th scope="col" class="c-resp k-resp">Responsable</th><th scope="col" class="c-src k-src">Fuente</th><th scope="col" class="c-when k-when"<?= $ariaSort('created') ?>><?= $sortLink('created', 'Recibido') ?></th><th scope="col" class="c-tk k-task">Próxima tarea</th><th scope="col" class="c-act"><span class="sr">Llamar</span></th>
       </tr></thead>
       <tbody>
       <?php foreach ($rows as $r): $name = Fmt::name($r); ?>
         <tr data-peek="<?= $e($r['id']) ?>"<?= $r['temperature'] === 'hot' && $r['first_contact_at'] === null && $r['stage'] === 'new' ? ' class="is-urgent"' : '' ?>>
           <td class="c-chk"><input type="checkbox" name="ids[]" value="<?= $e($r['id']) ?>" aria-label="Seleccionar a <?= $e($name) ?>"></td>
-          <th scope="row" class="c-name"><a class="who" href="/leads/<?= $e($r['id']) ?>"><?= Ui::avatar($name, 'md') ?><span><b><?= $e($name) ?></b><small class="mono"><?= $e(Fmt::code((int) $r['id'])) ?> · <?= $e(Fmt::phone($r['phone_e164'])) ?></small></span></a></th>
+          <th scope="row" class="c-name"><a class="who" href="<?= $e($leadHref((int) $r['id'])) ?>"><?= Ui::avatar($name, 'md') ?><span><b><?= $e($name) ?></b><small class="mono"><?= $e(Fmt::code((int) $r['id'])) ?> · <?= $e(Fmt::phone($r['phone_e164'])) ?></small><?php $rsla = Sla::status($r); if ($rsla !== null): ?><span class="who__sla"><?= Ui::sla($rsla) ?></span><?php endif; ?></span></a></th>
           <td class="c-prof k-prof" data-l="Perfil"><?= $e(Catalog::label(Catalog::PROFILES_SHORT, $r['profile'])) ?></td>
           <td class="c-st k-st mono" data-l="Estado"><?= $e($r['state'] ?? '—') ?></td>
           <td class="c-eq k-eq" data-l="Equipo"><?= $e(Ui::equipment($r['equipment_types'], 2)) ?></td>
           <td class="c-n k-pts" data-l="Puntos"><?= Ui::score((int) $r['score'], $r['temperature']) ?></td>
           <td class="c-tmp k-temp"><?= Ui::temp($r['temperature']) ?></td>
           <td class="c-stage k-stage"><?= Ui::stage($r['stage'], $r['pipeline']) ?></td>
+          <td class="c-resp k-resp" data-l="Responsable"><?= !empty($r['assignee']) ? '<span class="rsp">' . Ui::avatar((string) $r['assignee'], 'sm') . '<span>' . $e($r['assignee']) . '</span></span>' : '<span class="muted">Sin asignar</span>' ?></td>
           <td class="c-src k-src" data-l="Fuente"><?= $e(Catalog::source($r['source'])) ?></td>
           <td class="c-when k-when mono" data-l="Recibido" title="<?= $e(Fmt::dateTime($r['created_at'])) ?>"><?= $e(Fmt::ago($r['created_at'])) ?></td>
           <?php $nt = $nextTasks[(int) $r['id']] ?? null; $ntLate = $nt !== null && $nt !== '' && (int) \Captacion\Clock::parse($nt) < \Captacion\Clock::time(); ?>

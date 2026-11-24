@@ -68,7 +68,7 @@ return static function (array $ctx): void {
 
     // ------------------------------------------------------------------ Vistas guardadas (servicio)
     $sys = array_column(SavedViews::system(), 'id');
-    T::eq($sys, ['sys-hot_pending', 'sys-today', 'sys-no_task', 'sys-discarded', 'sys-presented_wait', 'sys-review'], 'vistas del sistema: Calientes pendientes, Llegaron hoy, Sin tarea, Descartados, Presentados sin respuesta y (Q5b) Por revisar');
+    T::eq($sys, ['sys-hot_pending', 'sys-today', 'sys-no_task', 'sys-discarded', 'sys-presented_wait', 'sys-review', 'sys-mine', 'sys-sla'], 'vistas del sistema: Calientes pendientes, Llegaron hoy, Sin tarea, Descartados, Presentados sin respuesta, (Q5b) Por revisar y (AM) Mis leads y SLA vencido');
     $r = SavedViews::create($uid, 'Owner-operators de TX', ['pf' => 'owner_operator', 'us' => 'tx', 'zz' => 'basura', 'q' => 'zzzqq'], 'score', 'asc', null);
     T::ok($r['ok'] && is_int($r['id']), 'vistas: guardar filtros y orden con un nombre');
     $vid = (int) $r['id'];
@@ -174,7 +174,7 @@ return static function (array $ctx): void {
 
     // --- tema por usuario, sin parpadeo (atributo en <html> desde el servidor + script con nonce)
     $page = $s->get('/');
-    T::ok(preg_match('/<html lang="es" data-theme-pref="auto" data-side="open" data-density="comfortable">/', $page['body']) === 1 && str_contains($page['body'], 'name="color-scheme" content="light dark"') && preg_match('/<script nonce="[^"]+">\(function\(d,w\)\{var h=d\.documentElement/', $page['body']) === 1, 'tema: <html> trae la preferencia del usuario y un script con nonce que fija data-theme antes de pintar');
+    T::ok(preg_match('/<html lang="es" data-theme-pref="auto" data-side="open" data-density="comfortable" data-kbd="on">/', $page['body']) === 1 && str_contains($page['body'], 'name="color-scheme" content="light dark"') && preg_match('/<script nonce="[^"]+">\(function\(d,w\)\{var h=d\.documentElement/', $page['body']) === 1, 'tema: <html> trae la preferencia del usuario y un script con nonce que fija data-theme antes de pintar');
     T::eq($s->ajax('/ajax/prefs', ['key' => 'theme', 'value' => 'dark'])['status'], 200, 'tema: guardar «oscuro» por /ajax/prefs');
     $page = $s->get('/leads');
     T::ok(str_contains($page['body'], 'data-theme-pref="dark"') && Prefs::get($uid, 'theme') === 'dark' && Prefs::get($oid, 'theme') === 'auto', '  la preferencia persiste en la base, se aplica al recargar y no afecta al otro usuario');
@@ -264,7 +264,7 @@ return static function (array $ctx): void {
     T::ok(in_array($warm1, Prefs::recent($uid), true), 'el vistazo (y la ficha) se anotan en «recientes» de la paleta');
     $pg = $s->get('/leads?peek=' . $warm1);
     T::ok(str_contains($pg['body'], 'id="peek"') && str_contains($pg['body'], 'data-peek-id="' . $warm1 . '"') && str_contains($pg['body'], 'data-peek="' . $warm1 . '"') && str_contains($pg['body'], 'aria-modal="false"') && str_contains($pg['body'], 'aria-labelledby="pk-title"'), 'la lista trae el panel del vistazo y abre ?peek=ID al recargar; filas con data-peek y enlace a la ficha (sin JS sigue siendo un enlace)');
-    T::ok(str_contains($pg['body'], 'href="/leads/' . $warm1 . '"') && str_contains($s->get('/pipeline')['body'], 'id="peek"'), '  también en el tablero');
+    T::ok(str_contains($pg['body'], 'href="/leads/' . $warm1 . '?back=') && str_contains($s->get('/pipeline')['body'], 'id="peek"'), '  también en el tablero');
 
     // --- acciones rápidas
     $act = static fn(array $b, ?Panel $who = null) => ($who ?? $s)->ajax('/ajax/lead/act', ['id' => $warm1] + $b);

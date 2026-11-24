@@ -36,7 +36,11 @@ return static function (array $ctx): void {
         '/prospectos/export', '/prospectos/1', '/prospectos/1/result', '/prospectos/1/convert', '/referidos', '/referidos/new', '/referidos/confirm', '/referidos/1', '/referidos/1/approve', '/vacantes', '/vacantes/new',
         '/vacantes/1', '/vacantes/1/pause', '/resultados', '/reportes', '/reportes/export', '/informes', '/informes/1', '/informes/1/publish', '/informes/generate', '/comunicaciones', '/comunicaciones/plantillas',
         '/comunicaciones/plantillas/1', '/comunicaciones/plantillas/new', '/comunicaciones/plantillas/1/save', '/comunicaciones/envios', '/c/' . $token40, '/invite/' . $hex64, '/u/' . $tok20, '/login', '/login/2fa', '/logout',
-        '/leads/1', '/leads/1/stage', '/leads/1/note', '/leads/1/task',
+        '/leads/1', '/leads/1/stage', '/leads/1/note', '/leads/1/task', '/leads/1/assign',
+        // Fase AM · datos
+        '/importar', '/importar/1', '/importar/1/simular', '/leads/1/anonimizar', '/leads/1/fusionar', '/leads/1/enviar',
+        // Fase AM · automatizacion
+        '/ajax/config/recalc', '/config/webhooks/save', '/config/webhooks/test',
     ];
     $uncovered = [];
     foreach ($m1[1] as $p) {

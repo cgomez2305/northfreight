@@ -45,7 +45,7 @@ partial('summary', summary_for($route));
 
 <section class="section" aria-labelledby="tr-log">
   <div class="container stack">
-    <?php partial('section-head', ['eyebrow' => 'On every load', 'title' => 'What our load tracking logs', 'id' => 'tr-log']); ?>
+    <?php partial('section-head', [ 'title' => 'What our load tracking logs', 'id' => 'tr-log']); ?>
     <ul class="g5 gap-12 sb-cells">
       <?php foreach ($logs as $i => $t): ?>
       <li><?php partial('card', ['size' => 'tile', 'variant' => $i === 4 ? 'dark' : 'light', 'code' => 'LOG · ' . sprintf('%02d', $i + 1), 'title' => $t, 'cls' => 'sb-tile']); ?></li>
@@ -56,7 +56,6 @@ partial('summary', summary_for($route));
 
 <?php partial('photo-card', [
     'id'      => 'tr-proof',
-    'eyebrow' => 'Proof, not promises',
     'title'   => 'Incidents are handled with evidence',
     'lead'    => 'When a broker questions a late arrival or detention, the record is already there: time, place and photos. Your claim starts with proof, not with a phone call.',
     'image'   => ['base' => 'nf-check-tracking-mirror', 'alt' => 'Truck side mirror at sunset reflecting a white trailer and the highway behind it', 'pos' => '70% 50%'],

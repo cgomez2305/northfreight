@@ -23,3 +23,7 @@ node_modules/
 /captacion/storage/*
 !/captacion/storage/.gitignore
 !/captacion/storage/.htaccess
+
+# Buzón de correo (contraseña SMTP): solo en el servidor
+/app/config.mail.php
+/captacion/config/mail.env

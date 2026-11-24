@@ -40,6 +40,9 @@ final class LeadActions
     public static function event(int $leadId, string $type, array $payload, ?int $userId): void
     {
         Db::insert('lead_events', ['lead_id' => $leadId, 'type' => $type, 'payload' => $payload ?: null, 'user_id' => $userId, 'created_at' => Clock::now()]);
+        if ($type === 'stage_changed') {
+            RuleAutomation::onEvent($leadId, $type, $payload);   // fase AM: reglas de eventos y webhook saliente (nunca lanza)
+        }
     }
 
     private static function clean(mixed $v, int $max): string

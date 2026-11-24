@@ -64,7 +64,8 @@ $addr = org_address();   // NAP: solo se imprime si ADDRESS está definida en co
     </div>
   </div>
   <div class="footer__bar">
-    <span>© <?= date('Y') ?> <?= e((string) (cfg('legal_name') ?: cfg('brand') . ' LLC')) ?></span>
+    <span class="footer__copy">© <?= date('Y') ?> <?= e((string) (cfg('legal_name') ?: cfg('brand') . ' LLC')) ?>
+      <?php if ((string) cfg('credit_url') !== ''): ?><span class="footer__credit">Developed by <a class="foot__link" href="<?= e((string) cfg('credit_url')) ?>" rel="nofollow noopener" target="_blank">ClikRank<?= ns_icon('heart', 14, 'icon--fill footer__heart') ?><span class="sr-only"> (opens in a new tab)</span></a></span><?php endif; ?></span>
     <span class="footer__legal">
       <?php partial('lang-switch', ['route' => $route ?? null, 'variant' => 'foot']); ?>
       <?php if (route_is_live('/privacy-policy/')): ?><a class="foot__link" href="<?= e(url('/privacy-policy/')) ?>">Privacy</a><?php endif; ?>

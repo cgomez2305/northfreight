@@ -26,7 +26,7 @@ $tierRows = static function (string $g, string $tk, array $meta, array $tiers) u
 $tempLabels = ['hot' => 'Calientes', 'warm' => 'Tibios', 'cold' => 'Fríos', 'disqualified' => 'Descartados'];
 $delta = static fn(int $a, int $b): string => $a === $b ? '' : ' <span class="' . ($b > $a ? 'up' : 'down') . '">' . ($b > $a ? '+' : '−') . abs($b - $a) . '</span>';
 $resultBlock = static function (array $p, string $title, string $note) use ($tempLabels, $delta, $e): string {
-    $h = '<div class="pv"><p class="pv__t">' . $e($title) . '</p><table class="pv__t2"><thead><tr><th scope="col">Temperatura</th><th scope="col">Antes</th><th scope="col">Después</th></tr></thead><tbody>';
+    $h = '<div class="pv"><p class="pv__t">' . $e($title) . '</p><table class="pv__t2" aria-label="Leads por temperatura, antes y después"><thead><tr><th scope="col">Temperatura</th><th scope="col">Antes</th><th scope="col">Después</th></tr></thead><tbody>';
     foreach ($tempLabels as $k => $l) {
         $h .= '<tr><th scope="row">' . $l . '</th><td>' . Fmt::num($p['before'][$k]) . '</td><td>' . Fmt::num($p['after'][$k]) . $delta($p['before'][$k], $p['after'][$k]) . '</td></tr>';
     }
@@ -49,7 +49,7 @@ $resultBlock = static function (array $p, string $title, string $note) use ($tem
     <section class="card cfg-card" aria-labelledby="sc-d">
       <header class="card__h"><h2 class="label" id="sc-d">Company drivers</h2></header>
       <div class="card__b">
-        <?php if (in_array('scoring.driver.experience', $provPending, true)): ?><p class="prov-note"><?= Ui::icon('alert') ?>Los tramos de experiencia están <b>pendientes de confirmar con NorthStar</b>.</p><?php endif; ?>
+        <?php if (in_array('scoring.driver.experience', $provPending, true)): ?><p class="prov-note"><?= Ui::icon('alert') ?><span>Los tramos de experiencia están <b>pendientes de confirmar con NorthStar</b>.</span></p><?php endif; ?>
         <div class="numgrid"><?php foreach (ScoringConfig::DRIVER_POINTS as $k => $l) { echo $num("driver[$k]", $form['driver'][$k], "driver.$k", $e($l)); } ?></div>
         <div class="tiergrid"><?php foreach (ScoringConfig::TIERS['driver'] as $tk => $meta) { echo $tierRows('driver', $tk, $meta, $form['driver'][$tk]); } ?></div>
       </div>
@@ -67,7 +67,7 @@ $resultBlock = static function (array $p, string $title, string $note) use ($tem
           <button class="btn btn--secondary" type="submit" formaction="/config/scoring/preview"><?= Ui::icon('refresh') ?>Vista previa</button>
         </div>
         <div class="cfg-actions__b">
-          <button class="btn btn--ghost btn--sm" type="submit" formaction="/config/scoring/reset" name="group" value="all" formnovalidate data-confirm="¿Restablecer pesos de owners, drivers y umbrales a los valores del documento? Los leads existentes no cambian hasta que los recalcules.">Restablecer a los valores del documento</button>
+          <button class="btn btn--ghost btn--sm" type="submit" formaction="/config/scoring/reset" name="group" value="all" formnovalidate data-confirm="¿Restablecer pesos de owners, drivers y umbrales a los valores del documento? Los leads existentes no cambian hasta que los recalcules." data-confirm-title="¿Restablecer la puntuación?" data-confirm-label="Restablecer" data-confirm-danger>Restablecer a los valores del documento</button>
         </div>
       </footer>
     </section>
@@ -121,7 +121,7 @@ $resultBlock = static function (array $p, string $title, string $note) use ($tem
         <div class="pr-item"><fieldset class="opts-eq<?= isset($provErrors['dispatched_equipment']) ? ' has-err' : '' ?>"><legend>Equipos que NorthStar despacha <?= in_array('dispatched_equipment', $provPending, true) ? '<span class="chip chip--warm-o">Provisional</span>' : '' ?></legend>
           <div class="eqgrid"><?php foreach (Catalog::EQUIPMENT as $k => $l): ?><label class="check check--box"><input type="checkbox" name="dispatched_equipment[]" value="<?= $e($k) ?>"<?= in_array($k, $curEq, true) ? ' checked' : '' ?>><span><?= $e($l) ?></span></label><?php endforeach; ?></div>
           <?php if (isset($provErrors['dispatched_equipment'])): ?><small class="num__e"><?= $e($provErrors['dispatched_equipment']) ?></small><?php endif; ?>
-          <p class="muted">Un lead suma los puntos de «equipo que NorthStar despacha» si tiene al menos uno de estos. Amazon Relay no viene marcado: decisión pendiente.</p><?= $conf('dispatched_equipment') ?></fieldset></div>
+          <p class="muted">Un lead suma los puntos de «equipo que NorthStar despacha» si tiene al menos uno de estos. Por ahora NorthStar despacha dry van y Amazon Relay, y vienen marcados.</p><?= $conf('dispatched_equipment') ?></fieldset></div>
         <div class="pr-item"><label class="field<?= isset($provErrors['hiring_states']) ? ' has-err' : '' ?>"><span>Estados de contratación (company drivers) <?= in_array('hiring_states', $provPending, true) ? '<span class="chip chip--warm-o">Provisional</span>' : '' ?></span>
           <input type="text" name="hiring_states" value="<?= $e($curStates) ?>" placeholder="FL, TX, GA" maxlength="200" autocomplete="off"<?= isset($provErrors['hiring_states']) ? ' aria-invalid="true"' : '' ?>>
           <small><?= isset($provErrors['hiring_states']) ? '<span class="num__e">' . $e($provErrors['hiring_states']) . '</span>' : 'Abreviaturas de 2 letras separadas por comas. Vacío: nadie recibe esos puntos todavía.' ?></small></label><?= $conf('hiring_states') ?></div>

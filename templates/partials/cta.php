@@ -1,6 +1,6 @@
 <?php
 /**
- * CTA final "Let's talk about your operation." en un panel redondeado.
+ * CTA final "Hand us the paperwork. Keep the driving." en un panel redondeado.
  * El bloque anterior se separa con .pre-cta (el layout marca <main class="has-cta"> y lo aplica a la última .section).
  * Params: wa(string|null clave/mensaje), title(string con marcas), text(string),
  *         image(array|null, opcional: ['base'=>'nf-cta-night-truck','alt'=>''] foto de fondo DECORATIVA, oscurecida con --cta-veil (desde la izquierda; en móvil la foto va arriba, recorte <base>-m si existe);
@@ -27,7 +27,7 @@ if (!empty($coverage)) {
   <div class="container cta__in">
     <div class="cta__main">
       <img class="cta__mark" src="<?= e(asset('img/isotype-white.svg')) ?>" alt="" width="56" height="56">
-      <h2 class="t-cta" id="cta-title"><?= ns_rich($title ?? 'Let’s talk about{br}{hl}your operation.{/hl}') ?></h2>
+      <h2 class="t-cta" id="cta-title"><?= ns_rich($title ?? 'Hand us the paperwork.{br}{hl}Keep the driving.{/hl}') ?></h2>
       <p class="cta__text"><?= ns_rich($text ?? 'No forms first. Open WhatsApp with a ready message to send to a dispatcher.') ?><?= $note ? ' ' . e(implode(' ', $note)) : '' ?></p>
     </div>
     <div class="cta__actions">

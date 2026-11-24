@@ -33,6 +33,9 @@ final class EmailTarget implements HandoffTarget
             'to' => $to, 'subject' => $subject, 'text' => HandoffCard::text($card, $handoff), 'html' => HandoffCard::html($card, $handoff),
             'reply_to' => Mailer::to(), 'from_name' => 'NorthStar Captación',
         ]);
-        return ['ok' => true, 'code' => null, 'msg' => $r === 'sent' ? 'Correo enviado a ' . $to . '.' : 'Sin SMTP: la ficha quedó registrada en storage/mail.log (no se envió).'];
+        if ($r !== 'sent') {   // sin SMTP no salio nada: no se puede dar la entrega por hecha (queda en reintento y luego «fallida», visible en el panel)
+            throw new \RuntimeException('Sin SMTP configurado: la ficha quedó solo en storage/mail.log y no se envió.');
+        }
+        return ['ok' => true, 'code' => null, 'msg' => 'Correo enviado a ' . $to . '.'];
     }
 }

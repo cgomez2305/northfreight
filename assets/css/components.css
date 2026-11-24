@@ -60,7 +60,6 @@ a.btn--primary:is(:hover, :focus-visible)::after, a.btn--navy:is(:hover, :focus-
 .hdr__island { position: relative; height: var(--hdr-h); display: flex; align-items: center; border: 1px solid var(--hairline); border-radius: var(--r-pill); pointer-events: auto; }
 .hdr__island::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none; background: var(--glass-bg); -webkit-backdrop-filter: blur(var(--glass-blur)); backdrop-filter: blur(var(--glass-blur)); }
 /* Al hacer scroll las islas pasan a vidrio más opaco: el texto de la página que pasa por debajo no compite con el de la cabecera */
-.is-scrolled .hdr__island::before { background: var(--glass-strong); }
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .header .hdr__island::before { background: var(--panel); } }
 @media (prefers-reduced-transparency: reduce) { .header .hdr__island::before { background: var(--panel); -webkit-backdrop-filter: none; backdrop-filter: none; } }
 .hdr__brand { justify-self: start; padding: 0 20px 0 9px; }
@@ -111,18 +110,17 @@ a.btn--primary:is(:hover, :focus-visible)::after, a.btn--navy:is(:hover, :focus-
   .nav__burger:not(.nav__burger--link) { display: none; }
   .nav__burger--link { display: inline-flex; }
 }
-/* Compactación al hacer scroll (≥1025px; main.js pone .is-scrolled pasados ~80px): el logo se queda en el isotipo y la isla de acciones pierde el chip del reloj. Ancho animado solo en islas pequeñas y con altura fija: no mueve el contenido de la página */
-@media (min-width: 1025px) {
-  .hdr__brand, .hdr__act, .hdr__desk, .hdr__brand .logo__text { transition: padding .28s ease, max-width .28s ease, margin .28s ease, opacity .2s ease; }
-  .hdr__brand .logo__text { max-width: 190px; overflow: hidden; }
-  .hdr__desk { max-width: 260px; overflow: hidden; }
-  .is-scrolled .hdr__brand { padding-right: 9px; }
-  .is-scrolled .hdr__brand .logo { gap: 0; }
-  .is-scrolled .hdr__brand .logo__text { max-width: 0; opacity: 0; }
-  .is-scrolled .hdr__desk { max-width: 0; margin-right: 0; padding-left: 0; opacity: 0; }
-}
+/* Al hacer scroll (main.js pone .is-scrolled en el <header> pasados ~80px) las islas se funden en UNA sola barra de vidrio (el .hdr::before de fondo aparece y el fondo y el borde de cada isla se desvanecen): la cabecera deja de verse partida en trozos sueltos. El logo no se encoge y las posiciones no cambian, solo el vidrio; el desenfoque sigue en pseudo-elementos (nunca en .header) y solo hay uno activo a la vez. */
+.hdr { position: relative; }
+.hdr::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: var(--r-pill); border: 1px solid var(--hairline); pointer-events: none; background: var(--glass-strong); -webkit-backdrop-filter: blur(var(--glass-blur)); backdrop-filter: blur(var(--glass-blur)); opacity: 0; transition: opacity .28s ease; }
+.hdr__island, .hdr__island::before { transition: opacity .28s ease, border-color .28s ease; }
+.is-scrolled .hdr::before { opacity: 1; }
+.is-scrolled .hdr__island { border-color: transparent; }
+.is-scrolled .hdr__island::before { opacity: 0; }
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .header .hdr::before { background: var(--panel); } }
+@media (prefers-reduced-transparency: reduce) { .header .hdr::before { background: var(--panel); -webkit-backdrop-filter: none; backdrop-filter: none; } }
 @media (prefers-reduced-motion: reduce) {
-  .hdr__brand, .hdr__act, .hdr__desk, .hdr__brand .logo__text, .nav__pill, .nav__trigger .icon { transition: none !important; }
+  .hdr::before, .hdr__island, .hdr__island::before, .nav__pill, .nav__trigger .icon { transition: none !important; }
 }
 
 /* ---- Mega menús ---- */
@@ -283,7 +281,7 @@ a.card:focus-visible { outline-offset: 3px; }
 .card__top { display: flex; justify-content: space-between; align-items: center; }
 .card__icon { width: 54px; height: 54px; background: var(--panel-2); color: var(--cyan); display: inline-flex; align-items: center; justify-content: center; border-radius: var(--r-tile); transition: background-color var(--t-fast), color var(--t-fast); }
 a.card:hover .card__icon, .card--hover:hover .card__icon { background: var(--cyan); color: var(--navy-deep); }
-.card__num { font-family: var(--font-mono); font-weight: 500; font-size: 13px; letter-spacing: .1em; line-height: 1; color: var(--cyan); }
+.card__num { font-family: var(--font-mono); font-weight: 500; font-size: 13px; letter-spacing: .1em; line-height: 1; color: var(--cyan-light); }
 .card__meta { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
 .card__tag { font-size: 11px; color: var(--cyan-light); }
 .card__code { font-family: var(--font-mono); font-size: 12px; letter-spacing: .06em; color: var(--cyan-light); }
@@ -403,6 +401,10 @@ nav.footer__col .foot__link { font-family: var(--font-mono); font-size: 12px; te
 .foot__addr { display: flex; flex-direction: column; margin-top: 4px; font-style: normal; line-height: 1.6; color: var(--text-2); }
 .footer__bar { max-width: var(--wrap); margin: 0 auto; padding: 22px var(--gutter) 28px; border-top: 1px solid var(--hairline); display: flex; flex-wrap: wrap; gap: 8px 24px; justify-content: space-between; font-family: var(--font-mono); font-size: 12px; letter-spacing: .04em; }
 .footer__bar .foot__link { font-size: 12px; }
+.footer__copy { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 18px; }
+.footer__credit { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-2); }
+.footer__credit .foot__link { gap: 5px; color: var(--text); font-weight: 600; }
+.footer__heart { color: var(--cyan-light); }
 .footer__legal { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; }
 @media (min-width: 761px) { .footer__bar { padding-right: max(var(--gutter), 76px); } }   /* deja libre el botón flotante de WhatsApp */
 @media (pointer: coarse) { .foot__link { display: inline-flex; align-items: center; min-height: 44px; } .footer__col { gap: 0; } }
@@ -457,7 +459,7 @@ body:has(.mobile-menu:not([hidden])) .wa-float, body.menu-open .wa-float { displ
 .log__row { position: relative; display: grid; grid-template-columns: 48px 1fr; gap: 10px; align-items: start; }
 .log__time { font-family: var(--font-mono); font-size: 12px; color: var(--text-3); }
 .log__text { font-size: 15px; line-height: 1.4; color: var(--text-2); }
-.log__row--on .log__time { color: var(--cyan); font-weight: 500; }
+.log__row--on .log__time { color: var(--cyan-light); font-weight: 500; }
 .log__row--on .log__text { font-weight: 600; color: var(--text); }
 .log__row--on::before { content: ""; position: absolute; left: calc(-1 * var(--log-pad) - 4px); top: 6px; width: 7px; height: 7px; border-radius: 50%; background: var(--cyan); }
 .input { width: 100%; min-height: 52px; padding: 12px 18px; border: 1px solid var(--field-line); border-radius: var(--r-tile); background: var(--bg); font-family: var(--font-body); font-size: 16px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--text); transition: border-color var(--t-fast); }

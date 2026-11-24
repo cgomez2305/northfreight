@@ -57,7 +57,7 @@ summary::-webkit-details-marker { display: none; }
 .t-meta { font-size: 11px; }
 
 /* Color */
-.hl { color: var(--cyan); }
+.hl { color: var(--cyan-light); }
 .on-dark { color: var(--text); }
 .c-navy { color: var(--text); }
 .c-slate { color: var(--text-2); }

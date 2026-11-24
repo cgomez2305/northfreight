@@ -15,15 +15,6 @@ $tags = $variantA
 // Hero: mensaje de WhatsApp de la página.
 $waHref = wa($route['wa'] ?? null);
 
-// Widget "Start in WhatsApp" (hero): pestañas = quién eres, chips = en qué ayudamos (los servicios que ya existen). main.js recompone el enlace wa.me
-// con el mensaje; sin JS el botón apunta al enlace por defecto de la ruta. No se guarda ni se envía ningún dato.
-$waTabs = [
-    ['owner', 'Owner-operator', 'I run an owner-operator business'],
-    ['fleet', 'Small fleet', 'I run a small fleet'],
-    ['relay', 'Amazon Relay', 'I haul Amazon Relay freight'],
-];
-$waChips = ['Load booking', 'Load tracking', 'Back office'];
-
 // Video del hero: assets/video/hero.mp4 (escena de una sola pasada, 1080p, sin audio, SIN bucle: se queda en el último fotograma). main.js lo monta tras load + idle solo en >=1025px sobre la foto (que es su primer fotograma). Ver ns_hero_video() en kit.php.
 $heroVideo = ns_hero_video('hero');
 
@@ -102,7 +93,7 @@ $figures = [
 ?>
 <!-- HERO: foto protagonista (v3: nf-hero-highway-poster = primer fotograma de hero.mp4 a 1920×1080, sin master mayor porque el video de origen es 1280×720; degradado solo desde la izquierda y abajo) + titular + widget de WhatsApp. Recortes reales: -m (4:5, ≤760 px) y -sq (cuadrado, 761 a 1024 px); en escritorio la foto 16:9 completa con srcset 640 a 1920.
      Slot de video: si existe assets/video/hero.mp4 (o .webm) $heroVideo lo activa: el <video> va vacío (preload none, sin src) y main.js le pone la fuente tras load + idle en >=1025px, con fundido sobre la foto (que sigue siendo el LCP). Sin archivos no se emite nada y no hay peticiones. -->
-<script>(function(w,d){var r=d.documentElement;r.classList.add('js-wa');if(w.matchMedia&&w.matchMedia('(min-width:1025px)').matches&&!w.matchMedia('(prefers-reduced-motion: reduce)').matches){r.style.setProperty('--pin-h',w.innerHeight+'px');r.classList.add('hero-pre');w.addEventListener('load',function(){setTimeout(function(){if(!r.classList.contains('js-motion'))r.classList.remove('hero-pre')},7000)})}})(window,document)</script>
+<script>(function(w,d){var r=d.documentElement;if(w.matchMedia&&w.matchMedia('(min-width:1025px)').matches&&!w.matchMedia('(prefers-reduced-motion: reduce)').matches){r.style.setProperty('--pin-h',w.innerHeight+'px');r.classList.add('hero-pre');w.addEventListener('load',function(){setTimeout(function(){if(!r.classList.contains('js-motion'))r.classList.remove('hero-pre')},7000)})}})(window,document)</script>
 <section class="hero hero--home" id="top">
   <div class="hero__bg"<?= $heroVideo ? ' data-hero-video data-mp4="' . e($heroVideo['mp4'] ?? '') . '" data-webm="' . e($heroVideo['webm'] ?? '') . '"' : '' ?>><?= ns_img(['base' => 'nf-hero-highway-poster', 'widths' => [640, 1024, 1280, 1600, 1920], 'alt' => 'White semi truck driving away along an empty highway at golden hour, with the sun low over the plains', 'eager' => true, 'sizes' => '100vw',
         'art' => [
@@ -125,36 +116,16 @@ $figures = [
         <?php foreach ($tags as $t): ?><li class="tag"><?= e($t) ?></li><?php endforeach; ?>
       </ul>
     </div>
-    <div class="hero-wa" data-wa-widget data-wa-base="<?= e(cfg('wa_base')) ?>">
-      <p class="hero-wa__title t-meta">Start in WhatsApp</p>
-      <p class="hero-wa__note" data-wa-note>Open WhatsApp with a ready message to send to a dispatcher.</p>
-      <div class="hero-wa__ui" data-wa-ui hidden>
-        <div class="hero-wa__tabs" role="tablist" aria-label="I am">
-          <?php foreach ($waTabs as $i => [$key, $label, $who]): ?>
-          <button type="button" class="hero-wa__tab" role="tab" id="wa-tab-<?= e($key) ?>" aria-selected="<?= $i === 0 ? 'true' : 'false' ?>" aria-controls="wa-panel"<?= $i === 0 ? '' : ' tabindex="-1"' ?> data-who="<?= e($who) ?>"><?= e($label) ?></button>
-          <?php endforeach; ?>
-        </div>
-        <div class="hero-wa__panel" role="tabpanel" id="wa-panel" aria-labelledby="wa-tab-owner">
-          <div class="hero-wa__chips" role="group" aria-label="I want help with">
-            <?php foreach ($waChips as $c): ?>
-            <button type="button" class="hero-wa__chip" aria-pressed="false" data-svc="<?= e(strtolower($c)) ?>"><?= e($c) ?></button>
-            <?php endforeach; ?>
-          </div>
-          <p class="hero-wa__msg" data-wa-msg><?= e('Hi, ' . $waTabs[0][2] . ' and I\'d like to talk about dispatch with NorthStar.') ?></p>
-        </div>
-      </div>
-      <a class="btn btn--primary btn--card hero-wa__go" href="<?= e($waHref) ?>" rel="noopener" data-wa-open><span class="btn__t">Open WhatsApp</span></a>
-    </div>
   </div>
 </section>
 
-<?php partial('summary', summary_for($route) + ['variant' => 'lead', 'textfill' => true]   /* relleno de texto con el scroll (motion.js textScene): usado una sola vez; quitar 'textfill' lo desactiva */); ?>
+<?php partial('summary', summary_for($route) + ['variant' => 'lead']); ?>
 
 <!-- 01 SERVICES: rejilla de 3 tarjetas con foto; con html.js-motion y ≥1025px motion.js la convierte en un carril horizontal fijado (.home-services__pin) -->
 <section class="section home-services" id="services" aria-labelledby="services-title">
   <div class="home-services__pin">
     <div class="container">
-      <?php partial('section-head', ['eyebrow' => 'What we manage', 'title' => 'Three fronts.{pill:nf-hero-amazon-relay}{br}One dispatch desk.{pill:nf-hero-dry-van}', 'id' => 'services-title', 'split' => true,
+      <?php partial('section-head', [ 'title' => 'Three fronts.{pill:nf-hero-amazon-relay}{br}One dispatch desk.{pill:nf-hero-dry-van}', 'id' => 'services-title', 'split' => true,
           'lead' => 'We stay on the load until it is documented and settled. The same team that books it tracks it and closes it out.']); ?>
     </div>
     <div class="container home-rail">
@@ -174,8 +145,7 @@ $figures = [
 <!-- 02 CHOOSE YOUR SETUP: pestañas (Owner-operator · Small fleet · Amazon Relay carrier). Cada panel = foto 16:9 con tarjeta solapada, 3 puntos ya afirmados en la página de destino, enlace y WhatsApp con el mensaje de esa variante. -->
 <?php partial('tabs', [
     'id'      => 'setup-title',
-    'eyebrow' => 'Your setup',
-    'title'   => 'Choose your setup',
+    'title'   => 'One truck, a small fleet or a Relay account.',
     'lead'    => 'Pick the one that looks like your operation. Each opens WhatsApp with a ready message.',
     'label'   => 'Choose your setup',
     'items'   => [
@@ -204,7 +174,6 @@ $figures = [
 <section class="home-relay curtain-next" aria-labelledby="relay-title">
   <div class="container home-relay__in">
     <div class="home-relay__main">
-      <span class="t-eyebrow">Specialty</span>
       <h2 class="t-h2" id="relay-title">Amazon Relay dispatch for <span class="hl">carriers who move fast.</span></h2>
       <p class="t-body home-relay__lead">Relay rewards carriers who move fast and keep clean records. Our desk watches the load board for you, books the blocks that fit your trucks and follows performance and disputes inside your account.</p>
       <a class="btn btn--primary home-relay__btn" href="<?= e(url('/amazon-relay-dispatch/')) ?>"><span class="btn__t">Amazon Relay dispatch</span></a>
@@ -220,7 +189,7 @@ $figures = [
 <section class="section home-why" aria-labelledby="why-title">
   <div class="why__pin">
     <div class="container">
-      <?php partial('section-head', ['eyebrow' => 'Why a desk', 'title' => 'A team, not a single dispatcher', 'id' => 'why-title']); ?>
+      <?php partial('section-head', [ 'title' => 'A team, not a single dispatcher', 'id' => 'why-title']); ?>
     </div>
     <div class="container why">
       <ol class="why__list">
@@ -243,7 +212,7 @@ $figures = [
 <!-- 04 ONBOARDING: columnas con foto, línea fina arriba y línea cian que se rellena con el scroll (motion.js); desfase vertical escalonado en escritorio -->
 <section class="section home-onboarding" aria-labelledby="onboarding-title">
   <div class="container stack">
-    <?php partial('section-head', ['eyebrow' => 'Onboarding', 'title' => 'How we plug into your operation.', 'id' => 'onboarding-title']); ?>
+    <?php partial('section-head', [ 'title' => 'How we plug into your operation.', 'id' => 'onboarding-title']); ?>
     <ol class="home-steps">
       <?php foreach ($steps as $si => [$title, $text, $gets, $photo]):
           $sv = (string) ($photo['video'] ?? '');
@@ -274,7 +243,6 @@ $videoReady = ns_video_ready();
 $teamCard = [
     'id'      => 'team-title',
     'cls'     => 'home-team',
-    'eyebrow' => 'The desk behind the load',
     'title'   => 'Built by dispatchers.{br}{hl}Run as a team.{/hl}',
     'image'   => ['base' => 'nf-dispatch-room-wide', 'alt' => 'A quiet dispatch desk by a large window at dusk, with two monitors, a headset, a notebook and a lamp, overlooking a freight yard with trailers', 'pos' => '50% 50%'],
 ];
@@ -299,7 +267,7 @@ partial('photo-card', $teamCard); ?>
 <section class="section" aria-labelledby="evidence-title">
   <div class="container split home-evidence">
     <div class="home-evidence__text">
-      <?php partial('section-head', ['eyebrow' => 'Proof, not promises', 'title' => 'Incidents are handled with evidence.', 'id' => 'evidence-title',
+      <?php partial('section-head', [ 'title' => 'Incidents are handled with evidence.', 'id' => 'evidence-title',
           'lead' => 'When a broker questions detention, a lumper fee or a late arrival, the answer is already on file. Here is what our desk keeps for every load.']); ?>
       <ul class="home-docs" aria-label="Documents the desk keeps for every load">
         <?php foreach ($docs as $i => $d): ?>
@@ -357,7 +325,6 @@ partial('photo-card', $teamCard); ?>
 <!-- 08 FROM THE DESK: artículo destacado + 2 filas (datos de app/data/posts.php; sin fechas mientras `published` esté vacío) -->
 <?php partial('desk-block', [
     'id'      => 'desk-guides',
-    'eyebrow' => 'From the desk',
     'title'   => 'Guides from the desk',
     'lead'    => 'Practical guides on what dispatch costs, how Amazon Relay works and how to get paid for every hour at the dock.',
     'btn'     => ['label' => 'All articles', 'href' => url('/blog/')],
@@ -365,7 +332,7 @@ partial('photo-card', $teamCard); ?>
 ]); ?>
 
 <!-- 09 FAQ -->
-<?php partial('faq', ['items' => route_faq_items($route), 'eyebrow' => 'FAQ', 'title' => 'Truck dispatch questions carriers ask us.', 'pre_cta' => true,
+<?php partial('faq', ['items' => route_faq_items($route), 'title' => 'Truck dispatch questions carriers ask us.', 'pre_cta' => true,
     // Foto del FAQ por tema (cada pregunta de app/data/faq.php lleva 'topic'): 0 costo, arranque y contrato · 1 Amazon Relay · 2 alcance · 3 con quién trabajamos. El tema 0 es la foto de siempre (4:5 nativo).
     'image' => ['base' => 'nf-faq-dock-light-4x5', 'alt' => 'White trailer backed into a dock door on a warehouse wall, with yellow bollards and painted parking lines', 'sizes' => '(min-width:1025px) 500px, 0px', 'topics' => [
         ['base' => 'nf-faq-dock-light-4x5', 'alt' => 'White trailer backed into a dock door on a warehouse wall, with yellow bollards and painted parking lines'],

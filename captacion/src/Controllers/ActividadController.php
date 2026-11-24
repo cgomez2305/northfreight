@@ -39,6 +39,10 @@ final class ActividadController extends Responder
     private static function export(array $user): never
     {
         self::requirePost('/actividad');
+        if (!Reauth::fresh()) {   // la pantalla ya está bloqueada sin confirmar identidad; el POST directo no puede saltarse ese bloqueo (el registro lleva IP y correos)
+            self::flash(false, 'Confirma tu identidad (contraseña y código) para exportar la actividad.');
+            self::redirect('/actividad');
+        }
         parse_str(is_string($_POST['qs'] ?? null) ? mb_substr($_POST['qs'], 0, 600) : '', $q);
         $f = ActivityView::filters($q);
         $res = ActivityView::query($f, 1, ActivityView::EXPORT_MAX);

@@ -34,8 +34,8 @@ return static function (array $ctx): void {
         ['owner 6 camiones (+15) = limite 70 caliente', ['truck_count' => 6] + $owner, 70, 'hot'],
         ['owner 12 camiones (+15)', ['truck_count' => 12] + $owner, 70, 'hot'],
         ['owner sin dato de camiones (0 y formulario incompleto)', ['truck_count' => null] + $owner, 50, 'warm'],
-        ['owner con Amazon Relay (equipo no despachado: 0)', ['equipment_types' => ['amazon-relay']] + $owner, 55, 'warm'],
-        ['owner con reefer + otro (equipo despachado: +10)', ['equipment_types' => ['other', 'reefer']] + $owner, 65, 'warm'],
+        ['owner con Amazon Relay (equipo despachado: +10, fase AH)', ['equipment_types' => ['amazon-relay']] + $owner, 65, 'warm'],
+        ['owner con reefer + otro (reefer ya no se despacha: sin +10)', ['equipment_types' => ['other', 'reefer']] + $owner, 55, 'warm'],
         ['owner 2 anos exactos = +5 de experiencia; solo CDL+ingles+exp', ['first_name' => 'M', 'last_name' => '', 'phone_e164' => '+18635550101', 'email' => null, 'state' => null, 'truck_count' => null, 'equipment_types' => [], 'authority_status' => null, 'years_experience' => 2] + $owner, 40, 'warm'],
         ['owner 1 ano (<2): 35 = frio', ['first_name' => 'M', 'last_name' => '', 'email' => null, 'state' => null, 'truck_count' => null, 'equipment_types' => [], 'authority_status' => null, 'years_experience' => 1] + $owner, 35, 'cold'],
         ['owner sin experiencia declarada', ['first_name' => 'M', 'last_name' => '', 'email' => null, 'state' => null, 'truck_count' => null, 'equipment_types' => [], 'authority_status' => null, 'years_experience' => 0] + $owner, 35, 'cold'],
@@ -108,8 +108,9 @@ return static function (array $ctx): void {
     // Banderas derivadas
     T::ok(in_array('cdl_unsure', Flags::derive([], ['cdl_type' => 'unsure']), true), 'bandera cdl_unsure');
     T::ok(!in_array('cdl_unsure', Flags::derive(['cdl_unsure'], ['cdl_type' => 'standard']), true), 'cdl_unsure se quita cuando deja de aplicar');
-    T::ok(in_array('below_min_experience', Flags::derive([], ['profile' => 'company_driver', 'years_experience' => 0], $S), true), 'driver con 0 anos: bandera below_min_experience (minimo 1)');
-    T::ok(!in_array('below_min_experience', Flags::derive([], ['profile' => 'company_driver', 'years_experience' => 1], $S), true), 'driver con 1 ano: sin bandera');
+    T::ok(in_array('below_min_experience', Flags::derive([], ['profile' => 'company_driver', 'years_experience' => 0], $S), true), 'driver con 0 anos: bandera below_min_experience (minimo 2)');
+    T::ok(in_array('below_min_experience', Flags::derive([], ['profile' => 'company_driver', 'years_experience' => 1], $S), true), 'driver con 1 ano: bandera (minimo 2, fase AH)');
+    T::ok(!in_array('below_min_experience', Flags::derive([], ['profile' => 'company_driver', 'years_experience' => 2], $S), true), 'driver con 2 anos: sin bandera');
     $red = Flags::derive(['stop', 'phone_invalid'], ['fmcsa_data' => ['found' => true, 'red_flags' => ['authority_inactive', 'no_insurance']]], $S);
     T::ok(in_array('red:authority_inactive', $red, true) && in_array('red:no_insurance', $red, true) && in_array('stop', $red, true) && in_array('phone_invalid', $red, true), 'banderas rojas de FMCSA; las manuales (stop, phone_invalid) se conservan');
     T::ok(in_array('usdot_not_found', Flags::derive([], ['fmcsa_data' => ['found' => false]], $S), true), 'bandera usdot_not_found');

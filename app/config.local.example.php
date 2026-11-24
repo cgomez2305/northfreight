@@ -36,7 +36,7 @@ define('SMTP_SECURE', 'ssl');      // 'ssl' | 'tls'
 // Destino de los mensajes de contacto, los avisos de descarga y las solicitudes de /careers/ (contact.php, download.php y lead.php leen MAIL_TO vía ns_mail_to()).
 // Valor propuesto por el cliente (fase S): el mismo correo de contacto. Cuando exista el correo con dominio propio (se crea en hPanel), cambiar AQUÍ MAIL_TO
 // y, en config.php o con define(), EMAIL (el correo visible) y MAIL_FROM (remitente; vacío = el buzón SMTP_USER).
-define('MAIL_TO', 'nfreightsolutionsllc@gmail.com');
+define('MAIL_TO', 'contact@northstarfreightsolutions.us');   // el buzón (SMTP_*, MAIL_TO, MAIL_FROM) puede ir aparte en app/config.mail.php (ver config.mail.example.php), que gana a este archivo
 // define('MAIL_FROM', 'desk@tu-dominio.us');
 
 // IP real detrás de un proxy/CDN: por defecto el límite por IP usa REMOTE_ADDR. Si en el servidor REMOTE_ADDR llega con la IP del proxy (todos los visitantes compartirían el mismo límite),
@@ -56,7 +56,7 @@ define('RATE_LIMIT', 5);
 // define('SHOW_ON_SHIFT', true);
 // define('SHOW_ON_SHIFT_PRODUCTION', true);
 // Cobertura e idiomas (texto visible en /contact/ y /our-desk/). Vacío = desaparece de todo el sitio.
-// define('COVERAGE_TEXT', 'Dispatch desk coverage: 24/7');
+// define('COVERAGE_TEXT', 'Dispatch desk coverage: 24/7, all U.S. states');
 // define('LANGUAGES_TEXT', 'English and Spanish');
 // Descargables (BOL y agreement): false (defecto) = en producción dan 404 y no aparecen en ningún sitio; true solo cuando el cliente apruebe los archivos de assets/downloads/.
 // define('DOWNLOADS_APPROVED', true);

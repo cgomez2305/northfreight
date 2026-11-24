@@ -78,7 +78,7 @@
  rp.addEventListener('click', function (e) {
   var t = e.target.closest ? e.target.closest('button,a') : null; if (!t || !rp.contains(t)) return;
   if (t.hasAttribute('data-rp-close')) { close(); return; }
-  if (t.hasAttribute('data-hist')) { e.preventDefault(); var h = $('#rp-hist', rp); if (h) { h.scrollIntoView({ behavior: 'smooth', block: 'start' }); } return; }
+  if (t.hasAttribute('data-hist')) { e.preventDefault(); var h = $('#rp-hist', rp); if (h) { h.scrollIntoView({ behavior: (matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'), block: 'start' }); } return; }
   if (t.hasAttribute('data-impact-go')) { e.preventDefault(); schedule(true); return; }
   if (t.hasAttribute('data-sim-go')) { e.preventDefault(); simulate(t); return; }
   var add = t.getAttribute('data-add');
@@ -95,7 +95,7 @@
   var r = btn.closest('[data-rule]');
   if (kind === 'rule') {
    var list = $('[data-rules]', rp), key = nextKey(list, 'n'); btn.disabled = true;
-   row('rule', 'rules[' + key + ']').then(function (el) { btn.disabled = false; if (!el) return; el.setAttribute('data-fresh', '1'); list.appendChild(el); emptyState(); el.scrollIntoView({ behavior: 'smooth', block: 'center' }); var i = $('.rule__name input', el); if (i) i.focus(); touched(); });
+   row('rule', 'rules[' + key + ']').then(function (el) { btn.disabled = false; if (!el) return; el.setAttribute('data-fresh', '1'); list.appendChild(el); emptyState(); el.scrollIntoView({ behavior: (matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'), block: 'center' }); var i = $('.rule__name input', el); if (i) i.focus(); touched(); });
    return;
   }
   if (kind === 'cond' || kind === 'group') {
@@ -144,7 +144,16 @@
   c.setAttribute('data-key', nk); c.classList.remove('has-err');
   var id = $('input[name$="[id]"]', c); if (id) id.value = ''; var ex = $('input[name$="[example]"]', c); if (ex) ex.value = '0'; var ex2 = $('.rule__ex', c); if (ex2) ex2.remove();
   var nm = $('.rule__name input', c); if (nm) nm.value = (nm.value + ' (copia)').slice(0, 80);
-  r.parentNode.insertBefore(c, r.nextSibling); wireGrips(c); c.scrollIntoView({ behavior: 'smooth', block: 'center' }); if (nm) nm.focus(); touched();
+  r.parentNode.insertBefore(c, r.nextSibling); wireGrips(c); c.scrollIntoView({ behavior: (matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'), block: 'center' }); if (nm) nm.focus(); touched();
+ }
+
+ /* ---------- Disparador de las reglas de eventos y tiempo: solo se ven los parámetros del evento elegido ---------- */
+ function syncTrigger(tr) {
+  if (!tr) return; var sel = $('[data-rt=type]', tr), ty = sel ? sel.value : '', helps = {};
+  try { helps = JSON.parse(tr.getAttribute('data-helps') || '{}'); } catch (e) { helps = {}; }
+  $$('[data-rt-p]', tr).forEach(function (p) { p.hidden = (p.getAttribute('data-rt-p') || '').split(' ').indexOf(ty) < 0; });
+  var h = $('[data-rt-help]', tr); if (h) h.textContent = helps[ty] || 'Elige qué evento activa la regla.';
+  var hl = $('[data-rt-p~=no_first_contact] small', tr); if (hl) hl.textContent = ty === 'task_overdue' ? '(0 a 720)' : '(1 a 720)';
  }
 
  /* ---------- Cambios en los campos ---------- */
@@ -163,6 +172,7 @@
    row('act', anp, { type: t.value }).then(function (el) { if (!el) { t.disabled = false; return; } a.replaceWith(el); var f = $('[data-ra=type]', el); if (f) f.focus(); touched(); });
    return;
   }
+  if (t.getAttribute('data-rt') === 'type') { syncTrigger(t.closest('[data-trigger]')); }
   if (t.getAttribute('data-rb') === 'mode') { var b = t.closest('[data-group],[data-block]'); b.setAttribute('data-mode', t.value); }
   if (t.hasAttribute('data-on')) { t.closest('[data-rule]').classList.toggle('is-off', !t.checked); }
   if (t.matches('[data-impact-scope]')) { schedule(true); return; }
@@ -208,7 +218,7 @@
    if (!j.ok) { if (j.errors) showErrors(j.errors); NS.toast(j.msg || 'No se pudo simular.', { bad: true }); return; }
    dirty = false; if (out) { var t = D.createElement('template'); t.innerHTML = j.html; out.textContent = ''; out.appendChild(t.content); }
    if (j.status === 'running') poll(j.id); else NS.toast('Simulación terminada (borrador v' + j.version + ' guardado).');
-   var s = $('.rp__side', rp); if (s && sheet()) out.scrollIntoView({ behavior: 'smooth', block: 'center' });
+   var s = $('.rp__side', rp); if (s && sheet()) out.scrollIntoView({ behavior: (matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'), block: 'center' });
   });
  }
  function poll(id) {

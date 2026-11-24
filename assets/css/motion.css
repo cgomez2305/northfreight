@@ -4,7 +4,7 @@
 
 /* ---- Footer y bandas: el desplazamiento inicial hacia abajo (y: 60) de la última banda no debe alargar la altura del documento mientras se hace scroll
    (si lo alargara, el scrub del footer nunca llegaría a 1). overflow-y: clip recorta ese desborde sin crear contenedor de scroll ni romper el header sticky ---- */
-@supports (overflow-y: clip) { .js-motion body { overflow-y: clip; } }
+@supports (overflow-y: clip) { .js-motion body { overflow-y: clip; display: flow-root; } }   /* flow-root: sin él, el margen superior del header (24 px) se colapsa a través del body y este arranca en y=24; el hero del home sube con margen negativo hasta y=8 y el overflow-y: clip del body le recortaba esos 16 px (borde superior plano y esquinas cuadradas en reposo; al hacer scroll el hero se mueve y se veían redondeadas) */
 
 /* ---- Escena 3: parallax de fotos (.px). Marco con overflow hidden; la imagen mide 110 % del alto (el mínimo que da recorrido al parallax sin ampliar la foto más de la cuenta: cada punto extra
    obliga a ampliar la foto y a pedir una variante mayor) y arranca centrada (-4,55 % de su alto).
@@ -29,12 +29,11 @@
   .js-motion .curtain--short { height: calc(var(--cur-p) * 2); }
 }
 
-/* ---- Relleno de texto (data-textfill, >=1025px): cada palabra parte de opacidad .5 (AA medido) y motion.js la sube a 1 ---- */
-@media (min-width: 1025px) { .js-motion [data-textfill] .w { opacity: .65; } }
-
 /* ---- Escena 1: hero de la home. El contenedor de la foto se encoge y revela el fondo; necesita el radio fijo y el recorte ---- */
 @media (min-width: 1025px) {
-  .js-motion .hero--home .hero__bg { clip-path: inset(1px round calc(var(--r-panel) - 1px)); will-change: transform; }   /* recorte ESTÁTICO con radio fijo (no se anima); el 1px evita la línea de foto cruda que asoma por el borde al escalar con medio píxel */
+  .js-motion .hero--home .hero__bg { clip-path: inset(0 round var(--r-panel)); will-change: transform; }   /* recorte ESTÁTICO con radio fijo (no se anima). Sin el inset de 1px: con la escena a escala fraccionaria, ese recorte caía en medio de un píxel y dejaba una línea clara (foto cruda sin el degradado) en los bordes izquierdo y superior; medido con el póster y con el video */
+  .js-motion .hero--home .hero__bg { border-radius: var(--r-panel); overflow: hidden; isolation: isolate; }   /* además del clip-path: Safari y algunos Chrome no recortan un <video> con clip-path de un ancestro transformado y se ve cuadrado */
+  .js-motion .hero--home .hero__bg video, .js-motion .hero--home .hero__bg img { border-radius: var(--r-panel); }   /* el radio en el propio <video>/<img> es el único recorte que respetan todos los navegadores */
   .js-motion .hero--home .hero__bg picture { overflow: hidden; border-radius: var(--r-panel); }   /* la foto se recorta también en su propio marco: atenúa la fila de borde que asoma al escalar */
   .js-motion .hero--home .hero__main,
   .js-motion .hero--home .tags,

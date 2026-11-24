@@ -22,7 +22,14 @@
 .intg__u2{display:grid;gap:6px}
 .intg__k{font:500 var(--fs-sm)/1.3 var(--f-sans);color:var(--ink-3)}
 .intg__u2 .rlink{display:flex;gap:8px;align-items:center}
-.intg__u2 .rlink input{flex:1;min-width:0;min-height:40px}
+.intg__u2 .rlink input{flex:1;min-width:0;min-height:40px;padding:6px 10px;border:1px solid var(--line-2);border-radius:var(--r-ctl);background:var(--sunk);color:var(--ink-2);font-size:var(--fs-sm);text-overflow:ellipsis}
 .intg__lnk{margin:0;font-size:14px}
 .intg__lnk a{display:inline-flex;gap:4px;align-items:center}
 .intg__lnk .ic{width:14px;height:14px;margin-left:4px;vertical-align:-2px}
+/* Fase AM: webhooks salientes genéricos */
+.whout{margin-top:14px}
+.whout__once{display:grid;gap:6px;padding:12px 14px;border:1px solid var(--accent-line);background:var(--accent-tint);border-radius:var(--r-card)}
+.whout__ev{display:grid;gap:8px}
+.whout__t{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.whout__t .cfg-fs{display:flex;gap:12px;align-items:center;flex-wrap:wrap;border:0;padding:0;margin:0}
+.whout__h{margin-top:18px}

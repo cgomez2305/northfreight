@@ -329,6 +329,16 @@ return static function (array $ctx): void {
     T::ok($g2['status'] === 200 && $p2['status'] === 200 && (int) Db::value("SELECT COUNT(*) FROM lead_events WHERE lead_id = ? AND type = 'consent_revoked'", [$u]) === 1, 'repetir la baja (POST del botón o «One-Click» del cliente de correo) es idempotente');
     T::eq(Infra::http('GET', $panel->base . '/u/' . substr($tok, 0, -1) . 'x')['status'], 404, 'token de baja manipulado: 404');
     T::eq(Infra::http('GET', $panel->base . '/u/' . str_repeat('a', 60))['status'], 404, 'token de baja inventado: 404');
+    // Regresión B3 (auditoría 2026-11-22): una IP ya limitada por tokens inventados NO bloquea una baja con token válido (obligación legal de la baja)
+    $st = 0;
+    for ($i = 0; $i < 70; $i++) {
+        $st = Infra::http('GET', $panel->base . '/u/' . str_repeat('b', 60))['status'];
+        if ($st === 429) {
+            break;
+        }
+    }
+    T::eq($st, 429, 'tokens de baja inventados: límite estricto por IP (429)');
+    T::eq(Infra::http('POST', $panel->base . '/u/' . $tok, ['form' => ['List-Unsubscribe' => 'One-Click']])['status'], 200, 'con la IP ya limitada, un token de baja VÁLIDO sigue funcionando');
     $b = count($mails());
     Clock::travel(40 * 86400);
     $tick();
@@ -354,20 +364,23 @@ return static function (array $ctx): void {
     T::eq($enr($sg, 'a12_referral')['status'], 'completed', '  y la inscripción queda completada');
     Clock::travel(0);
 
-    // ------------------------------------------------------------------ Sin SMTP: todo queda «registrado»
+    // ------------------------------------------------------------------ Sin SMTP: la secuencia NO avanza como «enviada» (fase AM)
     Fx::noSmtp();
     Db::pdo()->exec("DELETE FROM sequence_enrollments");
     Db::pdo()->exec("DELETE FROM messages");
     @unlink(Storage::dir('mail.log'));
     $ns = $warm(['email' => 'nosmtp@example.com']);
     Sequences::enrollWarm($ns);
+    $stepBefore = (int) $enr($ns)['step'];
     Clock::travel(2 * 86400);
     $b = count($mails());
     $tick();
     Clock::travel(0);
     $ml = (string) @file_get_contents(Storage::dir('mail.log'));
-    T::ok(count($mails()) === $b && str_contains($ml, '[logged: SMTP sin configurar]') && str_contains($ml, 'nosmtp@example.com') && str_contains($ml, 'List-Unsubscribe'), 'sin SMTP el correo queda en storage/mail.log (con destinatario y cabeceras) y no sale a nadie');
-    T::eq(Db::value("SELECT status FROM messages WHERE lead_id = ?", [$ns]), 'logged', '  y en messages queda «logged», no «sent»');
+    $enNs = $enr($ns);
+    T::ok(count($mails()) === $b && (int) $enNs['step'] === $stepBefore && str_contains((string) $enNs['blocked_reason'], 'Sin SMTP') && !str_contains($ml, 'nosmtp@example.com'), 'sin SMTP el paso queda bloqueado («Sin SMTP»), no avanza, no sale a nadie y no se anota como enviado');
+    T::eq((int) Db::value("SELECT COUNT(*) FROM messages WHERE lead_id = ?", [$ns]), 0, '  y en messages no queda ningún «logged» de la secuencia');
+    Db::insert('messages', ['lead_id' => $ns, 'channel' => 'email', 'direction' => 'out', 'body' => 'x', 'template_key' => 'a6_d1', 'subject' => 'Prueba', 'status' => 'logged', 'created_at' => Clock::now()]);   // un envío manual sin SMTP sí queda «registrado»
     $page = $panel->get('/comunicaciones/envios');
     $panelNoSmtp = Panel::start($ctx, 'panel21b');
     Db::run('UPDATE users SET totp_last_step = NULL WHERE id = ?', [$aid]);

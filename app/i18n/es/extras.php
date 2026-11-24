@@ -12,4 +12,12 @@ return [
     'Please check the highlighted answers and send it again.' => 'Revisa las respuestas marcadas y envía de nuevo.',
     'No openings listed right now. We only publish real positions, so this page stays honest.' => 'Por ahora no hay vacantes publicadas. Solo publicamos puestos reales, así que esta página se mantiene honesta.',
     'Not right now: there are no company driver openings listed. If that changes, they will appear on this site.' => 'Por ahora no: no hay vacantes de company driver publicadas. Si eso cambia, aparecerán en este sitio.',
+    'NorthStar is a remote truck dispatch company for owner-operators and small fleets. Our trucking dispatch services, a full freight dispatch service from one desk, cover load booking on Amazon Relay and dry van, load tracking from pickup to POD and back-office work.' => 'NorthStar es una empresa remota de dispatch de camiones para owner-operators y flotas pequeñas. Nuestros servicios de trucking dispatch, un servicio completo de freight dispatch desde un solo equipo, cubren la reserva de cargas en Amazon Relay y dry van, el seguimiento de cargas del pickup al POD y el trabajo de back office.',
+    'Hand us the paperwork.' => 'Pásanos el papeleo.',
+    'Keep the driving.' => 'Tú sigue manejando.',
+    'One truck, a small fleet or a Relay account.' => 'Un camión, una flota pequeña o una cuenta de Relay.',
+    'Partner with the desk' => 'Trabaja con el equipo',
+    'Developed by' => 'Desarrollado por',
+    '(opens in a new tab)' => '(se abre en una pestaña nueva)',
+    'ClikRank' => 'ClikRank',
 ];

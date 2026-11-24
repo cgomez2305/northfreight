@@ -14,12 +14,36 @@ if (defined('NS_CONFIG_LOADED')) {
 }
 define('NS_CONFIG_LOADED', true);
 
-// 1) Local primero: así sus define() ganan a los valores por defecto de abajo.
+// 0) Correo (config.mail.php, fuera de git): buzón SMTP y destinos. Devuelve un array CLAVE => valor y GANA a config.local.php
+//    en esas claves (solo SMTP_*, MAIL_TO, MAIL_FROM y EMAIL), así se puede cambiar el buzón sin reescribir config.local.php.
+$ns_mail = __DIR__ . '/config.mail.php';
+$ns_mail_keys = [];
+if (is_file($ns_mail)) {
+    $ns_mail_cfg = require $ns_mail;
+    foreach (is_array($ns_mail_cfg) ? $ns_mail_cfg : [] as $k => $v) {
+        if (is_string($k) && preg_match('/^(SMTP_(HOST|PORT|USER|PASS|SECURE)|MAIL_TO|MAIL_FROM|EMAIL)$/', $k) && (is_string($v) || is_int($v)) && !defined($k)) {
+            define($k, $v);
+            $ns_mail_keys[$k] = true;
+        }
+    }
+    unset($ns_mail_cfg, $k, $v);
+}
+unset($ns_mail);
+
+// 1) Local después: sus define() ganan a los valores por defecto de abajo. Si repite una clave que ya fijó config.mail.php,
+//    PHP avisaría «Constant X already defined»: ese aviso concreto se descarta (manda el archivo de correo); cualquier otro sigue su curso.
 $ns_local = __DIR__ . '/config.local.php';
 if (is_file($ns_local)) {
-    require $ns_local;
+    set_error_handler(static function (int $no, string $str) use ($ns_mail_keys): bool {
+        return preg_match('/^Constant (\w+) already defined/', $str, $m) === 1 && isset($ns_mail_keys[$m[1]]);
+    }, E_WARNING);
+    try {
+        require $ns_local;
+    } finally {
+        restore_error_handler();
+    }
 }
-unset($ns_local);
+unset($ns_local, $ns_mail_keys);
 
 /** Define una constante solo si no la fijó config.local.php. */
 function ns_default(string $name, mixed $value): void
@@ -41,7 +65,7 @@ ns_default('PHONE', '+1 863-651-3322');          // visible como texto
 ns_default('TEL', '+18636513322');                // para href="tel:"
 // Correo visible y de contacto. Se imprime en footer, CTA final, /contact/, legales y pop-up móvil, y llega a JSON-LD y llms.txt: cambiarlo AQUÍ (o con define() en config.local.php)
 // basta para pasar al correo con dominio propio. Literal aparte: la meta de /contact/ en app/routes.php (no se toca sin decisión de SEO).
-ns_default('EMAIL', 'nfreightsolutionsllc@gmail.com');
+ns_default('EMAIL', 'contact@northstarfreightsolutions.us');
 // Remitente (From) de los correos del sitio. Vacío = el buzón SMTP_USER. Con SMTP de Hostinger debe ser el propio buzón autenticado.
 ns_default('MAIL_FROM', '');
 ns_default('WA_BASE', 'https://wa.me/18636513322');
@@ -52,9 +76,10 @@ ns_default('DOMAIN', 'northstarfreight.example');
 // --- Entidad / SEO (todas OPCIONALES: vacías hasta que el cliente las confirme) -----------------------------------
 // Solo se emiten en JSON-LD (Organization) y en el footer cuando están definidas. Ver app/config.local.example.php.
 ns_default('LEGAL_NAME', 'NorthStar Freight Solutions LLC');   // nombre legal (confirmado por el cliente, fase S). Llega a JSON-LD legalName. No es secreto.
-ns_default('ADDRESS', []);         // OMITIDA a propósito (decisión del cliente, fase S: no se publica dirección). ['street'=>'', 'city'=>'', 'region'=>'', 'postal'=>'', 'country'=>'US']
-ns_default('SAME_AS', []);         // URLs de perfiles oficiales (LinkedIn, Facebook, YouTube…)
-ns_default('FOUNDING_DATE', '');   // PENDIENTE (fecha exacta). 'YYYY' o 'YYYY-MM-DD'. Solo se sabe que opera desde el 1 de junio de 2026: no se publica sin confirmar.
+ns_default('CREDIT_URL', 'https://clikrank.com/');   // crédito del footer «Developed by ClikRank ♥» (enlace nofollow). Vacío = sin crédito. Confirmar la URL con Carlos.
+ns_default('ADDRESS', ['street' => '30 N Gould St, Ste N', 'city' => 'Sheridan', 'region' => 'WY', 'postal' => '82801', 'country' => 'US']);   // Carlos, 2026-11-23: «sí utilizamos esa para todo» (es la dirección del agente registrado en Sheridan, WY). Se imprime en el footer (NAP), en el JSON-LD y en los textos legales; los correos del CRM la llevan por ley (Configuración > Correo, a mano). Para ocultarla: define('ADDRESS', []) en config.local.php
+ns_default('SAME_AS', ['https://www.instagram.com/northstarfreightsolutionsllc']);   // perfiles oficiales (cliente, 2026-11-20: Instagram; sin LinkedIn, Facebook ni YouTube todavía)
+ns_default('FOUNDING_DATE', '');   // PENDIENTE: Carlos (2026-11-23): registrada el 30 de septiembre (falta el AÑO) y trabajando desde el 1 de junio de 2024 para oficializarse. 'YYYY' o 'YYYY-MM-DD'. No se publica hasta tener el año de registro.
 // robots.txt de producción: bots de ENTRENAMIENTO de IA (GPTBot, ClaudeBot, Google-Extended, Applebot-Extended, CCBot).
 // 'allow' (defecto) | 'block'. Los bots de búsqueda/respuesta de IA (OAI-SearchBot, PerplexityBot…) siempre quedan permitidos.
 ns_default('AI_TRAINING_BOTS', 'allow');
@@ -74,8 +99,8 @@ ns_default('MAIL_TO', EMAIL);                     // destino de los envíos del 
 // Cada solicitud se guarda como una línea JSON en storage/leads/AAAA-MM.jsonl (sin base de datos) y avisa por correo.
 // LEAD_WEBHOOK_URL (opcional, en config.local.php): si existe, cada lead se envía también por POST JSON (cURL, timeout 4 s; un fallo nunca rompe la respuesta al usuario).
 ns_default('LEAD_WEBHOOK_URL', '');
-// Años mínimos de experiencia para marcar un lead como `qualified` (junto con CDL estándar = Sí e inglés Sí/Básico). PENDIENTE (cliente): confirmar el número.
-ns_default('LEAD_MIN_YEARS', 1);
+// Años mínimos de experiencia para marcar un lead de CONDUCTOR (perfil company-driver) como `qualified` (junto con CDL estándar = Sí e inglés Sí/Básico). Cliente, 2026-11-20: 2 años verificables; carriers y owner-operators sin mínimo.
+ns_default('LEAD_MIN_YEARS', 2);
 // Analítica: reservados para cuando Carlos elija herramienta (§10). HOY NO SE CARGA NINGÚN SCRIPT DE TERCEROS: los eventos (generate_lead / Lead) solo se emiten si ya existen gtag/fbq en la página.
 // Mini-CRM de captacion (captacion/): 1 = ademas del JSONL, cada lead se entrega al motor en proceso (requiere captacion/config/.env y la base migrada). 0 = apagado (comportamiento de la fase P).
 // Por defecto se enciende solo donde exista captacion/config/.env (el servidor); en local y en pruebas queda apagado. Un define('CAPTACION_ENABLED', 0|1) en config.local.php siempre manda.
@@ -106,7 +131,7 @@ ns_default('SHOW_ON_SHIFT', false);   // fase S: retirado en TODOS los entornos 
 // Cobertura del desk (fase S, decisión del cliente: 24/7). UN solo sitio para cambiarla o vaciarla: con '' desaparece de todas las páginas.
 // Aparece solo donde había un hueco natural: la línea de horario de /contact/ (rótulo "Desk hours") y el cierre de /our-desk/. Sin promesas de tiempo de respuesta.
 // Sin openingHours en JSON-LD a propósito. PENDIENTE de validar por Carlos con el cliente.
-ns_default('COVERAGE_TEXT', 'Dispatch desk coverage: 24/7');
+ns_default('COVERAGE_TEXT', 'Dispatch desk coverage: 24/7, all U.S. states');
 // Idiomas de atención (fase S: el equipo atiende en inglés y español). '' = no se muestra. Aparece en /contact/ y en el cierre de /our-desk/.
 ns_default('LANGUAGES_TEXT', 'English and Spanish');
 // Descargables (BOL y agreement): el cliente pidió NO ofrecerlos hasta que estén aprobados. false (defecto) = en ENV=production las rutas /resources/bol-template/ y
@@ -153,6 +178,7 @@ function cfg(?string $key = null): mixed
             'email'                => EMAIL,
             'domain'               => DOMAIN,
             'legal_name'           => LEGAL_NAME,
+            'credit_url'           => CREDIT_URL,
             'address'              => ADDRESS,
             'same_as'              => SAME_AS,
             'founding_date'        => FOUNDING_DATE,

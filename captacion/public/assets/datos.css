@@ -1,0 +1,32 @@
+/* NorthStar Captación · fase AM (datos): /importar y /leads/{id}/enviar. Se carga solo en esas pantallas, encima de panel.css. Sin estilos en línea (CSP). */
+.dsend__pick,.dimp__up{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+.dsend__sel,.dimp__file{flex:1 1 320px;min-width:0}
+.dsend__sub{display:flex;flex-direction:column;gap:2px;margin:0 0 12px}
+.dsend__sub b{color:var(--ink);font-weight:600}
+.dsend__body{margin:0;padding:16px;border:1px solid var(--line);border-radius:var(--r-in);background:var(--sunk);color:var(--ink);font:400 var(--fs-md)/1.55 var(--f-sans);white-space:pre-wrap;overflow-wrap:anywhere}
+.dsend__chan{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.dsend__chan .card__b{display:flex;flex-direction:column;gap:12px;align-items:flex-start}
+.dimp__file input[type=file]{min-height:44px;padding:0 10px 0 0;color:var(--ink-2);font-size:var(--fs-md);display:flex;align-items:center}
+.dimp__file input[type=file]::file-selector-button{min-height:44px;margin:0 12px 0 0;padding:0 16px;border:0;border-right:1px solid var(--line-2);border-radius:var(--r-ctl) 0 0 var(--r-ctl);background:var(--sunk);color:var(--ink);font:500 var(--fs-md) var(--f-sans);cursor:pointer}
+.dimp__file input[type=file]::file-selector-button:hover{background:var(--line)}
+.dimp__hint{flex:1 1 100%;font-size:var(--fs-sm);line-height:1.4}
+.dimp__form{display:flex;flex-direction:column;gap:16px}
+.dimp__map td,.dimp__map th{height:auto;padding-block:8px}
+.dimp__map tbody th{font-weight:500;color:var(--ink)}
+.dimp__map select{min-width:220px}
+.dimp__ex{color:var(--ink-3);max-width:220px;overflow:hidden;text-overflow:ellipsis}
+.dimp__opts{display:flex;flex-direction:column;gap:16px}
+.dimp__dup{border:0;margin:0;padding:0;display:flex;flex-direction:column;gap:8px;min-width:0}
+.dimp__dup legend{padding:0;margin-bottom:6px}
+.dimp__go{display:flex;flex-direction:column;gap:14px}
+.dimp__act{display:flex;gap:10px;flex-wrap:wrap}
+.dimp__bar{display:block;width:100%;height:8px;margin-bottom:10px;accent-color:var(--accent)}
+.dimp__sum{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:12px 0}
+.dimp__sum div{padding:14px 16px;border:1px solid var(--line);border-radius:var(--r-in);background:var(--sunk)}
+.dimp__sum dt{color:var(--ink-3);font-size:var(--fs-sm)}
+.dimp__sum dd{margin:2px 0 0;font:600 var(--fs-xl)/1.2 var(--f-sans);font-variant-numeric:tabular-nums;color:var(--ink)}
+.dimp__det{margin:12px 0}
+.dimp__det summary{cursor:pointer;color:var(--accent-ink);min-height:44px;display:flex;align-items:center}
+.dimp__h{margin:6px 0}
+.dimp__why{display:flex;flex-direction:column;gap:4px;margin:0 0 8px;padding:0;list-style:none;color:var(--ink-2)}
+@media (max-width:760px){.dsend__chan{grid-template-columns:minmax(0,1fr)}.dimp__sum{grid-template-columns:minmax(0,1fr)}.dimp__map select{min-width:0;width:100%}.dimp__ex{display:none}}

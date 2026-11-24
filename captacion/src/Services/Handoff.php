@@ -96,13 +96,52 @@ final class Handoff
         }
         $host = strtolower($p['host']);
         if (!$local) {
-            $ip = filter_var($host, FILTER_VALIDATE_IP) ? $host : (gethostbyname($host) !== $host ? gethostbyname($host) : null);
-            if ($host === 'localhost' || str_ends_with($host, '.local') || str_ends_with($host, '.internal')
-                || ($ip !== null && filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false)) {
-                return 'La URL apunta a una dirección interna o privada; usa la URL pública de tu n8n.';
+            if ($host === 'localhost' || str_ends_with($host, '.local') || str_ends_with($host, '.internal') || self::hostIsInternal($host)) {
+                return 'La URL apunta a una dirección interna o privada, o su dominio no se puede resolver; usa la URL pública de tu n8n.';
             }
         }
         return null;
+    }
+
+    /**
+     * true si el host es (o resuelve a) una dirección interna, o si no se puede comprobar: se rechaza ante la duda.
+     * Cubre IPv6 entre corchetes ([::1], [fd00::1]), IPv4 mapeada en IPv6 (::ffff:127.0.0.1, que filter_var NO marca como reservada),
+     * formas numéricas que libcurl entiende como IPv4 (0x7f.1, 127.1, 2130706433) y TODAS las IP de un nombre (A y AAAA), no solo la primera.
+     */
+    private static function hostIsInternal(string $host): bool
+    {
+        $host = trim($host, '[]');
+        if (filter_var($host, FILTER_VALIDATE_IP) !== false) {
+            return self::ipIsInternal($host);
+        }
+        if (preg_match('/^(0x[0-9a-f]+|\d+)(\.(0x[0-9a-f]+|\d+))*$/i', $host) === 1) {
+            return true;
+        }
+        $ips = gethostbynamel($host) ?: [];
+        foreach (@dns_get_record($host, DNS_AAAA) ?: [] as $r) {
+            if (isset($r['ipv6']) && is_string($r['ipv6'])) {
+                $ips[] = $r['ipv6'];
+            }
+        }
+        if ($ips === []) {
+            return true;
+        }
+        foreach ($ips as $ip) {
+            if (self::ipIsInternal($ip)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static function ipIsInternal(string $ip): bool
+    {
+        $bin = @inet_pton($ip);
+        if ($bin !== false && strlen($bin) === 16 && str_starts_with($bin, str_repeat("\0", 10) . "\xff\xff")) {
+            $v4 = inet_ntop(substr($bin, 12));
+            $ip = $v4 !== false ? $v4 : $ip;   // ::ffff:a.b.c.d se evalúa como la IPv4 embebida
+        }
+        return filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false;
     }
 
     /** @return array{ok:bool,errors:array<string,string>,values:array{email:string,webhook_url:string,webhook_on:bool}} */

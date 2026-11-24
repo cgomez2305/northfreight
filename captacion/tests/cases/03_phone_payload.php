@@ -17,11 +17,14 @@ return static function (array $ctx): void {
         $r = Phone::normalize((string) $in);
         T::ok($r['ok'] && $r['e164'] === $out && !$r['intl'], "telefono valido '$in' -> $out");
     }
+    foreach (['(209) 555-0134' => '+12095550134', '919-555-0101' => '+19195550101', '469-555-0102' => '+14695550102'] as $in => $out) {
+        T::eq(Phone::normalize($in)['e164'], $out, "fase AK: codigo de area N9X real aceptado: $in");
+    }
     // Invalidos
     $invalid = [
         '' => 'empty', '   ' => 'empty', '555-0101' => 'length', '123456789' => 'length', '863555010' => 'length', '86355501011' => 'length', '+1 863 555 010' => 'length',
         '123-456-7890' => 'nanp_leading_digit', '863-155-0101' => 'nanp_leading_digit', '911-555-0101' => 'nanp_area_code', '863-911-0101' => 'nanp_exchange',
-        '290-555-0101' => 'nanp_area_code', '000-000-0000' => 'nanp_leading_digit', '222-222-2222' => 'repeated_digits', 'abc' => 'chars', '863-555-01O1' => 'chars',
+'000-000-0000' => 'nanp_leading_digit', '222-222-2222' => 'repeated_digits', 'abc' => 'chars', '863-555-01O1' => 'chars',
         '863+555+0101' => 'chars', '+0 863 555 0101' => 'length', '+44' => 'length', '(863) 555-0101; DROP TABLE' => 'chars',
     ];
     foreach ($invalid as $in => $reason) {

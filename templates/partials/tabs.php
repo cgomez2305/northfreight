@@ -6,7 +6,7 @@
  * y cablea las pestañas; con esa clase solo se ve el panel activo. A partir de 1025px la tarjeta es absoluta y la altura del panel no cambia al cambiar de pestaña.
  * CSS: components.css (.tabs*, .tabp*).
  * Params:
- *  id, eyebrow, title, lead   cabecera de sección (H2 con id; único en la página)
+ *  id, title, lead   cabecera de sección (H2 con id; único en la página)
  *  items  array  [['key'=>'owner','label'=>'Owner-operator','title'=>'Owner-operator' (H3 del panel),'points'=>[3 textos],'image'=>['base','alt','pos'?],'video'=>'nombre' (opcional: assets/video/<nombre>.mp4, una pasada sin bucle, solo >=1025 px, montado por main.js [data-bgvideo] cuando el panel se hace visible; póster de escritorio `<image.base>-vid`),'link'=>['label','href']|null,'wa'=>'owner' (clave o mensaje de wa())], …]
  *  label  string aria-label de la lista de pestañas      cls string clase extra en <section>
  */
@@ -19,7 +19,7 @@ $uid = 'tabs-' . preg_replace('/[^a-z0-9-]/', '', strtolower((string) ($id ?? 'x
 ?>
 <section class="section tabs-sec<?= !empty($cls) ? ' ' . e($cls) : '' ?>"<?= !empty($id) ? ' aria-labelledby="' . e($id) . '"' : '' ?>>
   <div class="container stack">
-    <?php partial('section-head', ['id' => $id ?? '', 'eyebrow' => $eyebrow ?? '', 'title' => $title ?? '', 'lead' => $lead ?? '']); ?>
+    <?php partial('section-head', ['id' => $id ?? '', 'title' => $title ?? '', 'lead' => $lead ?? '']); ?>
     <script>(function(d){d.documentElement.classList.add('js-tabs');d.addEventListener('DOMContentLoaded',function(){var r=d.getElementById('<?= e($uid) ?>');if(!r)return;var t=[].slice.call(r.querySelectorAll('[role="tab"]')),p=[].slice.call(r.querySelectorAll('[role="tabpanel"]'));function pick(i,f){t.forEach(function(b,k){var on=k===i;b.setAttribute('aria-selected',on?'true':'false');b.tabIndex=on?0:-1;p[k].classList.toggle('is-on',on);});if(f)t[i].focus();}t.forEach(function(b,i){b.addEventListener('click',function(){pick(i,false);});b.addEventListener('keydown',function(e){var n=null;if(e.key==='ArrowRight')n=(i+1)%t.length;else if(e.key==='ArrowLeft')n=(i-1+t.length)%t.length;else if(e.key==='Home')n=0;else if(e.key==='End')n=t.length-1;if(n===null)return;e.preventDefault();pick(n,true);});});});})(document);</script>
     <div class="tabs" id="<?= e($uid) ?>">
       <div class="tabs__list" role="tablist"<?= !empty($label) ? ' aria-label="' . e($label) . '"' : '' ?>>

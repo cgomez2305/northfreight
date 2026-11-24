@@ -9,6 +9,7 @@ use Captacion\Clock;
 use Captacion\Db;
 use Captacion\Models\Lead;
 use Captacion\Services\ActivityLog;
+use Captacion\Services\Assignment;
 use Captacion\Services\Catalog;
 use Captacion\Services\Csv;
 use Captacion\Services\Dashboard;
@@ -18,6 +19,7 @@ use Captacion\Services\LeadActions;
 use Captacion\Services\LeadQuery;
 use Captacion\Services\Sequences;
 use Captacion\Services\Prefs;
+use Captacion\Services\RateLimiter;
 use Captacion\Services\SavedViews;
 use Captacion\Services\Timeline;
 use Captacion\Services\Undo;
@@ -68,6 +70,10 @@ final class LeadsController extends Responder
         $user = self::user();
         $lead = Lead::find($id);
         if ($lead === null) {
+            $into = Db::value('SELECT merged_into FROM leads WHERE id = ? AND merged_into IS NOT NULL', [$id]);   // fase AM: un lead fusionado redirige a su principal
+            if ($into !== null && Lead::find((int) $into) !== null) {
+                self::redirect('/leads/' . (int) $into, 302);
+            }
             self::notFound();
         }
         $events = Db::all('SELECT type, payload, user_id, created_at FROM lead_events WHERE lead_id = ? ORDER BY created_at DESC, id DESC LIMIT 300', [$id]);
@@ -97,8 +103,9 @@ final class LeadsController extends Responder
         foreach (array_keys($stageOptions) as $s) {
             $needsOverride[$s] = LeadActions::needsOverride($lead, (string) $s);
         }
-        self::page('lead', $user, 'leads', [['Leads', '/leads'], [$name, null]], [
-            'title' => $name, 'css' => ['charts', 'lead'], 'hideTabbar' => true, 'lead' => $lead, 'timeline' => Timeline::build($lead, $events, $messages, $noteText, $users), 'notes' => $notes, 'tasks' => $tasks, 'calls' => $calls,
+        $back = self::listBack($id);
+        self::page('lead', $user, 'leads', [['Leads', $back], [$name, null]], [
+            'back' => $back, 'admins' => Assignment::admins(), 'title' => $name, 'css' => ['charts', 'lead'], 'hideTabbar' => true, 'lead' => $lead, 'timeline' => Timeline::build($lead, $events, $messages, $noteText, $users), 'notes' => $notes, 'tasks' => $tasks, 'calls' => $calls,
             'consents' => $consents, 'appts' => $appts, 'users' => $users, 'dupes' => $dupes, 'stageOptions' => $stageOptions,
             'needsOverride' => $needsOverride, 'handoff' => Handoff::forLead($id), 'seqs' => Sequences::forLead($id),
         ]);
@@ -113,7 +120,19 @@ final class LeadsController extends Responder
         $ids = is_array($_POST['ids'] ?? null) ? array_map('intval', $_POST['ids']) : [];
         $act = is_string($_POST['do'] ?? null) ? $_POST['do'] : '';
         if ($act === 'export') {
+            self::exportBudget($user);
             self::exportResponse($user, null, $ids, 'seleccion');
+        }
+        if ($act === 'assign') {
+            $raw = is_string($_POST['assignee'] ?? null) ? $_POST['assignee'] : '';
+            if ($raw === '' || !ctype_digit($raw)) {
+                self::flash(false, 'Elige a quién asignar los leads (o «Sin asignar»).');
+                self::redirect($back);
+            }
+            $to = (int) $raw > 0 ? (int) $raw : null;   // «0» = quitar el responsable
+            $r = Assignment::bulkAssign($ids, $to, (int) $user['id']);
+            self::flash($r['ok'], $r['msg'], Undo::assign((int) $user['id'], $r['changes']));
+            self::redirect($back);
         }
         $r = LeadActions::bulkStage($ids, (string) ($_POST['stage'] ?? ''), ['reason' => (string) ($_POST['reason'] ?? ''), 'note' => (string) ($_POST['note'] ?? '')], (int) $user['id']);
         self::flash($r['ok'], $r['msg'], Undo::bulk((int) $user['id'], $r['changes'] ?? []));   // Q5a-G: «Deshacer» el cambio masivo
@@ -125,6 +144,7 @@ final class LeadsController extends Responder
     {
         $user = self::user();
         self::requirePost('/leads');
+        self::exportBudget($user);
         $ids = is_array($_POST['ids'] ?? null) ? array_map('intval', $_POST['ids']) : null;
         $scope = is_string($_POST['scope'] ?? null) ? $_POST['scope'] : 'filters';
         if ($scope === 'period') {
@@ -142,6 +162,20 @@ final class LeadsController extends Responder
         self::exportResponse($user, LeadQuery::filters($q), $scope === 'selection' ? $ids : null, $scope === 'selection' ? 'seleccion' : 'filtro');
     }
 
+    /**
+     * Mismo tope que /tabla/export (20 por hora y usuario) para TODAS las salidas CSV de leads (filtros, periodo y selección masiva): una sesión robada no puede vaciar
+     * la base (hasta 10.000 filas con nombre, teléfono y correo) en bucle. Al pasarse, vuelve a la bandeja con un aviso.
+     */
+    private static function exportBudget(array $user): void
+    {
+        $key = 'u' . (int) $user['id'];
+        if (RateLimiter::tooMany('leads_export', $key, ModosController::EXPORT_LIMIT, 3600)) {
+            self::flash(false, 'Hiciste muchas exportaciones seguidas. Espera un rato y vuelve a intentarlo.');
+            self::redirect(self::backUrl());
+        }
+        RateLimiter::hit('leads_export', $key, 3600);
+    }
+
     private static function exportResponse(array $user, ?array $f, ?array $ids, string $tag): never
     {
         $rows = LeadQuery::exportRows($f, $ids);
@@ -152,6 +186,25 @@ final class LeadsController extends Responder
     {
         ActivityLog::record('leads_export', (int) $user['id'], 'lead', null, ['rows' => count($rows)] + $meta);
         self::download('leads-' . $tag . '-' . gmdate('Ymd-His') . '.csv', 'text/csv; charset=utf-8', Csv::leads($rows));
+    }
+
+    /**
+     * «Volver a la lista» de la ficha (AM): la lista de la que se vino (Lista, Tabla, Tablero, Calendario o Cronología) con sus filtros, página y vista guardada.
+     * Llega en `?back=` (solo rutas internas con caracteres seguros, validado como backUrl); si no llega y se acaba de hacer una acción sobre ESTE lead (la acción redirige a
+     * la ficha sin `back`), se usa el que se recordó en la sesión; si no hay ninguno, /leads.
+     */
+    private static function listBack(int $leadId): string
+    {
+        $ok = static fn(mixed $b): bool => is_string($b) && preg_match('#^/(leads|tabla|pipeline|calendario|cronologia)(\?[A-Za-z0-9_%=&.\-+]{0,800})?$#', $b) === 1;
+        if (isset($_GET['back'])) {   // pedido explicito: si es valido se usa y se recuerda; si no, /leads (nunca la memoria de otra visita)
+            if (!$ok($_GET['back'])) {
+                return '/leads';
+            }
+            $_SESSION['lead_back'] = ['id' => $leadId, 'url' => (string) $_GET['back']];
+            return (string) $_GET['back'];
+        }
+        $mem = $_SESSION['lead_back'] ?? null;
+        return is_array($mem) && (int) ($mem['id'] ?? 0) === $leadId && $ok($mem['url'] ?? null) ? (string) $mem['url'] : '/leads';
     }
 
     /** Vuelta a la bandeja con los mismos filtros (parametro `back`, solo rutas internas /leads...). */

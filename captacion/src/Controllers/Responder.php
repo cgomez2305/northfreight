@@ -10,6 +10,7 @@ use Captacion\Db;
 use Captacion\Middleware\SecurityHeaders;
 use Captacion\Models\User;
 use Captacion\Services\Commands;
+use Captacion\Services\LeadQuery;
 use Captacion\Services\Notifications;
 use Captacion\Services\Prefs;
 use Captacion\Services\SavedViews;
@@ -54,8 +55,9 @@ abstract class Responder
             self::redirect('/login');
         }
         if (($user['role'] ?? '') === 'viewer' && !$viewerOk) {
-            self::html('message', ['title' => 'Sin permiso', 'heading' => 'Sin permiso', 'text' => 'Tu cuenta solo puede ver los resultados y los informes.', 'linkHref' => '/resultados', 'linkText' => 'Ir a resultados'], 403);
+            self::errorPage('Sin permiso', 'Sin permiso', 'Tu cuenta solo puede ver los resultados y los informes.', 403);
         }
+        LeadQuery::forUser((int) $user['id']);   // AM: «Mis leads» (rs=me) necesita saber quién mira
         return $user;
     }
 
@@ -71,6 +73,7 @@ abstract class Responder
         if (($user['role'] ?? '') === 'viewer' && !$viewerOk) {
             self::json(['ok' => false, 'error' => 'forbidden'], 403);
         }
+        LeadQuery::forUser((int) $user['id']);
         return $user;
     }
 
@@ -123,11 +126,35 @@ abstract class Responder
         ], $status);
     }
 
+    /**
+     * Fase AM: pagina de error. Con sesion valida se dibuja DENTRO del shell (menu, migas, tema) y «Volver» lleva al inicio de su rol (el lector, a /resultados);
+     * sin sesion, o si algo falla al armar el shell (base caida en un 500), cae a la tarjeta simple.
+     */
+    public static function errorPage(string $title, string $heading, string $text, int $status): never
+    {
+        $user = null;
+        try {
+            Session::start();
+            $uid = Session::userId();
+            $u = $uid !== null ? User::find($uid) : null;
+            if ($u !== null && (int) $u['is_active'] === 1 && $u['totp_confirmed_at'] !== null) {
+                $user = $u;
+            }
+            if ($user !== null) {
+                $viewer = ($user['role'] ?? '') === 'viewer';
+                self::page('message_shell', $user, '', [[$heading, null]], ['title' => $title, 'heading' => $heading, 'text' => $text, 'backHref' => $viewer ? '/resultados' : '/', 'backText' => $viewer ? 'Volver a resultados' : 'Volver al panel'], $status);
+            }
+        } catch (\Throwable) {
+            // sin shell: tarjeta simple
+        }
+        self::html('message', ['title' => $title, 'heading' => $heading, 'text' => $text], $status);
+    }
+
     /** Solo administradores: el resto ve una pagina 403 (los viewers no ven ni la barra lateral de administracion). */
     protected static function requireAdmin(array $user): void
     {
         if (($user['role'] ?? '') !== 'admin') {
-            self::html('message', ['title' => 'Sin permiso', 'heading' => 'Sin permiso', 'text' => 'Esta sección es solo para administradores.'], 403);
+            self::errorPage('Sin permiso', 'Sin permiso', 'Esta sección es solo para administradores.', 403);
         }
     }
 
@@ -166,7 +193,7 @@ abstract class Responder
 
     protected static function notFound(): never
     {
-        self::html('message', ['title' => 'No encontrado', 'heading' => 'No encontrado', 'text' => 'Esta página no existe.'], 404);
+        self::errorPage('No encontrado', 'No encontrado', 'Esta página no existe.', 404);
     }
 
     protected static function ip(): string

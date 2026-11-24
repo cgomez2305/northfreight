@@ -117,7 +117,7 @@ return static function (array $ctx): void {
     T::eq(Infra::header($s->get('/leads?v=calendario'), 'location'), '/calendario', '  v=calendario');
     // columnas (formulario, sin JS)
     $r = $s->post('/tabla/cols', ['_csrf' => $s->csrf, 'back' => '/tabla', 'move' => 'src:up']);
-    T::ok($r['status'] === 303 && $tcols()[7] === 'src' && $tcols()[8] === 'stage', 'columnas: subir una columna cambia su posición');
+    T::ok($r['status'] === 303 && $tcols()[8] === 'src' && $tcols()[9] === 'resp', 'columnas: subir una columna cambia su posición (AM: «Responsable» va tras Etapa por defecto)');
     $s->post('/tabla/cols', ['_csrf' => $s->csrf, 'back' => '/tabla', 'move' => 'prof:up']);
     T::eq($tcols()[0], 'prof', '  subir la primera no hace nada');
     $s->post('/tabla/cols', ['_csrf' => $s->csrf, 'back' => '/tabla', 'col' => ['prof', 'usdot', 'inventada', 'when']]);

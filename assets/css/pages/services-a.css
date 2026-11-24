@@ -10,7 +10,7 @@
 /* ---- Plantilla de equipo ---- */
 .sa-sheet { background: var(--bg); color: var(--text); padding: clamp(20px, 3vw, 32px); display: flex; flex-direction: column; border: 1px solid var(--hairline); border-radius: var(--r-card); }
 .sa-sheet__head { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-bottom: 6px; }
-.sa-sheet__title { color: var(--cyan); letter-spacing: .1em; }
+.sa-sheet__title { color: var(--cyan-light); letter-spacing: .1em; }
 .sa-sheet__rows { display: flex; flex-direction: column; }
 .sa-sheet__row { display: flex; flex-direction: column; gap: 6px; padding: 16px 0; border-bottom: 1px solid var(--hairline); }
 .sa-sheet__row dt { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--text-3); }

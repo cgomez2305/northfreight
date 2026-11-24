@@ -48,3 +48,12 @@ Sin cambiar title, meta, H1 ni H2:
 4. **`/contact/?sent=1`:** emitir también `noindex` en la meta (hoy solo cabecera). No afecta a Google.
 5. Cuando exista contenido para `/box-truck-dispatch/`, enlazarla desde owner, home y la tabla de equipos antes de pasarla a `live`.
 6. Tras el lanzamiento: Search Console > Páginas (estado de indexación por idioma) y «Enlaces» > «Enlaces internos más enlazados» para contrastar este mapa con datos reales.
+
+## 5. Actualización tras fusionar `main` (2026-11-24)
+
+`main` había avanzado 37 commits (fases AG a AN y CRM). Se fusionó en la rama `claude/seo-fase-af` y se resolvieron 5 conflictos (`CLAUDE.md`, `faq.php`, `extras.php`, `routes.es.php`, `words.php`). Cambios respecto al informe anterior:
+
+- **Power only ya no es oferta** (el cliente atiende solo Amazon Relay y dry van): `/power-only-dispatch/` y `/es/dispatch-power-only/` están en `draft`. Se quitaron los enlaces de FAQ que añadí hacia esa página; el sitio queda con 42 URLs en producción simulada (44 en staging).
+- Se conserva el reforzamiento de enlaces de `/how-it-works/` (8 enlaces contextuales de salida) y las FAQ nuevas de dispatcher, «near me» y horario.
+- Nueva medición (producción simulada): 42/42 con `index, follow` y permisos de vista previa, 0 enlaces rotos, 0 huérfanas, titles ≤ 60 y metas ≤ 155, hreflang recíproco, una sola Organization en los dos idiomas.
+- Quedan 4 URLs rastreadas fuera del sitemap a propósito (`/careers/apply/` y `/es/trabaja-con-nosotros/aplicar/`, con y sin `?type=`): `noindex, follow` con canonical limpio.

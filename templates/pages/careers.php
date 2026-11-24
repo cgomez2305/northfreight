@@ -35,7 +35,7 @@ $driverCard = $jobs
 ?>
 <section class="section" aria-labelledby="cr-paths">
   <div class="container stack">
-    <?php partial('section-head', ['id' => 'cr-paths', 'eyebrow' => 'Two ways to work with us', 'title' => 'Choose your path']); ?>
+    <?php partial('section-head', ['id' => 'cr-paths', 'title' => 'Choose your path']); ?>
     <div class="g2 cr-paths">
       <?php partial('card', [
           'variant' => 'link', 'href' => url('/careers/owner-operators/'), 'tag' => 'Owner-operators', 'title' => 'Partner with a dispatcher',
@@ -53,7 +53,7 @@ $driverCard = $jobs
 
 <section class="section" aria-labelledby="cr-why">
   <div class="container stack">
-    <?php partial('section-head', ['id' => 'cr-why', 'eyebrow' => 'Why NorthStar', 'title' => 'What you get with the desk']); ?>
+    <?php partial('section-head', ['id' => 'cr-why', 'title' => 'What you get with the desk']); ?>
     <?php
     $why = [
         ['You approve every load', 'We tell you what we booked and why.'],
@@ -72,7 +72,7 @@ $driverCard = $jobs
 
 <section class="section" aria-labelledby="cr-how">
   <div class="container stack">
-    <?php partial('section-head', ['id' => 'cr-how', 'eyebrow' => 'How it works', 'title' => 'From application to your first load', 'lead' => 'Send the short application or message us on WhatsApp. This is how we start and how we work with you every day.']); ?>
+    <?php partial('section-head', ['id' => 'cr-how', 'title' => 'From application to your first load', 'lead' => 'Send the short application or message us on WhatsApp. This is how we start and how we work with you every day.']); ?>
     <?php partial('steps', ['label' => 'How we start and work with you', 'items' => [
         ['title' => 'You apply', 'text' => 'Four short steps, or a WhatsApp message if you prefer.'],
         ['title' => 'We learn your operation', 'text' => 'Trucks, equipment, lanes, drivers, home time and the accounts you already run, including Amazon Relay.'],
@@ -84,17 +84,17 @@ $driverCard = $jobs
 </section>
 
 <?php
-// Requisitos: SOLO datos pendientes del cliente. En producción ph() devuelve '' y la sección entera desaparece (nunca un hueco).
-$reqs = array_values(array_filter([
-    ph('Minimum driving experience'),
-    ph('Authority and insurance needed'),
-    ph('Equipment types accepted'),
-    ph('Documents to have ready'),
-], static fn(string $h): bool => $h !== ''));
+// Requisitos confirmados por el cliente (2026-11-20): autoridad activa, seguro, equipo y documentos; conductores: 2 años de experiencia verificable.
+$reqs = [
+    'Carriers and owner-operators: an active authority (MC) and insurance in force.',
+    'Equipment for dry van or Amazon Relay freight.',
+    'The company and equipment documents needed to operate day to day.',
+    'Drivers: at least two years of verifiable truck driving experience.',
+];
 if ($reqs): ?>
 <section class="section" aria-labelledby="cr-reqs">
   <div class="container stack">
-    <?php partial('section-head', ['id' => 'cr-reqs', 'eyebrow' => 'Requirements', 'title' => 'What you need to apply']); ?>
+    <?php partial('section-head', ['id' => 'cr-reqs', 'title' => 'What you need to apply']); ?>
     <ul class="cr-reqs">
       <?php foreach ($reqs as $r): ?><li><?= $r ?></li><?php endforeach; ?>
     </ul>
@@ -113,7 +113,7 @@ $more = [
 ?>
 <section class="section" aria-labelledby="cr-more">
   <div class="container stack">
-    <?php partial('section-head', ['id' => 'cr-more', 'eyebrow' => 'Keep reading', 'title' => 'Before you apply']); ?>
+    <?php partial('section-head', ['id' => 'cr-more', 'title' => 'Before you apply']); ?>
     <div class="cr-rows">
       <?php foreach ($more as $m): if (!route_is_live($m[0])) { continue; } $th = ns_thumb($m[0], $used); if ($th) { $used[] = $th[0]; }
           partial('row-card', ['href' => url($m[0]), 'title' => $m[1], 'text' => $m[2], 'chips' => $m[3], 'h' => 'p', 'image' => $th ? ['base' => $th[0], 'alt' => $th[1]] : null]);

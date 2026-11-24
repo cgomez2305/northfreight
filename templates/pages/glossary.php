@@ -61,7 +61,7 @@ partial('hero', [
 <?php if ($related): ?>
 <section class="section section--surface tools-related" aria-labelledby="gloss-tools-title">
   <div class="container stack">
-    <?php partial('section-head', ['eyebrow' => 'Put it to work', 'title' => 'Tools that use these terms', 'id' => 'gloss-tools-title']); ?>
+    <?php partial('section-head', [ 'title' => 'Tools that use these terms', 'id' => 'gloss-tools-title']); ?>
     <div class="g3">
       <?php foreach ($related as $c):
         partial('card', [

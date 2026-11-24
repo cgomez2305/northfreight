@@ -30,8 +30,8 @@ $action = $isNew ? '/vacantes/new' : '/vacantes/' . $job['id'] . '/save';
   </fieldset>
   <fieldset class="vform__g">
     <legend class="label">Fechas y lugar de trabajo</legend>
-    <label class="field"><span>Publicación</span><input type="date" name="posted_on" value="<?= $e($f('posted_on')) ?>" required><?= $err('posted_on') ?></label>
-    <label class="field"><span>Vence</span><input type="date" name="valid_through" value="<?= $e($f('valid_through')) ?>" min="<?= $e($today) ?>" required><small>Debe ser futura para publicar. Al vencer, la página deja de existir sola.</small><?= $err('valid_through') ?></label>
+    <label class="field"><span>Publicación</span><input type="date" lang="es" name="posted_on" value="<?= $e($f('posted_on')) ?>" required><?= $err('posted_on') ?></label>
+    <label class="field"><span>Vence</span><input type="date" lang="es" name="valid_through" value="<?= $e($f('valid_through')) ?>" min="<?= $e($today) ?>" required><small>Debe ser futura para publicar. Al vencer, la página deja de existir sola.</small><?= $err('valid_through') ?></label>
     <label class="field"><span>Ciudad</span><input type="text" name="city" value="<?= $e($f('city')) ?>" maxlength="80"><?= $err('city') ?></label>
     <label class="field"><span>Estado</span><select name="region"><option value="">Elige…</option><?php foreach ($states as $k => $l): ?><option value="<?= $e($k) ?>"<?= $f('region') === $k ? ' selected' : '' ?>><?= $e($k) ?> · <?= $e($l) ?></option><?php endforeach; ?></select><?= $err('region') ?></label>
     <label class="field"><span>Código postal (opcional)</span><input type="text" name="postal" value="<?= $e($f('postal')) ?>" maxlength="10" inputmode="numeric"><?= $err('postal') ?></label>
@@ -68,7 +68,7 @@ $action = $isNew ? '/vacantes/new' : '/vacantes/' . $job['id'] . '/save';
   <div class="vform__a">
     <?php foreach ([['publish', 'Publicar en el sitio', in_array($job['status'], ['draft', 'paused'], true), 'primary'], ['pause', 'Pausar', $job['status'] === 'active', 'secondary'], ['close', 'Cerrar', in_array($job['status'], ['active', 'paused'], true), 'secondary'], ['reopen', 'Reabrir como borrador', $job['status'] === 'closed', 'secondary'], ['delete', 'Borrar borrador', $job['status'] === 'draft' && $job['published_at'] === null, 'danger']] as [$op, $label, $show, $kind]): if (!$show) { continue; } ?>
       <form method="post" action="/vacantes/<?= $e($job['id']) ?>/status"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="op" value="<?= $e($op) ?>">
-        <button class="btn btn--<?= $e($kind) ?>" type="submit"<?= in_array($op, ['pause', 'close', 'delete'], true) ? ' data-confirm="' . $e($op === 'delete' ? '¿Borrar este borrador? No se puede deshacer.' : ($op === 'pause' ? '¿Pausar la vacante? Su página dejará de existir (404) hasta que la publiques otra vez.' : '¿Cerrar la vacante? Su página dejará de existir (404).')) . '"' : '' ?>><?= $e($label) ?></button></form>
+        <button class="btn btn--<?= $e($kind) ?>" type="submit"<?= in_array($op, ['pause', 'close', 'delete'], true) ? Ui::confirm(['text' => $op === 'delete' ? '¿Borrar este borrador? No se puede deshacer.' : ($op === 'pause' ? '¿Pausar la vacante? Su página dejará de existir (404) hasta que la publiques otra vez.' : '¿Cerrar la vacante? Su página dejará de existir (404).'), 'title' => $op === 'delete' ? '¿Borrar el borrador?' : ($op === 'pause' ? '¿Pausar la vacante?' : '¿Cerrar la vacante?'), 'label' => $op === 'delete' ? 'Borrar' : ($op === 'pause' ? 'Pausar' : 'Cerrar'), 'danger' => $op === 'delete']) : '' ?>><?= $e($label) ?></button></form>
     <?php endforeach; ?>
   </div>
 </section>

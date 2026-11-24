@@ -44,7 +44,7 @@
 .crc__table thead th { font-family: var(--font-mono); font-weight: 500; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: var(--text-3); border-bottom-color: var(--hairline-strong); }
 .crc__table tbody th { font-family: var(--font-head); font-weight: 700; font-size: 24px; line-height: 1.1; color: var(--text); width: 24%; }
 .crc__table .crc__desk { background: var(--panel); color: var(--text); }
-.crc__table thead .crc__desk { color: var(--cyan); }
+.crc__table thead .crc__desk { color: var(--cyan-light); }
 @media (max-width: 760px) {
   .crc__table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
   .crc__table, .crc__table tbody, .crc__table tr, .crc__table th, .crc__table td { display: block; width: 100%; }
@@ -53,7 +53,7 @@
   .crc__table td { padding: 10px 20px 16px; border: 0; }
   .crc__table td::before { content: attr(data-label); display: block; margin-bottom: 4px; font-family: var(--font-mono); font-weight: 500; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--text-3); }
   .crc__table .crc__desk { background: var(--panel-2); }
-  .crc__table .crc__desk::before { color: var(--cyan); }
+  .crc__table .crc__desk::before { color: var(--cyan-light); }
 }
 
 /* ---- Vacantes ---- */

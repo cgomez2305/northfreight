@@ -249,8 +249,8 @@ function ns_lead_mail_body(array $l, array $opt): string
     }
 
     // --- Elegibilidad interna: nunca se muestra ni rechaza en pantalla ---
-    // LEAD_MIN_YEARS = 0 (defecto desde la fase S): los años de experiencia NO cuentan como criterio hasta que el cliente apruebe el requisito.
-    $minYears = defined('LEAD_MIN_YEARS') ? max(0, (int) LEAD_MIN_YEARS) : 0;
+    // Años mínimos (cliente, 2026-11-20): 2 años de experiencia verificable SOLO para conductores; carriers y owner-operators no tienen mínimo.
+    $minYears = ($profile === 'company-driver' && defined('LEAD_MIN_YEARS')) ? max(0, (int) LEAD_MIN_YEARS) : 0;
     $qualified = $old['cdl_standard'] === 'yes' && in_array($old['english'], ['yes', 'basic'], true) && ($minYears === 0 || (int) $yearsRaw >= $minYears);
 
     $consentGiven = $old['consent'] === '1';

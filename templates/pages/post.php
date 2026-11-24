@@ -134,7 +134,7 @@ partial('hero', [
 <?php if ($related): ?>
 <section class="section section--surface blog-related" aria-labelledby="related-title">
   <div class="container stack">
-    <?php partial('section-head', ['eyebrow' => 'Keep reading', 'title' => 'Related from the desk', 'id' => 'related-title']); ?>
+    <?php partial('section-head', [ 'title' => 'Related from the desk', 'id' => 'related-title']); ?>
     <div class="rlist">
       <?php $used = []; foreach ($related as $r):
           $t = ns_thumb($r['href'], $used);

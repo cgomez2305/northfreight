@@ -69,6 +69,11 @@ return static function (array $ctx): void {
     T::ok(!$v['ok'] && isset($v['errors']['email'], $v['errors']['webhook_url']), 'configuracion: correo y URL invalidos se rechazan');
     Env::set('APP_ENV', 'production');
     T::ok(Handoff::urlProblem('http://example.com/hook') !== null && Handoff::urlProblem('https://user:pw@example.com/h') !== null && Handoff::urlProblem('https://localhost/h') !== null && Handoff::urlProblem('https://192.168.1.5/h') !== null && Handoff::urlProblem('https://127.0.0.1/h') !== null, 'produccion: http, credenciales en la URL, localhost y redes privadas se rechazan');
+    // Regresión B1 (auditoría 2026-11-22): estas formas se saltaban el filtro porque filter_var/gethostbyname no las reconocían
+    foreach (['https://[::1]/h', 'https://[::ffff:127.0.0.1]/h', 'https://[::ffff:7f00:1]/h', 'https://[fd00::1]/h', 'https://0x7f.1/h', 'https://127.1/h', 'https://2130706433/h', 'https://169.254.169.254/h', 'https://nosuchhost.invalid/h'] as $bad) {
+        T::ok(Handoff::urlProblem($bad) !== null, "produccion: $bad se rechaza");
+    }
+    T::ok(Handoff::urlProblem('https://8.8.8.8/h') === null && Handoff::urlProblem('https://[2606:4700::1111]/h') === null, 'produccion: una IP pública (IPv4 o IPv6) sigue permitida');
     Env::set('APP_ENV', 'local');
     T::ok(Handoff::urlProblem("http://127.0.0.1:$hookPort/hook") === null, 'en local (pruebas) se permite http://127.0.0.1');
     T::ok(!Handoff::saveConfig(['email' => '', 'webhook_url' => "http://127.0.0.1:$hookPort/hook", 'webhook_on' => true], null, $aid)['ok'], 'activar el webhook sin secreto: se rechaza');

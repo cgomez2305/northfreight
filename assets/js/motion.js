@@ -6,7 +6,7 @@
      hero interno (.hero) · bandas y paneles (.section--surface, .section--dark, .home-relay, .cta, .footer, .co-band) · rejillas 3D por filas
      (.g2 a .g6, .blog-grid; las .g4 entran en ola) · titulares de sección (.t-h2, .t-h2-s) · marcos de foto (.px) con parallax y escala · cifras (entradas una vez) ·
      patrón B (foto ancha con tarjeta solapada: la tarjeta sube con desfase respecto a la foto) · patrón C (filas apiladas con sticky: la fila cubierta se escala a .955 y su foto se atenúa) ·
-     cortina fotográfica (.curtain: foto sticky que la sección .curtain-next cubre; la imagen interior se desplaza con scrub) · relleno de texto ([data-textfill] .w: opacidad .5 a 1 por palabra, >=1025px).
+     cortina fotográfica (.curtain: foto sticky que la sección .curtain-next cubre; la imagen interior se desplaza con scrub).
    Solo home: hero fijado (también se desvanece el widget de WhatsApp y sigue el video de fondo), carril horizontal fijado de servicios, sticky "Why a desk" (pin ~2,1 alturas: numeral, foto con crossfade e ítem activo),
    líneas de progreso del onboarding (scaleX con scrub) y parallax de la banda de video. Móvil (<1025 px): parallax de fotos, líneas, cifras y entrada de bandas, sin pines ni 3D.
    Nunca se anima ningún input, select, textarea ni resultado aria-live. Estilos que necesitan: assets/css/motion.css. */
@@ -59,7 +59,7 @@
     var main = hero && one('.hero__main', hero);
     if (!hero || !bg || !img || !main) return;
     var l1 = one('.home-hero__l1', hero), l2 = one('.home-hero__l2', hero);
-    var tags = one('.tags', hero), ctas = one('.hero__ctas', hero), wa = one('.hero-wa', hero), vid = one('video', bg);
+    var tags = one('.tags', hero), ctas = one('.hero__ctas', hero), vid = one('video', bg);
     var tl = g.timeline({
       defaults: { ease: 'none', duration: 1 },  // duración 1 = todo el recorrido del pin
       scrollTrigger: { trigger: hero, start: 'top top', end: function () { return '+=' + Math.round(vh()); }, pin: true, scrub: 0.6, anticipatePin: 1, invalidateOnRefresh: true }
@@ -69,7 +69,6 @@
       .fromTo(main, { y: 0 }, { y: -140 }, 0)
       .fromTo(main, { opacity: 1 }, { opacity: 0, duration: 0.6 }, 0);
     if (vid) tl.fromTo(vid, { yPercent: 0 }, { yPercent: -2 }, 0);   // video de fondo opcional: sigue a la foto
-    if (wa) tl.fromTo(wa, { y: 0, opacity: 1 }, { y: -90, opacity: 0, duration: 0.5 }, 0);   // el widget de WhatsApp se desvanece con el texto
     if (l1) tl.fromTo(l1, { x: 0 }, { x: -48 }, 0);
     if (l2) tl.fromTo(l2, { x: 0 }, { x: 48 }, 0);
     var fade = [tags, ctas].filter(Boolean);
@@ -294,17 +293,6 @@
     });
   }
 
-  /* ---- Relleno de texto (>=1025px): cada palabra ([data-textfill] .w, la parte el helper PHP ns_words) sube de opacidad .5 a 1 con el scroll, una tras otra. Un solo trigger por bloque; solo opacity.
-     Opacidad inicial .5 (no .3): --text a .5 sobre --bg mantiene AA. Sin esta escena el texto se ve completo (el CSS solo lo atenúa bajo html.js-motion) ---- */
-  function textScene() {
-    $('[data-textfill]').forEach(function (el) {
-      var words = $('.w', el);
-      if (words.length < 2 || !sees(el)) return;
-      g.fromTo(words, { opacity: 0.65 }, { opacity: 1, ease: 'none', stagger: 0.12,
-        scrollTrigger: { trigger: el, start: 'top 80%', end: 'bottom 58%', scrub: true } });
-    });
-  }
-
   /* ---- Banda de video (home): la capa con póster y video se desplaza ±4 % de su alto (110 % del marco) mientras la banda cruza la ventana; no toca el bucle ---- */
   function vbandScene() {
     $('.vband__media').forEach(function (m) {
@@ -330,7 +318,6 @@
       pcardScene();
       if (c.rail) { rowsScene(); railStages(); curtainScene(); }
       fileScene();
-      textScene();
     }
     return function () { undo.forEach(function (f) { f(); }); };
   }

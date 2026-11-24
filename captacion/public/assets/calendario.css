@@ -70,7 +70,7 @@
 .evc__ic{flex:none;width:26px;height:26px;display:grid;place-items:center}
 .evc__ic .ic{width:16px;height:16px}
 .evc__tick{flex:none}
-.tick{width:30px;height:30px;border-radius:50%;border:2px solid var(--line-2);background:var(--surface);display:grid;place-items:center;color:transparent;cursor:pointer;flex:none;padding:0}
+.tick{width:30px;height:30px;border-radius:50%;border:2px solid var(--field);background:var(--surface);display:grid;place-items:center;color:transparent;cursor:pointer;flex:none;padding:0}
 .tick:hover{border-color:var(--ok-dot);color:var(--ok-dot)}
 .tick .ic{width:15px;height:15px;stroke-width:2.6}
 .evc__m{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px;color:inherit!important;text-decoration:none!important}
@@ -89,6 +89,7 @@
 .evm__d .field{flex:1;min-width:0}
 .cal__help{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:var(--fs-sm);color:var(--ink-3)}.cal__help .ic{width:15px;height:15px}
 .cal__help kbd{font:400 var(--fs-xs) var(--f-mono);padding:2px 6px;border:1px solid var(--line-2);border-radius:var(--r-sm);background:var(--sunk);color:var(--ink-3)}
+@media (pointer:coarse){.cal__help{display:none}}
 html[data-density=compact] .cal__d{min-height:92px}
 html[data-density=compact] .ev{min-height:20px;padding-top:1px;padding-bottom:1px}
 html[data-density=compact] .evc{padding-top:5px;padding-bottom:5px}

@@ -6,13 +6,13 @@ use Captacion\Services\Prospects;
 use Captacion\Services\UsStates;
 use Captacion\Services\UsTimeZones;
 
-/** Variables: $f, $per, $list, $counts, $history, $now, $summary, $cfg, $run, $cron, $totalAll, $back, $csrf */
+/** Variables: $f, $per, $list, $counts, $callable, $history, $now, $summary, $cfg, $run, $cron, $totalAll, $back, $csrf */
 $rows = $list['rows'];
 $nFilters = (int) ($f['q'] !== '') + (int) ($f['us'] !== '') + (int) ($f['fl'] !== '') + (int) ($f['ag'] > 0) + (int) ($f['ph'] !== '');
-$qsBase = array_filter(['tab' => $f['tab'] !== 'today' ? $f['tab'] : null, 'q' => $f['q'] ?: null, 'us' => $f['us'] ?: null, 'fl' => $f['fl'] ?: null, 'ag' => $f['ag'] ?: null, 'ph' => $f['ph'] ?: null, 'per' => $per !== 25 ? $per : null], static fn($v) => $v !== null);
+$qsBase = array_filter(['tab' => $f['tab'] !== 'today' ? $f['tab'] : null, 'q' => $f['q'] ?: null, 'us' => $f['us'] ?: null, 'fl' => $f['fl'] ?: null, 'ag' => $f['ag'] ?: null, 'ph' => $f['ph'] ?: null, 'now' => $f['now'] ?: null, 'per' => $per !== 25 ? $per : null], static fn($v) => $v !== null);
 $tabHref = static fn(string $tab): string => '/prospectos' . Ui::qs(array_merge(array_diff_key($qsBase, ['tab' => 1]), $tab !== 'today' ? ['tab' => $tab] : []));
 $tabHint = ['today' => 'Por llamar y reintentos que ya tocan', 'to_call' => 'Nunca llamados', 'no_answer' => 'Hasta 3 intentos sin respuesta', 'talked' => 'Hubo conversación', 'interested' => 'Quieren seguir; conviértelos en lead', 'not_interested' => 'Dijeron que no', 'dnc' => 'Permanente: nunca se vuelven a listar'];
-$todayEt = Fmt::et($now)->format('Y-m-d');
+$todayEt = \Captacion\Services\Prospects::etDay($now);   // el dia de las llamadas es por ET, no por la zona de visualizacion
 $ageLabel = static function (?string $granted) use ($now): string {
     if ($granted === null) {
         return 'Sin fecha';
@@ -93,7 +93,7 @@ $cronAt = is_array($cron) ? ($cron['at'] ?? null) : null;
   <label class="field"><span>Estado (EE. UU.)</span><select name="us"><option value="">Todos</option><?php foreach (UsStates::NAMES as $k => $l): ?><option value="<?= $e($k) ?>"<?= $f['us'] === $k ? ' selected' : '' ?>><?= $e($k) ?> · <?= $e($l) ?></option><?php endforeach; ?></select></label>
   <label class="field"><span>Flota</span><select name="fl"><option value="">Cualquiera</option><?php foreach (Prospects::FLEETS as $k => $l): ?><option value="<?= $e($k) ?>"<?= $f['fl'] === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
   <label class="field"><span>Autoridad</span><select name="ag"><option value="">Cualquier antigüedad</option><?php foreach (Prospects::AGES as $k => $l): ?><option value="<?= $e($k) ?>"<?= $f['ag'] === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
-  <div class="filters__a"><button class="btn btn--primary btn--sm" type="submit"><span class="btn__t">Aplicar</span></button><?php if ($nFilters > 0): ?><a class="btn btn--ghost btn--sm" href="<?= $e($tabHref($f['tab'])) ?>">Quitar filtros</a><?php endif; ?></div>
+  <div class="filters__a"><button class="btn btn--secondary btn--sm" type="submit"><span class="btn__t">Aplicar</span></button><?php if ($nFilters > 0): ?><a class="btn btn--ghost btn--sm" href="<?= $e($tabHref($f['tab'])) ?>">Quitar filtros</a><?php endif; ?></div>
 </form>
 
 <?php if (!$rows): ?>
@@ -108,6 +108,14 @@ $cronAt = is_array($cron) ? ($cron['at'] ?? null) : null;
   <?php endif; ?>
 </section>
 <?php else: ?>
+<div class="pq">
+  <p class="pq__now" role="status"><?php if ($callable !== null): ?><span class="dot<?= $callable > 0 ? ' is-ok' : ' dot--warn' ?>"></span><?= $callable > 0 ? '<b>' . $e(Fmt::num($callable)) . '</b> se pueden llamar ahora (hora local permitida y con teléfono); van primero.' : 'Ahora nadie de esta lista está en horario permitido.' ?><?php endif; ?></p>
+  <div class="pq__a">
+    <?php if ($callable !== null): ?><a class="seg__i<?= $f['now'] === '1' ? ' is-on' : '' ?>" href="<?= $e('/prospectos' . Ui::qs(array_merge(array_diff_key($qsBase, ['now' => 1, 'page' => 1]), $f['now'] === '1' ? [] : ['now' => '1']))) ?>"<?= $f['now'] === '1' ? ' aria-current="page"' : '' ?>>Solo llamables ahora</a><?php endif; ?>
+    <label class="perpage"><span>Por página</span><select data-per aria-label="Prospectos por página"><?php foreach (Prospects::PER as $n): ?><option value="<?= $e($n) ?>"<?= $per === $n ? ' selected' : '' ?>><?= $e($n) ?></option><?php endforeach; ?></select></label>
+  </div>
+</div>
+<div class="pr-head" aria-hidden="true"><span>Estado</span><span>Transportista</span><span>Ubicación y hora local</span><span>Flota</span><span>Autoridad</span><span>Intentos</span></div>
 <ol class="plist" aria-label="Prospectos">
 <?php foreach ($rows as $r):
     $id = (int) $r['id'];
@@ -121,92 +129,94 @@ $cronAt = is_array($cron) ? ($cron['at'] ?? null) : null;
     $closed = in_array($r['status'], ['no_answer_closed', 'not_interested'], true);
     $statusChip = ['to_call' => 'warm', 'no_answer' => 'plain', 'no_answer_closed' => 'dq', 'talked' => 'plain', 'interested' => 'ok', 'not_interested' => 'dq', 'dnc' => 'bad'][$r['status']] ?? 'plain';
     $nextLabel = $r['next_call_at'] !== null && $open ? $dayFmt((string) $r['next_call_at']) : null;
+    $callNow = $open && $r['phone'] !== null && $tz['allowed'];
+    $loc = trim(($r['city'] ? ucwords(strtolower((string) $r['city'])) . ', ' : '') . ($r['state'] ?? ''), ' ,') ?: '—';
     ?>
-  <li class="pc<?= $dnc ? ' is-dnc' : '' ?><?= $conv ? ' is-conv' : '' ?>" id="p-<?= $e($id) ?>">
-    <article aria-labelledby="pn-<?= $e($id) ?>">
-      <header class="pc__h">
-        <div class="pc__id">
-          <h2 id="pn-<?= $e($id) ?>" class="pc__n"><?= $e($name) ?></h2>
-          <p class="pc__ids mono">USDOT <?= $e($r['usdot']) ?><?= $r['mc_number'] ? ' · ' . $e($r['mc_number']) : '' ?><?= $r['dba'] && $r['dba'] !== $r['legal_name'] ? ' · DBA ' . $e(Fmt::company((string) $r['dba'])) : '' ?></p>
-        </div>
-        <div class="pc__tags">
-          <span class="chip chip--<?= $e($statusChip) ?>"><?php if ($statusChip !== 'plain'): ?><i class="dot"></i><?php endif; ?><?= $e(Prospects::STATUSES[$r['status']] ?? $r['status']) ?></span>
-          <?php if ($conv): ?><a class="chip chip--stage" href="/leads/<?= $e($r['converted_lead_id']) ?>">Lead #<?= $e($r['converted_lead_id']) ?></a><?php endif; ?>
-        </div>
-      </header>
-
-      <dl class="pc__d">
-        <div><dt>Ubicación</dt><dd><?= $e(trim(($r['city'] ? ucwords(strtolower((string) $r['city'])) . ', ' : '') . ($r['state'] ?? ''), ' ,') ?: '—') ?></dd></div>
-        <div><dt>Flota</dt><dd><?= $r['fleet_size'] !== null ? $e($r['fleet_size']) . ($r['fleet_size'] == 1 ? ' unidad' : ' unidades') : '—' ?><?= $r['drivers'] !== null && (int) $r['drivers'] > 0 && (int) $r['drivers'] < 500 ? ' · ' . $e($r['drivers']) . ($r['drivers'] == 1 ? ' conductor' : ' conductores') : '' ?></dd></div>
-        <div><dt>Autoridad</dt><dd><?= $e($ageLabel($r['authority_granted_at'])) ?><small><?= $r['authority_granted_at'] ? $e(Fmt::et($r['authority_granted_at'] . ' 12:00:00')->format('j M Y')) : '' ?></small></dd></div>
-        <div><dt>Carga declarada</dt><dd><?= $cats ? $e(implode(' · ', array_map(static fn($c) => ProspectConfig::CARGO[$c][0], array_slice($cats, 0, 3)))) : '—' ?></dd></div>
-        <?php if ($r['email']): ?><div class="pc__mail"><dt>Correo en FMCSA</dt><dd class="mono"><?= $e($r['email']) ?></dd></div><?php endif; ?>
-      </dl>
-
-      <?php if ($open || $dnc || $conv): ?>
-      <div class="pc__call">
-        <?php if ($dnc): ?>
-          <p class="pc__note"><?= Ui::icon('shield') ?>Marcado «No llamar más»: permanente. No volverá a listarse.</p>
-        <?php elseif ($r['phone'] === null): ?>
-          <span class="btn btn--secondary is-off" aria-disabled="true"><span class="btn__t">Llamar</span></span><span class="pc__local pc__local--off">Sin teléfono en FMCSA</span>
-        <?php elseif ($tz['allowed']): ?>
-          <a class="btn btn--secondary" href="tel:<?= $e($r['phone']) ?>" aria-label="Llamar a <?= $e($name) ?>, <?= $e(Fmt::phone($r['phone'])) ?>"><span class="btn__t">Llamar</span></a>
-          <span class="pc__num mono"><?= $e(Fmt::phone($r['phone'])) ?></span>
-          <span class="pc__local">Allá son las <?= $e($tz['local_hm']) ?> <?= $e($tz['zone_label']) ?><?= $tz['multi'] ? ' · dos zonas horarias' : '' ?></span>
-        <?php else: ?>
-          <span class="btn btn--secondary is-off" role="link" aria-disabled="true" title="<?= $e($tz['reason']) ?>"><span class="btn__t">Llamar</span></span>
-          <span class="pc__local pc__local--off"><?= $tz['known'] ? 'Fuera de horario · allá son las ' . $e($tz['local_hm']) . ' ' . $e($tz['zone_label']) . ($tz['opens_in'] ? ' · abre en ' . $e(Fmt::dur((int) $tz['opens_in'])) : '') : 'Sin estado: no se sabe la hora local' ?></span>
-          <details class="pc__ph"><summary>Ver teléfono</summary><span class="mono"><?= $e(Fmt::phone($r['phone'])) ?></span></details>
-        <?php endif; ?>
-        <?php if (!$dnc && ($r['attempts'] > 0 || $nextLabel !== null)): ?>
-          <p class="pc__att"><?= (int) $r['attempts'] > 0 ? 'Intentos sin respuesta: <b>' . $e($r['attempts']) . ' de ' . Prospects::MAX_ATTEMPTS . '</b>' : '' ?><?= $nextLabel !== null ? ' · Siguiente intento: <b>' . $e($nextLabel) . '</b>' : '' ?></p>
-        <?php endif; ?>
-      </div>
-      <?php endif; ?>
-
-      <?php if ($open): ?>
-      <form class="pc__res" method="post" action="/prospectos/<?= $e($id) ?>/result">
-        <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="back" value="<?= $e($back) ?>">
-        <details class="pc__more">
-          <summary>Nota y siguiente intento (opcional)</summary>
-          <div class="pc__fields">
-            <label class="field"><span>Nota</span><input type="text" name="note" maxlength="500" autocomplete="off" placeholder="Qué dijo, a qué hora llamar…"></label>
-            <label class="field"><span>Siguiente intento (<?= $e(Fmt::zone()) ?>)</span><input type="date" name="next" min="<?= $e($todayEt) ?>"></label>
+  <li class="pc<?= $dnc ? ' is-dnc' : '' ?><?= $conv ? ' is-conv' : '' ?><?= $callNow ? ' is-now' : '' ?>" id="p-<?= $e($id) ?>">
+    <details class="pr" data-pr>
+      <summary class="pr__s" aria-describedby="pd-<?= $e($id) ?>">
+        <span class="pr__st"><span class="chip chip--<?= $e($statusChip) ?>"><?php if ($statusChip !== 'plain'): ?><i class="dot"></i><?php endif; ?><?= $e(Prospects::STATUSES[$r['status']] ?? $r['status']) ?></span></span>
+        <span class="pr__who"><b class="pr__n" id="pn-<?= $e($id) ?>"><?= $e($name) ?></b><span class="pr__ids mono">USDOT <?= $e($r['usdot']) ?><?= $r['mc_number'] ? ' · ' . $e($r['mc_number']) : '' ?></span></span>
+        <span class="pr__loc"><?= $e($loc) ?><small class="pr__tz<?= $callNow ? ' is-ok' : '' ?>"><?php if (!$tz['known']): ?>Sin hora local<?php elseif ($tz['allowed']): ?><i class="dot is-ok"></i><?= $e($tz['local_hm']) ?> <?= $e($tz['zone_label']) ?> · en horario<?php else: ?><?= $e($tz['local_hm']) ?> <?= $e($tz['zone_label']) ?><?= $tz['opens_in'] ? ' · abre en ' . $e(Fmt::dur((int) $tz['opens_in'])) : ' · fuera de horario' ?><?php endif; ?></small></span>
+        <span class="pr__fl"><span class="pr__k">Flota </span><?= $r['fleet_size'] !== null ? $e($r['fleet_size']) . ($r['fleet_size'] == 1 ? ' unidad' : ' unidades') : '—' ?></span>
+        <span class="pr__age"><span class="pr__k">Autoridad </span><?= $e($ageLabel($r['authority_granted_at'])) ?></span>
+        <span class="pr__att"><?= $dnc ? 'No llamar' : ($conv ? 'Lead #' . $e($r['converted_lead_id']) : ((int) $r['attempts'] > 0 ? $e($r['attempts']) . ' de ' . Prospects::MAX_ATTEMPTS : 'Sin llamar')) ?><?php if ($nextLabel !== null): ?><small>Próximo: <?= $e($nextLabel) ?></small><?php endif; ?></span>
+        <span class="pr__chev" aria-hidden="true"><?= Ui::icon('chevron-down') ?></span>
+      </summary>
+      <div class="pr__b" id="pd-<?= $e($id) ?>">
+        <div class="pr__main">
+          <?php if ($open || $dnc || $conv): ?>
+          <div class="pc__call">
+            <?php if ($dnc): ?>
+              <p class="pc__note"><?= Ui::icon('shield') ?>Marcado «No llamar más»: permanente. No volverá a listarse.</p>
+            <?php elseif ($r['phone'] === null): ?>
+              <span class="btn btn--secondary is-off" aria-disabled="true"><span class="btn__t">Llamar</span></span><span class="pc__local pc__local--off">Sin teléfono en FMCSA</span>
+            <?php elseif ($tz['allowed']): ?>
+              <a class="btn btn--primary" href="tel:<?= $e($r['phone']) ?>" aria-label="Llamar a <?= $e($name) ?>, <?= $e(Fmt::phone($r['phone'])) ?>"><?= Ui::icon('phone') ?><span class="btn__t">Llamar</span></a>
+              <span class="pc__num mono"><?= $e(Fmt::phone($r['phone'])) ?></span>
+              <span class="pc__local">Allá son las <?= $e($tz['local_hm']) ?> <?= $e($tz['zone_label']) ?><?= $tz['multi'] ? ' · dos zonas horarias' : '' ?></span>
+            <?php else: ?>
+              <span class="btn btn--secondary is-off" role="link" aria-disabled="true" title="<?= $e($tz['reason']) ?>"><span class="btn__t">Llamar</span></span>
+              <span class="pc__local pc__local--off"><?= $tz['known'] ? 'Fuera de horario · allá son las ' . $e($tz['local_hm']) . ' ' . $e($tz['zone_label']) . ($tz['opens_in'] ? ' · abre en ' . $e(Fmt::dur((int) $tz['opens_in'])) : '') : 'Sin estado: no se sabe la hora local' ?></span>
+              <details class="pc__ph"><summary>Ver teléfono</summary><span class="mono"><?= $e(Fmt::phone($r['phone'])) ?></span></details>
+            <?php endif; ?>
+            <?php if (!$dnc && ($r['attempts'] > 0 || $nextLabel !== null)): ?>
+              <p class="pc__att"><?= (int) $r['attempts'] > 0 ? 'Intentos sin respuesta: <b>' . $e($r['attempts']) . ' de ' . Prospects::MAX_ATTEMPTS . '</b>' : '' ?><?= $nextLabel !== null ? ' · Siguiente intento: <b>' . $e($nextLabel) . '</b>' : '' ?></p>
+            <?php endif; ?>
           </div>
-        </details>
-        <div class="pc__btns" role="group" aria-label="Registrar el resultado de la llamada a <?= $e($name) ?>">
-          <?php foreach (Prospects::RESULTS as $k => $label): ?>
-            <button class="rbtn rbtn--<?= $e($k) ?>" type="submit" name="result" value="<?= $e($k) ?>"<?= $k === 'dnc' ? ' data-confirm="¿Marcar «' . $e($name) . '» como No llamar más? Es permanente: su teléfono no volverá a listarse."' : '' ?>><?= Ui::icon($resultIcon[$k]) ?><?= $e($label) ?></button>
-          <?php endforeach; ?>
+          <?php endif; ?>
+
+          <?php if ($open): ?>
+          <form class="pc__res" method="post" action="/prospectos/<?= $e($id) ?>/result" data-pr-form>
+            <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="back" value="<?= $e($back) ?>">
+            <div class="pc__fields">
+              <label class="field"><span>Nota (opcional)</span><input type="text" name="note" maxlength="500" autocomplete="off" placeholder="Qué dijo, a qué hora volver a llamar…"></label>
+              <label class="field"><span>Siguiente intento (ET, opcional)</span><input type="date" lang="es" name="next" min="<?= $e($todayEt) ?>"></label>
+            </div>
+            <div class="pc__btns" role="group" aria-label="Registrar el resultado de la llamada a <?= $e($name) ?>">
+              <?php foreach (Prospects::RESULTS as $k => $label): ?>
+                <button class="rbtn rbtn--<?= $e($k) ?>" type="submit" name="result" value="<?= $e($k) ?>"<?= $k === 'dnc' ? ' data-confirm-title="¿No llamar más?" data-confirm-label="Marcar como no llamar" data-confirm-danger data-confirm="¿Marcar «' . $e($name) . '» como No llamar más? Es permanente: su teléfono no volverá a listarse."' : '' ?>><?= Ui::icon($resultIcon[$k]) ?><?= $e($label) ?></button>
+              <?php endforeach; ?>
+            </div>
+          </form>
+          <?php endif; ?>
         </div>
-      </form>
-      <?php endif; ?>
 
-      <?php if (!$dnc): ?>
-      <div class="pc__f">
-        <?php if ($conv): ?>
-          <a class="btn btn--secondary btn--sm" href="/leads/<?= $e($r['converted_lead_id']) ?>">Ver lead #<?= $e($r['converted_lead_id']) ?></a>
-        <?php else: ?>
-          <form method="post" action="/prospectos/<?= $e($id) ?>/convert"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="back" value="<?= $e($back) ?>">
-            <button class="btn btn--secondary btn--sm" type="submit"<?= $r['status'] !== 'interested' ? ' data-confirm="¿Convertir a «' . $e($name) . '» en lead? Se crea en «Contactado», sin consentimiento de mensajes y sin alertas."' : '' ?>><?= Ui::icon('user-plus') ?>Convertir en lead</button></form>
-        <?php endif; ?>
-        <?php if ($closed && !$conv): ?>
-          <form method="post" action="/prospectos/<?= $e($id) ?>/reopen"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="back" value="<?= $e($back) ?>"><button class="btn btn--ghost btn--sm" type="submit"><?= Ui::icon('refresh') ?>Reabrir</button></form>
-        <?php endif; ?>
+        <aside class="pr__side" aria-label="Datos de <?= $e($name) ?>">
+          <dl class="pc__d">
+            <?php if ($r['dba'] && $r['dba'] !== $r['legal_name']): ?><div><dt>Nombre comercial</dt><dd><?= $e(Fmt::company((string) $r['dba'])) ?></dd></div><?php endif; ?>
+            <div><dt>Autoridad concedida</dt><dd><?= $r['authority_granted_at'] ? $e(Fmt::et($r['authority_granted_at'] . ' 12:00:00')->format('j M Y')) : 'Sin fecha' ?></dd></div>
+            <div><dt>Conductores</dt><dd><?= $r['drivers'] !== null && (int) $r['drivers'] > 0 && (int) $r['drivers'] < 500 ? $e($r['drivers']) : '—' ?></dd></div>
+            <div><dt>Carga declarada</dt><dd><?= $cats ? $e(implode(' · ', array_map(static fn($c) => ProspectConfig::CARGO[$c][0], array_slice($cats, 0, 3)))) : '—' ?></dd></div>
+            <?php if ($r['email']): ?><div class="pc__mail"><dt>Correo en FMCSA</dt><dd class="mono"><?= $e($r['email']) ?></dd></div><?php endif; ?>
+          </dl>
+          <?php if (!$dnc): ?>
+          <div class="pc__f">
+            <?php if ($conv): ?>
+              <a class="chip chip--stage" href="/leads/<?= $e($r['converted_lead_id']) ?>">Lead #<?= $e($r['converted_lead_id']) ?></a>
+              <a class="btn btn--secondary btn--sm" href="/leads/<?= $e($r['converted_lead_id']) ?>">Ver lead #<?= $e($r['converted_lead_id']) ?></a>
+            <?php else: ?>
+              <form method="post" action="/prospectos/<?= $e($id) ?>/convert"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="back" value="<?= $e($back) ?>">
+                <button class="btn btn--secondary btn--sm" type="submit"<?= $r['status'] !== 'interested' ? ' data-confirm-title="¿Convertir en lead?" data-confirm-label="Convertir" data-confirm="¿Convertir a «' . $e($name) . '» en lead? Se crea en «Contactado», sin consentimiento de mensajes y sin alertas."' : '' ?>><?= Ui::icon('user-plus') ?>Convertir en lead</button></form>
+            <?php endif; ?>
+            <?php if ($closed && !$conv): ?>
+              <form method="post" action="/prospectos/<?= $e($id) ?>/reopen"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="back" value="<?= $e($back) ?>"><button class="btn btn--ghost btn--sm" type="submit"><?= Ui::icon('refresh') ?>Reabrir</button></form>
+            <?php endif; ?>
+          </div>
+          <?php endif; ?>
+          <?php if ($hist): ?>
+          <details class="pc__hist"<?= count($hist) <= 3 ? ' open' : '' ?>>
+            <summary>Historial (<?= $e(count($hist)) ?>)</summary>
+            <ol>
+              <?php foreach ($hist as $h): ?>
+                <li><time class="mono"><?= $e($dayFmt((string) $h['created_at'])) ?></time><b><?= $e(Prospects::RESULTS[$h['result']] ?? ['reopened' => 'Reabierto', 'converted' => 'Convertido en lead'][$h['result']] ?? $h['result']) ?></b><?= (int) $h['attempt_no'] > 0 ? ' <span class="muted">intento ' . $e($h['attempt_no']) . '</span>' : '' ?><?= $h['user_name'] ? ' <span class="muted">· ' . $e($h['user_name']) . '</span>' : '' ?><?= $h['note'] ? '<p>' . $e($h['note']) . '</p>' : '' ?></li>
+              <?php endforeach; ?>
+            </ol>
+          </details>
+          <?php endif; ?>
+        </aside>
       </div>
-      <?php endif; ?>
-
-      <?php if ($hist): ?>
-      <details class="pc__hist">
-        <summary>Historial (<?= $e(count($hist)) ?>)</summary>
-        <ol>
-          <?php foreach ($hist as $h): ?>
-            <li><time class="mono"><?= $e($dayFmt((string) $h['created_at'])) ?></time><b><?= $e(Prospects::RESULTS[$h['result']] ?? ['reopened' => 'Reabierto', 'converted' => 'Convertido en lead'][$h['result']] ?? $h['result']) ?></b><?= (int) $h['attempt_no'] > 0 ? ' <span class="muted">intento ' . $e($h['attempt_no']) . '</span>' : '' ?><?= $h['user_name'] ? ' <span class="muted">· ' . $e($h['user_name']) . '</span>' : '' ?><?= $h['note'] ? '<p>' . $e($h['note']) . '</p>' : '' ?></li>
-          <?php endforeach; ?>
-        </ol>
-      </details>
-      <?php endif; ?>
-    </article>
+    </details>
   </li>
 <?php endforeach; ?>
 </ol>

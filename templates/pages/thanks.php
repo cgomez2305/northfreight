@@ -25,7 +25,7 @@ partial('hero', [
 ?>
 <section class="section pre-cta" aria-labelledby="th-next">
   <div class="container stack">
-    <?php partial('section-head', ['id' => 'th-next', 'eyebrow' => 'What happens next', 'title' => 'Your next steps']); ?>
+    <?php partial('section-head', ['id' => 'th-next', 'title' => 'Your next steps']); ?>
     <?php partial('steps', ['label' => 'What happens after you apply', 'items' => [
         ['title' => 'The desk reads your application', 'text' => 'A dispatcher goes through your answers.'],
         ['title' => 'We get in touch if it is a fit', 'text' => 'On WhatsApp or the way you chose, so we can learn your operation.'],

@@ -15,6 +15,26 @@ final class Ui
         return View::e($v);
     }
 
+    /**
+     * Fase AM: atributos del dialogo de confirmacion de un boton (data-confirm + titulo + etiqueta + rojo solo si es destructivo).
+     * $c = texto, o ['text','title','label','danger'=>true]. Sin danger el boton de confirmar es el primario (publicar, convertir, marcar pagado...).
+     */
+    public static function confirm(string|array $c): string
+    {
+        $a = is_array($c) ? $c : ['text' => $c];
+        $out = ' data-confirm="' . self::e((string) ($a['text'] ?? '')) . '"';
+        if (!empty($a['title'])) {
+            $out .= ' data-confirm-title="' . self::e((string) $a['title']) . '"';
+        }
+        if (!empty($a['label'])) {
+            $out .= ' data-confirm-label="' . self::e((string) $a['label']) . '"';
+        }
+        if (!empty($a['danger'])) {
+            $out .= ' data-confirm-danger';
+        }
+        return $out;
+    }
+
     public static function icon(string $name, string $class = ''): string
     {
         return '<svg class="ic' . ($class !== '' ? ' ' . self::e($class) : '') . '" aria-hidden="true" focusable="false"><use href="#i-' . self::e($name) . '"/></svg>';
@@ -35,6 +55,13 @@ final class Ui
     public static function avatar(string $name, string $size = '', ?int $variant = null): string
     {
         return '<span class="av' . ($size !== '' ? ' av--' . self::e($size) : '') . '" aria-hidden="true">' . self::e(Fmt::initials($name)) . '</span>';
+    }
+
+    /** Indicador del plazo de primer contacto (AM): punto de 6 px + texto («vence en 23 min» / «vencido hace 2 h»); nunca solo color. @param array{late:bool,secs:int,label:string} $s de Sla::status */
+    public static function sla(array $s): string
+    {
+        $cls = $s['late'] ? 'late' : ($s['secs'] <= 900 ? 'soon' : 'ok');
+        return '<span class="sla sla--' . $cls . '"><i class="dot" aria-hidden="true"></i><span class="sr">Plazo de primer contacto: </span>' . self::e($s['label']) . '</span>';
     }
 
     public static function score(int $score, string $temp): string

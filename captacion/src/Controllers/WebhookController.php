@@ -34,7 +34,7 @@ final class WebhookController extends Responder
         set_exception_handler(static function (\Throwable $t) use ($source): void {
             Storage::error('webhook ' . $source . ' ' . get_class($t), $t->getMessage() . ' @' . basename($t->getFile()) . ':' . $t->getLine());
             try {
-                Integrations::webhook($source, 'err', 'Error interno: ' . get_class($t));
+                Integrations::webhook($source, 'err', 'Error interno al procesar el evento: revisa storage/error.log');
             } catch (\Throwable) {
             }
             if (!headers_sent()) {
@@ -238,7 +238,7 @@ final class WebhookController extends Responder
             self::json(['ok' => false, 'error' => 'invalid_event'], 422);
         }
         $res = Db::transaction(static function () use ($e, $eventId, $leadId): array {
-            $id = Webhook::claim('n8n', Webhook::key($eventId));
+            $id = Webhook::claim('n8n', Webhook::key($eventId), null, null, true);   // fase AM: un evento que fallo se puede reintentar con el mismo event_id
             if ($id === null) {
                 return ['ok' => true, 'duplicate' => true];
             }

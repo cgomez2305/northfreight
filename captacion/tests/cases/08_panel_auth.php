@@ -132,6 +132,12 @@ return static function (array $ctx): void {
     $r3 = $login($j3, "' OR 1=1 --", 'x');
     T::eq($r3['status'], 401, "inyeccion SQL en el correo: 401");
     T::ok($count('activity_log', "action = 'login_failed'") === 3, 'activity_log: 3 fallos de login registrados');
+    // Regresión A4 (auditoría 2026-11-22): lo que no es un correo (una contraseña pegada en el campo de correo) no se guarda en claro
+    $clear();   // sin el bloqueo por IP de los intentos anteriores: este intento debe llegar a registrarse
+    $jp = $fresh();
+    $rp = $login($jp, 'Pegada-por-error-Secreta-9!', 'x');
+    T::eq($rp['status'], 401, 'una contraseña pegada en el campo de correo: 401 como cualquier fallo');
+    T::ok($count('login_attempts', "email LIKE '%Secreta%'") === 0 && $count('activity_log', "changes LIKE '%Secreta%'") === 0, 'un valor que no es un correo no queda guardado en login_attempts ni en activity_log');
     $clear();
 
     // Contrasena correcta -> 2FA pendiente (aun sin sesion)

@@ -28,7 +28,7 @@ $stLabel = ['ok' => 'Correcta', 'failed' => 'Falló', 'running' => 'En curso'];
   <?php if (!$backups): ?>
     <div class="empty empty--sm"><?= Ui::icon('star', 'empty__star ic--star') ?><h3>Aún no hay copias</h3><p>La primera se hará esta noche a las 3:30 a. m. (hora de Nueva York) o ahora mismo con «Hacer copia ahora». Si el cron de copias no está creado, mira el README §11.</p></div>
   <?php else: ?>
-    <div class="tw"><table class="tbl tbl--bk">
+    <div class="tw"><table class="tbl tbl--bk" aria-label="Copias de seguridad de la base de datos">
       <thead><tr><th scope="col">Fecha</th><th scope="col">Archivo</th><th scope="col" class="num-c">Tamaño</th><th scope="col" class="num-c">Tablas</th><th scope="col" class="num-c">Filas</th><th scope="col">Estado</th><th scope="col"><span class="sr">Acciones</span></th></tr></thead>
       <tbody>
         <?php foreach ($backups as $b): $bcls = $b['status'] === 'ok' ? 'ok' : ($b['status'] === 'failed' ? 'bad' : 'warn'); ?>

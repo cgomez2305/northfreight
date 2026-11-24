@@ -23,8 +23,8 @@ $chips = ['ty' => static fn($v) => 'Tipo: ' . ActivityView::GROUPS[$v][0], 'us' 
 <form class="act-f card" method="get" action="/actividad">
   <label class="field"><span>Tipo</span><select name="ty"><option value="">Todos</option><?php foreach (ActivityView::GROUPS as $k => [$l]): ?><option value="<?= $e($k) ?>"<?= ($f['ty'] ?? '') === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
   <label class="field"><span>Usuario</span><select name="us"><option value="">Todos</option><?php foreach ($users as $u): ?><option value="<?= $e($u['id']) ?>"<?= ($f['us'] ?? '') === (string) $u['id'] ? ' selected' : '' ?>><?= $e($u['name']) ?></option><?php endforeach; ?></select></label>
-  <label class="field"><span>Desde (<?= $e(Fmt::zone()) ?>)</span><input type="date" name="from" value="<?= $e($f['from'] ?? '') ?>"></label>
-  <label class="field"><span>Hasta (<?= $e(Fmt::zone()) ?>)</span><input type="date" name="to" value="<?= $e($f['to'] ?? '') ?>"></label>
+  <label class="field"><span>Desde (<?= $e(Fmt::zone()) ?>)</span><input type="date" lang="es" name="from" value="<?= $e($f['from'] ?? '') ?>"></label>
+  <label class="field"><span>Hasta (<?= $e(Fmt::zone()) ?>)</span><input type="date" lang="es" name="to" value="<?= $e($f['to'] ?? '') ?>"></label>
   <label class="field act-f__q"><span>Buscar</span><span class="inp"><?= Ui::icon('search') ?><input type="search" name="q" value="<?= $e($f['q'] ?? '') ?>" placeholder="Acción, IP, lead #, usuario…" maxlength="100"></span></label>
   <div class="act-f__a"><button class="btn btn--secondary" type="submit"><?= Ui::icon('filter') ?>Filtrar</button><?php if ($nFilters): ?><a class="btn btn--ghost" href="/actividad"><?= Ui::icon('x') ?>Quitar</a><?php endif; ?></div>
 </form>
@@ -35,7 +35,7 @@ $chips = ['ty' => static fn($v) => 'Tipo: ' . ActivityView::GROUPS[$v][0], 'us' 
   <?php if (!$rows): ?>
     <div class="empty empty--sm"><?= Ui::icon('star', 'empty__star ic--star') ?><h3><?= $total === 0 ? 'Aún no hay actividad' : 'Nada coincide con esos filtros' ?></h3><p><?= $total === 0 ? 'Los inicios de sesión, cambios y exportaciones irán apareciendo aquí.' : 'Prueba con otro tipo, otras fechas o menos texto.' ?></p></div>
   <?php else: ?>
-    <div class="tw"><table class="tbl tbl--act">
+    <div class="tw"><table class="tbl tbl--act" aria-label="Registro de actividad">
       <thead><tr><th scope="col">Cuándo</th><th scope="col">Quién</th><th scope="col">Qué</th><th scope="col">Detalle</th><th scope="col">Desde</th></tr></thead>
       <tbody>
         <?php foreach ($rows as $r): $g = ActivityView::groupOf((string) $r['action']); $bad = in_array($r['action'], ['login_failed', 'login_2fa_failed', 'login_blocked', 'reauth_failed', 'reauth_blocked', 'setup_failed'], true); ?>
@@ -69,7 +69,7 @@ $chips = ['ty' => static fn($v) => 'Tipo: ' . ActivityView::GROUPS[$v][0], 'us' 
       <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>">
       <fieldset class="cfg-fs"<?= $locked ? ' disabled' : '' ?>>
         <label class="field"><span>Días de retención (30 a 3650)</span><input type="text" name="days" value="<?= $e($retention) ?>" inputmode="numeric" maxlength="4" autocomplete="off" required></label>
-        <button class="btn btn--primary" type="submit"><span class="btn__t">Guardar retención</span></button>
+        <button class="btn btn--secondary" type="submit"><span class="btn__t">Guardar retención</span></button>
       </fieldset>
     </form>
   </div>

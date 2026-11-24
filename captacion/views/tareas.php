@@ -41,15 +41,15 @@ $taskRow = static function (array $it) use ($e, $csrf, $canWrite, $back, $now): 
       <time class="trow__w<?= $late ? ' is-late' : '' ?>"><?= $when !== null ? $e($when) : '' ?><?php if ($late): ?><small>vencida <?= $e(Fmt::ago((string) $it['due_at'])) ?></small><?php endif; ?></time>
       <?php if ($isTask && $canWrite): ?>
         <div class="dd trow__a" data-dd>
-          <button class="icon-btn icon-btn--sm" type="button" aria-expanded="false" aria-haspopup="menu" aria-controls="tm-<?= $e($it['id']) ?>" aria-label="Acciones de la tarea: <?= $e($it['title']) ?>"><?= Ui::icon('dots') ?></button>
-          <div class="dd__panel" id="tm-<?= $e($it['id']) ?>" role="menu" hidden>
+          <button class="icon-btn icon-btn--sm" type="button" aria-expanded="false" aria-controls="tm-<?= $e($it['id']) ?>" aria-label="Acciones de la tarea: <?= $e($it['title']) ?>"><?= Ui::icon('dots') ?></button>
+          <div class="dd__panel" id="tm-<?= $e($it['id']) ?>" aria-label="Acciones de la tarea" hidden>
             <?php if (!$done): ?>
-              <form method="post" action="/tareas/<?= $e($it['id']) ?>/snooze"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="back" value="<?= $e($back) ?>"><input type="hidden" name="mode" value="1h"><button class="dd__item" type="submit" role="menuitem"><?= Ui::icon('clock') ?>Posponer 1 hora</button></form>
-              <form method="post" action="/tareas/<?= $e($it['id']) ?>/snooze"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="back" value="<?= $e($back) ?>"><input type="hidden" name="mode" value="tomorrow"><button class="dd__item" type="submit" role="menuitem"><?= Ui::icon('calendar') ?>Posponer a mañana</button></form>
-              <button class="dd__item" type="button" role="menuitem" data-snooze="<?= $e($data) ?>"><?= Ui::icon('calendar') ?>Elegir fecha…</button>
+              <form method="post" action="/tareas/<?= $e($it['id']) ?>/snooze"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="back" value="<?= $e($back) ?>"><input type="hidden" name="mode" value="1h"><button class="dd__item" type="submit"><?= Ui::icon('clock') ?>Posponer 1 hora</button></form>
+              <form method="post" action="/tareas/<?= $e($it['id']) ?>/snooze"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="back" value="<?= $e($back) ?>"><input type="hidden" name="mode" value="tomorrow"><button class="dd__item" type="submit"><?= Ui::icon('calendar') ?>Posponer a mañana</button></form>
+              <button class="dd__item" type="button" data-snooze="<?= $e($data) ?>"><?= Ui::icon('calendar') ?>Elegir fecha…</button>
             <?php endif; ?>
-            <button class="dd__item" type="button" role="menuitem" data-edit="<?= $e($data) ?>"><?= Ui::icon('pencil') ?>Editar…</button>
-            <form method="post" action="/tareas/<?= $e($it['id']) ?>/delete"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="back" value="<?= $e($back) ?>"><button class="dd__item dd__item--bad" type="submit" role="menuitem" data-confirm="¿Eliminar la tarea «<?= $e($it['title']) ?>»? Dejará de verse en la lista."><?= Ui::icon('trash') ?>Eliminar</button></form>
+            <button class="dd__item" type="button" data-edit="<?= $e($data) ?>"><?= Ui::icon('pencil') ?>Editar…</button>
+            <form method="post" action="/tareas/<?= $e($it['id']) ?>/delete"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="back" value="<?= $e($back) ?>"><button class="dd__item dd__item--bad" type="submit" data-confirm-title="¿Eliminar la tarea?" data-confirm-label="Eliminar" data-confirm-danger data-confirm="¿Eliminar la tarea «<?= $e($it['title']) ?>»? Dejará de verse en la lista."><?= Ui::icon('trash') ?>Eliminar</button></form>
           </div>
         </div>
       <?php endif; ?>
@@ -65,7 +65,7 @@ $taskRow = static function (array $it) use ($e, $csrf, $canWrite, $back, $now): 
   </div>
   <?php if ($canWrite): ?>
   <div class="page-head__a">
-    <button class="btn btn--primary" type="button" data-open="#task-new"><span class="btn__t">Nueva tarea</span></button>
+    <button class="btn btn--primary" type="button" data-open="#task-new"><?= Ui::icon('plus') ?><span class="btn__t">Nueva tarea</span></button>
   </div>
   <?php endif; ?>
 </div>
@@ -137,7 +137,7 @@ $leadPicker = static function (string $id) use ($e): string {
     <label class="field"><span>Qué hay que hacer</span><input type="text" name="title" required maxlength="190" placeholder="Llamar para confirmar documentos"></label>
     <?= $leadPicker('lp-new') ?>
     <div class="dlg__row">
-      <label class="field"><span>Para (hora <?= $e(Fmt::zone()) ?>)</span><input type="datetime-local" name="due"></label>
+      <label class="field"><span>Para (hora <?= $e(Fmt::zone()) ?>)</span><input type="datetime-local" lang="es" name="due"></label>
       <label class="field"><span>Prioridad</span><select name="priority"><?php foreach (Catalog::PRIORITIES as $k => $l): ?><option value="<?= $e($k) ?>"<?= $k === 2 ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
     </div>
     <div class="dlg__a"><button class="btn btn--ghost" type="button" data-close>Cancelar</button><button class="btn btn--primary" type="submit"><span class="btn__t">Crear tarea</span></button></div>
@@ -150,7 +150,7 @@ $leadPicker = static function (string $id) use ($e): string {
     <label class="field"><span>Qué hay que hacer</span><input type="text" name="title" required maxlength="190"></label>
     <?= $leadPicker('lp-edit') ?>
     <div class="dlg__row">
-      <label class="field"><span>Para (hora <?= $e(Fmt::zone()) ?>)</span><input type="datetime-local" name="due"></label>
+      <label class="field"><span>Para (hora <?= $e(Fmt::zone()) ?>)</span><input type="datetime-local" lang="es" name="due"></label>
       <label class="field"><span>Prioridad</span><select name="priority"><?php foreach (Catalog::PRIORITIES as $k => $l): ?><option value="<?= $e($k) ?>"><?= $e($l) ?></option><?php endforeach; ?></select></label>
     </div>
     <div class="dlg__a"><button class="btn btn--ghost" type="button" data-close>Cancelar</button><button class="btn btn--primary" type="submit"><span class="btn__t">Guardar cambios</span></button></div>
@@ -161,7 +161,7 @@ $leadPicker = static function (string $id) use ($e): string {
     <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="back" value="<?= $e($back) ?>"><input type="hidden" name="mode" value="date">
     <div class="dlg__h"><h2 class="dlg__t" id="task-snooze-t">Posponer tarea</h2><button class="icon-btn icon-btn--sm" type="button" data-close aria-label="Cerrar"><?= Ui::icon('x') ?></button></div>
     <p class="dlg__m" data-snooze-title></p>
-    <label class="field"><span>Nueva fecha y hora (<?= $e(Fmt::zone()) ?>)</span><input type="datetime-local" name="date" required></label>
+    <label class="field"><span>Nueva fecha y hora (<?= $e(Fmt::zone()) ?>)</span><input type="datetime-local" lang="es" name="date" required></label>
     <div class="dlg__a"><button class="btn btn--ghost" type="button" data-close>Cancelar</button><button class="btn btn--primary" type="submit"><span class="btn__t">Posponer</span></button></div>
   </form>
 </dialog>

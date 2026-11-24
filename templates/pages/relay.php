@@ -40,14 +40,13 @@ partial('summary', summary_for($route));
 ?>
 <section class="section" aria-labelledby="relay-manage">
   <div class="container stack">
-    <?php partial('section-head', ['id' => 'relay-manage', 'eyebrow' => 'Inside your Relay account', 'title' => 'What we manage in your Amazon Relay account']); ?>
+    <?php partial('section-head', ['id' => 'relay-manage', 'title' => 'What we manage in your Amazon Relay account']); ?>
     <?php partial('photo-rows', ['label' => 'What we manage in your Amazon Relay account', 'items' => array_map(static fn(array $m): array => ['tag' => $m[0], 'title' => $m[1], 'text' => $m[2], 'icon' => $m[3], 'image' => $m[4]], $manage)]); ?>
   </div>
 </section>
 
 <?php partial('photo-card', [
     'id'    => 'relay-why',
-    'eyebrow' => 'Why it matters',
     'title' => 'Why Relay needs a dedicated desk',
     'lead'  => 'Relay moves fast: good blocks can go quickly and a weak scorecard limits what you can book. A desk that watches the board and fixes issues early keeps your trucks earning.',
     'image' => ['base' => 'nf-setup-amazon-relay', 'alt' => 'White semi truck with a dry van trailer driving past a long distribution warehouse with lit loading docks at dusk', 'pos' => '30% 55%'],
@@ -56,7 +55,6 @@ partial('summary', summary_for($route));
 <?php if ($guides): ?>
 <?php partial('desk-block', [
     'id'      => 'relay-guides',
-    'eyebrow' => 'From the desk',
     'title'   => 'Guides for Relay carriers',
     'lead'    => 'How the Relay load board works, what Relay requires from carriers and what dispatch costs, in plain language.',
     'btn'     => ['label' => 'All articles', 'href' => url('/blog/')],

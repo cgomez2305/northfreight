@@ -1,7 +1,7 @@
 <?php
 /**
  * Front controller del panel (subdominio captacion.). Rutas: / (dashboard), /pipeline, /tareas, /config, /actividad, /leads, /leads/{id}, /leads/{id}/{accion}, /leads/bulk, /leads/export, /ajax/search, /ajax/notifications/read, /login, /login/2fa, /logout,
- * Q6: /ajax/dashboard (refresco ligero del dashboard, solo administradores). Q5a: /ajax/prefs, /ajax/peek, /ajax/lead/act, /ajax/lead/create, /ajax/undo, /ajax/counters, /undo, /vistas/*. Q4a: /prospectos, /referidos, /vacantes (solo administradores). Q3: /reportes, /resultados, /informes, /comunicaciones; publicas con token: /c/{token}, /u/{token}, /invite/{token}. Autorizacion por rol DENEGADA POR DEFECTO en Responder::user().
+ * AM: /importar (CSV de leads), /leads/{id}/anonimizar|fusionar|enviar. Q6: /ajax/dashboard (refresco ligero del dashboard, solo administradores). Q5a: /ajax/prefs, /ajax/peek, /ajax/lead/act, /ajax/lead/create, /ajax/undo, /ajax/counters, /undo, /vistas/*. Q4a: /prospectos, /referidos, /vacantes (solo administradores). Q3: /reportes, /resultados, /informes, /comunicaciones; publicas con token: /c/{token}, /u/{token}, /invite/{token}. Autorizacion por rol DENEGADA POR DEFECTO en Responder::user().
  * setup.php y api/lead.php son puntos de entrada propios. Cualquier otra ruta: 404.
  */
 
@@ -14,6 +14,8 @@ use Captacion\Controllers\AjaxController;
 use Captacion\Controllers\AuthController;
 use Captacion\Controllers\ComunicacionesController;
 use Captacion\Controllers\ConfigController;
+use Captacion\Controllers\DatosController;
+use Captacion\Controllers\ImportController;
 use Captacion\Controllers\ReglasController;
 use Captacion\Controllers\DashboardController;
 use Captacion\Controllers\InviteController;
@@ -44,6 +46,13 @@ set_exception_handler(static function (Throwable $t): void {
         http_response_code(500);
         \Captacion\Middleware\SecurityHeaders::send();
         header('Content-Type: text/html; charset=utf-8');
+    }
+    if (!headers_sent()) {
+        try {
+            \Captacion\Controllers\Responder::errorPage('Error', 'Algo falló', 'El panel no pudo completar la petición. Revisa storage/error.log en el servidor.', 500);
+        } catch (Throwable) {
+            // sin shell: tarjeta simple (abajo)
+        }
     }
     echo \Captacion\View::render('message', ['title' => 'Error', 'heading' => 'Algo falló', 'text' => 'El panel no pudo completar la petición. Revisa storage/error.log en el servidor.']);
 });
@@ -109,6 +118,10 @@ switch (true) {
         UxController::counters();
     case preg_match('#^/ajax/rules/(panel|row|preview|simulate|simstatus)$#', $path, $m) === 1:
         ReglasController::ajax($m[1]);
+    // --- Fase AM · automatizacion ---------------------------------------------------------------------------------------------
+    case $path === '/ajax/config/recalc':
+        ConfigController::recalcStatus();
+    // --- fin Fase AM -----------------------------------------------------------------------------------------------------------
     case $path === '/undo':
         UxController::undoForm();
     case preg_match('#^/vistas/(new|\d{1,12})(?:/(rename|pin|unpin|delete|update))?$#', $path, $m) === 1:
@@ -157,13 +170,16 @@ switch (true) {
         AuthController::twofa();
     case $path === '/logout':
         AuthController::logout();
+    // ---------------------------------------------------------------- Fase AM · datos (solo administradores; van ANTES de la ruta generica /leads/{id}/{accion})
+    case preg_match('#^/leads/(\d{1,12})/(anonimizar|fusionar|enviar)$#', $path, $m) === 1:
+        DatosController::handle((int) $m[1], $m[2]);
+    case preg_match('#^/importar(?:/(\d{1,12})(?:/(simular|start|discard))?)?$#', $path, $m) === 1:
+        ImportController::route(($m[1] ?? '') !== '' ? (int) $m[1] : null, ($m[2] ?? '') !== '' ? $m[2] : null);
+    // ---------------------------------------------------------------- fin Fase AM · datos
     case preg_match('#^/leads/(\d{1,12})$#', $path, $m) === 1:
         LeadsController::show((int) $m[1]);
     case preg_match('#^/leads/(\d{1,12})/([a-z-]{3,20})$#', $path, $m) === 1:
         LeadActionsController::handle((int) $m[1], $m[2]);
     default:
-        http_response_code(404);
-        \Captacion\Middleware\SecurityHeaders::send();
-        header('Content-Type: text/html; charset=utf-8');
-        echo \Captacion\View::render('message', ['title' => 'No encontrado', 'heading' => 'No encontrado', 'text' => 'Esta página no existe.']);
+        \Captacion\Controllers\Responder::errorPage('No encontrado', 'No encontrado', 'Esta página no existe.', 404);
 }

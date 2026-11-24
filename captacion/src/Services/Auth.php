@@ -63,6 +63,9 @@ final class Auth
     public static function attemptPassword(string $email, string $password, string $ip): array
     {
         $email = strtolower(trim($email));
+        if (filter_var($email, FILTER_VALIDATE_EMAIL) === false) {
+            $email = '';   // lo escrito no es un correo (p. ej. una contraseña pegada por error): no se guarda en login_attempts ni en activity_log; solo cuenta el límite por IP
+        }
         if (self::isBlocked($email, $ip)) {
             ActivityLog::record('login_blocked', null, 'user', null, ['email' => $email], $ip);
             return ['status' => 'blocked', 'user' => null];

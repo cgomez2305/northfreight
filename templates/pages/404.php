@@ -31,7 +31,7 @@ if ($links):
 ?>
 <section class="section" aria-labelledby="nf-services">
   <div class="container stack">
-    <?php partial('section-head', ['eyebrow' => 'Our services', 'title' => 'Where to next?', 'id' => 'nf-services']); ?>
+    <?php partial('section-head', [ 'title' => 'Where to next?', 'id' => 'nf-services']); ?>
     <div class="<?= count($links) === 5 ? 'g5' : (count($links) % 3 === 0 ? 'g3' : 'g2') ?>">
       <?php foreach ($links as $l): ?>
       <?php partial('card', ['variant' => 'link', 'size' => 'tile', 'title' => $l[0], 'text' => $l[1], 'href' => url($l[2]), 'cta' => 'Open']); ?>

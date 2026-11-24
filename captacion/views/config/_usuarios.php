@@ -5,9 +5,9 @@ use Captacion\Ui;
 /** Variables: $viewers, $once, $inviteForm, $errors, $locked, $csrf */
 $fe = static fn(string $k) => isset($errors[$k]) ? ' aria-invalid="true" aria-describedby="eu-' . $k . '"' : '';
 $em = static fn(string $k) => isset($errors[$k]) ? '<small class="num__e" id="eu-' . $k . '">' . htmlspecialchars($errors[$k], ENT_QUOTES) . '</small>' : '';
-$act = static function (string $action, int $id, string $label, string $cls, string $icon, string $confirm = '') use ($csrf, $e, $locked): string {
+$act = static function (string $action, int $id, string $label, string $cls, string $icon, string|array $confirm = '') use ($csrf, $e, $locked): string {
     return '<form class="inl" method="post" action="/config/users/' . $action . '"><input type="hidden" name="_csrf" value="' . $e($csrf) . '"><input type="hidden" name="id" value="' . $id . '">'
-        . '<button class="btn btn--sm ' . $cls . '" type="submit"' . ($locked ? ' disabled' : '') . ($confirm !== '' ? ' data-confirm="' . $e($confirm) . '"' : '') . '><span class="btn__t">' . $e($label) . '</span></button></form>';
+        . '<button class="btn btn--sm ' . $cls . '" type="submit"' . ($locked ? ' disabled' : '') . ($confirm !== '' ? Ui::confirm($confirm) : '') . '><span class="btn__t">' . $e($label) . '</span></button></form>';
 };
 ?>
 <p class="cfg-intro">Cuentas de <b>solo lectura</b> para NorthStar. Un lector ve únicamente <b>Resultados</b> (totales, embudo, firmados, costo por firmado, tendencia y motivos de pérdida) e <b>Informes</b> mensuales: nunca nombres, teléfonos, correos, USDOT ni exportaciones. Se invita con un enlace de un solo uso (48 h) para fijar contraseña y activar el 2FA.</p>
@@ -35,18 +35,18 @@ $act = static function (string $action, int $id, string $label, string $cls, str
   <?php if (!$viewers): ?>
     <div class="empty empty--sm"><?= Ui::icon('star', 'empty__star ic--star') ?><h3>Aún no hay lectores</h3><p>Invita a la persona de NorthStar que verá los resultados y los informes.</p></div>
   <?php else: ?>
-    <div class="tw"><table class="tbl tbl--users"><thead><tr><th scope="col">Persona</th><th scope="col">Estado</th><th scope="col">Último acceso</th><th scope="col"><span class="sr">Acciones</span></th></tr></thead><tbody>
+    <div class="tw"><table class="tbl tbl--users" aria-label="Personas con acceso al panel"><thead><tr><th scope="col">Persona</th><th scope="col">Estado</th><th scope="col">Último acceso</th><th scope="col"><span class="sr">Acciones</span></th></tr></thead><tbody>
       <?php foreach ($viewers as $v):
         $pending = $v['totp_confirmed_at'] === null;
-        $state = (int) $v['is_active'] !== 1 ? ['Desactivada', 'hot'] : ($pending ? ['Invitación pendiente', 'plain'] : ['Activa', 'warm']);
+        $state = (int) $v['is_active'] !== 1 ? ['Desactivada', 'hot'] : ($pending ? ['Invitación pendiente', 'plain'] : ['Activa', 'ok']);
       ?>
         <tr><th scope="row" class="c-n"><span class="who"><?= Ui::avatar((string) $v['name']) ?><span><b><?= $e($v['name']) ?></b><small><?= $e($v['email']) ?></small></span></span></th>
           <td data-l="Estado"><span class="chip chip--<?= $e($state[1]) ?>"><i class="dot"></i><?= $e($state[0]) ?></span><?php if ($pending && $v['invite_until'] !== null && (int) $v['is_active'] === 1): ?><small class="muted"> · vale hasta <?= $e(Fmt::dateTime($v['invite_until'])) ?></small><?php endif; ?></td>
           <td class="c-when" data-l="Último acceso"><?= $v['last_login_at'] !== null ? $e(Fmt::dateTime($v['last_login_at'])) . ' · ' . $e(Fmt::ago($v['last_login_at'])) : 'Nunca' ?></td>
           <td class="c-act">
             <?php if ((int) $v['is_active'] === 1): ?>
-              <?= $pending ? $act('relink', (int) $v['id'], 'Enlace nuevo', 'btn--secondary', 'link') : $act('reset', (int) $v['id'], 'Reiniciar 2FA', 'btn--secondary', 'key', 'Se borra su contraseña y su 2FA, sus sesiones dejan de valer y recibirá un enlace nuevo para repetir el alta. ¿Seguir?') ?>
-              <?= $act('deactivate', (int) $v['id'], 'Desactivar', 'btn--ghost', 'x', 'La cuenta deja de poder entrar y sus sesiones abiertas dejan de valer. ¿Desactivar?') ?>
+              <?= $pending ? $act('relink', (int) $v['id'], 'Enlace nuevo', 'btn--secondary', 'link') : $act('reset', (int) $v['id'], 'Reiniciar 2FA', 'btn--secondary', 'key', ['text' => 'Se borra su contraseña y su 2FA, sus sesiones dejan de valer y recibirá un enlace nuevo para repetir el alta. ¿Seguir?', 'title' => '¿Reiniciar el 2FA?', 'label' => 'Reiniciar', 'danger' => true]) ?>
+              <?= $act('deactivate', (int) $v['id'], 'Desactivar', 'btn--ghost', 'x', ['text' => 'La cuenta deja de poder entrar y sus sesiones abiertas dejan de valer. ¿Desactivar?', 'title' => '¿Desactivar la cuenta?', 'label' => 'Desactivar', 'danger' => true]) ?>
             <?php else: ?><?= $act('activate', (int) $v['id'], 'Activar', 'btn--secondary', 'check') ?><?php endif; ?></td></tr>
       <?php endforeach; ?>
     </tbody></table></div>

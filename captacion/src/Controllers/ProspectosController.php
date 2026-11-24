@@ -46,7 +46,7 @@ final class ProspectosController extends Responder
         $cron = Settings::get('cron.prospects');
         self::page('prospectos', $user, 'prospectos', [['Prospectos', null]], [
             'title' => 'Prospectos', 'css' => ['prospectos'], 'js' => ['prospectos'], 'f' => $f, 'per' => $per, 'list' => $page, 'counts' => Prospects::counts($f, $now),
-            'history' => Prospects::historyFor(array_column($page['rows'], 'id')), 'now' => $now, 'summary' => Prospects::summary($now), 'cfg' => $cfg, 'run' => $run,
+            'callable' => in_array($f['tab'], ['today', 'to_call', 'no_answer'], true) ? Prospects::callableCount($f, $now) : null, 'history' => Prospects::historyFor(array_column($page['rows'], 'id')), 'now' => $now, 'summary' => Prospects::summary($now), 'cfg' => $cfg, 'run' => $run,
             'cron' => is_array($cron) ? $cron : null, 'totalAll' => (int) \Captacion\Db::value('SELECT COUNT(*) FROM prospects_fmcsa WHERE deleted_at IS NULL'),
             'back' => '/prospectos' . self::qs($f, $per, $page['page']),
         ]);
@@ -56,7 +56,7 @@ final class ProspectosController extends Responder
     public static function qs(array $f, int $per = 25, int $page = 1): string
     {
         $q = array_filter([
-            'tab' => $f['tab'] !== 'today' ? $f['tab'] : null, 'q' => $f['q'] ?: null, 'us' => $f['us'] ?: null, 'fl' => $f['fl'] ?: null, 'ag' => $f['ag'] ?: null, 'ph' => $f['ph'] ?: null,
+            'tab' => $f['tab'] !== 'today' ? $f['tab'] : null, 'q' => $f['q'] ?: null, 'us' => $f['us'] ?: null, 'fl' => $f['fl'] ?: null, 'ag' => $f['ag'] ?: null, 'ph' => $f['ph'] ?: null, 'now' => ($f['now'] ?? '') ?: null,
             'per' => $per !== 25 ? $per : null, 'page' => $page > 1 ? $page : null,
         ], static fn($v) => $v !== null);
         return $q ? '?' . http_build_query($q, '', '&', PHP_QUERY_RFC3986) : '';

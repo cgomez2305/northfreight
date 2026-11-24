@@ -72,7 +72,7 @@ partial('hero', [
 ?>
 <section class="section" aria-labelledby="eq-handles">
   <div class="container stack">
-    <?php partial('section-head', ['id' => 'eq-handles', 'eyebrow' => 'What the desk handles', 'title' => $eq['handles_title']]); ?>
+    <?php partial('section-head', ['id' => 'eq-handles', 'title' => $eq['handles_title']]); ?>
     <div class="g4">
       <?php $last = count($eq['handles']) - 1; foreach ($eq['handles'] as $i => $h): ?>
         <?php partial('card', ['variant' => $i === $last ? 'dark' : 'light', 'cls' => 'sa-n30', 'min_title' => true, 'title' => $h[0], 'text' => $h[1]]); ?>
@@ -84,7 +84,7 @@ partial('hero', [
 <section class="section section--dark" aria-labelledby="eq-checks">
   <div class="container sa-need">
     <div class="sa-need__main">
-      <?php partial('section-head', ['id' => 'eq-checks', 'theme' => 'dark', 'eyebrow' => 'Before we book', 'title' => 'What we check on every load']); ?>
+      <?php partial('section-head', ['id' => 'eq-checks', 'theme' => 'dark', 'title' => 'What we check on every load']); ?>
       <ol class="sa-checks">
         <?php foreach ($eq['checks'] as $i => $c): ?>
         <li><span><?= e($c) ?></span></li>
@@ -109,7 +109,6 @@ partial('hero', [
   <div class="container">
     <div class="sa-faq">
       <div class="sa-faq__head">
-        <span class="t-eyebrow">FAQ</span>
         <h2 class="t-h2 c-navy" id="faq-title"><?= e($eq['faq_title']) ?></h2>
       </div>
       <div class="sa-faq__list">

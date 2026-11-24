@@ -825,12 +825,134 @@ CREATE TABLE IF NOT EXISTS rule_simulation_rows (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ===== 013_lead_modes.sql =====
--- 013_lead_modes: fase Q5c (vistas Tabla, Calendario y Cronología). Idempotente (IF NOT EXISTS: MariaDB 10.1+; se puede repetir sin daño).
+-- 013_lead_modes: fase Q5c (vistas Tabla, Calendario y Cronología). SQL estándar (MariaDB y MySQL 8); el migrador registra la versión y no la repite.
 -- 1) Una vista guardada recuerda también el modo (lista, tablero, tabla, calendario o cronología). NULL = la pantalla en la que se abre.
-ALTER TABLE saved_views ADD COLUMN IF NOT EXISTS mode VARCHAR(12) NULL AFTER pipeline;
+ALTER TABLE saved_views ADD COLUMN mode VARCHAR(12) NULL AFTER pipeline;
 -- 2) Cronología global: los eventos de todos los leads por fecha (desc) con cursor (created_at, id); sin este índice cada página recorrería la tabla entera.
-ALTER TABLE lead_events ADD KEY IF NOT EXISTS idx_events_created (created_at, id);
+ALTER TABLE lead_events ADD KEY idx_events_created (created_at, id);
 -- 3) Calendario por rango visible: tareas por fecha de vencimiento (hechas o no) y entregas programadas (jobs pendientes por tipo y hora).
-ALTER TABLE tasks ADD KEY IF NOT EXISTS idx_tasks_due_range (deleted_at, due_at);
-ALTER TABLE jobs ADD KEY IF NOT EXISTS idx_jobs_type_run (type, status, run_at);
+ALTER TABLE tasks ADD KEY idx_tasks_due_range (deleted_at, due_at);
+ALTER TABLE jobs ADD KEY idx_jobs_type_run (type, status, run_at);
+
+-- ===== 014_cliente_ah.sql =====
+-- 014_cliente_ah: fase AH (respuestas del cliente, 2026-11-20). NorthStar solo atiende Amazon Relay y dry van, y a un company driver le pide 2 años de experiencia.
+-- Solo se cambia lo que sigue exactamente como lo sembró 003: si Carlos ya lo editó desde Configuración, no se toca. Estándar en MariaDB y MySQL 8.
+UPDATE settings SET value = '["dry-van","amazon-relay"]'
+ WHERE `key` = 'dispatched_equipment' AND value = '["dry-van","reefer","flatbed","box-truck","hotshot","power-only"]';
+UPDATE settings SET value = '2' WHERE `key` = 'driver_min_years' AND value = '1';
+-- Equipos y años mínimos dejan de ser provisionales; estados de contratación y tramos de experiencia siguen pendientes.
+UPDATE settings SET value = '["hiring_states","scoring.driver.experience"]'
+ WHERE `key` = 'provisional' AND value = '["dispatched_equipment","hiring_states","driver_min_years","scoring.driver.experience"]';
+
+-- ===== 015_responsable_sla.sql =====
+-- 015_responsable_sla: fase AM-operacion. SQL estándar (MariaDB 10.11 y MySQL 8); el migrador registra la versión y no la repite.
+-- 1) Responsable del lead: id del usuario (admin activo) a cargo. NULL = sin asignar. Sin FK a propósito: si un usuario se borra, el lead queda "sin asignar" por la lógica
+--    de la aplicación (Assignment::assignable) y no se bloquea el borrado. El índice cubre «Mis leads» y los filtros por responsable.
+ALTER TABLE leads ADD COLUMN assigned_to BIGINT UNSIGNED NULL AFTER external_crm_id;
+ALTER TABLE leads ADD KEY idx_leads_assigned (assigned_to, deleted_at);
+-- 2) Tipo de una tarea creada por el sistema (p. ej. 'sla_first_contact': «Primer contacto con …»); NULL = tarea normal. Sirve para no duplicarla y para cerrarla sola al contactar.
+ALTER TABLE tasks ADD COLUMN kind VARCHAR(24) NULL AFTER priority;
+ALTER TABLE tasks ADD KEY idx_tasks_kind (kind, lead_id);
+
+-- ===== 016_datos_privacidad.sql =====
+-- 016_datos_privacidad: fase AM (frente «datos»). Lista de supresion (STOP de numeros que aun no son lead y borrado a peticion), anonimizacion,
+-- fusion de duplicados e importacion CSV de leads. SQL estandar valido en MariaDB 10.11 y MySQL 8.
+
+-- leads.anonymized_at: el lead se anonimizo a peticion del titular (irreversible). Se conservan id, fechas, fuente, etapa y puntuacion para las estadisticas.
+-- leads.merged_into: este lead se fusiono en otro (tiene deleted_at; la ficha vieja redirige al principal).
+ALTER TABLE leads ADD COLUMN anonymized_at DATETIME NULL;
+ALTER TABLE leads ADD COLUMN merged_into BIGINT UNSIGNED NULL;
+ALTER TABLE leads ADD KEY idx_leads_merged (merged_into);
+
+-- Lista de supresion. NUNCA guarda el telefono ni el correo en claro: solo HMAC-SHA256 (clave derivada de APP_KEY) del valor normalizado
+-- (telefono E.164, correo en minusculas). kind: phone | email. reason: sms_stop (el titular respondio STOP por SMS) | erasure (borrado a peticion).
+-- Una razon `erasure` nunca se rebaja a sms_stop; START por SMS solo quita las de razon sms_stop.
+CREATE TABLE suppression (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  kind VARCHAR(8) NOT NULL,
+  value_hash CHAR(64) NOT NULL,
+  reason VARCHAR(20) NOT NULL,
+  source_lead_id BIGINT UNSIGNED NULL,
+  created_by BIGINT UNSIGNED NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_suppression (kind, value_hash),
+  KEY idx_suppression_reason (reason, created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Importaciones CSV de leads (ruta /importar). El archivo vive en storage/imports/<token>.csv (0600) y se borra al terminar.
+-- status: uploaded | queued | running | done | failed | cancelled. mapping = columna del CSV -> campo del lead. problems = primeras filas con problema (sin datos personales).
+CREATE TABLE lead_imports (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  user_id BIGINT UNSIGNED NULL,
+  token CHAR(32) NOT NULL,
+  filename VARCHAR(160) NOT NULL,
+  tag VARCHAR(40) NOT NULL,
+  status VARCHAR(12) NOT NULL DEFAULT 'uploaded',
+  delimiter_char VARCHAR(4) NOT NULL DEFAULT ',',
+  encoding VARCHAR(16) NOT NULL DEFAULT 'UTF-8',
+  total_rows INT UNSIGNED NOT NULL DEFAULT 0,
+  mapping JSON NULL,
+  options JSON NULL,
+  processed INT UNSIGNED NOT NULL DEFAULT 0,
+  created_count INT UNSIGNED NOT NULL DEFAULT 0,
+  duplicate_count INT UNSIGNED NOT NULL DEFAULT 0,
+  rejected_count INT UNSIGNED NOT NULL DEFAULT 0,
+  problems JSON NULL,
+  error VARCHAR(300) NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  started_at DATETIME NULL,
+  finished_at DATETIME NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_import_token (token),
+  KEY idx_imports_created (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ===== 017_automatizacion.sql =====
+-- 017_automatizacion: fase AM (frente «automatizacion y correcciones»).
+--  1) Reglas por eventos y por tiempo: un tipo nuevo de conjunto, `automation` (disparadores: cambio de etapa, sin primer contacto tras N horas, tarea vencida, consentimiento revocado).
+--  2) Avisos de regla en la campana (rule_notices).
+--  3) Webhooks salientes genericos: registro de entregas con idempotencia por event_id (outbound_deliveries). La configuracion (URL, secreto cifrado, eventos) vive en settings.
+--  4) La simulacion de reglas de eventos cuenta avisos de campana y webhooks (dos columnas nuevas en rule_simulation_rows).
+
+ALTER TABLE rule_sets MODIFY kind ENUM('scoring','alerts','routing_tasks','automation') NOT NULL;
+ALTER TABLE rule_applications MODIFY kind ENUM('scoring','alerts','routing_tasks','automation') NOT NULL;
+
+ALTER TABLE rule_simulation_rows ADD COLUMN bells TINYINT UNSIGNED NOT NULL DEFAULT 0;
+ALTER TABLE rule_simulation_rows ADD COLUMN hooks TINYINT UNSIGNED NOT NULL DEFAULT 0;
+
+-- Avisos que una regla puso en la campana. Cada aviso es una clave distinta en notification_reads ('rule_notice:<id>'): se marca leido por usuario como los demas.
+CREATE TABLE IF NOT EXISTS rule_notices (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  lead_id BIGINT UNSIGNED NOT NULL,
+  set_id BIGINT UNSIGNED NOT NULL,
+  rule_id VARCHAR(24) NOT NULL,
+  rule_name VARCHAR(80) NOT NULL,
+  text VARCHAR(200) NOT NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_rule_notices_created (created_at),
+  KEY idx_rule_notices_lead (lead_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Entregas del webhook saliente generico. event_id (UNIQUE) = idempotencia: un mismo evento no se encola dos veces. El cuerpo se guarda tal como se firmo (los reintentos reenvian
+-- exactamente lo mismo). Sin datos de contacto salvo que la configuracion tenga «incluir contacto»; se purga a los 30 dias.
+CREATE TABLE IF NOT EXISTS outbound_deliveries (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  event_id VARCHAR(40) NOT NULL,
+  event VARCHAR(30) NOT NULL,
+  lead_id BIGINT UNSIGNED NULL,
+  payload JSON NOT NULL,
+  status ENUM('pending','sent','failed','skipped') NOT NULL DEFAULT 'pending',
+  attempts TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  http_status SMALLINT UNSIGNED NULL,
+  last_error VARCHAR(190) NULL,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  sent_at DATETIME NULL,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_outbound_event (event_id),
+  KEY idx_outbound_created (created_at),
+  KEY idx_outbound_status (status, created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

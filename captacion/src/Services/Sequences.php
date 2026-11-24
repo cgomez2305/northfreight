@@ -50,7 +50,7 @@ final class Sequences
     public const STATUS = ['active' => 'Activa', 'paused' => 'En pausa', 'completed' => 'Completada', 'stopped' => 'Detenida'];
     public const REASONS = [
         'stage' => 'El lead avanzó de etapa', 'responded' => 'El lead respondió', 'manual' => 'Pausada a mano', 'unsubscribed' => 'Se dio de baja', 'no_consent' => 'Sin consentimiento de correo vigente',
-        'removed' => 'Sacada a mano', 'no_email' => 'El lead no tiene correo', 'lead_deleted' => 'El lead ya no existe',
+        'removed' => 'Sacada a mano', 'no_email' => 'El lead no tiene correo', 'lead_deleted' => 'El lead ya no existe', 'erasure' => 'Lead anonimizado a petición', 'merged' => 'Lead fusionado en otro',
     ];
     public const DEFAULT_CAP_HOUR = 20;
     public const DEFAULT_CAP_LEAD = 1;
@@ -269,6 +269,7 @@ final class Sequences
                 $step = self::DEFS[$key]['steps'][(int) $e['step']] ?? null;
                 $due = $step !== null ? max(Clock::time(), (int) Clock::parse((string) $e['created_at']) + $step['day'] * 86400) : Clock::time();
                 Db::run("UPDATE sequence_enrollments SET status = 'active', paused_reason = NULL, blocked_reason = NULL, next_run_at = ? WHERE id = ?", [Clock::at($due), $enrollmentId]);
+                self::clearFinishedJobs($enrollmentId);
                 LeadActions::event($lead, 'sequence_resumed', ['sequence' => $key, 'enrollment_id' => $enrollmentId], $userId);
                 ActivityLog::record('sequence_resume', $userId, 'lead', $lead, ['enrollment_id' => $enrollmentId]);
                 return ['ok' => true, 'msg' => 'Inscripción reanudada.'];
@@ -294,6 +295,15 @@ final class Sequences
 
     // --- Envio ---------------------------------------------------------------------------------------------------------------------------
 
+    /**
+     * Fase AM: la clave de dedupe `seq:id:paso:bloqueos` sobrevive al job terminado; si el paso se pausa y se reanuda sin cambiar de paso ni de bloqueos, la misma clave
+     * impedia volver a encolarlo y la inscripcion quedaba atascada. Al reanudar se borran los jobs YA TERMINADOS (done, failed, cancelled) de esa inscripcion.
+     */
+    private static function clearFinishedJobs(int $enrollmentId): void
+    {
+        Db::run("DELETE FROM jobs WHERE type = 'sequence_step' AND dedupe_key LIKE ? AND status IN ('done','failed','cancelled')", ['seq:' . $enrollmentId . ':%']);
+    }
+
     /** Encola un job por inscripcion vencida. Lo llama cron/process_jobs.php antes de procesar la cola. @return int jobs nuevos */
     public static function enqueueDue(): int
     {
@@ -311,12 +321,12 @@ final class Sequences
 
     private static function sentLastHour(): int
     {
-        return (int) Db::value("SELECT COUNT(*) FROM messages WHERE channel = 'email' AND direction = 'out' AND sequence_key IS NOT NULL AND status IN ('sent','logged') AND created_at > ?", [Clock::shift(-3600)]);
+        return (int) Db::value("SELECT COUNT(*) FROM messages WHERE channel = 'email' AND direction = 'out' AND sequence_key IS NOT NULL AND status = 'sent' AND created_at > ?", [Clock::shift(-3600)]);
     }
 
     private static function sentToLead(int $leadId): int
     {
-        return (int) Db::value("SELECT COUNT(*) FROM messages WHERE lead_id = ? AND channel = 'email' AND direction = 'out' AND sequence_key IS NOT NULL AND status IN ('sent','logged') AND created_at > ?", [$leadId, Clock::shift(-86400)]);
+        return (int) Db::value("SELECT COUNT(*) FROM messages WHERE lead_id = ? AND channel = 'email' AND direction = 'out' AND sequence_key IS NOT NULL AND status = 'sent' AND created_at > ?", [$leadId, Clock::shift(-86400)]);
     }
 
     private static function block(array $e, string $reason, int $waitSeconds): void
@@ -389,6 +399,11 @@ final class Sequences
         if (!empty($step['needs_source']) && $cfg['rates_source'] === '') {
             LeadActions::event($leadId, 'sequence_step_skipped', ['sequence' => $e['sequence_key'], 'step' => $step['label'], 'why' => 'sin fuente real de tarifas'], null);
             self::advance($e, $stepIdx, false);
+            return;
+        }
+        if (!Mailer::canDeliver()) {
+            // Fase AM: sin SMTP real (o sin PHPMailer) el paso NO avanza como «enviado»: se queda en su sitio, bloqueado y visible en Inscripciones, y sale solo cuando haya SMTP.
+            self::block($e, 'Sin SMTP', 3600);
             return;
         }
         if (self::sentLastHour() >= $cfg['cap_hour']) {

@@ -11,7 +11,7 @@ $em = static fn(string $k) => isset($errors[$k]) ? '<small class="num__e" id="ea
 <p class="cfg-intro">Qué te avisa, por dónde y cuándo. Las alertas urgentes (lead caliente, segunda alerta y firmado que vuelve a escribir) nunca esperan al horario de silencio.</p>
 <?php if (!$tgOk): ?><p class="flash flash--warn" role="status"><?= Ui::icon('alert') ?>Telegram no está configurado en el servidor: los interruptores de Telegram no enviarán nada hasta que agregues TELEGRAM_BOT_TOKEN y TELEGRAM_CHAT_ID. Mira «Integraciones».</p><?php endif; ?>
 <form method="post" action="/config/alerts" class="cfg-form" novalidate>
-  <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>">
+  <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="am_form" value="1">
   <fieldset class="cfg-fs"<?= $locked ? ' disabled' : '' ?>>
     <section class="card cfg-card" aria-labelledby="al-t">
       <header class="card__h"><h2 class="label" id="al-t">Telegram</h2></header>
@@ -35,13 +35,37 @@ $em = static fn(string $k) => isset($errors[$k]) ? '<small class="num__e" id="ea
           <small>Déjalo vacío para usar <code>MAIL_TO</code> del servidor<?= $envMail !== '' ? ' (' . $e($envMail) . ')' : ' (hoy sin configurar)' ?>.</small></label>
       </div>
     </section>
+    <section class="card cfg-card" aria-labelledby="al-d">
+      <header class="card__h"><h2 class="label" id="al-d">Resumen diario</h2></header>
+      <div class="card__b al-list">
+        <label class="tgl"><input type="checkbox" name="daily_digest" value="1"<?= $a['daily_digest'] ? ' checked' : '' ?>><span class="tgl__t"><b>Resumen de las 8:00</b><small>Cada día a las 8:00 (hora de <?= $e(Fmt::zone()) ?>) por correo y, si está configurado, por Telegram: leads de ayer, sin contactar y con el plazo vencido, tareas, citas de hoy y la siguiente mejor acción. Solo para administradores.</small></span></label>
+      </div>
+    </section>
+    <section class="card cfg-card" aria-labelledby="al-s">
+      <header class="card__h"><h2 class="label" id="al-s">Plazo de primer contacto</h2></header>
+      <div class="card__b al-list">
+        <label class="field al-min<?= isset($errors['sla_minutes']) ? ' has-err' : '' ?>"><span>Minutos para el primer contacto</span><input type="text" name="sla_minutes" value="<?= $e($sla['minutes']) ?>" inputmode="numeric" maxlength="4" autocomplete="off"<?= $fe('sla_minutes') ?>><?= $em('sla_minutes') ?><small>Entre 5 y 1440. Por defecto 60. Un lead sin primer contacto muestra «vence en…» o «vencido hace…» y avisa en la campana.</small></label>
+        <label class="tgl"><input type="checkbox" name="sla_escalate" value="1"<?= $sla['escalate'] ? ' checked' : '' ?>><span class="tgl__t"><b>Avisar por Telegram al vencer</b><small>Una alerta por lead e intento (respeta el horario de silencio). Solo para los que vencieron en las últimas 24 horas.</small></span></label>
+        <label class="tgl"><input type="checkbox" name="sla_auto_task" value="1"<?= $sla['auto_task'] ? ' checked' : '' ?>><span class="tgl__t"><b>Crear la tarea «Primer contacto»</b><small>Al llegar un lead se crea una tarea con vencimiento = llegada + plazo. Se cierra sola al contactarlo.</small></span></label>
+      </div>
+    </section>
+    <section class="card cfg-card" aria-labelledby="al-r">
+      <header class="card__h"><h2 class="label" id="al-r">Reparto de leads</h2></header>
+      <div class="card__b al-list">
+        <label class="tgl"><input type="checkbox" name="assign_auto" value="1"<?= $assign['auto'] ? ' checked' : '' ?>><span class="tgl__t"><b>Repartir los leads nuevos entre el equipo</b><small>Apagado por defecto. Encendido, cada lead nuevo se asigna por turnos a los administradores marcados. Un lead que vuelve a escribir conserva su responsable; las altas manuales e importaciones no se reparten.</small></span></label>
+        <fieldset class="warm<?= isset($errors['assign_users']) ? ' has-err' : '' ?>"><legend>Reciben leads</legend>
+          <?php foreach ($admins as $aid => $aname): ?><label class="check check--c"><input type="checkbox" name="assign_users[]" value="<?= $e($aid) ?>"<?= in_array($aid, $assign['users'], true) ? ' checked' : '' ?>><span><?= $e($aname) ?></span></label><?php endforeach; ?>
+          <?= $em('assign_users') ?>
+        </fieldset>
+      </div>
+    </section>
     <section class="card cfg-card" aria-labelledby="al-q">
       <header class="card__h"><h2 class="label" id="al-q">Horario de silencio</h2></header>
       <div class="card__b al-list">
         <label class="tgl"><input type="checkbox" name="quiet_enabled" value="1" data-quiet<?= $q['enabled'] ? ' checked' : '' ?>><span class="tgl__t"><b>Silenciar alertas no urgentes</b><small>El Telegram de tibios y los correos esperan a que termine el silencio. Hora de <?= $e(Fmt::zone()) ?>.</small></span></label>
         <div class="dlg__row al-q<?= isset($errors['quiet']) ? ' has-err' : '' ?>">
-          <label class="field"><span>Desde</span><input type="time" name="quiet_start" value="<?= $e($q['start']) ?>"<?= $fe('quiet') ?>></label>
-          <label class="field"><span>Hasta</span><input type="time" name="quiet_end" value="<?= $e($q['end']) ?>"<?= $fe('quiet') ?>></label>
+          <label class="field"><span>Desde</span><input type="time" lang="es" name="quiet_start" value="<?= $e($q['start']) ?>"<?= $fe('quiet') ?>></label>
+          <label class="field"><span>Hasta</span><input type="time" lang="es" name="quiet_end" value="<?= $e($q['end']) ?>"<?= $fe('quiet') ?>></label>
         </div>
         <?= $em('quiet') ?>
       </div>

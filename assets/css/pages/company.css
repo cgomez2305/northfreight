@@ -20,7 +20,7 @@
 }
 /* 404: solo el numeral enorme, sin caja */
 .co-404 { width: 100%; align-self: center; display: flex; align-items: center; justify-content: flex-end; }
-.co-404__num { font-family: var(--font-head); font-weight: 900; font-size: clamp(120px, 20vw, 280px); line-height: .8; letter-spacing: -.03em; color: var(--cyan); }
+.co-404__num { font-family: var(--font-head); font-weight: 900; font-size: clamp(120px, 20vw, 280px); line-height: .8; letter-spacing: -.03em; color: var(--cyan-light); }
 @media (max-width: 1024px) { .co-404 { justify-content: flex-start; } }
 .co-res-hero .hero__aside { flex: 0 1 420px; }
 .co-tiles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; width: 100%; max-width: 420px; }
@@ -45,7 +45,7 @@
 a.card.card--dark.co-res .card__code { color: var(--cyan-light); }
 a.card.card--dark.co-res .card__title { color: var(--text); }
 a.card.card--dark.co-res .card__link, a.card.card--dark.co-res:hover .card__link { color: var(--cyan-light); }
-a.card.co-res:hover .card__code { color: var(--cyan); }
+a.card.co-res:hover .card__code { color: var(--cyan-light); }
 a.card.card--dark.co-res:hover .card__code { color: var(--cyan-light); }
 .co-res .card__link { margin-top: 0; }
 /* Banda cian de cierre */

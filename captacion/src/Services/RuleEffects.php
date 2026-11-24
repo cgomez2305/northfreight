@@ -51,7 +51,7 @@ final class RuleEffects
     }
 
     /** INSERT IGNORE en rule_applications; true si es la primera vez. */
-    private static function once(int $leadId, array $a, string $action, ?int $points, array $detail, ?string $key): bool
+    public static function once(int $leadId, array $a, string $action, ?int $points, array $detail, ?string $key): bool
     {
         $st = Db::run(
             'INSERT IGNORE INTO rule_applications (lead_id, set_id, version_id, rule_id, rule_name, kind, action, points, detail, dedupe_key, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
@@ -131,7 +131,7 @@ final class RuleEffects
         $name = (string) ($p['name'] ?? 'Regla');
         // Sigue publicada y activa? (si se retiro o se apago despues de encolarse, no se avisa)
         $live = false;
-        foreach (RuleSets::engineSets() as $s) {
+        foreach ([...RuleSets::engineSets(), ...RuleSets::automationSets()] as $s) {   // fase AM: las alertas de reglas de eventos y tiempo tambien pasan por aqui
             if ($s['set_id'] === (int) ($p['set_id'] ?? 0)) {
                 foreach ($s['rules'] as $r) {
                     $live = $live || ($r['id'] === ($p['rule_id'] ?? '') && !empty($r['enabled']));

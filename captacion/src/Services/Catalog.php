@@ -22,6 +22,7 @@ final class Catalog
     public const SOURCES = [
         'web_careers' => 'Sitio · Careers', 'web' => 'Sitio web', 'n8n_whatsapp' => 'WhatsApp', 'manual' => 'Carga manual', 'import' => 'Importación',
         'meta' => 'Meta Ads', 'meta_ads' => 'Meta Ads', 'calcom' => 'Cal.com', 'indeed' => 'Indeed', 'fmcsa_outbound' => 'FMCSA saliente', 'referral' => 'Referido',
+        'csv_import' => 'Importación CSV',
     ];
 
     public const EQUIPMENT = [
@@ -55,11 +56,12 @@ final class Catalog
 
     public const FLAGS = [
         'cdl_unsure' => 'CDL sin confirmar', 'below_min_experience' => 'Experiencia bajo el mínimo', 'fmcsa_pending' => 'FMCSA pendiente', 'usdot_not_found' => 'USDOT no encontrado',
-        'phone_invalid' => 'Teléfono inválido', 'intl_phone' => 'Teléfono internacional', 'stop' => 'STOP (sin contacto)', 'stop_sms' => 'STOP (SMS)', 'stop_call' => 'STOP (llamada)', 'stop_email' => 'STOP (correo)',
+        'phone_invalid' => 'Teléfono inválido', 'intl_phone' => 'Teléfono internacional', 'stop' => 'STOP (sin contacto)', 'stop_sms' => 'STOP (SMS)', 'stop_call' => 'STOP (llamada)', 'stop_email' => 'STOP (correo)', 'stop_whatsapp' => 'STOP (WhatsApp)', 'anonymized' => 'Anonimizado',
         'red:authority_inactive' => 'Autoridad inactiva', 'red:no_insurance' => 'Sin seguro registrado', 'review_queue' => 'Por revisar',
     ];
 
     public const EVENT_LABELS = [
+        'rule_notice' => 'Aviso de una regla en la campana',
         'created' => 'Lead recibido', 'reentry' => 'Volvió a escribir', 'reopened' => 'Reabierto por reingreso', 'reentry_signed' => 'Un lead firmado volvió a escribir', 'scored' => 'Puntuación recalculada',
         'fmcsa' => 'Consulta a FMCSA', 'disqualified' => 'Descartado automáticamente', 'alert_sent' => 'Alerta enviada', 'consent_revoked' => 'Consentimiento revocado',
         'stage_changed' => 'Cambio de etapa', 'note_added' => 'Nota añadida', 'note_edited' => 'Nota editada', 'note_deleted' => 'Nota eliminada', 'task_created' => 'Tarea creada',
@@ -74,12 +76,15 @@ final class Catalog
         'message_sent' => 'Mensaje enviado (n8n)', 'message_failed' => 'Falló un mensaje (n8n)', 'sequence_message_sent' => 'Paso de secuencia enviado por WhatsApp', 'bot_finished' => 'El bot de WhatsApp terminó',
         'handoff_ready' => 'Listo para hablar con Carlos', 'automation_error' => 'Error de una automatización', 'lead_updated' => 'Datos actualizados por una automatización', 'meta_fields_unmapped' => 'Campos de Meta sin mapear',
         'rule_alert_skipped' => 'Alerta de regla omitida (tope por hora)', 'prospect_converted' => 'Convertido desde un prospecto FMCSA', 'referral_linked' => 'Llegó por un código de referido', 'referral_signed' => 'Su referido firmó',
+        'assigned' => 'Responsable asignado', 'sla_breached' => 'Venció el plazo de primer contacto',
+        'anonymized' => 'Lead anonimizado a petición', 'merged' => 'Leads fusionados', 'suppressed' => 'Lista de supresión aplicada', 'template_sent' => 'Plantilla enviada', 'whatsapp_opened' => 'WhatsApp abierto con una plantilla',
     ];
 
     /** Grupo de filtro de la linea de tiempo de cada tipo de evento. */
     public const EVENT_GROUPS = [
         'call_logged' => 'contact', 'stage_changed' => 'stage', 'reopened_manual' => 'stage', 'reopened' => 'stage',
         'note_added' => 'note', 'note_edited' => 'note', 'note_deleted' => 'note', 'task_created' => 'task', 'task_done' => 'task', 'task_reopened' => 'task', 'task_snoozed' => 'task', 'task_rescheduled' => 'task', 'task_edited' => 'task', 'task_deleted' => 'task',
+        'template_sent' => 'contact', 'whatsapp_opened' => 'contact',
     ];
 
     /** Etiquetas del desglose de la puntuacion (las de Scoring van sin acentos). */
@@ -120,6 +125,9 @@ final class Catalog
     {
         if ($key === null || $key === '') {
             return $fallback;
+        }
+        if ($map === self::FLAGS && str_starts_with($key, 'import:')) {
+            return 'Importado: ' . substr($key, 7);   // fase AM: archivo CSV de origen
         }
         if ($map === self::FLAGS && str_starts_with($key, 'tag:')) {
             return 'Etiqueta: ' . substr($key, 4);   // etiquetas que ponen las reglas (Q5b)

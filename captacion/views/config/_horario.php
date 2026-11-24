@@ -19,8 +19,8 @@ $nowIn = static fn(string $tz): string => (new DateTimeImmutable('now', new Date
       <header class="card__h"><h2 class="label" id="hh-t">Horario comercial</h2></header>
       <div class="card__b">
         <div class="dlg__row hz-h">
-          <label class="field"><span>Abre</span><input type="time" name="start" value="<?= $e($hours['start']) ?>" required></label>
-          <label class="field"><span>Cierra</span><input type="time" name="end" value="<?= $e($hours['end']) ?>" required></label>
+          <label class="field"><span>Abre</span><input type="time" lang="es" name="start" value="<?= $e($hours['start']) ?>" required></label>
+          <label class="field"><span>Cierra</span><input type="time" lang="es" name="end" value="<?= $e($hours['end']) ?>" required></label>
         </div>
         <fieldset class="hz-days"><legend>Días laborables</legend>
           <div class="eqgrid"><?php foreach ($days as $n => $l): ?><label class="check check--box"><input type="checkbox" name="days[]" value="<?= $e($n) ?>"<?= in_array($n, $hours['days'], true) ? ' checked' : '' ?>><span><?= $e($l) ?></span></label><?php endforeach; ?></div>

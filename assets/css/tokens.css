@@ -7,7 +7,7 @@
   --navy-deep: #04132A;        /* texto sobre botón cian */
 
   /* Marca */
-  --cyan: #06A6CC;
+  --cyan: #06B0D4;
   --cyan-light: #6FD3EC;
 
   /* Texto (todos pasan AA ≥ 4.5:1 sobre --bg, --panel y --panel-2) */
@@ -19,13 +19,13 @@
   --hairline: rgba(255, 255, 255, .10);
   --hairline-strong: rgba(255, 255, 255, .18);
   --field-line: #5F7893;       /* borde de inputs, selects y textareas: 4,18:1 sobre --bg, 3,72:1 sobre --panel y 3,19:1 sobre --panel-2 (WCAG 1.4.11 pide 3:1; --hairline-strong daba 1,68:1) */
-  --cyan-line: rgba(6, 166, 204, .55);
-  --cyan-tint: rgba(6, 166, 204, .12);
+  --cyan-line: rgba(6, 176, 212, .55);
+  --cyan-tint: rgba(6, 176, 212, .12);
   --overlay: rgba(4, 16, 31, .72);
   --glass-bg: rgba(10, 29, 51, .72);       /* píldora del header (translúcida con desenfoque) */
   --glass-blur: 16px;
   /* Degradados solo sobre fotos (garantizan contraste AA del texto). Hero de la home: velo desde la izquierda y desde abajo; el resto de la foto queda a la vista. */
-  --hero-fade-left: linear-gradient(90deg, rgba(4, 16, 31, .93) 0%, rgba(4, 16, 31, .9) 40%, rgba(4, 16, 31, .74) 54%, rgba(4, 16, 31, .45) 66%, rgba(4, 16, 31, .18) 76%, rgba(4, 16, 31, 0) 86%);
+  --hero-fade-left: linear-gradient(90deg, rgba(4, 16, 31, .93) 0%, rgba(4, 16, 31, .9) 42%, rgba(4, 16, 31, .8) 58%, rgba(4, 16, 31, .5) 67%, rgba(4, 16, 31, .22) 77%, rgba(4, 16, 31, 0) 88%);
   --hero-fade-tablet: linear-gradient(90deg, rgba(4, 16, 31, .93) 0%, rgba(4, 16, 31, .92) 60%, rgba(4, 16, 31, .84) 76%, rgba(4, 16, 31, .62) 90%, rgba(4, 16, 31, .5) 100%);   /* hero del home de 761 a 1024 px: el texto llega a ~77 % del ancho sobre el cielo claro del video v3 */
   --hero-fade-bottom: linear-gradient(0deg, rgba(4, 16, 31, .75) 0%, rgba(4, 16, 31, .3) 22%, rgba(4, 16, 31, 0) 44%);
   --hero-fade-top: linear-gradient(180deg, rgba(4, 16, 31, .5) 0%, rgba(4, 16, 31, 0) 22%);   /* detrás de la píldora del menú */

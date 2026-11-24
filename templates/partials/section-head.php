@@ -1,10 +1,10 @@
 <?php
 /**
- * Cabecera de sección: eyebrow + H2 (+ lead). Marcas en textos: {hl}…{/hl}, {br}, {{ph:X}}.
- * Params: title(string, requerido), eyebrow(string|null), lead(string|null), tag('h2' defecto|'h1'|'h3'),
+ * Cabecera de sección: H2 (+ lead). Sin etiqueta («eyebrow») encima: si el título se entiende solo, la etiqueta sobra (fase AF). Marcas en textos: {hl}…{/hl}, {br}, {{ph:X}}.
+ * Params: title(string, requerido), lead(string|null), tag('h2' defecto|'h1'|'h3'),
  *         size('h2' defecto|'h2-s'), theme('light' defecto|'dark'), split(bool: lead a la derecha en escritorio),
  *         id(string|null para aria-labelledby/ancla), cls(string),
- *         count(int|null: variante "índice" en escritorio, eyebrow y cuenta "(05)" en columna estrecha a la izquierda y el H2 en la ancha; en móvil se apila.
+ *         count(int|null: variante "índice" en escritorio, cuenta "(05)" en columna estrecha a la izquierda y el H2 en la ancha; en móvil se apila.
  *               La cuenta es decorativa (aria-hidden), va fuera del H2 y SOLO se pasa con un número real de la propia página, p. ej. count($items). No combina con split).
  */
 require_once __DIR__ . '/kit.php';
@@ -19,7 +19,6 @@ $cls = 'section-head' . ($dark ? ' section-head--dark' : '') . ($split ? ' secti
 <div class="<?= e($cls) ?>">
   <?php if ($idx): ?>
   <div class="section-head__side">
-    <?php if (!empty($eyebrow)): ?><span class="t-eyebrow"><?= ns_rich($eyebrow) ?></span><?php endif; ?>
     <span class="section-head__count" aria-hidden="true">(<?= e(sprintf('%02d', $count)) ?>)</span>
   </div>
   <div class="section-head__body">
@@ -29,7 +28,6 @@ $cls = 'section-head' . ($dark ? ' section-head--dark' : '') . ($split ? ' secti
 </div>
 <?php return; endif; ?>
   <?php if ($split): ?><div class="section-head__main"><?php endif; ?>
-  <?php if (!empty($eyebrow)): ?><span class="t-eyebrow"><?= ns_rich($eyebrow) ?></span><?php endif; ?>
   <<?= $tag ?> class="<?= $size ?>"<?= !empty($id) ? ' id="' . e($id) . '"' : '' ?>><?= ns_rich($title) ?></<?= $tag ?>>
   <?php if ($split): ?></div><p class="section-head__lead t-body"><?= ns_rich($lead) ?></p>
   <?php elseif (!empty($lead)): ?><p class="t-body c-slate"><?= ns_rich($lead) ?></p><?php endif; ?>

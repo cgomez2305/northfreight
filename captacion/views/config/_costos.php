@@ -31,7 +31,7 @@ foreach ($costTable['months'] as $m) {
           <label class="field<?= isset($errors['source']) ? ' has-err' : '' ?>"><span>Fuente</span>
             <select name="source" required<?= isset($errors['source']) ? ' aria-invalid="true"' : '' ?>><option value="">Elige una fuente…</option><?php foreach ($sources as $k => $l): ?><option value="<?= $e($k) ?>"<?= $f['source'] === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select>
             <?php if (isset($errors['source'])): ?><small class="num__e"><?= $e($errors['source']) ?></small><?php endif; ?></label>
-          <label class="field<?= isset($errors['period']) ? ' has-err' : '' ?>"><span>Mes</span><input type="month" name="period" value="<?= $e($f['period']) ?>" min="2020-01" max="<?= $e($maxPeriod) ?>" required<?= isset($errors['period']) ? ' aria-invalid="true"' : '' ?>>
+          <label class="field<?= isset($errors['period']) ? ' has-err' : '' ?>"><span>Mes</span><input type="month" lang="es" name="period" value="<?= $e($f['period']) ?>" min="2020-01" max="<?= $e($maxPeriod) ?>" required<?= isset($errors['period']) ? ' aria-invalid="true"' : '' ?>>
             <?php if (isset($errors['period'])): ?><small class="num__e"><?= $e($errors['period']) ?></small><?php endif; ?></label>
           <label class="field<?= isset($errors['amount']) ? ' has-err' : '' ?>"><span>Monto (USD)</span><input type="text" name="amount" value="<?= $e($f['amount']) ?>" inputmode="decimal" placeholder="350.00" maxlength="12" autocomplete="off" required<?= isset($errors['amount']) ? ' aria-invalid="true"' : '' ?>>
             <?php if (isset($errors['amount'])): ?><small class="num__e"><?= $e($errors['amount']) ?></small><?php endif; ?></label>
@@ -48,7 +48,7 @@ foreach ($costTable['months'] as $m) {
   <?php if (!$rows): ?>
     <div class="empty empty--sm"><?= Ui::icon('star', 'empty__star ic--star') ?><h3>Sin costos cargados</h3><p>Agrega cuánto gastaste en Meta, Indeed u otros canales y el dashboard calculará el costo por lead.</p></div>
   <?php else: ?>
-    <div class="tw"><table class="tbl tbl--costs">
+    <div class="tw"><table class="tbl tbl--costs" aria-label="Costos mensuales por canal">
       <thead><tr><th scope="col">Mes</th><th scope="col">Fuente</th><th scope="col" class="num-c">Monto</th><th scope="col" class="num-c">Leads</th><th scope="col" class="num-c">Costo por lead</th><th scope="col" class="num-c">Firmados</th><th scope="col" class="num-c">Costo por firmado</th><th scope="col"><span class="sr">Acciones</span></th></tr></thead>
       <tbody>
         <?php $lastP = null; foreach ($rows as $r): ?>
@@ -61,7 +61,7 @@ foreach ($costTable['months'] as $m) {
             <td class="num-c" data-l="Firmados"><?= $e(Fmt::num($r['signed'])) ?></td>
             <td class="num-c" data-l="Costo por firmado"><?= $e($money($r['cps'])) ?></td>
             <td class="c-act"><a class="icon-btn icon-btn--sm" href="/config?tab=costos&amp;edit=<?= $e($r['id']) ?>#co-f" aria-label="Editar el costo de <?= $e(\Captacion\Services\Catalog::source($r['source'])) ?> de <?= $e($monthName($r['period'])) ?>"><?= Ui::icon('pencil') ?></a>
-              <?php if (!$locked): ?><form class="inl" method="post" action="/config/costs/delete"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="id" value="<?= $e($r['id']) ?>"><button class="icon-btn icon-btn--sm" type="submit" aria-label="Eliminar el costo de <?= $e(\Captacion\Services\Catalog::source($r['source'])) ?> de <?= $e($monthName($r['period'])) ?>" data-confirm="¿Eliminar este costo? El costo por lead de ese mes se recalcula sin él."><?= Ui::icon('trash') ?></button></form><?php endif; ?></td>
+              <?php if (!$locked): ?><form class="inl" method="post" action="/config/costs/delete"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="id" value="<?= $e($r['id']) ?>"><button class="icon-btn icon-btn--sm" type="submit" aria-label="Eliminar el costo de <?= $e(\Captacion\Services\Catalog::source($r['source'])) ?> de <?= $e($monthName($r['period'])) ?>" data-confirm="¿Eliminar este costo? El costo por lead de ese mes se recalcula sin él." data-confirm-title="¿Eliminar el costo?" data-confirm-label="Eliminar" data-confirm-danger><?= Ui::icon('trash') ?></button></form><?php endif; ?></td>
           </tr>
           <?php $lastP = $r['period']; ?>
         <?php endforeach; ?>

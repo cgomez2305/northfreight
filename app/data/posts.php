@@ -7,8 +7,8 @@
  *   type ('article' = página propia en /blog/SLUG/; 'link' = tarjeta del índice que apunta a un recurso),
  *   kind (etiqueta TOOL|GUIDE|TEMPLATE en las tarjetas 'link'), lead y toc (solo artículos).
  * date usa la convención {{ph:...}} (phtext()): '{{ph:Publish date}}' hasta que haya fecha real (YYYY-MM-DD).
- * published / modified (solo artículos): fechas ISO YYYY-MM-DD. 'published' queda VACÍO hasta que el cliente confirme la fecha real
- *   de publicación (no se inventa; mientras tanto la pantalla usa 'date' con ph()). 'modified' = última edición real del contenido.
+ * published / modified (solo artículos): fechas ISO YYYY-MM-DD. 'published' lo fijó Carlos el 2026-11-23 (fechas elegidas a su criterio, no reales: cámbialas
+ *   cuando haya una publicación real). 'modified' = última edición real del contenido.
  *   Alimentan datePublished/dateModified del JSON-LD Article y el byline (<time datetime>) del artículo.
  * image (opcional): ['base' => 'nombre-en-assets/img', 'alt' => '…'] foto de la tarjeta del índice (artículos y tarjetas 'link' de recursos); sin image la tarjeta va sin foto.
  * Orden = orden de aparición en la maqueta: destacado primero, luego el resto.
@@ -24,7 +24,7 @@ return [
         'minutes'  => 7,
         'excerpt'  => 'Percentage of the gross, flat weekly fee or per load: what each model really costs an owner-operator and what should be included.',
         'date'     => '{{ph:Publish date}}',
-        'published' => '',            // PENDIENTE (cliente): YYYY-MM-DD
+        'published' => '2026-11-02',   // fecha elegida por Carlos (2026-11-23: «fechas random no es problema»); cambiar aquí cuando haya una real
         'modified' => '2026-11-02',
         'featured' => true,
         'type'     => 'article',
@@ -46,7 +46,7 @@ return [
         'minutes'  => 6,
         'excerpt'  => 'Authority, SCAC code, insurance, equipment and the steps to get approved on Amazon Relay.',
         'date'     => '{{ph:Publish date}}',
-        'published' => '',            // PENDIENTE (cliente): YYYY-MM-DD
+        'published' => '2026-11-05',   // fecha elegida por Carlos (2026-11-23: «fechas random no es problema»); cambiar aquí cuando haya una real
         'modified' => '2026-11-02',
         'featured' => false,
         'type'     => 'article',
@@ -68,7 +68,7 @@ return [
         'minutes'  => 6,
         'excerpt'  => 'One-way loads, round trips and blocks: how Relay freight is posted, booked and tracked.',
         'date'     => '{{ph:Publish date}}',
-        'published' => '',            // PENDIENTE (cliente): YYYY-MM-DD
+        'published' => '2026-11-09',   // fecha elegida por Carlos (2026-11-23: «fechas random no es problema»); cambiar aquí cuando haya una real
         'modified' => '2026-11-02',
         'featured' => false,
         'type'     => 'article',
@@ -90,7 +90,7 @@ return [
         'minutes'  => 5,
         'excerpt'  => 'What to document at the dock so lumper receipts and detention hours turn into money on your settlement.',
         'date'     => '{{ph:Publish date}}',
-        'published' => '',            // PENDIENTE (cliente): YYYY-MM-DD
+        'published' => '2026-11-12',   // fecha elegida por Carlos (2026-11-23: «fechas random no es problema»); cambiar aquí cuando haya una real
         'modified' => '2026-11-02',
         'featured' => false,
         'type'     => 'article',
