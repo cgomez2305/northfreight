@@ -123,3 +123,8 @@ html[data-density=compact] .evc{padding-top:5px;padding-bottom:5px}
   .cal__g--d .cal__d{padding:12px}
   .evm__p{right:auto;left:0}
 }
+.cal__ag{display:none}
+.cal__agt{margin:16px 2px 8px;font-size:var(--fs-md);font-weight:600}
+.cal__d.is-drop-t{box-shadow:inset 0 0 0 1px var(--accent)}
+.is-tdrag{opacity:.6}
+@media (max-width:760px){.cal__ag{display:block}}

@@ -100,6 +100,17 @@ final class DailyDigest
             'Tareas vencidas: ' . $overdue . ' · para hoy: ' . $todayTasks,
             'Citas de hoy: ' . count($appts) . ($appts ? ' (' . implode(', ', array_map(static fn($a) => Fmt::et((string) $a['starts_at'])->format('H:i') . ' ' . Fmt::name($a), array_slice($appts, 0, 8))) . ')' : ''),
         ];
+        try {   // fase AT: captación saliente (llamadas y correos de ayer, lista de hoy y respuestas pendientes)
+            $ps = ProspectReport::summary($y0, $t0);
+            $listToday = Prospects::page(Prospects::filters([]), $now, 1, 1)['total'];
+            $rep = ProspectReplies::pending()['n'];
+            if ($ps['calls'] > 0 || $ps['mail']['sent'] > 0 || $listToday > 0) {
+                $lines[] = 'Prospectos ayer: ' . $ps['calls'] . ' llamadas (' . $ps['reached'] . ' contestaron, ' . $ps['interested'] . ' interesados)' . ($ps['mail']['sent'] + $ps['mail']['followups'] > 0 ? ' · ' . ($ps['mail']['sent'] + $ps['mail']['followups']) . ' correos, ' . $ps['mail']['replied'] . ' respuestas' : '');
+                $lines[] = 'Lista de llamadas de hoy: ' . $listToday . ($rep > 0 ? ' · ' . $rep . ($rep === 1 ? ' respondió a un correo y espera tu llamada' : ' respondieron a un correo y esperan tu llamada') : '');
+            }
+        } catch (\Throwable) {
+            // el resumen sale igual sin esta parte
+        }
         $acts = array_map(static fn($a) => $a['title'] . ': ' . $a['detail'], $actions);
         $text = "Resumen de captación · $day\n\n" . implode("\n", $lines) . "\n\nSiguiente mejor acción:\n" . ($acts ? '- ' . implode("\n- ", $acts) : '- Todo al día.') . "\n\nPanel: " . Url::base() . "/\n";
         $tg = '<b>' . self::e('Resumen de captación · ' . $day) . "</b>\n" . implode("\n", array_map([self::class, 'e'], $lines)) . "\n<b>Siguiente mejor acción</b>\n" . ($acts ? implode("\n", array_map(static fn($a) => '• ' . self::e($a), $acts)) : self::e('Todo al día.'))

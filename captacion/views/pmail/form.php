@@ -44,6 +44,15 @@ $canLaunch = !$isNew && !$blockers;
       <label class="field<?= isset($errors['body']) ? ' has-err' : '' ?>"><span>Mensaje (texto plano; deja una línea en blanco entre párrafos)</span><textarea name="body" id="pm-body" rows="14" maxlength="20000" required<?= $fe('body') ?>><?= $e($form['body']) ?></textarea><?= $em('body') ?></label>
       <div class="pm-vars"><span class="muted">Variables (pulsa para insertar):</span><?php foreach (ProspectMail::VARS as $k => $l): if ($k === '{link_baja}') { continue; } ?><button class="pm-var" type="button" data-var="<?= $e($k) ?>" title="<?= $e($l) ?>"><?= $e($k) ?></button><?php endforeach; ?></div>
       <p class="muted">El pie con la dirección física, el motivo del correo y la baja de un clic se añade siempre. Los transportistas están en EE. UU.: escribe en inglés.</p>
+      <fieldset class="pm-seg pm-fu">
+        <legend>Segundo correo</legend>
+        <label class="field"><span>¿Cuándo?</span><select name="followup_days" data-fu><?php foreach (ProspectMail::FOLLOWUP_DAYS as $k => $l): ?><option value="<?= $e($k) ?>"<?= (int) ($form['followup_days'] ?? 0) === (int) $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
+        <p class="muted pm-fu__h">Solo a quien no abrió el primero, no hizo clic ni respondió. Usa el mismo tope por hora.</p>
+        <div class="pm-fu__f" data-fu-fields>
+          <label class="field<?= isset($errors['followup_subject']) ? ' has-err' : '' ?>"><span>Asunto del segundo correo</span><input type="text" name="followup_subject" value="<?= $e(($form['followup_subject'] ?? '') !== '' ? $form['followup_subject'] : 'Following up: dispatch for {empresa}') ?>" maxlength="190"<?= $fe('followup_subject') ?>><?= $em('followup_subject') ?></label>
+          <label class="field<?= isset($errors['followup_body']) ? ' has-err' : '' ?>"><span>Mensaje del segundo correo</span><textarea name="followup_body" rows="8" maxlength="20000"<?= $fe('followup_body') ?>><?= $e(($form['followup_body'] ?? '') !== '' ? $form['followup_body'] : str_replace('\n', "\n", ProspectMail::FOLLOWUP_BODY)) ?></textarea><?= $em('followup_body') ?></label>
+        </div>
+      </fieldset>
     </div>
     <footer class="card__f"><span class="muted"><?= $isNew ? 'Se guarda como borrador: nada se envía todavía.' : 'Guardar cambia el borrador y pide una prueba nueva antes de lanzar.' ?></span>
       <button class="btn <?= $canLaunch ? 'btn--secondary' : 'btn--primary' ?>" type="submit" name="do" value="save"><span class="btn__t"><?= $isNew ? 'Guardar borrador' : 'Guardar cambios' ?></span></button></footer>
@@ -77,7 +86,7 @@ $canLaunch = !$isNew && !$blockers;
         <form method="post" action="/prospectos/correos/<?= $e($c['id']) ?>/prueba">
           <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>">
           <button class="btn btn--secondary btn--block" type="submit"<?= $canDeliver ? '' : ' disabled' ?>><?= Ui::icon('send') ?><span class="btn__t">Enviarme una prueba</span></button>
-          <p class="muted pm-help">Llega a <?= $e($userEmail) ?> con «[PRUEBA]» en el asunto y los datos de <?= $sampleName !== '' ? $e(Fmt::company($sampleName)) : 'un prospecto de ejemplo' ?>.<?= $c['test_sent_at'] ? ' Última prueba: ' . $e(Fmt::dateTime((string) $c['test_sent_at'])) . '.' : '' ?></p>
+          <p class="muted pm-help">Llega<?= (int) ($c['followup_days'] ?? 0) > 0 ? 'n los dos correos' : '' ?> a <?= $e($userEmail) ?> con «[PRUEBA]» en el asunto y los datos de <?= $sampleName !== '' ? $e(Fmt::company($sampleName)) : 'un prospecto de ejemplo' ?>.<?= $c['test_sent_at'] ? ' Última prueba: ' . $e(Fmt::dateTime((string) $c['test_sent_at'])) . '.' : '' ?></p>
         </form>
         <?php if ($blockers): ?>
           <ul class="pm-block" aria-label="Antes de lanzar"><?php foreach ($blockers as $b): ?><li><?= Ui::icon('alert') ?><span><?= $e($b) ?></span></li><?php endforeach; ?></ul>

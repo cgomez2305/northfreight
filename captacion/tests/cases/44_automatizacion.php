@@ -253,8 +253,8 @@ return static function (array $ctx): void {
     T::eq($viewer->ajax('/ajax/prefs', ['key' => 'keys', 'value' => 'off'])['status'], 403, '  el lector no puede guardar ese ajuste');
     // B12 · diálogo de confirmación
     $tk = Fx::lead(['stage' => 'contacted', 'first_contact_at' => Clock::now()]);
-    Db::insert('tasks', ['title' => 'Llamar a Pepe', 'lead_id' => $tk, 'due_at' => Clock::at(time() + 3600), 'priority' => 2, 'created_at' => Clock::now()]);
-    $tp = $panel->get('/tareas');
+    Db::insert('tasks', ['title' => 'Llamar a Pepe', 'lead_id' => $tk, 'due_at' => Clock::at(time() - 120), 'priority' => 2, 'created_at' => Clock::now()]);
+    $tp = $panel->get('/tareas?tab=overdue');   // vencida: aparece a cualquier hora (con «+1 h» fallaba de 23:00 a 24:00 ET, cuando caía mañana)
     T::ok(str_contains($tp['body'], 'data-confirm-title="¿Eliminar la tarea?"') && str_contains($tp['body'], 'data-confirm-label="Eliminar" data-confirm-danger'), 'B12 eliminar una tarea: título y botón propios y botón rojo (destructivo)');
     $ip = $panel->get('/informes/' . (int) $rep['id']);
     $dr = Db::one("SELECT id FROM reports WHERE kind = 'monthly' AND status = 'draft' ORDER BY id DESC LIMIT 1");

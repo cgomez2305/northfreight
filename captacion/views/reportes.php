@@ -79,6 +79,8 @@ $grp = static function (array $rows, string $first, callable $name): string {
   <section class="card card--table rep-span" aria-labelledby="r-st"><header class="card__h"><h2 class="label" id="r-st">Por estado de EE. UU.</h2><?= $exp('estados', 'Estados') ?></header><?= $grp($m['states'], 'Estado', static fn($k) => $k) ?></section>
 </div>
 
+<?php require __DIR__ . '/rep/_prospectos.php'; ?>
+
 <section class="card card--table" aria-labelledby="r-as">
   <header class="card__h"><h2 class="label" id="r-as">Por responsable</h2><?= $exp('responsables', 'Por responsable') ?></header>
   <div class="tw"><table class="tbl tbl--rep">

@@ -49,6 +49,12 @@ $star = '<svg class="empty__star" aria-hidden="true"><use href="#i-star"/></svg>
     <?php require __DIR__ . '/rep/_canales.php'; ?>
   <?php endif; ?>
 </section>
+<?php
+$ps = \Captacion\Services\ProspectReport::summary((int) $range['from'], (int) $range['to']);   // fase AT: llamadas y correos a prospectos, solo totales
+$pct = static fn(int $n, int $d): string => $d > 0 ? Fmt::pct($n * 100 / $d, 0) : '—';
+$outLink = false;
+if ($ps['calls'] > 0 || $ps['mail']['sent'] > 0): require __DIR__ . '/rep/_saliente.php'; endif;
+?>
 <section class="card" aria-labelledby="r-ls" data-rs-ls>
   <header class="card__h"><h2 class="label" id="r-ls">Motivos de pérdida</h2><span class="muted"><?= $e($m['loss']['total']) ?> en total</span></header>
   <div class="card__b">

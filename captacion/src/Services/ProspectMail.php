@@ -32,8 +32,14 @@ final class ProspectMail
     public const BATCH = 10;
     public const VARS = [
         '{empresa}' => 'Razón social del transportista', '{ciudad}' => 'Ciudad', '{estado}' => 'Estado (EE. UU.)', '{flota}' => 'Flota («6 trucks», «1 truck»)',
-        '{whatsapp}' => 'WhatsApp de NorthStar', '{link_calculadora}' => 'Calculadora de rate per mile del sitio', '{link_baja}' => 'Enlace de baja (el pie ya lo lleva)',
+        '{whatsapp}' => 'WhatsApp de NorthStar', '{link_calculadora}' => 'Calculadora de rate per mile del sitio (cuenta clics)', '{link_web}' => 'Página principal del sitio (cuenta clics)',
+        '{link_baja}' => 'Enlace de baja (el pie ya lo lleva)',
     ];
+    /** Fase AT: segundo correo a los N días a quien no abrió, no hizo clic ni respondió (0 = sin segundo correo). */
+    public const FOLLOWUP_DAYS = [0 => 'Sin segundo correo', 3 => 'A los 3 días', 5 => 'A los 5 días', 7 => 'A los 7 días', 10 => 'A los 10 días'];
+    public const FOLLOWUP_BODY = "Hi,\n\nJust following up on my note from last week. If dispatch support for {empresa} is on your list, NorthStar can book Amazon Relay and dry van loads, follow every trip and keep the paperwork organized.\n\nA quick reply or a WhatsApp message at {whatsapp} is enough to start.\n\nNorthStar Freight Solutions";
+    /** Destinos de los enlaces con conteo de clics (/r/{token}): solo estos, nunca una URL que llegue de fuera. */
+    public const CLICK_TARGETS = [1 => '/resources/rate-per-mile-calculator/', 2 => '/'];
     public const WHY = 'You are receiving this email because your company is listed as a motor carrier in the public FMCSA registry. If you would rather not hear from NorthStar again, use the link below.';
     /** Textos de partida (inglés: los transportistas están en EE. UU.). Solo afirman lo que NorthStar hace hoy (CLAUDE.md §8.2): Amazon Relay y dry van, MC nuevos, 24/7. */
     public const STARTERS = [
@@ -61,14 +67,15 @@ final class ProspectMail
 
     // --- Ajustes --------------------------------------------------------------------------------------------------------------------
 
-    /** @return array{cap_hour:int,cooldown_days:int} */
+    /** @return array{cap_hour:int,cooldown_days:int,read_replies:bool} */
     public static function settings(): array
     {
         $s = Settings::get('prospect_mail', []);
         $s = is_array($s) ? $s : [];
         $cap = (int) ($s['cap_hour'] ?? self::DEFAULT_CAP_HOUR);
         $cool = (int) ($s['cooldown_days'] ?? self::DEFAULT_COOLDOWN_DAYS);
-        return ['cap_hour' => $cap >= 1 && $cap <= 200 ? $cap : self::DEFAULT_CAP_HOUR, 'cooldown_days' => $cool >= 0 && $cool <= 365 ? $cool : self::DEFAULT_COOLDOWN_DAYS];
+        return ['cap_hour' => $cap >= 1 && $cap <= 200 ? $cap : self::DEFAULT_CAP_HOUR, 'cooldown_days' => $cool >= 0 && $cool <= 365 ? $cool : self::DEFAULT_COOLDOWN_DAYS,
+            'read_replies' => (bool) ($s['read_replies'] ?? false)];
     }
 
     public static function saveSettings(array $in, int $userId): array
@@ -81,8 +88,12 @@ final class ProspectMail
         if ($cool < 0 || $cool > 365) {
             return self::fail('El periodo de espera debe estar entre 0 y 365 días.');
         }
-        Settings::set('prospect_mail', ['cap_hour' => $cap, 'cooldown_days' => $cool]);
-        ActivityLog::record('prospect_mail_settings', $userId, 'settings', null, ['cap_hour' => $cap, 'cooldown_days' => $cool]);
+        $read = ($in['read_replies'] ?? '') === '1';
+        Settings::set('prospect_mail', ['cap_hour' => $cap, 'cooldown_days' => $cool, 'read_replies' => $read]);
+        ActivityLog::record('prospect_mail_settings', $userId, 'settings', null, ['cap_hour' => $cap, 'cooldown_days' => $cool, 'read_replies' => $read]);
+        if ($read) {
+            ProspectReplies::ensureScheduled();
+        }
         return self::ok('Ajustes de envío guardados.');
     }
 
@@ -207,25 +218,34 @@ final class ProspectMail
         $counts = [];
         if ($rows) {
             $ids = array_map(static fn($r) => (int) $r['id'], $rows);
-            foreach (Db::all('SELECT campaign_id, status, COUNT(*) n, SUM(opened_at IS NOT NULL) o FROM prospect_campaign_recipients WHERE campaign_id IN (' . implode(',', $ids) . ') GROUP BY campaign_id, status') as $c) {
-                $counts[(int) $c['campaign_id']][(string) $c['status']] = (int) $c['n'];
-                $counts[(int) $c['campaign_id']]['opened'] = ($counts[(int) $c['campaign_id']]['opened'] ?? 0) + (int) $c['o'];
+            foreach (Db::all('SELECT campaign_id, status, COUNT(*) n, SUM(opened_at IS NOT NULL) o, SUM(clicked_at IS NOT NULL) k, SUM(replied_at IS NOT NULL) rp FROM prospect_campaign_recipients WHERE campaign_id IN (' . implode(',', $ids) . ') GROUP BY campaign_id, status') as $c) {
+                $cid = (int) $c['campaign_id'];
+                $counts[$cid][(string) $c['status']] = (int) $c['n'];
+                $counts[$cid]['opened'] = ($counts[$cid]['opened'] ?? 0) + (int) $c['o'];
+                $counts[$cid]['clicked'] = ($counts[$cid]['clicked'] ?? 0) + (int) $c['k'];
+                $counts[$cid]['replied'] = ($counts[$cid]['replied'] ?? 0) + (int) $c['rp'];
             }
         }
         foreach ($rows as &$r) {
             $r['segment'] = self::segment(Db::decode($r['segment']));
-            $r['counts'] = ($counts[(int) $r['id']] ?? []) + ['queued' => 0, 'sent' => 0, 'failed' => 0, 'skipped' => 0, 'opened' => 0];
+            $r['counts'] = ($counts[(int) $r['id']] ?? []) + ['queued' => 0, 'sent' => 0, 'failed' => 0, 'skipped' => 0, 'opened' => 0, 'clicked' => 0, 'replied' => 0];
         }
         return $rows;
     }
 
-    /** @return array{queued:int,sent:int,failed:int,skipped:int,opened:int} */
+    /** @return array{queued:int,sent:int,failed:int,skipped:int,opened:int,clicked:int,replied:int,fu_sent:int,fu_queued:int,fu_wait:int} */
     public static function stats(int $id): array
     {
-        $s = ['queued' => 0, 'sent' => 0, 'failed' => 0, 'skipped' => 0, 'opened' => 0];
-        foreach (Db::all('SELECT status, COUNT(*) n, SUM(opened_at IS NOT NULL) o FROM prospect_campaign_recipients WHERE campaign_id = ? GROUP BY status', [$id]) as $r) {
+        $s = ['queued' => 0, 'sent' => 0, 'failed' => 0, 'skipped' => 0, 'opened' => 0, 'clicked' => 0, 'replied' => 0, 'fu_sent' => 0, 'fu_queued' => 0, 'fu_wait' => 0];
+        foreach (Db::all("SELECT status, COUNT(*) n, SUM(opened_at IS NOT NULL) o, SUM(clicked_at IS NOT NULL) k, SUM(replied_at IS NOT NULL) rp, SUM(fu_status = 'sent') fs, SUM(fu_status = 'queued') fq,
+                                 SUM(status = 'sent' AND fu_status IS NULL) fw FROM prospect_campaign_recipients WHERE campaign_id = ? GROUP BY status", [$id]) as $r) {
             $s[(string) $r['status']] = (int) $r['n'];
             $s['opened'] += (int) $r['o'];
+            $s['clicked'] += (int) $r['k'];
+            $s['replied'] += (int) $r['rp'];
+            $s['fu_sent'] += (int) $r['fs'];
+            $s['fu_queued'] += (int) $r['fq'];
+            $s['fu_wait'] += (int) $r['fw'];
         }
         return $s;
     }
@@ -240,6 +260,10 @@ final class ProspectMail
             $p[] = $status;
         } elseif ($status === 'opened') {
             $w .= ' AND r.opened_at IS NOT NULL';
+        } elseif ($status === 'clicked') {
+            $w .= ' AND r.clicked_at IS NOT NULL';
+        } elseif ($status === 'replied') {
+            $w .= ' AND r.replied_at IS NOT NULL';
         }
         $total = (int) Db::value("SELECT COUNT(*) FROM prospect_campaign_recipients r WHERE $w", $p);
         $pages = max(1, (int) ceil($total / $per));
@@ -260,6 +284,9 @@ final class ProspectMail
             'subject' => trim((string) preg_replace('/\s+/', ' ', is_string($in['subject'] ?? null) ? mb_substr($in['subject'], 0, 300) : '')),
             'body' => str_replace("\r\n", "\n", trim(is_string($in['body'] ?? null) ? mb_substr($in['body'], 0, 21000) : '')),
             'segment' => self::segment($in),
+            'followup_days' => isset(self::FOLLOWUP_DAYS[(int) ($in['followup_days'] ?? 0)]) ? (int) ($in['followup_days'] ?? 0) : 0,
+            'followup_subject' => trim((string) preg_replace('/\s+/', ' ', is_string($in['followup_subject'] ?? null) ? mb_substr($in['followup_subject'], 0, 300) : '')),
+            'followup_body' => str_replace("\r\n", "\n", trim(is_string($in['followup_body'] ?? null) ? mb_substr($in['followup_body'], 0, 21000) : '')),
         ];
         $err = [];
         if ($v['name'] === '' || mb_strlen($v['name']) > 120) {
@@ -276,6 +303,19 @@ final class ProspectMail
         if ($unknown) {
             $err['body'] = 'Variable desconocida: ' . implode(', ', $unknown) . '. Usa solo las de la lista.';
         }
+        if ($v['followup_days'] > 0) {
+            if ($v['followup_subject'] === '' || mb_strlen($v['followup_subject']) > 190) {
+                $err['followup_subject'] = 'El asunto del segundo correo debe tener de 1 a 190 caracteres.';
+            }
+            if (mb_strlen($v['followup_body']) < 20 || mb_strlen($v['followup_body']) > 20000) {
+                $err['followup_body'] = 'El segundo correo debe tener de 20 a 20.000 caracteres.';
+            }
+            preg_match_all('/\{[a-z_]{2,30}\}/', $v['followup_subject'] . "\n" . $v['followup_body'], $m2);
+            $unk2 = array_values(array_diff(array_unique($m2[0]), array_keys(self::VARS)));
+            if ($unk2) {
+                $err['followup_body'] = 'Variable desconocida: ' . implode(', ', $unk2) . '. Usa solo las de la lista.';
+            }
+        }
         return ['ok' => $err === [], 'errors' => $err, 'values' => $v];
     }
 
@@ -283,6 +323,7 @@ final class ProspectMail
     {
         $now = Clock::now();
         $id = (int) Db::insert('prospect_campaigns', ['name' => $v['name'], 'segment' => $v['segment'], 'subject' => $v['subject'], 'body' => $v['body'], 'status' => 'draft',
+            'followup_days' => $v['followup_days'] ?? 0, 'followup_subject' => ($v['followup_subject'] ?? '') !== '' ? $v['followup_subject'] : null, 'followup_body' => ($v['followup_body'] ?? '') !== '' ? $v['followup_body'] : null,
             'created_by' => $userId, 'created_at' => $now, 'updated_at' => $now]);
         ActivityLog::record('prospect_campaign_create', $userId, 'prospect_campaign', $id, ['segment' => $v['segment']]);
         return $id;
@@ -294,7 +335,8 @@ final class ProspectMail
         if ($c === null || $c['status'] !== 'draft') {
             return self::fail('Solo se puede editar una campaña en borrador.');
         }
-        Db::update('prospect_campaigns', $id, ['name' => $v['name'], 'segment' => $v['segment'], 'subject' => $v['subject'], 'body' => $v['body'], 'updated_at' => Clock::now()]);
+        Db::update('prospect_campaigns', $id, ['name' => $v['name'], 'segment' => $v['segment'], 'subject' => $v['subject'], 'body' => $v['body'], 'updated_at' => Clock::now(),
+            'followup_days' => $v['followup_days'] ?? 0, 'followup_subject' => ($v['followup_subject'] ?? '') !== '' ? $v['followup_subject'] : null, 'followup_body' => ($v['followup_body'] ?? '') !== '' ? $v['followup_body'] : null]);
         ActivityLog::record('prospect_campaign_update', $userId, 'prospect_campaign', $id, ['segment' => $v['segment']]);
         return self::ok('Borrador guardado.');
     }
@@ -325,11 +367,19 @@ final class ProspectMail
         ];
     }
 
-    /** @return array{subject:string,text:string,html:string,unresolved:list<string>} */
-    public static function render(array $c, array $p, string $unsubUrl, ?string $pixel = null): array
+    /**
+     * @param int $step 1 = correo de la campaña, 2 = segundo correo (fase AT)
+     * @param ?int $rid destinatario: con él, {link_calculadora} y {link_web} pasan por /r/{token} y cuentan el clic (sin él, la vista previa y la prueba llevan el enlace directo)
+     * @return array{subject:string,text:string,html:string,unresolved:list<string>}
+     */
+    public static function render(array $c, array $p, string $unsubUrl, ?string $pixel = null, int $step = 1, ?int $rid = null): array
     {
-        return Templates::render(['subject' => (string) $c['subject'], 'body' => (string) $c['body']], ['first_name' => '', 'state' => $p['state'] ?? ''], 'en', $unsubUrl,
-            self::vars($p), ['why' => self::WHY, 'pixel' => $pixel]);
+        $links = [];
+        foreach ([1 => '{link_calculadora}', 2 => '{link_web}'] as $t => $var) {
+            $links[$var] = $rid !== null ? Unsub::clickUrl($rid, $t) : Templates::SITE . self::CLICK_TARGETS[$t];
+        }
+        $tpl = $step === 2 ? ['subject' => (string) ($c['followup_subject'] ?? ''), 'body' => (string) ($c['followup_body'] ?? '')] : ['subject' => (string) $c['subject'], 'body' => (string) $c['body']];
+        return Templates::render($tpl, ['first_name' => '', 'state' => $p['state'] ?? ''], 'en', $unsubUrl, $links + self::vars($p), ['why' => self::WHY, 'pixel' => $pixel]);
     }
 
     /** Prospecto de muestra para la vista previa: el primero del segmento o uno ficticio. */
@@ -352,9 +402,16 @@ final class ProspectMail
         if (filter_var($to, FILTER_VALIDATE_EMAIL) === false) {
             return self::fail('Tu usuario no tiene un correo válido para recibir la prueba.');
         }
-        $r = self::render($c, self::sample($c['segment'], Clock::time()), Url::base() . '/u/PRUEBA');
+        $sample = self::sample($c['segment'], Clock::time());
+        $steps = (int) ($c['followup_days'] ?? 0) > 0 ? [1, 2] : [1];
         try {
-            $status = Mailer::deliver(['to' => $to, 'subject' => '[PRUEBA] ' . $r['subject'], 'text' => $r['text'], 'html' => $r['html'], 'from_name' => Sequences::mailSettings()['from_name']]);
+            foreach ($steps as $step) {   // con segundo correo, la prueba manda los dos
+                $r = self::render($c, $sample, Url::base() . '/u/PRUEBA', null, $step);
+                $status = Mailer::deliver(['to' => $to, 'subject' => '[PRUEBA' . ($step === 2 ? ' · 2.º correo' : '') . '] ' . $r['subject'], 'text' => $r['text'], 'html' => $r['html'], 'from_name' => Sequences::mailSettings()['from_name']]);
+                if ($status !== 'sent') {
+                    break;
+                }
+            }
         } catch (\Throwable $t) {
             return self::fail('El servidor de correo rechazó la prueba: ' . mb_substr(Storage::redact($t->getMessage()), 0, 160));
         }
@@ -363,7 +420,7 @@ final class ProspectMail
         }
         Db::update('prospect_campaigns', $id, ['test_sent_at' => Clock::now()]);
         ActivityLog::record('prospect_campaign_test', $userId, 'prospect_campaign', $id);
-        return self::ok('Prueba enviada a ' . $to . '. Revísala y, si está bien, lanza la campaña.');
+        return self::ok((count($steps) === 2 ? 'Los dos correos de prueba se enviaron a ' : 'Prueba enviada a ') . $to . '. Revísala y, si está bien, lanza la campaña.');
     }
 
     /** Lo que impide lanzar ESTA campaña (vacío = se puede). @return list<string> */
@@ -373,9 +430,12 @@ final class ProspectMail
         if ($c['status'] !== 'draft') {
             $b[] = 'La campaña ya se lanzó.';
         }
-        $r = self::render($c, self::sample($c['segment'], Clock::time()), Url::base() . '/u/EJEMPLO');
-        if ($r['unresolved']) {
-            $b[] = 'El texto tiene marcadores o variables sin resolver: ' . implode(' ', array_map(static fn($m) => mb_substr($m, 0, 40), array_slice($r['unresolved'], 0, 3)));
+        $sample = self::sample($c['segment'], Clock::time());
+        foreach ((int) ($c['followup_days'] ?? 0) > 0 ? [1, 2] : [1] as $step) {
+            $r = self::render($c, $sample, Url::base() . '/u/EJEMPLO', null, $step);
+            if ($r['unresolved']) {
+                $b[] = ($step === 2 ? 'El segundo correo' : 'El texto') . ' tiene marcadores o variables sin resolver: ' . implode(' ', array_map(static fn($m) => mb_substr($m, 0, 40), array_slice($r['unresolved'], 0, 3)));
+            }
         }
         if ($c['test_sent_at'] === null || (int) Clock::parse((string) $c['test_sent_at']) < (int) Clock::parse((string) $c['updated_at'])) {
             $b[] = 'Envíate una prueba después del último cambio.';
@@ -416,6 +476,9 @@ final class ProspectMail
             throw $t;
         }
         self::schedule($id, $now);
+        if (self::settings()['read_replies']) {
+            ProspectReplies::ensureScheduled();
+        }
         ActivityLog::record('prospect_campaign_launch', $userId, 'prospect_campaign', $id, ['recipients' => $aud['n'], 'segment' => $c['segment']]);
         $cap = self::settings()['cap_hour'];
         return self::ok('Campaña lanzada: ' . Fmt::num($aud['n']) . ' correos en cola, a un máximo de ' . $cap . ' por hora.');
@@ -459,6 +522,7 @@ final class ProspectMail
             return self::fail('Solo se cancela una campaña que se está enviando o en pausa.');
         }
         Db::run("UPDATE prospect_campaign_recipients SET status = 'skipped', skip_reason = 'campaña cancelada' WHERE campaign_id = ? AND status = 'queued'", [$id]);
+        Db::run("UPDATE prospect_campaign_recipients SET fu_status = 'skipped', fu_skip_reason = 'campaña cancelada' WHERE campaign_id = ? AND status = 'sent' AND (fu_status IS NULL OR fu_status = 'queued')", [$id]);
         Db::update('prospect_campaigns', $id, ['status' => 'cancelled', 'finished_at' => Clock::now()]);
         ActivityLog::record('prospect_campaign_cancel', $userId, 'prospect_campaign', $id);
         return self::ok('Campaña cancelada. Los correos que no habían salido ya no se envían.');
@@ -468,7 +532,8 @@ final class ProspectMail
 
     private static function sentLastHour(int $now): int
     {
-        return (int) Db::value("SELECT COUNT(*) FROM prospect_campaign_recipients WHERE status = 'sent' AND sent_at > ?", [Clock::at($now - 3600)]);
+        return (int) Db::value("SELECT COUNT(*) FROM prospect_campaign_recipients WHERE status = 'sent' AND sent_at > ?", [Clock::at($now - 3600)])
+            + (int) Db::value("SELECT COUNT(*) FROM prospect_campaign_recipients WHERE fu_status = 'sent' AND fu_sent_at > ?", [Clock::at($now - 3600)]);
     }
 
     private static function pauseFor(int $id, string $why): void
@@ -512,9 +577,15 @@ final class ProspectMail
             self::schedule($id, $now + 300);   // tope de la hora alcanzado: vuelve a mirar en 5 min
             return;
         }
+        $step1 = (int) Db::value("SELECT COUNT(*) FROM prospect_campaign_recipients WHERE campaign_id = ? AND status = 'queued'", [$id]) > 0;
+        if (!$step1 && (int) ($c['followup_days'] ?? 0) > 0) {
+            self::promoteFollowups($c, $now);
+        }
+        $col = $step1 ? 'status' : 'fu_status';
         $rows = Db::all(
-            "SELECT r.id rid, r.email, p.id, p.legal_name, p.dba, p.state, p.city, p.fleet_size, p.usdot, p.status p_status, p.do_not_call, p.converted_lead_id, p.email_opt_out_at, p.deleted_at p_deleted
-               FROM prospect_campaign_recipients r JOIN prospects_fmcsa p ON p.id = r.prospect_id WHERE r.campaign_id = ? AND r.status = 'queued' ORDER BY r.id LIMIT " . (int) ($budget * 5),
+            "SELECT r.id rid, r.email, r.opened_at, r.clicked_at, r.replied_at, p.id, p.legal_name, p.dba, p.state, p.city, p.fleet_size, p.usdot, p.status p_status, p.do_not_call, p.converted_lead_id, p.email_opt_out_at,
+                    p.email_replied_at, p.deleted_at p_deleted
+               FROM prospect_campaign_recipients r JOIN prospects_fmcsa p ON p.id = r.prospect_id WHERE r.campaign_id = ? AND r.$col = 'queued' ORDER BY r.id LIMIT " . (int) ($budget * 5),
             [$id]
         );
         $sup = self::suppressedEmails();
@@ -526,19 +597,23 @@ final class ProspectMail
                 break;
             }
             $why = self::skipReason($r, $sup);
+            if ($why === null && !$step1 && ($r['opened_at'] !== null || $r['clicked_at'] !== null || $r['replied_at'] !== null || $r['email_replied_at'] !== null)) {
+                $why = $r['replied_at'] !== null || $r['email_replied_at'] !== null ? 'respondió' : 'ya abrió el primero';
+            }
             if ($why !== null) {
-                Db::run("UPDATE prospect_campaign_recipients SET status = 'skipped', skip_reason = ? WHERE id = ?", [$why, (int) $r['rid']]);
+                Db::run($step1 ? "UPDATE prospect_campaign_recipients SET status = 'skipped', skip_reason = ? WHERE id = ?" : "UPDATE prospect_campaign_recipients SET fu_status = 'skipped', fu_skip_reason = ? WHERE id = ?", [$why, (int) $r['rid']]);
                 continue;
             }
             $unsub = Unsub::prospectUrl((int) $r['id']);
-            $m = self::render($c, $r, $unsub, Unsub::openUrl((int) $r['rid']));
+            $m = self::render($c, $r, $unsub, Unsub::openUrl((int) $r['rid']), $step1 ? 1 : 2, (int) $r['rid']);
             try {
                 $status = Mailer::deliver(['to' => (string) $r['email'], 'subject' => $m['subject'], 'text' => $m['text'], 'html' => $m['html'], 'from_name' => $from['from_name'],
                     'reply_to' => $from['reply_to'] !== '' ? $from['reply_to'] : Mailer::to(),
                     'headers' => ['List-Unsubscribe' => '<' . $unsub . '>', 'List-Unsubscribe-Post' => 'List-Unsubscribe=One-Click']]);
             } catch (\Throwable $t) {
                 $fails++;
-                Db::run("UPDATE prospect_campaign_recipients SET status = 'failed', error = ? WHERE id = ?", [mb_substr(Storage::redact($t->getMessage()), 0, 250), (int) $r['rid']]);
+                $err = mb_substr(Storage::redact($t->getMessage()), 0, 250);
+                Db::run($step1 ? "UPDATE prospect_campaign_recipients SET status = 'failed', error = ? WHERE id = ?" : "UPDATE prospect_campaign_recipients SET fu_status = 'failed', error = ? WHERE id = ?", [$err, (int) $r['rid']]);
                 if ($fails >= 3) {
                     self::pauseFor($id, 'El servidor de correo rechazó 3 envíos seguidos. Revisa el SMTP y reanuda.');
                     return;
@@ -552,16 +627,32 @@ final class ProspectMail
             $fails = 0;
             $sentNow++;
             $at = Clock::now();
-            Db::run("UPDATE prospect_campaign_recipients SET status = 'sent', sent_at = ?, error = NULL WHERE id = ?", [$at, (int) $r['rid']]);
+            Db::run($step1 ? "UPDATE prospect_campaign_recipients SET status = 'sent', sent_at = ?, error = NULL WHERE id = ?" : "UPDATE prospect_campaign_recipients SET fu_status = 'sent', fu_sent_at = ? WHERE id = ?", [$at, (int) $r['rid']]);
             Db::run('UPDATE prospects_fmcsa SET last_emailed_at = ? WHERE id = ?', [$at, (int) $r['id']]);
         }
-        $left = (int) Db::value("SELECT COUNT(*) FROM prospect_campaign_recipients WHERE campaign_id = ? AND status = 'queued'", [$id]);
-        if ($left === 0) {
-            Db::update('prospect_campaigns', $id, ['status' => 'done', 'finished_at' => Clock::now()]);
-            ActivityLog::record('prospect_campaign_done', null, 'prospect_campaign', $id, self::stats($id));
+        $left = (int) Db::value("SELECT COUNT(*) FROM prospect_campaign_recipients WHERE campaign_id = ? AND (status = 'queued' OR fu_status = 'queued')", [$id]);
+        if ($left > 0) {
+            self::schedule($id, $now + 60);
             return;
         }
-        self::schedule($id, $now + 60);
+        if ((int) ($c['followup_days'] ?? 0) > 0) {   // faltan segundos correos que aún no tocan: vuelve cuando toque el primero
+            $next = Db::value("SELECT MIN(sent_at) FROM prospect_campaign_recipients WHERE campaign_id = ? AND status = 'sent' AND fu_status IS NULL", [$id]);
+            if ($next !== null) {
+                self::schedule($id, max($now + 60, (int) Clock::parse((string) $next) + (int) $c['followup_days'] * 86400));
+                return;
+            }
+        }
+        Db::update('prospect_campaigns', $id, ['status' => 'done', 'finished_at' => Clock::now()]);
+        ActivityLog::record('prospect_campaign_done', null, 'prospect_campaign', $id, self::stats($id));
+    }
+
+    /** Pasa a la cola del segundo correo a quien recibió el primero hace N días o más; quien ya abrió, hizo clic o respondió no lo recibe. */
+    private static function promoteFollowups(array $c, int $now): void
+    {
+        $cut = Clock::at($now - (int) $c['followup_days'] * 86400);
+        Db::run("UPDATE prospect_campaign_recipients SET fu_status = 'skipped', fu_skip_reason = IF(replied_at IS NOT NULL, 'respondió', IF(clicked_at IS NOT NULL, 'hizo clic', 'ya abrió el primero'))
+                  WHERE campaign_id = ? AND status = 'sent' AND fu_status IS NULL AND sent_at <= ? AND (opened_at IS NOT NULL OR clicked_at IS NOT NULL OR replied_at IS NOT NULL)", [(int) $c['id'], $cut]);
+        Db::run("UPDATE prospect_campaign_recipients SET fu_status = 'queued' WHERE campaign_id = ? AND status = 'sent' AND fu_status IS NULL AND sent_at <= ?", [(int) $c['id'], $cut]);
     }
 
     // --- Baja y aperturas (páginas públicas) ------------------------------------------------------------------------------------------
@@ -591,6 +682,14 @@ final class ProspectMail
         Db::run('UPDATE prospect_campaign_recipients SET opened_at = COALESCE(opened_at, ?), open_count = LEAST(open_count + 1, 60000) WHERE id = ? AND status = \'sent\'', [Clock::now(), $recipientId]);
     }
 
+    /** Clic en un enlace del correo (fase AT): cuenta también como apertura (hay clientes que bloquean el píxel). Devuelve la URL de destino. */
+    public static function recordClick(int $recipientId, int $target): string
+    {
+        $now = Clock::now();
+        Db::run('UPDATE prospect_campaign_recipients SET clicked_at = COALESCE(clicked_at, ?), click_count = LEAST(click_count + 1, 60000), opened_at = COALESCE(opened_at, ?) WHERE id = ? AND status = \'sent\'', [$now, $now, $recipientId]);
+        return Templates::SITE . (self::CLICK_TARGETS[$target] ?? '/');
+    }
+
     /** Último correo de campaña de cada prospecto (para la lista de Prospectos). @param list<int> $ids @return array<int,array{name:string,sent_at:string,opened:bool}> */
     public static function lastFor(array $ids): array
     {
@@ -600,9 +699,9 @@ final class ProspectMail
         }
         $out = [];
         try {   // la lista de Prospectos nunca debe romperse por esto (p. ej. en el minuto entre el despliegue y la migración 018)
-            foreach (Db::all("SELECT r.prospect_id, r.sent_at, r.opened_at, c.name FROM prospect_campaign_recipients r JOIN prospect_campaigns c ON c.id = r.campaign_id
+            foreach (Db::all("SELECT r.prospect_id, r.sent_at, r.opened_at, r.clicked_at, r.replied_at, c.name FROM prospect_campaign_recipients r JOIN prospect_campaigns c ON c.id = r.campaign_id
                                WHERE r.status = 'sent' AND r.prospect_id IN (" . implode(',', $ids) . ') ORDER BY r.sent_at') as $r) {
-                $out[(int) $r['prospect_id']] = ['name' => (string) $r['name'], 'sent_at' => (string) $r['sent_at'], 'opened' => $r['opened_at'] !== null];
+                $out[(int) $r['prospect_id']] = ['name' => (string) $r['name'], 'sent_at' => (string) $r['sent_at'], 'opened' => $r['opened_at'] !== null, 'clicked' => $r['clicked_at'] !== null, 'replied' => $r['replied_at'] !== null];
             }
         } catch (\Throwable) {
             return [];

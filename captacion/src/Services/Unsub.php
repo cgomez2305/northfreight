@@ -90,6 +90,19 @@ final class Unsub
         return self::check($token, 'o', 'open');
     }
 
+    /** Enlace con conteo de clics (fase AT): destinatario y destino (1 = calculadora, 2 = página principal) firmados en el token. */
+    public static function clickUrl(int $recipientId, int $target): string
+    {
+        return Url::base() . '/r/' . self::signed('k', $recipientId * 10 + $target, 'click');
+    }
+
+    /** @return ?array{0:int,1:int} [destinatario, destino] si el token es autentico */
+    public static function verifyClick(string $token): ?array
+    {
+        $v = self::check($token, 'k', 'click');
+        return $v === null ? null : [intdiv($v, 10), $v % 10];
+    }
+
     /** Aplica la baja. @return array{ok:bool,lang:string,first_name:string,already:bool} */
     public static function apply(int $leadId, string $via): array
     {

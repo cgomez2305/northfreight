@@ -119,3 +119,5 @@
 .qd button:hover{background:var(--sunk);color:var(--ink)}
 .qd button.is-on{background:var(--accent-tint);border-color:var(--accent-line);color:var(--accent-ink)}
 @media (pointer:coarse){.qd button{min-height:44px}}
+.pr__rep{display:inline-flex;align-items:center;gap:5px;font-size:var(--fs-xs);font-weight:500;color:var(--accent-ink)}
+.pr__rep .ic{width:13px;height:13px}

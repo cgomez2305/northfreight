@@ -9,7 +9,11 @@ $done = $stats['sent'] + $stats['failed'] + $stats['skipped'];
 $pct = (int) floor($done * 100 / $total);
 $openPct = $stats['sent'] > 0 ? (int) round($stats['opened'] * 100 / $stats['sent']) : null;
 $chip = ['sending' => 'ok', 'paused' => 'warm', 'done' => 'plain', 'cancelled' => 'dq'];
-$tabs = ['' => ['Todos', (int) $c['total']], 'sent' => ['Enviados', $stats['sent']], 'opened' => ['Abiertos', $stats['opened']], 'queued' => ['En cola', $stats['queued']], 'skipped' => ['Omitidos', $stats['skipped']], 'failed' => ['Fallidos', $stats['failed']]];
+$tabs = ['' => ['Todos', (int) $c['total']], 'sent' => ['Enviados', $stats['sent']], 'opened' => ['Abiertos', $stats['opened']], 'clicked' => ['Con clic', $stats['clicked']], 'replied' => ['Respondieron', $stats['replied']],
+    'queued' => ['En cola', $stats['queued']], 'skipped' => ['Omitidos', $stats['skipped']], 'failed' => ['Fallidos', $stats['failed']]];
+$tabs = array_filter($tabs, static fn($t, $k) => $k === '' || $k === 'sent' || $t[1] > 0, ARRAY_FILTER_USE_BOTH);   // sin pestañas vacías
+$fuDays = (int) ($c['followup_days'] ?? 0);
+$waitingFu = $c['status'] === 'sending' && $stats['queued'] === 0 && $stats['fu_queued'] === 0 && $stats['fu_wait'] > 0;
 $rChip = ['queued' => 'plain', 'sent' => 'ok', 'failed' => 'bad', 'skipped' => 'dq'];
 $base = '/prospectos/correos/' . (int) $c['id'];
 ?>
@@ -35,22 +39,28 @@ $base = '/prospectos/correos/' . (int) $c['id'];
 
 <section class="card pm-kpis" aria-label="Resultado de la campaña">
   <div class="pm-prog">
-    <p><b><?= $e(Fmt::num($done)) ?></b> de <?= $e(Fmt::num((int) $c['total'])) ?> procesados<?= $c['status'] === 'sending' ? ' · ' . $e(Fmt::num($stats['queued'])) . ' en cola, a ' . $e($settings['cap_hour']) . ' por hora' : '' ?></p>
+    <p><b><?= $e(Fmt::num($done)) ?></b> de <?= $e(Fmt::num((int) $c['total'])) ?> procesados<?= $c['status'] === 'sending' && !$waitingFu ? ' · ' . $e(Fmt::num($stats['queued'] + $stats['fu_queued'])) . ' en cola, a ' . $e($settings['cap_hour']) . ' por hora' : '' ?></p>
     <progress max="100" value="<?= $e($pct) ?>" aria-label="Progreso del envío"><?= $e($pct) ?> %</progress>
   </div>
   <dl class="pm-k">
     <div><dt>Enviados</dt><dd><?= $e(Fmt::num($stats['sent'])) ?></dd></div>
     <div><dt>Abiertos</dt><dd><?= $e(Fmt::num($stats['opened'])) ?><?php if ($openPct !== null): ?> <small><?= $e($openPct) ?> %</small><?php endif; ?></dd></div>
-    <div><dt>Omitidos</dt><dd><?= $e(Fmt::num($stats['skipped'])) ?></dd></div>
-    <div><dt>Fallidos</dt><dd><?= $e(Fmt::num($stats['failed'])) ?></dd></div>
+    <div><dt>Con clic</dt><dd><?= $e(Fmt::num($stats['clicked'])) ?></dd></div>
+    <div><dt>Respondieron</dt><dd><?= $e(Fmt::num($stats['replied'])) ?></dd></div>
   </dl>
-  <p class="muted pm-help">Las aperturas son orientativas (algunos clientes de correo cargan la imagen solos y otros la bloquean). Las respuestas llegan a tu buzón; las bajas se aplican solas.</p>
+  <p class="muted pm-help"><?php if ($fuDays > 0): ?>Segundo correo a los <?= $e($fuDays) ?> días: <?= $e(Fmt::num($stats['fu_sent'])) ?> enviados<?= $waitingFu ? ' · ' . $e(Fmt::num($stats['fu_wait'])) . ' esperan su fecha' : '' ?>. <?php endif; ?>Omitidos <?= $e(Fmt::num($stats['skipped'])) ?> · fallidos <?= $e(Fmt::num($stats['failed'])) ?>. Las aperturas son orientativas; los clics y las respuestas, no. Las bajas se aplican solas.</p>
 </section>
 
 <details class="card pm-set">
   <summary class="card__h"><span class="label">Correo enviado</span><span class="muted"><?= $e($c['subject']) ?></span></summary>
   <div class="card__b"><div class="cm-body"><?= nl2br($e($c['body'])) ?></div></div>
 </details>
+<?php if ($fuDays > 0): ?>
+<details class="card pm-set">
+  <summary class="card__h"><span class="label">Segundo correo · a los <?= $e($fuDays) ?> días</span><span class="muted"><?= $e((string) $c['followup_subject']) ?></span></summary>
+  <div class="card__b"><div class="cm-body"><?= nl2br($e((string) $c['followup_body'])) ?></div></div>
+</details>
+<?php endif; ?>
 
 <nav class="ptabs" aria-label="Destinatarios por resultado">
   <?php foreach ($tabs as $k => [$label, $n]): $on = $ver === $k; ?><a class="ptab<?= $on ? ' is-on' : '' ?>" href="<?= $e($base . ($k !== '' ? '?ver=' . $k : '')) ?>"<?= $on ? ' aria-current="true"' : '' ?>><?= $e($label) ?><span class="ptab__n"><?= $e(Fmt::num($n)) ?></span></a><?php endforeach; ?>

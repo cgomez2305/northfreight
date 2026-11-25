@@ -1070,3 +1070,31 @@ Pruebas: `50_fase_ar` (y ajustes en `17_pulido`, `30_ux_q5a`, `38_resultados_q6i
 - **«Solo con correo»** (`ph=mail`): el filtro existía en el código pero solo por URL, sin control ni chip (un filtro invisible). Ahora está en el panel «Filtros», con chip y en el contador del botón. Sirve para preparar los correos en lote.
 
 Prueba: `51_fase_as`.
+
+## 33. Barra lateral minimalista y captación saliente completa (fase AT, 2026-11-25)
+
+Pedido de Carlos: «empieza por todas las de captación saliente y operación; no me gusta la barra de desplazamiento de la barra lateral: más práctica, accesible y minimalista».
+
+**Barra lateral**
+- Sin barra de desplazamiento a la vista (`scrollbar-width: none`); si no cabe, un filete arriba o abajo avisa de que hay más (`has-less`/`has-more` en `panel.js`). A 1280×720 cabe entera.
+- Sin títulos de grupo: las secciones se separan con filetes (`.side__sep`). «Vistas» se pliega con un botón (`aria-expanded`, se recuerda en `localStorage`; si la vista activa está dentro, se queda abierta).
+- «Contraer» pasa a un botón de icono junto al logo (solo ≥1100 px); el logo pierde el selector de espacio de trabajo que no hacía nada.
+- La tarjeta «Estado del sistema» desaparece: es un punto ámbar en el avatar cuando hay avisos y una opción con su estado en el menú de la cuenta.
+- Nombres accesibles para buscador y cuenta también en el riel (antes el texto oculto dejaba los botones sin nombre).
+- El modo riel (tablet 761 a 1099 px y barra contraída) es UNA regla con container query (`@container side (max-width:100px)`) en lugar de dos copias: `panel.css` pasa de 30,5 a 28,7 KB.
+
+**Correos en lote a prospectos** (migración `019_campanas_seguimiento.sql`)
+- **Segundo correo** opcional a los 3, 5, 7 o 10 días con asunto y texto propios (hay uno de partida), solo a quien no abrió, no hizo clic ni respondió; comparte el tope por hora; la prueba manda los dos. La campaña sigue «Enviando» mientras esperan los segundos correos y termina al salir el último.
+- **Clics**: `{link_calculadora}` y la variable nueva `{link_web}` pasan por `/r/{token}` (destinatario y destino firmados con HMAC; solo dos destinos fijos del sitio, nunca una URL de la petición; un token falso lleva a la página principal sin contar nada). Un clic cuenta también como apertura.
+- **Respuestas** (`Services/ProspectReplies` + `Services/Imap`, cliente IMAP propio sin la extensión de PHP): cada 10 minutos, si está encendido en «Ajustes de envío» (apagado por defecto), lee el buzón del remitente en SOLO LECTURA (`EXAMINE` y `BODY.PEEK` de From, Date y Subject; nunca `SELECT`, `STORE` ni mover). Si responde un destinatario: marca la respuesta, deja de enviarle el segundo correo y lo que tuviera en cola, sale el primero en la «Lista de hoy» con «Respondió al correo» hasta que se le llame, y avisa la campana. Ignora respuestas automáticas y rebotes. Credenciales: `IMAP_HOST`, `IMAP_PORT`, `IMAP_USER`, `IMAP_PASS`, `IMAP_SECURE` en `.env` o `config/mail.env`; sin ellas usa las del SMTP (en Hostinger, `imap.hostinger.com:993`).
+- Lista y ficha de la campaña con clics, respuestas y segundos correos; pestañas de destinatarios sin las vacías.
+
+**Prospectos**
+- «No interesado» vuelve a «Por llamar» pasados 3, 6 o 12 meses (Configuración > Prospectos; «Nunca» por defecto). Lo hace el cron horario de FMCSA. «No llamar más», teléfonos en la lista de no llamar y convertidos, nunca.
+- La columna de intentos dice «Llamado hace …» en lugar de «Sin llamar» para quien ya conversó.
+
+**Métricas**: sección «Captación saliente» en `/reportes` (`Services/ProspectReport`): llamadas, contestadas, interesados, convertidos, correos, respuestas, clics y bajas; desglose por flota, antigüedad de la autoridad y estado; campañas del rango. El resumen diario añade las llamadas y correos de ayer, la lista de hoy y las respuestas pendientes. `/resultados` (NorthStar) muestra los totales, sin nombres ni enlaces internos.
+
+**Calendario móvil**: en el mes, la agenda del día va bajo la cuadrícula (tocar un día la cambia sin recargar; sin JS, el día elegido) y una tarea se mueve con el dedo manteniéndola pulsada 0,35 s y arrastrándola a otro día (el desplazamiento normal sigue funcionando).
+
+Prueba: `52_fase_at` (con un servidor IMAP falso, `tests/lib/imap_mock.php`). Sin probar en un buzón real: el primer encendido conviene hacerlo mirando «Última lectura» en Ajustes de envío. El arrastre táctil solo se probó por código (Playwright no simula mantener pulsado y arrastrar).

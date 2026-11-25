@@ -66,13 +66,15 @@ final class Prospects
 
     /**
      * Condicion de la «Lista de hoy»: por llamar + seguimientos que tocan HOY (día ET, el mismo corte que la campana «Seguimientos de hoy»): reintentos sin respuesta y,
-     * desde la fase AS, también «Conversó» e «Interesado» con fecha de seguimiento (antes solo los avisaba la campana y nunca aparecían en la lista).
+     * desde la fase AS, también «Conversó» e «Interesado» con fecha de seguimiento (antes solo los avisaba la campana y nunca aparecían en la lista), y desde la AT
+     * quien respondió a un correo de campaña y aún no se ha llamado (van los primeros).
      * Nunca prospectos de «no llamar» ni los ya convertidos en lead.
      */
     private static function todayClause(int $now): array
     {
         $end = self::etToUtc(self::etDay($now), true) ?? Clock::at($now);
-        return ["(p.status = 'to_call' OR (p.status = 'no_answer' AND (p.next_call_at IS NULL OR p.next_call_at <= ?)) OR (p.status IN ('talked', 'interested') AND p.next_call_at IS NOT NULL AND p.next_call_at <= ?)) AND p.converted_lead_id IS NULL", [$end, $end]];
+        return ["(p.status = 'to_call' OR (p.status = 'no_answer' AND (p.next_call_at IS NULL OR p.next_call_at <= ?)) OR (p.status IN ('talked', 'interested') AND p.next_call_at IS NOT NULL AND p.next_call_at <= ?)
+            OR (p.email_replied_at IS NOT NULL AND (p.last_call_at IS NULL OR p.last_call_at < p.email_replied_at) AND p.status NOT IN ('dnc', 'not_interested'))) AND p.converted_lead_id IS NULL", [$end, $end]];
     }
 
     /** Estados (EE. UU.) con prospectos y cuántos hay en cada uno, para el filtro (antes la lista traía los 51 aunque no hubiera nadie). @return array<string,int> */
@@ -174,7 +176,7 @@ final class Prospects
         $total = (int) Db::value("SELECT COUNT(*) FROM prospects_fmcsa p WHERE $sql", $p);
         $pages = max(1, (int) ceil($total / $per));
         $page = max(1, min($page, $pages));
-        $order = $f['tab'] === 'today' ? "(p.status <> 'to_call') DESC, p.next_call_at ASC, p.authority_granted_at DESC, p.completeness DESC, p.id ASC" : 'p.authority_granted_at DESC, p.completeness DESC, p.id ASC';
+        $order = $f['tab'] === 'today' ? "(p.email_replied_at IS NOT NULL AND (p.last_call_at IS NULL OR p.last_call_at < p.email_replied_at)) DESC, (p.status <> 'to_call') DESC, p.next_call_at ASC, p.authority_granted_at DESC, p.completeness DESC, p.id ASC" : 'p.authority_granted_at DESC, p.completeness DESC, p.id ASC';
         $op = [];
         if (in_array($f['tab'], ['talked', 'interested'], true)) {
             $order = 'p.last_call_at DESC, p.id DESC';
@@ -357,6 +359,26 @@ final class Prospects
             Storage::error('prospect record failed', get_class($t) . ': ' . $t->getMessage());
             return self::fail('No se pudo registrar el resultado. Inténtalo de nuevo.');
         }
+    }
+
+    /**
+     * Fase AT: «No interesado» de hace más de N meses (Configuración > Prospectos, apagado por defecto) vuelve a «Por llamar» con 0 intentos.
+     * Nunca «No llamar más», ni con el teléfono en la lista de no llamar, ni ya convertidos. Lo llama el cron horario de FMCSA. @return int cuántos volvieron
+     */
+    public static function relist(int $now): int
+    {
+        $months = (int) ProspectConfig::get()['relist_months'];
+        if ($months <= 0) {
+            return 0;
+        }
+        $cut = (new \DateTimeImmutable('@' . $now))->modify('-' . $months . ' months')->format('Y-m-d H:i:s');
+        $n = Db::run("UPDATE prospects_fmcsa p SET p.status = 'to_call', p.attempts = 0, p.closed_at = NULL, p.next_call_at = NULL, p.updated_at = ?
+                       WHERE p.status = 'not_interested' AND p.deleted_at IS NULL AND p.do_not_call = 0 AND p.converted_lead_id IS NULL AND p.closed_at IS NOT NULL AND p.closed_at <= ?
+                         AND (p.phone IS NULL OR NOT EXISTS (SELECT 1 FROM dnc_numbers d WHERE d.phone_e164 = p.phone))", [Clock::at($now), $cut])->rowCount();
+        if ($n > 0) {
+            ActivityLog::record('prospects_relist', null, 'prospect', null, ['count' => $n, 'months' => $months]);
+        }
+        return $n;
     }
 
     /** Reabre un prospecto cerrado por falta de respuesta (o «no interesado»): vuelve a «Por llamar» con 0 intentos. «No llamar más» jamas se reabre. */

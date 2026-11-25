@@ -18,7 +18,7 @@ final class Env
     }
 
     /** Claves que puede fijar config/mail.env (el buzón SMTP y los destinos de correo, nada más). */
-    private const MAIL_KEYS = '/^(SMTP_(HOST|PORT|USER|PASS|SECURE)|MAIL_TO|MAIL_FROM|PHPMAILER_AUTOLOAD)$/';
+    private const MAIL_KEYS = '/^(SMTP_(HOST|PORT|USER|PASS|SECURE)|IMAP_(HOST|PORT|USER|PASS|SECURE)|MAIL_TO|MAIL_FROM|PHPMAILER_AUTOLOAD)$/';
 
     /**
      * Lee el archivo .env (KEY=VALUE, # comentarios, comillas simples o dobles). Devuelve false si no existe.

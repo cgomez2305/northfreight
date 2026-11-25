@@ -153,17 +153,18 @@ $drop = static fn(string $k): string => '/prospectos' . Ui::qs(array_diff_key($q
     $statusChip = ['to_call' => 'warm', 'no_answer' => 'plain', 'no_answer_closed' => 'dq', 'talked' => 'plain', 'interested' => 'ok', 'not_interested' => 'dq', 'dnc' => 'bad'][$r['status']] ?? 'plain';
     $nextLabel = $r['next_call_at'] !== null && $open ? $dayFmt((string) $r['next_call_at']) : null;
     $callNow = $open && $r['phone'] !== null && $tz['allowed'];
+    $replied = $open && !empty($r['email_replied_at']) && ($r['last_call_at'] === null || (string) $r['last_call_at'] < (string) $r['email_replied_at']);   // fase AT: respondió a un correo y aún no se le ha llamado
     $loc = trim(($r['city'] ? ucwords(strtolower((string) $r['city'])) . ', ' : '') . ($r['state'] ?? ''), ' ,') ?: '—';
     ?>
   <li class="pc<?= $dnc ? ' is-dnc' : '' ?><?= $conv ? ' is-conv' : '' ?><?= $callNow ? ' is-now' : '' ?>" id="p-<?= $e($id) ?>">
     <details class="pr" data-pr>
       <summary class="pr__s" aria-describedby="pd-<?= $e($id) ?>">
         <span class="pr__st"><span class="chip chip--<?= $e($statusChip) ?>"><?php if ($statusChip !== 'plain'): ?><i class="dot"></i><?php endif; ?><?= $e(Prospects::STATUSES[$r['status']] ?? $r['status']) ?></span></span>
-        <span class="pr__who"><b class="pr__n" id="pn-<?= $e($id) ?>"><?= $e($name) ?></b><span class="pr__ids mono">USDOT <?= $e($r['usdot']) ?><?= $r['mc_number'] ? ' · ' . $e($r['mc_number']) : '' ?></span></span>
+        <span class="pr__who"><b class="pr__n" id="pn-<?= $e($id) ?>"><?= $e($name) ?></b><span class="pr__ids mono">USDOT <?= $e($r['usdot']) ?><?= $r['mc_number'] ? ' · ' . $e($r['mc_number']) : '' ?></span><?php if ($replied): ?><span class="pr__rep"><?= Ui::icon('mail') ?>Respondió al correo <?= $e(Fmt::ago((string) $r['email_replied_at'])) ?></span><?php endif; ?></span>
         <span class="pr__loc"><?= $e($loc) ?><small class="pr__tz<?= $callNow ? ' is-ok' : '' ?>"><?php if (!$tz['known']): ?>Sin hora local<?php elseif ($tz['allowed']): ?><i class="dot is-ok"></i><?= $e($tz['local_hm']) ?> <?= $e($tz['zone_label']) ?> · en horario<?php else: ?><?= $e($tz['local_hm']) ?> <?= $e($tz['zone_label']) ?><?= $tz['opens_in'] ? ' · abre en ' . $e(Fmt::dur((int) $tz['opens_in'])) : ' · fuera de horario' ?><?php endif; ?></small></span>
         <span class="pr__fl"><span class="pr__k">Flota </span><?= $r['fleet_size'] !== null ? $e($r['fleet_size']) . ($r['fleet_size'] == 1 ? ' unidad' : ' unidades') : '—' ?></span>
         <span class="pr__age"><span class="pr__k">Autoridad </span><?= $e($ageLabel($r['authority_granted_at'])) ?></span>
-        <span class="pr__att"><?= $dnc ? 'No llamar' : ($conv ? 'Lead #' . $e($r['converted_lead_id']) : ((int) $r['attempts'] > 0 ? $e($r['attempts']) . ' de ' . Prospects::MAX_ATTEMPTS : 'Sin llamar')) ?><?php if ($nextLabel !== null): ?><small>Próximo: <?= $e($nextLabel) ?></small><?php endif; ?></span>
+        <span class="pr__att"><?= $dnc ? 'No llamar' : ($conv ? 'Lead #' . $e($r['converted_lead_id']) : ((int) $r['attempts'] > 0 ? $e($r['attempts']) . ' de ' . Prospects::MAX_ATTEMPTS : ($r['last_call_at'] !== null ? 'Llamado ' . $e(Fmt::ago((string) $r['last_call_at'])) : 'Sin llamar'))) ?><?php if ($nextLabel !== null): ?><small>Próximo: <?= $e($nextLabel) ?></small><?php endif; ?></span>
         <span class="pr__chev" aria-hidden="true"><?= Ui::icon('chevron-down') ?></span>
       </summary>
       <div class="pr__b" id="pd-<?= $e($id) ?>">
@@ -213,7 +214,7 @@ $drop = static fn(string $k): string => '/prospectos' . Ui::qs(array_diff_key($q
             <div><dt>Carga declarada</dt><dd><?= $cats ? $e(implode(' · ', array_map(static fn($c) => ProspectConfig::CARGO[$c][0], array_slice($cats, 0, 3)))) : '—' ?></dd></div>
             <?php if ($r['email']): ?><div class="pc__mail"><dt>Correo en FMCSA</dt><dd class="mono"><?= $e($r['email']) ?></dd></div><?php endif; ?>
             <?php if (!empty($r['email_opt_out_at'])): ?><div class="pc__mail"><dt>Correos en lote</dt><dd>Se dio de baja el <?= $e(Fmt::date((string) $r['email_opt_out_at'])) ?></dd></div>
-            <?php elseif (isset($mailed[$id])): ?><div class="pc__mail"><dt>Último correo en lote</dt><dd><?= $e(Fmt::date($mailed[$id]['sent_at'])) ?> · <?= $e($mailed[$id]['name']) ?><small><?= $mailed[$id]['opened'] ? 'Lo abrió' : 'Sin abrir todavía' ?></small></dd></div><?php endif; ?>
+            <?php elseif (isset($mailed[$id])): ?><div class="pc__mail"><dt>Último correo en lote</dt><dd><?= $e(Fmt::date($mailed[$id]['sent_at'])) ?> · <?= $e($mailed[$id]['name']) ?><small><?= !empty($mailed[$id]['replied']) ? 'Respondió' : (!empty($mailed[$id]['clicked']) ? 'Hizo clic en un enlace' : ($mailed[$id]['opened'] ? 'Lo abrió' : 'Sin abrir todavía')) ?></small></dd></div><?php endif; ?>
           </dl>
           <?php if (!$dnc): ?>
           <div class="pc__f">

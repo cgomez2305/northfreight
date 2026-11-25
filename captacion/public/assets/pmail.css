@@ -49,3 +49,9 @@
   .pm-seg,.pm-set__f{grid-template-columns:minmax(0,1fr)}
   .pm-k{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+.pm-fu{grid-template-columns:minmax(0,1fr)}
+.pm-fu__h{font-size:var(--fs-sm)}
+.pm-fu__f{display:grid;gap:12px}
+.pm-fu__f[hidden]{display:none}
+.pm-rr{grid-column:1/-1;align-items:flex-start}
+.pm-rr small{display:block;margin-top:2px;font-size:var(--fs-sm);color:var(--ink-3)}

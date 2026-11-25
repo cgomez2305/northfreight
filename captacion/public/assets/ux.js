@@ -156,7 +156,7 @@
  var fold = $('[data-side-toggle]');
  function setSide(v, save) {
   H.setAttribute('data-side', v);
-  if (fold) { fold.setAttribute('aria-pressed', v === 'collapsed' ? 'true' : 'false'); var t = v === 'collapsed' ? 'Expandir barra lateral' : 'Contraer barra lateral'; fold.setAttribute('data-tip', t); $('.nav-i__t', fold).textContent = t; }
+  if (fold) { fold.setAttribute('aria-pressed', v === 'collapsed' ? 'true' : 'false'); var t = v === 'collapsed' ? 'Expandir barra lateral' : 'Contraer barra lateral'; fold.setAttribute('data-tip', t); fold.setAttribute('aria-label', t); }
   if (save) api('/ajax/prefs', { key: 'side', value: v });
  }
  NS.toggleSide = function () { setSide(H.getAttribute('data-side') === 'collapsed' ? 'open' : 'collapsed', true); };

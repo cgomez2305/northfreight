@@ -92,6 +92,23 @@ final class Infra
     }
 
     /** Arranca el SMTP falso (lib/smtp_mock.php). Devuelve el puerto. */
+    /** Servidor IMAP falso (fase AT): solo lectura, mensajes en un JSON que se relee en cada orden. */
+    public static function imapMock(string $name, string $messages, string $log): int
+    {
+        $port = self::freePort(26800);
+        self::spawn($name, [PHP_BINARY, __DIR__ . '/imap_mock.php', (string) $port, $messages, $log], [], self::$work . "/$name.log");
+        $deadline = microtime(true) + 10;
+        while (microtime(true) < $deadline) {
+            $s = @fsockopen('127.0.0.1', $port, $e, $es, 0.2);
+            if ($s) {
+                fclose($s);
+                return $port;
+            }
+            usleep(100000);
+        }
+        throw new \RuntimeException("imap mock $name no arranco");
+    }
+
     public static function smtpMock(string $name, string $log, string $modeFile = ''): int
     {
         $port = self::freePort(25800);

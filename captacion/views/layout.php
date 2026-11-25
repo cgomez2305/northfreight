@@ -5,7 +5,7 @@ use Captacion\Middleware\SecurityHeaders;
 $nonce = SecurityHeaders::nonce();
 $assetV = static fn(string $f): string => (string) (@filemtime(CAPTACION_ROOT . '/public/assets/' . $f) ?: 1);
 $shell = !empty($shell);
-$brand = '<a class="brand" href="' . (!empty($isViewer) ? '/resultados' : '/') . '" aria-label="NorthStar Captación, ir al inicio" data-tip="NorthStar Captación"><img class="brand__mark" src="/assets/isotype.svg" width="26" height="26" alt=""><span class="brand__txt"><b>NorthStar</b><small>Captación</small></span>' . Ui::icon('chevrons') . '</a>';
+$brand = '<a class="brand" href="' . (!empty($isViewer) ? '/resultados' : '/') . '" aria-label="NorthStar Captación, ir al inicio" data-tip="NorthStar Captación"><img class="brand__mark" src="/assets/isotype.svg" width="26" height="26" alt=""><span class="brand__txt"><b>NorthStar</b><small>Captación</small></span></a>';
 ?>
 <!doctype html>
 <html lang="es"<?= isset($prefs) ? ' data-theme-pref="' . $e($prefs['theme']) . '" data-side="' . $e($prefs['side']) . '" data-density="' . $e($prefs['density']) . '"' . (empty($isViewer) ? ' data-kbd="' . $e($prefs['keys'] ?? 'on') . '"' : '') : '' ?>>
@@ -39,12 +39,13 @@ $brand = '<a class="brand" href="' . (!empty($isViewer) ? '/resultados' : '/') .
   <aside class="side" id="side" aria-label="Navegación principal">
     <div class="side__head">
       <?= $brand ?>
+      <?php if (empty($isViewer)): ?><button class="icon-btn side__fold" type="button" data-side-toggle aria-pressed="<?= ($prefs['side'] ?? 'open') === 'collapsed' ? 'true' : 'false' ?>" aria-label="Contraer barra lateral" data-tip="Contraer barra lateral"><?= Ui::icon('panel-left') ?></button><?php endif; ?>
       <button class="icon-btn side__close" type="button" data-nav-close aria-label="Cerrar menú"><?= Ui::icon('x') ?></button>
     </div>
 <?php if (empty($isViewer)): ?>
-    <button class="side__search" type="button" data-search data-tip="Buscar o ejecutar" aria-haspopup="dialog" aria-keyshortcuts="Control+K Meta+K /"><?= Ui::icon('search') ?><span>Buscar…</span><span class="kbds" aria-hidden="true"><kbd data-mod>Ctrl</kbd><kbd>K</kbd></span></button>
+    <button class="side__search" type="button" data-search data-tip="Buscar o ejecutar" aria-label="Buscar o ejecutar" aria-haspopup="dialog" aria-keyshortcuts="Control+K Meta+K /"><?= Ui::icon('search') ?><span>Buscar…</span><span class="kbds" aria-hidden="true"><kbd data-mod>Ctrl</kbd><kbd>K</kbd></span></button>
 <?php endif; ?>
-    <nav class="side__nav">
+    <nav class="side__nav" aria-label="Secciones">
 <?php
 $ni = static function (string $href, string $icon, string $label, string $key, array $o = []) use ($e, $active): string {
     $on = $active === $key;
@@ -54,41 +55,40 @@ $ni = static function (string $href, string $icon, string $label, string $key, a
 };
 ?>
 <?php if (!empty($isViewer)): ?>
-      <p class="side__group">NorthStar</p>
       <?= $ni('/resultados', 'bar-chart', 'Resultados', 'resultados') ?>
       <?= $ni('/informes', 'file', 'Informes', 'informes') ?>
 <?php else: ?>
-      <p class="side__group">Principal</p>
       <?= $ni('/', 'dashboard', 'Dashboard', 'dashboard') ?>
       <?= $ni(\Captacion\Services\Prefs::home((string) ($prefs['lmode'] ?? 'lista')), 'users', 'Leads', in_array($active, ['leads', 'pipeline'], true) && ($_GET['v'] ?? '') === '' ? $active : 'leads') ?>
       <?= $ni('/tareas', 'list-check', 'Tareas', 'tareas', ['badge' => $overdueBadge, 'title' => 'Tareas vencidas', 'sr' => 'vencidas']) ?>
-      <?php if ($navViews): ?><p class="side__group">Vistas</p><?php endif; ?>
-      <?php foreach ($navViews as $v): $vOn = ($_GET['v'] ?? '') === $v['id'] && in_array($active, ['leads', 'pipeline'], true); ?>
-        <a class="nav-i nav-i--view<?= $vOn ? ' is-on' : '' ?>" href="<?= $e($v['href']) ?>" data-tip="<?= $e($v['name']) ?>"<?= $vOn ? ' aria-current="page"' : '' ?>><?= Ui::icon($v['icon']) ?><span class="nav-i__t"><?= $e($v['name']) ?></span><span class="nav-i__n" data-view-count="<?= $e($v['id']) ?>"><?= $e($v['count']) ?></span></a>
-      <?php endforeach; ?>
+      <?php if ($navViews): ?>
+      <div class="side__views" data-side-views>
+        <button class="side__vh" type="button" aria-expanded="true" aria-controls="side-vl"><?= Ui::icon('chevron-down') ?>Vistas</button>
+        <div class="side__vl" id="side-vl" role="group" aria-label="Vistas guardadas">
+        <?php foreach ($navViews as $v): $vOn = ($_GET['v'] ?? '') === $v['id'] && in_array($active, ['leads', 'pipeline'], true); ?>
+          <a class="nav-i nav-i--view<?= $vOn ? ' is-on' : '' ?>" href="<?= $e($v['href']) ?>" data-tip="<?= $e($v['name']) ?>"<?= $vOn ? ' aria-current="page"' : '' ?>><?= Ui::icon($v['icon']) ?><span class="nav-i__t"><?= $e($v['name']) ?></span><span class="nav-i__n" data-view-count="<?= $e($v['id']) ?>"><?= $e($v['count']) ?></span></a>
+        <?php endforeach; ?>
+        </div>
+      </div>
+      <?php endif; ?>
       <?php if ($isAdmin): ?>
-      <p class="side__group">Captación</p>
+      <hr class="side__sep">
       <?= $ni('/prospectos', 'phone', 'Prospectos', in_array($active, ['prospectos', 'pmail'], true) ? $active : 'prospectos', ['badge' => (int) ($followBadge ?? 0), 'title' => 'Seguimientos de hoy', 'sr' => 'seguimientos de hoy']) ?>
       <?= $ni('/referidos', 'user-plus', 'Referidos', 'referidos', ['badge' => (int) ($bonusBadge ?? 0), 'cls' => 'hot', 'title' => 'Bonos por aprobar', 'sr' => 'bonos por aprobar']) ?>
       <?= $ni('/vacantes', 'file', 'Vacantes', 'vacantes') ?>
-      <p class="side__group">Seguimiento</p>
+      <hr class="side__sep">
       <?= $ni('/reportes', 'bar-chart', 'Reportes', in_array($active, ['reportes', 'informes'], true) ? $active : 'reportes') ?>
       <?= $ni('/comunicaciones', 'mail', 'Comunicaciones', 'comunicaciones') ?>
-      <p class="side__group">Administración</p>
+      <hr class="side__sep">
       <?= $ni('/config', 'gear', 'Configuración', 'config') ?>
       <?= $ni('/actividad', 'activity', 'Actividad', 'actividad') ?>
       <?php endif; ?>
 <?php endif; ?>
     </nav>
     <div class="side__foot">
-      <?php if (empty($isViewer)): ?><a class="sys" href="/#cola" data-tip="Estado del sistema">
-        <span class="sys__row"><i class="dot<?= !empty($sysOk) ? ' is-ok' : '' ?>"></i><span class="sys__t">Estado del sistema</span></span>
-        <small>Cola, cron e integraciones</small>
-      </a><?php endif; ?>
-      <?php if (empty($isViewer)): ?><button class="side__fold" type="button" data-side-toggle aria-pressed="<?= ($prefs['side'] ?? 'open') === 'collapsed' ? 'true' : 'false' ?>" data-tip="Contraer barra lateral"><?= Ui::icon('panel-left') ?><span class="nav-i__t">Contraer barra lateral</span></button><?php endif; ?>
       <div class="dd" data-dd>
-        <button class="user" type="button" aria-expanded="false" aria-controls="dd-user">
-          <?= Ui::avatar((string) $user['name'], 'md', 0) ?>
+        <button class="user" type="button" aria-expanded="false" aria-controls="dd-user" aria-label="Cuenta de <?= $e($user['name']) ?><?= empty($isViewer) && empty($sysOk) ? ' (hay avisos en el estado del sistema)' : '' ?>" data-tip="<?= $e($user['name']) ?>">
+          <span class="user__av"><?= Ui::avatar((string) $user['name'], 'md', 0) ?><?php if (empty($isViewer) && empty($sysOk)): ?><i class="user__st" title="Hay avisos en el estado del sistema"></i><?php endif; ?></span>
           <span class="user__txt"><b><?= $e($user['name']) ?></b><small><?= $e($user['role'] === 'admin' ? 'Administrador' : 'Lector · NorthStar') ?></small></span>
           <?= Ui::icon('chevrons') ?>
         </button>

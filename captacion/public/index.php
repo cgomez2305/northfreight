@@ -167,6 +167,8 @@ switch (true) {
         InviteController::handle($m[1]);
     case preg_match('#^/u/([A-Za-z0-9_-]{20,100})$#', $path, $m) === 1:
         PublicController::unsubscribe($m[1]);
+    case preg_match('#^/r/([A-Za-z0-9_-]{20,100})$#', $path, $m) === 1:
+        PublicController::click($m[1]);
     case preg_match('#^/o/([A-Za-z0-9_-]{20,100})$#', $path, $m) === 1:
         PublicController::open($m[1]);
     case $path === '/login':

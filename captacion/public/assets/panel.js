@@ -5,11 +5,19 @@
  var CSRF = (D.currentScript && D.currentScript.getAttribute('data-csrf')) || '';
  var mac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
  $$('[data-mod]').forEach(function (k) { if (mac) k.textContent = '⌘'; });
- /* barra lateral: lleva el elemento activo a la vista y marca con un filete inferior que hay mas debajo (sin degradados) */
+ /* barra lateral (fase AT): sin barra de desplazamiento a la vista; un filete arriba o abajo avisa de que hay más (sin degradados). «Vistas» se pliega y se recuerda. */
  $$('.side__nav').forEach(function (nav) {
+ var views = $('[data-side-views]', nav);
+ if (views) {
+  var vb = $('.side__vh', views), vk = 'ns-side-views';
+  var setV = function (open, save) { views.classList.toggle('is-closed', !open); vb.setAttribute('aria-expanded', open ? 'true' : 'false'); if (save) { try { localStorage.setItem(vk, open ? '1' : '0'); } catch (e) {} } more(); };
+  var keep = '1'; try { keep = localStorage.getItem(vk) || '1'; } catch (e) {}
+  if (keep === '0' && !$('[aria-current="page"]', views)) setV(false, false);
+  vb.addEventListener('click', function () { setV(views.classList.contains('is-closed'), true); });
+ }
  var on = $('[aria-current="page"]', nav);
  if (on && on.scrollIntoView) on.scrollIntoView({ block: 'nearest' });
- function more() { nav.classList.toggle('has-more', nav.scrollHeight - nav.clientHeight - nav.scrollTop > 4); }
+ function more() { nav.classList.toggle('has-more', nav.scrollHeight - nav.clientHeight - nav.scrollTop > 4); nav.classList.toggle('has-less', nav.scrollTop > 4); }
  more(); nav.addEventListener('scroll', more, { passive: true }); window.addEventListener('resize', more);
  });
  var openDd = null;

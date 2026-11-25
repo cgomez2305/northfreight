@@ -17,7 +17,9 @@ namespace Captacion\Services;
 
 final class ProspectConfig
 {
-    public const DEFAULTS = ['enabled' => true, 'max_age_months' => 12, 'states' => [], 'max_fleet' => 10, 'require_phone' => true, 'cargo' => [], 'daily_cap' => 40];
+    public const DEFAULTS = ['enabled' => true, 'max_age_months' => 12, 'states' => [], 'max_fleet' => 10, 'require_phone' => true, 'cargo' => [], 'daily_cap' => 40, 'relist_months' => 0];
+    /** Fase AT: «No interesado» vuelve a «Por llamar» pasados estos meses (0 = nunca). «No llamar más» jamás vuelve. */
+    public const RELIST = [0 => 'Nunca', 3 => 'A los 3 meses', 6 => 'A los 6 meses', 12 => 'A los 12 meses'];
 
     /** categoria => [etiqueta, banderas crgo_* del censo (sin el prefijo)] */
     public const CARGO = [
@@ -72,6 +74,14 @@ final class ProspectConfig
         $int('max_age_months', 1, 24, 'La antigüedad máxima (meses)');
         $int('max_fleet', 1, 100, 'La flota máxima');
         $int('daily_cap', 1, 500, 'El tope diario');
+        if (array_key_exists('relist_months', $in)) {
+            $rm = (int) (is_scalar($in['relist_months']) ? $in['relist_months'] : -1);
+            if (isset(self::RELIST[$rm])) {
+                $clean['relist_months'] = $rm;
+            } else {
+                $err['relist_months'] = 'Elige una opción de la lista.';
+            }
+        }
         if (array_key_exists('states', $in)) {
             $list = is_array($in['states']) ? $in['states'] : (is_string($in['states']) ? preg_split('/[\s,;]+/', $in['states']) : []);
             $states = [];

@@ -14,6 +14,7 @@ $tp = $prefs['theme'] ?? 'auto';
   </div>
 </div>
 <?php if (empty($isViewer)): $kon = ($prefs['keys'] ?? 'on') !== 'off'; ?>
+<a class="dd__item" href="/#cola"><i class="dot<?= !empty($sysOk) ? ' is-ok' : '' ?>"></i>Estado del sistema<span class="dd__state"><?= !empty($sysOk) ? 'Al día' : 'Revisar' ?></span></a>
 <button class="dd__item" type="button" data-keys><?= Ui::icon('keyboard') ?>Ver los atajos de teclado<kbd>?</kbd></button>
 <button class="dd__item dd__item--sw" type="button" role="switch" aria-checked="<?= $kon ? 'true' : 'false' ?>" data-keys-toggle><?= Ui::icon('zap') ?><span class="dd__sw-t">Atajos de una tecla</span><span class="dd__state" data-keys-state><?= $kon ? 'Activados' : 'Desactivados' ?></span></button>
 <?php endif; ?>

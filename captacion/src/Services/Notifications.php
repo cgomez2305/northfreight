@@ -106,6 +106,11 @@ final class Notifications
             $items[] = ['key' => 'prospects_due:' . $due['n'] . ':' . $due['max_id'], 'kind' => 'warn', 'title' => $due['n'] === 1 ? '1 prospecto con seguimiento para hoy' : $due['n'] . ' prospectos con seguimiento para hoy',
                 'meta' => 'Reintentos y llamadas que prometiste volver a hacer', 'href' => '/prospectos'];
         }
+        $rep = ProspectReplies::pending();   // fase AT: respondieron a un correo de campaña y aún no se les ha llamado
+        if ($rep['n'] > 0) {
+            $items[] = ['key' => 'prospect_replies:' . $rep['n'] . ':' . $rep['max_id'], 'kind' => 'hot', 'title' => $rep['n'] === 1 ? '1 prospecto respondió a un correo' : $rep['n'] . ' prospectos respondieron a un correo',
+                'meta' => 'Están los primeros en la Lista de hoy: llámalos', 'href' => '/prospectos'];
+        }
         $pcfg = ProspectConfig::get();
         if ($pcfg['enabled']) {
             $pcron = Settings::get('cron.prospects');

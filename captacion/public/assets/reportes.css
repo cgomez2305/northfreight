@@ -101,3 +101,9 @@
   .tbl--rep tbody tr:last-child>*{border-bottom:0!important}
 }
 
+.rep-out{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.rep-out dt{font-size:var(--fs-sm);color:var(--ink-3)}
+.rep-out dd{font-size:var(--fs-xl);font-weight:600;font-variant-numeric:tabular-nums}
+.rep-out small{font-size:var(--fs-xs);color:var(--ink-3)}
+.rep-res{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:14px;font-size:var(--fs-sm);color:var(--ink-2)}
+@media (max-width:760px){.rep-out{grid-template-columns:1fr 1fr}}

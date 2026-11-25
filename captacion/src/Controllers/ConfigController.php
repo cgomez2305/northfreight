@@ -358,9 +358,10 @@ final class ConfigController extends Responder
         $in = [
             'enabled' => isset($_POST['enabled']) ? '1' : '0', 'require_phone' => isset($_POST['require_phone']) ? '1' : '0', 'max_age_months' => $_POST['max_age_months'] ?? '', 'max_fleet' => $_POST['max_fleet'] ?? '',
             'daily_cap' => $_POST['daily_cap'] ?? '', 'states' => is_array($_POST['states'] ?? null) ? array_slice($_POST['states'], 0, 60) : [], 'cargo' => is_array($_POST['cargo'] ?? null) ? array_slice($_POST['cargo'], 0, 10) : [],
+            'relist_months' => $_POST['relist_months'] ?? '0',
         ];
         $v = ProspectConfig::normalize($in);
-        if ($v['errors'] || count($v['clean']) < 7) {
+        if ($v['errors'] || count($v['clean']) < 8) {
             self::flash(false, $v['errors'] ? 'Revisa los campos marcados.' : 'Faltan datos del formulario.');
             self::index($user, ['errors' => $v['errors'], 'pForm' => $in], 422, 'prospectos');
         }

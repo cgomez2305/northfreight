@@ -55,7 +55,7 @@ return static function (array $ctx): void {
     T::ok($size('panel') < 35000, 'panel.css (base) mide menos de 35 KB: ' . $size('panel') . ' bytes (antes de Q2b-F: 51.353)');
     // ------------------------------------------------------------------ Barra lateral y migas por rol
     $r = $s->get('/');
-    T::ok(str_contains($r['body'], 'data-tip="Leads"') && str_contains($r['body'], 'href="/tareas"') && str_contains($r['body'], 'href="/config"') && str_contains($r['body'], 'href="/actividad"') && str_contains($r['body'], 'Administración'), 'administrador: la barra lateral trae Leads, Tareas, Configuración y Actividad');
+    T::ok(str_contains($r['body'], 'data-tip="Leads"') && str_contains($r['body'], 'href="/tareas"') && str_contains($r['body'], 'href="/config"') && str_contains($r['body'], 'href="/actividad"') && str_contains($r['body'], 'data-tip="Configuración"'), 'administrador: la barra lateral trae Leads, Tareas, Configuración y Actividad');
     T::ok(str_contains($r['body'], 'href="/reportes"') && str_contains($r['body'], 'href="/comunicaciones"') && str_contains($r['body'], 'href="/prospectos"'), 'administrador: la barra lateral trae Prospectos, Reportes y Comunicaciones (Q3)');
     $side = (string) preg_replace('#^.*?<aside class="side"(.*?)</aside>.*$#s', '$1', $r['body']);
     T::ok(!str_contains($side, 'data-tip="Pipeline"') && !str_contains($side, 'data-tip="Bandeja"') && !str_contains($side, 'data-tip="Informes"') && !str_contains($side, 'Correos a prospectos'), 'fase AR: el menú no repite accesos (Pipeline = Leads › Tablero, Bandeja = campana, Informes y Correos son pestañas de su sección)');

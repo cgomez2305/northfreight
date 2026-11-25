@@ -135,6 +135,23 @@ $addHref = static fn(string $ymd): string => $q(['nueva' => $ymd]) . '#nueva';
         </div>
         <?php endforeach; ?>
       </div>
+      <?php
+      // Fase AT: agenda del día bajo la cuadrícula (solo en el móvil, donde los eventos del mes son puntos). Sin JS muestra el día elegido; con JS se cambia de día sin recargar.
+      $agDay = null;
+      foreach ($cal['days'] as $dd) {
+          if ($dd['ymd'] === $sel || ($agDay === null && $dd['today'])) {
+              $agDay = $dd;
+          }
+      }
+      $agDay ??= $cal['days'][0];
+      ?>
+      <section class="cal__ag" id="agenda" aria-labelledby="cal-ag-t" data-cal-ag>
+        <h3 class="cal__agt" id="cal-ag-t" aria-live="polite" data-cal-ag-t><?= $e(ucfirst($agDay['label'])) ?></h3>
+        <div data-cal-ag-b><?php if (!$agDay['events']): ?><p class="cal__e0">Nada programado este día.</p><?php else: ?><ul class="cal__c"><?php foreach ($agDay['events'] as $ev) { echo $card($ev); } ?></ul><?php endif; ?></div>
+        <?php foreach ($cal['days'] as $dd): if ($dd['events'] && $dd['ymd'] !== $agDay['ymd']): ?><template data-ag="<?= $e($dd['ymd']) ?>"><ul class="cal__c"><?php foreach ($dd['events'] as $ev) { echo $card($ev); } ?></ul></template><?php endif; endforeach; ?>
+        <template data-ag="<?= $e($agDay['ymd']) ?>"><?php if ($agDay['events']): ?><ul class="cal__c"><?php foreach ($agDay['events'] as $ev) { echo $card($ev); } ?></ul><?php endif; ?></template>
+        <?php foreach ($cal['days'] as $dd): ?><span hidden data-ag-l="<?= $e($dd['ymd']) ?>"><?= $e(ucfirst($dd['label'])) ?></span><?php endforeach; ?>
+      </section>
     <?php elseif ($mode === 'semana'): ?>
       <ol class="cal__g cal__g--w">
         <?php foreach ($cal['days'] as $d): ?>

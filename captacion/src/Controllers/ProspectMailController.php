@@ -54,6 +54,7 @@ final class ProspectMailController extends Responder
     {
         self::page('pmail/list', $user, 'pmail', [['Prospectos', '/prospectos'], ['Correos en lote', null]], [
             'title' => 'Correos a prospectos', 'css' => ['comms', 'pmail'], 'campaigns' => ProspectMail::list(), 'settings' => ProspectMail::settings(), 'blockers' => ProspectMail::blockers(),
+            'inbox' => \Captacion\Services\ProspectReplies::state(), 'inboxReady' => \Captacion\Services\ProspectReplies::configured(),
         ]);
     }
 
@@ -63,10 +64,11 @@ final class ProspectMailController extends Responder
         $now = Clock::time();
         if ($form === null) {
             if ($c !== null) {
-                $form = ['name' => $c['name'], 'subject' => $c['subject'], 'body' => $c['body'], 'segment' => $c['segment']];
+                $form = ['name' => $c['name'], 'subject' => $c['subject'], 'body' => $c['body'], 'segment' => $c['segment'], 'followup_days' => (int) ($c['followup_days'] ?? 0),
+                    'followup_subject' => (string) ($c['followup_subject'] ?? ''), 'followup_body' => (string) ($c['followup_body'] ?? '')];
             } else {
                 $st = is_string($_GET['inicio'] ?? null) && isset(ProspectMail::STARTERS[$_GET['inicio']]) ? ProspectMail::STARTERS[$_GET['inicio']] : null;
-                $form = ['name' => $st !== null ? $st['label'] : '', 'subject' => $st['subject'] ?? '', 'body' => $st['body'] ?? '', 'segment' => ProspectMail::segment($st['segment'] ?? $_GET)];
+                $form = ['name' => $st !== null ? $st['label'] : '', 'subject' => $st['subject'] ?? '', 'body' => $st['body'] ?? '', 'segment' => ProspectMail::segment($st['segment'] ?? $_GET), 'followup_days' => 0, 'followup_subject' => '', 'followup_body' => ''];
             }
         }
         $aud = ProspectMail::audience($form['segment'], $now);
@@ -116,7 +118,7 @@ final class ProspectMailController extends Responder
             self::form($user, $c);
         }
         $st = is_string($_GET['ver'] ?? null) ? $_GET['ver'] : '';
-        $st = isset(ProspectMail::R_STATUS[$st]) || $st === 'opened' ? $st : '';
+        $st = isset(ProspectMail::R_STATUS[$st]) || in_array($st, ['opened', 'clicked', 'replied'], true) ? $st : '';
         self::page('pmail/show', $user, 'pmail', [['Prospectos', '/prospectos'], ['Correos en lote', self::BASE], [$c['name'], null]], [
             'title' => $c['name'], 'css' => ['comms', 'pmail'], 'c' => $c, 'stats' => ProspectMail::stats($id), 'ver' => $st,
             'list' => ProspectMail::recipients($id, $st, max(1, (int) ($_GET['page'] ?? 1))), 'settings' => ProspectMail::settings(),

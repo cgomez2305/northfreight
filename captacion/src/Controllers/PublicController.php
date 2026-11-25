@@ -120,6 +120,27 @@ final class PublicController
         self::page('unsub', ['state' => 'done', 'lang' => $r['lang'], 'first_name' => $r['first_name'], 'already' => $r['already']]);
     }
 
+    // --- /r/{token}: enlace con conteo de clics de los correos a prospectos (fase AT). Solo redirige a destinos fijos del sitio (nunca a una URL de la petición). ---
+
+    public static function click(string $token): never
+    {
+        $v = Unsub::verifyClick($token);
+        $dest = \Captacion\Services\Templates::SITE . '/';
+        if ($v !== null && !self::limited('pub_click', self::LIMIT_VALID)) {
+            try {
+                $dest = \Captacion\Services\ProspectMail::recordClick($v[0], $v[1]);
+            } catch (\Throwable) {
+                // el visitante llega a la web igual
+            }
+        }
+        http_response_code(302);
+        header('Location: ' . $dest);
+        header('Cache-Control: no-store, max-age=0');
+        header('Referrer-Policy: no-referrer');
+        header('X-Robots-Tag: noindex');
+        exit;
+    }
+
     // --- /o/{token}: píxel de apertura de los correos a prospectos (fase AQ) ----------------------------------------------------------
 
     public static function open(string $token): never

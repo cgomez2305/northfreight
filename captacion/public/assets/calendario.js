@@ -48,12 +48,13 @@
  }
  function move(el, ymd) {
   var id = parseInt(el.getAttribute('data-task'), 10), cell = $('.cal__d[data-ymd="' + ymd + '"]', root);
-  if (!id || ymd === (el.closest('.cal__d') || {}).getAttribute('data-ymd')) return;
+  var cur = el.closest('.cal__d');   // en la agenda del móvil la tarjeta no está en una celda del mes
+  if (!id || (cur && ymd === cur.getAttribute('data-ymd'))) return;
   el.classList.add('is-busy');
   NS.api('/ajax/calendar/move', { task_id: id, ymd: ymd }).then(function (j) {
    el.classList.remove('is-busy');
    if (!j.ok) { NS.toast(j.msg || 'No se pudo mover la tarea.', { bad: true }); return; }
-   if (cell) { moved(el, cell, j); NS.toast(j.msg, { undo: j.undo }); el.focus({ preventScroll: true }); }
+   if (cell && cur) { moved(el, cell, j); NS.toast(j.msg, { undo: j.undo }); el.focus({ preventScroll: true }); }
    else NS.reloadWith(j.msg, j.undo);
   });
  }
@@ -66,6 +67,45 @@
  root.addEventListener('dragover', function (e) { var c = e.target.closest ? e.target.closest('.cal__d[data-ymd]') : null; if (drag && c) { e.preventDefault(); if (e.dataTransfer) e.dataTransfer.dropEffect = 'move'; $$('.is-drop', root).forEach(function (x) { if (x !== c) x.classList.remove('is-drop'); }); c.classList.add('is-drop'); } });
  root.addEventListener('dragleave', function (e) { var c = e.target.closest ? e.target.closest('.cal__d[data-ymd]') : null; if (c && !c.contains(e.relatedTarget)) c.classList.remove('is-drop'); });
  root.addEventListener('drop', function (e) { var c = e.target.closest ? e.target.closest('.cal__d[data-ymd]') : null; if (!drag || !c) return; e.preventDefault(); var el = drag; drag = null; el.classList.remove('is-drag'); move(el, c.getAttribute('data-ymd')); });
+
+ /* Fase AT: en pantallas táctiles, mantener pulsada una tarea (0,35 s) y arrastrarla con el dedo a otro día. El desplazamiento normal sigue funcionando. */
+ var td = null;
+ root.addEventListener('pointerdown', function (e) {
+  if (e.pointerType !== 'touch' || !canWrite) return;
+  var el = e.target.closest ? e.target.closest('[data-task]') : null; if (!el) return;
+  var timer = setTimeout(function () { td = { el: el, over: null }; el.classList.add('is-tdrag'); if (navigator.vibrate) { try { navigator.vibrate(15); } catch (x) {} } }, 350);
+  var cancel = function () { clearTimeout(timer); D.removeEventListener('pointerup', cancel); D.removeEventListener('pointercancel', cancel); };
+  D.addEventListener('pointerup', cancel); D.addEventListener('pointercancel', cancel);
+  el.addEventListener('pointermove', function early(m) { if (!td && (Math.abs(m.clientX - e.clientX) > 8 || Math.abs(m.clientY - e.clientY) > 8)) { cancel(); el.removeEventListener('pointermove', early); } });
+ });
+ D.addEventListener('touchmove', function (e) {
+  if (!td) return; e.preventDefault();
+  var t = e.touches[0], c = D.elementFromPoint(t.clientX, t.clientY), cell = c && c.closest ? c.closest('.cal__d[data-ymd]') : null;
+  if (td.over && td.over !== cell) td.over.classList.remove('is-drop-t');
+  td.over = cell; if (cell) cell.classList.add('is-drop-t');
+ }, { passive: false });
+ D.addEventListener('touchend', function (e) {
+  if (!td) return; e.preventDefault();
+  var d = td; td = null; d.el.classList.remove('is-tdrag');
+  if (d.over) { d.over.classList.remove('is-drop-t'); var from = d.el.closest('.cal__d'); if (!from || from.getAttribute('data-ymd') !== d.over.getAttribute('data-ymd')) move(d.el, d.over.getAttribute('data-ymd')); }
+ }, { passive: false });
+ root.addEventListener('contextmenu', function (e) { if (td || (e.target.closest && e.target.closest('[data-task]') && W.matchMedia('(pointer:coarse)').matches)) e.preventDefault(); });
+
+ /* Fase AT: agenda del día bajo el mes (móvil). Tocar un día la cambia sin recargar; sin JS el número abre la vista de día. */
+ var ag = $('[data-cal-ag]', root);
+ if (ag && mode === 'mes') {
+  root.addEventListener('click', function (e) {
+   var a = e.target.closest ? e.target.closest('.cal__g--m .cal__n[data-day]') : null;
+   if (!a || !W.matchMedia('(max-width:760px)').matches) return;
+   e.preventDefault();
+   var ymd = a.getAttribute('data-day'), tpl = $('template[data-ag="' + ymd + '"]', ag), lab = $('[data-ag-l="' + ymd + '"]', ag), box = $('[data-cal-ag-b]', ag);
+   $$('.cal__d.is-sel', root).forEach(function (c) { c.classList.remove('is-sel'); }); var cell = a.closest('.cal__d'); if (cell) cell.classList.add('is-sel');
+   $('[data-cal-ag-t]', ag).textContent = lab ? lab.textContent : ymd;
+   box.textContent = '';
+   if (tpl && tpl.content.childNodes.length) box.appendChild(tpl.content.cloneNode(true)); else { var p = D.createElement('p'); p.className = 'cal__e0'; p.textContent = 'Nada programado este día.'; box.appendChild(p); }
+   if (W.NS && NS.dp) NS.dp(box);
+  });
+ }
 
  /* «Posponer» y «Mover a otro día» sin recargar la página: mismas rutas del servidor, con Deshacer. Sin JS son formularios normales. */
  root.addEventListener('submit', function (e) {

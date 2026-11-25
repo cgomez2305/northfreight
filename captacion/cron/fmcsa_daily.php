@@ -39,6 +39,7 @@ foreach ($argv as $a) {
     $force = $force || $a === '--force';
 }
 try {
+    \Captacion\Services\Prospects::relist($now ?? Clock::time());   // fase AT: «No interesado» de hace N meses vuelve a la lista (si está encendido)
     $r = ProspectImport::tick($now, ['force' => $force]);
     $run = $r['run'] ?? null;
     Settings::set('cron.prospects', ['at' => Clock::now(), 'status' => $r['status'], 'day' => $run['day'] ?? null, 'finished' => !empty($run['finished'])]);

@@ -255,7 +255,8 @@ return static function (array $ctx): void {
     $q = $mkSet('alerts', 'Normales', [$R('nq', 'Normal', $blk('all', $cond('trucks', 'is', 7)), [['type' => 'telegram_alert', 'urgency' => 'normal', 'text' => 'Normal {nombre}']]),
         $R('uq', 'Urgente', $blk('all', $cond('trucks', 'is', 8)), [['type' => 'telegram_alert', 'urgency' => 'urgent', 'text' => 'Urgente {nombre}']])]);
     RuleSets::publish($q, $uid);
-    Settings::set('alerts', ['quiet' => ['enabled' => true, 'start' => '00:00', 'end' => '23:59']] + Alerts::get());
+    $etq = (new \DateTimeImmutable('@' . Clock::time()))->setTimezone(new \DateTimeZone(\Captacion\Services\Display::timezone()));   // silencio de 1 h antes a 3 h después de ahora (con 00:00 a 23:59 fallaba de 23:00 a 24:00 ET)
+    Settings::set('alerts', ['quiet' => ['enabled' => true, 'start' => $etq->modify('-1 hour')->format('H:i'), 'end' => $etq->modify('+3 hours')->format('H:i')]] + Alerts::get());
     Settings::clear();
     Db::pdo()->exec('DELETE FROM jobs');
     LeadIngest::handle($payload('2004', ['truck_count' => 7]), 'web_careers');
