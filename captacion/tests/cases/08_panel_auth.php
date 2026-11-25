@@ -162,7 +162,7 @@ return static function (array $ctx): void {
     T::ok($r['status'] === 303 && Infra::header($r, 'location') === '/', '2FA con el codigo del paso anterior (ventana -1): entra');
     T::ok($sid2 !== $sid1 && $sid2 !== '', 'el ID de sesion se regenera otra vez al completar el login');
     $r = $get('/', $jar1);
-    T::ok($r['status'] === 200 && str_contains($r['body'], 'Carlos') && str_contains($r['body'], 'Estado del sistema') && str_contains($r['body'], 'Leads recientes') && str_contains($r['body'], 'Salir'), 'panel: saludo, estado del sistema, leads recientes y salir');
+    T::ok($r['status'] === 200 && str_contains($r['body'], 'Carlos') && str_contains($r['body'], 'Estado del sistema') && (str_contains($r['body'], 'Leads recientes') || str_contains($r['body'], 'en cuanto llegue el primero')) && str_contains($r['body'], 'Salir'), 'panel: saludo, estado del sistema, leads recientes (o, con la base vacía, la tarjeta de primeros pasos) y salir');
     T::ok(str_contains($r['body'], 'nunca') && str_contains($r['body'], 'Telegram sin configurar'), 'panel: avisa "cron nunca ejecutado" y "Telegram sin configurar"');
     T::ok(Db::value('SELECT last_login_at FROM users') !== null && $count('activity_log', "action = 'login_ok'") === 1, 'last_login_at y activity_log login_ok');
 

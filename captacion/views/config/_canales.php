@@ -56,6 +56,7 @@ $btn = static fn(string $t): string => '<button class="btn btn--primary" type="s
   </fieldset>
 </form>
 
+<?php if (in_array('twilio', \Captacion\Services\Webhook::visible(), true)): ?>
 <form method="post" action="/config/canales/twilio" class="cfg-form" id="cn-twilio" novalidate>
   <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>">
   <fieldset class="cfg-fs"<?= $locked ? ' disabled' : '' ?>>
@@ -68,6 +69,7 @@ $btn = static fn(string $t): string => '<button class="btn btn--primary" type="s
     </section>
   </fieldset>
 </form>
+<?php endif; ?>
 
 <form method="post" action="/config/canales/n8n" class="cfg-form" id="cn-n8n" novalidate>
   <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>">
@@ -77,7 +79,7 @@ $btn = static fn(string $t): string => '<button class="btn btn--primary" type="s
       <div class="card__b">
         <p class="muted">n8n pregunta a <code>/internal/sequences/due</code> y solo recibe los pasos que marques aquí, y solo de leads con consentimiento vigente en ese canal. <b>Marca un paso solo cuando su plantilla de WhatsApp ya esté aprobada por Meta.</b> Todo apagado = n8n no envía nada.</p>
         <div class="eqgrid"><?php foreach ($steps as $k => $l): ?><label class="check check--box"><input type="checkbox" name="wa_steps[]" value="<?= $e($k) ?>"<?= in_array($k, $n8n['wa_steps'], true) ? ' checked' : '' ?>><span><?= $e($l) ?></span></label><?php endforeach; ?></div>
-        <label class="check check--box cn-w"><input type="checkbox" name="sms_enabled" value="1"<?= $n8n['sms_enabled'] ? ' checked' : '' ?>><span>Permitir también el canal SMS (solo después de registrar A2P 10DLC)</span></label>
+        <?php if (in_array('twilio', \Captacion\Services\Webhook::visible(), true) || $n8n['sms_enabled']): ?><label class="check check--box cn-w"><input type="checkbox" name="sms_enabled" value="1"<?= $n8n['sms_enabled'] ? ' checked' : '' ?>><span>Permitir también el canal SMS (solo después de registrar A2P 10DLC)</span></label><?php endif; ?>
       </div>
       <footer class="card__f"><span class="muted">Webhook de eventos: <code><?= $e($urls['n8n']) ?></code></span><?= $btn('Guardar pasos') ?></footer>
     </section>

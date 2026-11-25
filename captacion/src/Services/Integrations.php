@@ -199,7 +199,7 @@ final class Integrations
             'help' => 'Es de solo lectura y no necesita llave. Con SOCRATA_APP_TOKEN (gratis en data.transportation.gov) sube el límite de consultas.',
         ];
         // Canales externos (Q4b): webhooks entrantes
-        foreach (Webhook::SOURCES as $src) {
+        foreach (Webhook::visible() as $src) {
             $cards[] = self::webhookCard($src);
         }
         // Copia diaria de la base

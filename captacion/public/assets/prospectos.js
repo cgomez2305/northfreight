@@ -1,8 +1,12 @@
 /* NorthStar Captación · prospectos: cola de llamadas. Una fila abierta a la vez; al registrar un resultado se recuerda la fila SIGUIENTE y, tras volver a la lista,
-   se abre sola y recibe el foco (se trabaja la lista de arriba abajo sin buscar). Evita también el doble clic al enviar. Sin JS: filas <details> normales. */
+   se abre sola y recibe el foco (se trabaja la lista de arriba abajo sin buscar). Evita también el doble clic al enviar.
+   Barra de arriba (revisión de la grabación del 2026-11-24): panel «Filtros» que se abre y cierra (Esc, clic fuera), filtros que se aplican al elegirlos,
+   «Por página» que recarga la lista, panel de reglas que se cierra al hacer clic fuera y atajos de fecha para el siguiente intento. Sin JS: todo sigue funcionando
+   (filas <details>, panel de filtros visible con su botón Aplicar y el selector de fecha nativo). */
 (function () {
   'use strict';
   var KEY = 'ns-prospect-next';
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   var rows = Array.prototype.slice.call(document.querySelectorAll('details[data-pr]'));
   rows.forEach(function (d) {
     d.addEventListener('toggle', function () {
@@ -22,6 +26,51 @@
   // Tras registrar: la fila siguiente si sigue en la lista; si no (pasó de pestaña), la primera
   if (want !== null && rows.length) {
     var li = document.getElementById(want), d = li ? li.querySelector('details[data-pr]') : rows[0];
-    if (d) { d.open = true; var s = d.querySelector('summary'); if (s) { s.focus({ preventScroll: true }); s.scrollIntoView({ block: 'center', behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }); } }
+    if (d) { d.open = true; var s = d.querySelector('summary'); if (s) { s.focus({ preventScroll: true }); s.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' }); } }
   }
+
+  // Panel «Filtros»
+  var pop = document.querySelector('[data-fpop]');
+  if (pop) {
+    var btn = pop.querySelector('.fpop__b'), form = pop.closest('form');
+    var set = function (open, focusBtn) {
+      pop.classList.toggle('is-open', open); btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      if (open) { var first = pop.querySelector('select'); if (first) first.focus(); } else if (focusBtn) btn.focus();
+    };
+    btn.addEventListener('click', function () { set(!pop.classList.contains('is-open')); });
+    pop.addEventListener('keydown', function (e) { if (e.key === 'Escape' && pop.classList.contains('is-open')) { e.stopPropagation(); set(false, true); } });
+    document.addEventListener('click', function (e) { if (pop.classList.contains('is-open') && !pop.contains(e.target)) set(false); });
+    // elegir un filtro lo aplica (Aplicar queda para teclado y sin JS)
+    pop.querySelectorAll('select').forEach(function (sel) { sel.addEventListener('change', function () { if (form.requestSubmit) form.requestSubmit(); else form.submit(); }); });
+    // sin parámetros vacíos en la URL (?q=&us=…): se desactivan antes de enviar
+    if (form) form.addEventListener('submit', function () { form.querySelectorAll('input[name],select[name]').forEach(function (el) { if (el.value === '') el.disabled = true; }); });
+  }
+
+  // Por página
+  var per = document.querySelector('.pbar [data-per]');
+  if (per) per.addEventListener('change', function () { var u = new URL(location.href); u.searchParams.set('per', per.value); u.searchParams.delete('page'); location.href = u.toString(); });
+
+  // Reglas: el panel se cierra al hacer clic fuera o con Esc
+  var rules = document.querySelector('[data-rules]');
+  if (rules) {
+    document.addEventListener('click', function (e) { if (rules.open && !rules.contains(e.target)) rules.open = false; });
+    rules.addEventListener('keydown', function (e) { if (e.key === 'Escape' && rules.open) { rules.open = false; rules.querySelector('summary').focus(); } });
+  }
+
+  // Siguiente intento: atajos «Mañana», «En 3 días», «En 1 semana» (fecha de Nueva York, como el campo)
+  var etToday = function () {
+    try { var p = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/New_York', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()); return new Date(p + 'T12:00:00Z'); } catch (e) { return new Date(); }
+  };
+  document.querySelectorAll('[data-qd]').forEach(function (q) {
+    var inp = q.parentNode.querySelector('input[type=date]');
+    if (!inp) return;
+    q.hidden = false;
+    var mark = function () { q.querySelectorAll('button').forEach(function (b) { var on = b.getAttribute('data-v') === inp.value; b.classList.toggle('is-on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); }); };
+    q.querySelectorAll('button').forEach(function (b) {
+      var d = etToday(); d.setUTCDate(d.getUTCDate() + parseInt(b.getAttribute('data-days'), 10));
+      b.setAttribute('data-v', d.toISOString().slice(0, 10));
+      b.addEventListener('click', function () { inp.value = inp.value === b.getAttribute('data-v') ? '' : b.getAttribute('data-v'); mark(); });
+    });
+    inp.addEventListener('change', mark); mark();
+  });
 })();

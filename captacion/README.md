@@ -883,6 +883,7 @@ Hasta 3 acciones por impacto (0 a 100, medidor de 20 rayas). Reglas fijas; orden
 | `overdue` | tareas vencidas | 30 + 4·min(n,10) + 10 si la más antigua tiene más de 2 días | `/tareas?tab=overdue` |
 | `presented` | presentados a NorthStar sin respuesta | 25 + 5·min(n,5) | `/leads?hs=wait` |
 | `followups` | seguimientos de prospectos de hoy o vencidos | 25 + 3·min(n,8) | `/prospectos` |
+| `calls` | prospectos nuevos (nunca llamados) que se pueden llamar AHORA (en su horario local y con teléfono) | 22 + 2·min(⌊n/10⌋,10) | `/prospectos?tab=to_call&now=1` |
 | `no_task` | leads abiertos sin ninguna tarea | 20 + 2·min(n,10) | `/leads?nt=1&op=1` |
 | `referrals` | bonos de referidos por aprobar | 20 + 2·min(n,5) | `/referidos` |
 | `review` | leads en la cola de revisión de las reglas | 15 + 2·min(n,10) | `/leads?fl=review_queue` |
@@ -1015,3 +1016,17 @@ Corrección de los defectos de una revisión en tema oscuro (1440 y 390 px). Pru
 - **Config**: aviso provisional en un `<span>`, texto de Amazon Relay corregido (viene marcado), interruptores apagados con aro de 1 px y opacidad solo en el input, placeholders distinguibles con la edición bloqueada, casillas de n8n con alto automático, URL de webhook como campo de solo lectura, aviso del día 7 neutro en Correo. El webhook ya no guarda «Error interno: PDOException» sino un texto amable (el fallo de Twilio de la demo no se reproduce: `SmsInbound` funciona con la base actual; era un estado guardado).
 - **Otros**: icono en «Nueva tarea», «Volver a la lista» en una línea, nombre de plantilla primero en móvil, plantillas en orden natural (`Templates::all`), `lang="es"` en los 25 inputs de fecha, mes y hora, segmentados sin partir el texto, calendario sin ayuda de teclado en táctil, Vacantes con rejilla fija y punto de estado alineado, Referidos con rejilla fija, importar con selector de archivo estilizado (el texto «Choose File» lo pone el navegador), barra lateral que lleva lo activo a la vista y marca con un filete que hay más debajo, Dashboard: «Calificados» muestra el conteo (no el porcentaje) con menos de 5 leads.
 - **No reproducido o no hecho**: duplicado de `.pg` (solo hay una definición); la bola del interruptor sigue en `--surface` (con `--ink-3` sobre el riel `--field` no se vería).
+
+## 29. Usabilidad tras la reunión con el cliente (2026-11-25)
+
+Revisión de la grabación de la demostración del panel (24 min, portátil con pantalla de unos 1280×690 px). Lo que se vio y lo que se cambió:
+
+- **Prospectos ocupaba media pantalla antes de la lista** (la primera fila empezaba a 545 px: solo cabían 2 prospectos). Ahora: «Reglas de las llamadas en frío» es un botón con panel (se cierra con Esc o al hacer clic fuera), el estado de la búsqueda diaria va bajo el subtítulo, y búsqueda, **«Filtros»** (estado, flota y autoridad agrupados en un panel, como pidió el cliente: «encapsular todo y colocar solo un recuadro que diga filtros»), «Solo llamables ahora» (con su conteo) y «Por página» van en UNA barra. Elegir un filtro lo aplica al momento; los activos salen como chips que se quitan de uno en uno o todos; la URL ya no lleva parámetros vacíos. La primera fila empieza a ~350 px. Sin JS el panel de filtros se ve abierto con su botón «Aplicar».
+- **«Por página» no hacía nada en Prospectos** (el manejador solo existía dentro de la bandeja de leads): ahora recarga la lista.
+- **Siguiente intento**: atajos «Mañana», «En 3 días» y «En 1 semana» junto al selector de fecha (fecha de Nueva York, solo con JS).
+- **Barra lateral en pantallas bajas** (761 px o más de ancho y 820 px o menos de alto): filas de 30 px, «Estado del sistema» en una línea y pie más compacto. A 690 px de alto Prospectos se ve sin desplazar la barra.
+- **Dashboard sin leads = mucho ruido** (el cliente: «reducir el ruido visual»): mientras no haya NINGÚN lead, en lugar de gráficos y mapa de actividad vacíos sale una tarjeta que explica que aparecerán con el primer lead y lleva a Prospectos; «Hoy» y «Estado del sistema» se quedan. Nueva regla de «Siguiente mejor acción» `calls` (tabla de §24): antes decía «Todo al día» con 840 prospectos esperando llamada.
+- **Lenguaje**: la vista «Calientes pendientes» (al cliente le sonó a cualquier cosa menos a un cliente interesado) pasa a «Calientes por contactar». La pantalla de Leads vacía ya no enseña jerga técnica (`CAPTACION_ENABLED`, `POST /api/lead.php`, `import-jsonl`): explica de dónde llegan los leads (formulario de la web, prospectos convertidos, integraciones o CSV).
+- **SMS fuera de la vista**: el cliente no quiere SMS («bárralo»). Twilio desaparece de Integraciones y de Canales externos (y la casilla de SMS de n8n) mientras no exista `TWILIO_TOKEN` (`Webhook::visible()`); el endpoint sigue igual.
+
+Pruebas: `48_usabilidad_grabacion`. Lo que el cliente pidió y NO es de usabilidad (queda para decidir): correos en lote a prospectos segmentados por flota y estado, con seguimiento de aperturas; llamadas con IA (ElevenLabs); avisos por WhatsApp además de Telegram.

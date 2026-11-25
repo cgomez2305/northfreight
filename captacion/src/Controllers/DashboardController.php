@@ -49,6 +49,8 @@ final class DashboardController extends Responder
             'queue' => $queue, 'cronAgo' => $cronAgo, 'cronLate' => $cronLate,
             'sys' => ['telegram' => Telegram::configured(), 'smtp' => Mailer::smtpConfigured(), 'fmcsa' => (Env::get('FMCSA_WEBKEY') ?? '') !== ''],
             'csrf' => Session::csrf(),
+            // sin ningún lead todavía: el dashboard no pinta gráficos vacíos (ruido visual, revisión de la grabación del 2026-11-24)
+            'firstRun' => \Captacion\Db::value('SELECT 1 FROM leads WHERE deleted_at IS NULL LIMIT 1') === null,
         ]);
     }
 

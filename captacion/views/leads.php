@@ -53,9 +53,9 @@ $isEmptyDb = $grandTotal === 0;
   <h2 class="h2">Todavía no ha llegado ningún lead</h2>
   <p>Cuando llegue el primero, lo verás aquí con su puntuación, su temperatura y su etapa. Si es caliente, te avisamos por Telegram para que lo llames en minutos.</p>
   <ol class="steps">
-    <li><span class="steps__n">1</span><div><b>Formulario del sitio</b><p>Cada solicitud de <code>/careers/apply/</code> entra sola cuando <code>CAPTACION_ENABLED=1</code> está en el servidor.</p></div></li>
-    <li><span class="steps__n">2</span><div><b>API o automatizaciones</b><p><code>POST /api/lead.php</code> con el token interno: n8n, WhatsApp o una carga manual.</p></div></li>
-    <li><span class="steps__n">3</span><div><b>Importar lo acumulado</b><p><code>php captacion/bin/import-jsonl.php</code> reimporta los leads que el sitio guardó mientras el CRM estaba apagado.</p></div></li>
+    <li><span class="steps__n">1</span><div><b>Formulario de la web</b><p>Cada solicitud que llega por «Careers» en northstarfreightsolutions.us entra aquí sola, con su puntuación.</p></div></li>
+    <li><span class="steps__n">2</span><div><b>Prospectos que conviertes</b><p>Cuando un prospecto de FMCSA se interesa en la llamada, «Convertir en lead» lo trae aquí. <a href="/prospectos">Ir a prospectos</a></p></div></li>
+    <li><span class="steps__n">3</span><div><b>Integraciones o importación</b><p>Campañas de Meta, Cal.com o n8n (<a href="/config?tab=integraciones">Integraciones</a>), o una lista en CSV con «Importar CSV».</p></div></li>
   </ol>
 </section>
 <?php else: ?>

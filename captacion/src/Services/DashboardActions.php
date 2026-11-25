@@ -8,6 +8,8 @@
  *   overdue   tareas vencidas                                  30 + 4·min(n,10) + 10 si la mas antigua tiene mas de 2 dias  → /tareas?tab=overdue
  *   presented presentados a NorthStar sin respuesta            25 + 5·min(n,5)                                              → /leads?hs=wait
  *   followups seguimientos de prospectos de hoy o vencidos     25 + 3·min(n,8)                                              → /prospectos
+ *   calls     prospectos nuevos (nunca llamados) que se pueden   22 + 2·min(n/10,10) (n = en horario local y con teléfono)    → /prospectos?tab=to_call&now=1
+ *             llamar AHORA
  *   no_task   leads abiertos sin ninguna tarea                 20 + 2·min(n,10)                                             → /leads?nt=1&op=1
  *   referrals bonos de referidos por aprobar                   20 + 2·min(n,5)                                              → /referidos
  *   review    leads en la cola de revision de las reglas       15 + 2·min(n,10)                                             → /leads?fl=review_queue
@@ -42,6 +44,7 @@ final class DashboardActions
             'overdue' => $overdue, 'overdue_secs' => $oldest !== null ? Fmt::secondsBetween((string) $oldest, Clock::at($now)) : null,
             'presented' => LeadQuery::count(['hs' => 'wait']),
             'followups' => Prospects::followupsDue($now)['n'],
+            'calls' => Prospects::callableCount(Prospects::filters(['tab' => 'to_call']), $now),
             'no_task' => LeadQuery::count(['nt' => '1', 'op' => '1']),
             'referrals' => Referrals::pendingApproval(),
             'review' => LeadQuery::count(['fl' => 'review_queue']),
@@ -80,12 +83,14 @@ final class DashboardActions
         $push('presented', 3, $n, 25 + 5 * min($n, 5), 'Pregunta a NorthStar por los presentados', $pl($n, 'presentado sin respuesta', 'presentados sin respuesta'), '/leads' . Ui::qs(['hs' => 'wait']), 'Abrir la vista');
         $n = $c('followups');
         $push('followups', 4, $n, 25 + 3 * min($n, 8), 'Retoma los prospectos sin gestionar', $pl($n, 'seguimiento', 'seguimientos') . ' para hoy o ya vencidos', '/prospectos', 'Abrir prospectos');
+        $n = $c('calls');
+        $push('calls', 5, $n, 22 + 2 * min(intdiv($n, 10), 10), 'Llama a los prospectos nuevos', $pl($n, 'prospecto nuevo se puede', 'prospectos nuevos se pueden') . ' llamar ahora (en su horario local)', '/prospectos' . Ui::qs(['tab' => 'to_call', 'now' => '1']), 'Empezar a llamar');
         $n = $c('no_task');
-        $push('no_task', 5, $n, 20 + 2 * min($n, 10), 'Dale seguimiento a los leads sin tarea', $pl($n, 'lead abierto', 'leads abiertos') . ' sin ninguna tarea', '/leads' . Ui::qs(['nt' => '1', 'op' => '1']), 'Abrir la vista');
+        $push('no_task', 6, $n, 20 + 2 * min($n, 10), 'Dale seguimiento a los leads sin tarea', $pl($n, 'lead abierto', 'leads abiertos') . ' sin ninguna tarea', '/leads' . Ui::qs(['nt' => '1', 'op' => '1']), 'Abrir la vista');
         $n = $c('referrals');
-        $push('referrals', 6, $n, 20 + 2 * min($n, 5), 'Resuelve los bonos de referidos', $pl($n, 'bono', 'bonos') . ' por aprobar', '/referidos', 'Abrir referidos');
+        $push('referrals', 7, $n, 20 + 2 * min($n, 5), 'Resuelve los bonos de referidos', $pl($n, 'bono', 'bonos') . ' por aprobar', '/referidos', 'Abrir referidos');
         $n = $c('review');
-        $push('review', 7, $n, 15 + 2 * min($n, 10), 'Revisa la cola de las reglas', $pl($n, 'lead por revisar', 'leads por revisar'), '/leads' . Ui::qs(['fl' => 'review_queue']), 'Abrir la vista');
+        $push('review', 8, $n, 15 + 2 * min($n, 10), 'Revisa la cola de las reglas', $pl($n, 'lead por revisar', 'leads por revisar'), '/leads' . Ui::qs(['fl' => 'review_queue']), 'Abrir la vista');
 
         usort($list, static fn($a, $b) => [$b['impact'], $a['o']] <=> [$a['impact'], $b['o']]);
         return array_map(static function (array $a): array {

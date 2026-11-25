@@ -20,6 +20,16 @@ use Captacion\Env;
 final class Webhook
 {
     public const SOURCES = ['meta', 'calcom', 'twilio', 'n8n'];
+
+    /**
+     * Fuentes que el panel muestra en Integraciones y Canales externos. Twilio (SMS) se oculta mientras no esté configurado: NorthStar no usa SMS
+     * (decisión del cliente, reunión del 2026-11-24: «no me gusta el SMS para primer contacto»). El endpoint sigue funcionando igual (STOP/HELP).
+     * @return list<string>
+     */
+    public static function visible(): array
+    {
+        return array_values(array_filter(self::SOURCES, static fn(string $s): bool => $s !== 'twilio' || self::missing('twilio') === []));
+    }
     public const MIN_SECRET = 8;
     /** Ruta publica de cada webhook (respecto a la raiz del subdominio). */
     public const PATHS = ['meta' => '/api/webhooks/meta.php', 'calcom' => '/api/webhooks/calcom.php', 'twilio' => '/api/webhooks/sms.php', 'n8n' => '/api/webhooks/n8n.php'];

@@ -18,7 +18,7 @@ final class SavedViews
 {
     public const MAX = 30;
     public const SYSTEM = [
-        'hot_pending'    => ['name' => 'Calientes pendientes', 'icon' => 'zap', 'pin' => true],
+        'hot_pending'    => ['name' => 'Calientes por contactar', 'icon' => 'zap', 'pin' => true],
         'today'          => ['name' => 'Llegaron hoy', 'icon' => 'inbox', 'pin' => true],
         'no_task'        => ['name' => 'Sin tarea', 'icon' => 'list-check', 'pin' => false],
         'discarded'      => ['name' => 'Descartados', 'icon' => 'flag', 'pin' => true],

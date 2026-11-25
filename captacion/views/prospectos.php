@@ -32,31 +32,42 @@ $resultIcon = ['no_answer' => 'phone', 'talked' => 'chat', 'interested' => 'star
 $runAt = is_array($run) ? ($run['finished_at'] ?? $run['updated_at'] ?? null) : null;
 $cronAt = is_array($cron) ? ($cron['at'] ?? null) : null;
 ?>
-<div class="page-head">
+<div class="page-head page-head--p">
   <div>
     <h1 class="h1">Prospectos FMCSA</h1>
     <p class="sub"><?= $totalAll === 0 ? 'Autoridades nuevas de transportistas para llamar en frío, una por una y a mano.' : $e(Fmt::num($counts['today'])) . ' para llamar hoy · ' . $e(Fmt::num($summary['new_today'])) . ' nuevos hoy · ' . $e(Fmt::num($summary['total'])) . ' en total' ?></p>
+    <?php if ($totalAll > 0): ?>
+    <p class="pstat" role="status">
+      <span class="dot<?= is_array($run) && !empty($run['error']) ? ' dot--bad' : (!$cfg['enabled'] ? ' dot--warn' : ' is-ok') ?>"></span>
+      <?php if (!$cfg['enabled']): ?>Búsqueda diaria apagada.
+      <?php elseif ($runAt === null): ?>Aún no ha corrido la búsqueda diaria.
+      <?php else: ?>Última búsqueda <?= $e(Fmt::ago((string) $runAt)) ?>: <?= $e((int) ($run['counters']['new'] ?? 0)) ?> nuevos de <?= $e((int) ($run['counters']['read'] ?? 0)) ?> leídos<?= !empty($run['capped']) ? ' (tope diario alcanzado)' : '' ?><?= empty($run['finished']) ? ' · sigue en la próxima hora' : '' ?><?php if (!empty($run['error'])): ?> · error: <?= $e($run['error']) ?><?php endif; ?>.
+      <?php endif; ?>
+      <a class="link" href="/config?tab=prospectos">Ajustes de la búsqueda</a>
+    </p>
+    <?php endif; ?>
   </div>
-  <?php if ($totalAll > 0): ?>
   <div class="page-head__a">
-    <button class="btn btn--secondary filters-toggle" type="button" data-toggle="#filters" aria-expanded="<?= $nFilters > 0 ? 'true' : 'false' ?>" aria-controls="filters"><?= Ui::icon('filter') ?>Filtros<?= $nFilters > 0 ? ' <b class="badge">' . $e($nFilters) . '</b>' : '' ?></button>
+    <details class="rules" data-rules>
+      <summary><?= Ui::icon('shield') ?><span class="rules__t">Reglas de las llamadas en frío</span></summary>
+      <div class="rules__p">
+        <p class="rules__s">Solo a mano · 8 a. m. a 9 p. m. hora local · lista de no llamar</p>
+        <ul>
+          <li><b>Solo llamadas manuales.</b> Nada de marcadores automáticos, SMS ni correos en frío desde esta pantalla.</li>
+          <li><b>Horario permitido: 8 a. m. a 9 p. m. hora local del prospecto.</b> Fuera de ese horario el botón Llamar se bloquea; en estados con dos zonas horarias se exige que sea hora válida en ambas.</li>
+          <li><b>Lista interna de no llamar.</b> Quien diga que no, o pida que no lo llamen, se marca «No llamar más»: es permanente y su teléfono no vuelve a entrar aunque FMCSA lo entregue de nuevo.</li>
+          <li class="rules__todo"><b>Pendiente:</b> confirma con tu abogado el cumplimiento de las llamadas en frío (TCPA y listas estatales de no llamar) antes de operarlas.</li>
+        </ul>
+      </div>
+    </details>
+    <?php if ($totalAll > 0): ?>
     <form method="post" action="/prospectos/export">
       <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="qs" value="<?= $e(ltrim(Ui::qs($qsBase), '?')) ?>">
-      <button class="btn btn--secondary" type="submit"><span class="btn__t">Exportar CSV</span></button>
+      <button class="btn btn--secondary" type="submit"><?= Ui::icon('download') ?><span class="btn__t">Exportar CSV</span></button>
     </form>
+    <?php endif; ?>
   </div>
-  <?php endif; ?>
 </div>
-
-<details class="rules">
-  <summary><?= Ui::icon('shield') ?>Reglas de las llamadas en frío<span class="rules__s">Solo a mano · 8 a. m. a 9 p. m. hora local · lista de no llamar</span></summary>
-  <ul>
-    <li><b>Solo llamadas manuales.</b> Nada de marcadores automáticos, SMS ni correos en frío desde esta pantalla.</li>
-    <li><b>Horario permitido: 8 a. m. a 9 p. m. hora local del prospecto.</b> Fuera de ese horario el botón Llamar se bloquea; en estados con dos zonas horarias se exige que sea hora válida en ambas.</li>
-    <li><b>Lista interna de no llamar.</b> Quien diga que no, o pida que no lo llamen, se marca «No llamar más»: es permanente y su teléfono no vuelve a entrar aunque FMCSA lo entregue de nuevo.</li>
-    <li class="rules__todo"><b>Pendiente:</b> confirma con tu abogado el cumplimiento de las llamadas en frío (TCPA y listas estatales de no llamar) antes de operarlas.</li>
-  </ul>
-</details>
 
 <?php if ($totalAll === 0): ?>
 <section class="card empty empty--lg">
@@ -72,29 +83,44 @@ $cronAt = is_array($cron) ? ($cron['at'] ?? null) : null;
 </section>
 <?php else: ?>
 
-<p class="pstat" role="status">
-  <span class="dot<?= is_array($run) && !empty($run['error']) ? ' dot--bad' : (!$cfg['enabled'] ? ' dot--warn' : ' is-ok') ?>"></span>
-  <?php if (!$cfg['enabled']): ?>Búsqueda diaria apagada.
-  <?php elseif ($runAt === null): ?>Aún no ha corrido la búsqueda diaria.
-  <?php else: ?>Última búsqueda <?= $e(Fmt::ago((string) $runAt)) ?>: <?= $e((int) ($run['counters']['new'] ?? 0)) ?> nuevos de <?= $e((int) ($run['counters']['read'] ?? 0)) ?> leídos<?= !empty($run['capped']) ? ' (tope diario alcanzado)' : '' ?><?= empty($run['finished']) ? ' · sigue en la próxima hora' : '' ?><?php if (!empty($run['error'])): ?> · error: <?= $e($run['error']) ?><?php endif; ?>.
-  <?php endif; ?>
-  <a class="link" href="/config?tab=prospectos">Filtros y estado</a>
-</p>
-
 <nav class="ptabs" aria-label="Estado del prospecto">
   <?php foreach (Prospects::TABS as $k => $label): $on = $f['tab'] === $k; ?>
     <a class="ptab<?= $on ? ' is-on' : '' ?>" href="<?= $e($tabHref($k)) ?>"<?= $on ? ' aria-current="true"' : '' ?> title="<?= $e($tabHint[$k]) ?>"><?= $e($label) ?><span class="ptab__n"><?= $e(Fmt::num($counts[$k])) ?></span></a>
   <?php endforeach; ?>
 </nav>
 
-<form class="filters filters--p<?= $nFilters > 0 ? ' is-open' : '' ?>" id="filters" method="get" action="/prospectos" aria-label="Filtros">
+<?php
+$chips = [];
+if ($f['us'] !== '') { $chips[] = ['Estado: ' . $f['us'] . ' · ' . (UsStates::NAMES[$f['us']] ?? ''), 'us']; }
+if ($f['fl'] !== '') { $chips[] = ['Flota: ' . (Prospects::FLEETS[$f['fl']] ?? $f['fl']), 'fl']; }
+if ($f['ag'] > 0) { $chips[] = ['Autoridad: ' . (Prospects::AGES[$f['ag']] ?? $f['ag']), 'ag']; }
+if ($f['q'] !== '') { $chips[] = ['Búsqueda: «' . $f['q'] . '»', 'q']; }
+$nPanel = (int) ($f['us'] !== '') + (int) ($f['fl'] !== '') + (int) ($f['ag'] > 0);
+$drop = static fn(string $k): string => '/prospectos' . Ui::qs(array_diff_key($qsBase, [$k => 1, 'page' => 1]));
+?>
+<form class="pbar" id="filters" method="get" action="/prospectos" aria-label="Buscar y filtrar prospectos">
   <?php if ($f['tab'] !== 'today'): ?><input type="hidden" name="tab" value="<?= $e($f['tab']) ?>"><?php endif; ?>
-  <label class="field field--q"><span>Buscar</span><div class="inp"><?= Ui::icon('search') ?><input type="search" name="q" value="<?= $e($f['q']) ?>" placeholder="Razón social, USDOT, MC, teléfono o ciudad" maxlength="100"></div></label>
-  <label class="field"><span>Estado (EE. UU.)</span><select name="us"><option value="">Todos</option><?php foreach (UsStates::NAMES as $k => $l): ?><option value="<?= $e($k) ?>"<?= $f['us'] === $k ? ' selected' : '' ?>><?= $e($k) ?> · <?= $e($l) ?></option><?php endforeach; ?></select></label>
-  <label class="field"><span>Flota</span><select name="fl"><option value="">Cualquiera</option><?php foreach (Prospects::FLEETS as $k => $l): ?><option value="<?= $e($k) ?>"<?= $f['fl'] === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
-  <label class="field"><span>Autoridad</span><select name="ag"><option value="">Cualquier antigüedad</option><?php foreach (Prospects::AGES as $k => $l): ?><option value="<?= $e($k) ?>"<?= $f['ag'] === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
-  <div class="filters__a"><button class="btn btn--secondary btn--sm" type="submit"><span class="btn__t">Aplicar</span></button><?php if ($nFilters > 0): ?><a class="btn btn--ghost btn--sm" href="<?= $e($tabHref($f['tab'])) ?>">Quitar filtros</a><?php endif; ?></div>
+  <?php if ($f['now'] === '1'): ?><input type="hidden" name="now" value="1"><?php endif; ?>
+  <?php if ($per !== 25): ?><input type="hidden" name="per" value="<?= $e($per) ?>"><?php endif; ?>
+  <label class="pbar__q"><span class="sr">Buscar prospecto</span><div class="inp"><?= Ui::icon('search') ?><input type="search" name="q" value="<?= $e($f['q']) ?>" placeholder="Buscar por razón social, USDOT, MC, teléfono o ciudad" maxlength="100"></div></label>
+  <div class="fpop<?= $nPanel > 0 ? ' has-on' : '' ?>" data-fpop>
+    <button class="btn btn--secondary fpop__b" type="button" aria-expanded="false" aria-controls="fpop-p"><?= Ui::icon('filter') ?><span class="btn__t">Filtros</span><?= $nPanel > 0 ? '<b class="badge">' . $e($nPanel) . '</b>' : '' ?></button>
+    <div class="fpop__p" id="fpop-p" role="group" aria-label="Filtros de la lista">
+      <label class="field"><span>Estado (EE. UU.)</span><select name="us"><option value="">Todos</option><?php foreach (UsStates::NAMES as $k => $l): ?><option value="<?= $e($k) ?>"<?= $f['us'] === $k ? ' selected' : '' ?>><?= $e($k) ?> · <?= $e($l) ?></option><?php endforeach; ?></select></label>
+      <label class="field"><span>Flota</span><select name="fl"><option value="">Cualquiera</option><?php foreach (Prospects::FLEETS as $k => $l): ?><option value="<?= $e($k) ?>"<?= $f['fl'] === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
+      <label class="field"><span>Autoridad</span><select name="ag"><option value="">Cualquier antigüedad</option><?php foreach (Prospects::AGES as $k => $l): ?><option value="<?= $e($k) ?>"<?= $f['ag'] === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
+      <div class="filters__a"><button class="btn btn--secondary btn--sm" type="submit"><span class="btn__t">Aplicar</span></button><?php if ($nFilters > 0): ?><a class="btn btn--ghost btn--sm" href="<?= $e($tabHref($f['tab'])) ?>">Quitar filtros</a><?php endif; ?></div>
+    </div>
+  </div>
+  <?php if ($callable !== null && $rows): ?><a class="seg__i pbar__now<?= $f['now'] === '1' ? ' is-on' : '' ?>" href="<?= $e('/prospectos' . Ui::qs(array_merge(array_diff_key($qsBase, ['now' => 1, 'page' => 1]), $f['now'] === '1' ? [] : ['now' => '1']))) ?>" title="Solo quienes están en horario permitido (8 a. m. a 9 p. m. hora local) y tienen teléfono"<?= $f['now'] === '1' ? ' aria-current="page"' : '' ?>>Solo llamables ahora<span class="ptab__n"><?= $e(Fmt::num($callable)) ?></span></a><?php endif; ?>
+  <?php if ($rows): ?><label class="perpage"><span>Por página</span><select data-per aria-label="Prospectos por página"><?php foreach (Prospects::PER as $n): ?><option value="<?= $e($n) ?>"<?= $per === $n ? ' selected' : '' ?>><?= $e($n) ?></option><?php endforeach; ?></select></label><?php endif; ?>
 </form>
+<?php if ($chips): ?>
+<ul class="fchips" aria-label="Filtros activos">
+  <?php foreach ($chips as [$label, $k]): ?><li><a class="fchip" href="<?= $e($drop($k)) ?>" aria-label="Quitar filtro <?= $e($label) ?>"><?= $e($label) ?><?= Ui::icon('x') ?></a></li><?php endforeach; ?>
+  <?php if (count($chips) > 1): ?><li><a class="link" href="<?= $e($tabHref($f['tab'])) ?>">Quitar todos</a></li><?php endif; ?>
+</ul>
+<?php endif; ?>
 
 <?php if (!$rows): ?>
 <section class="card empty">
@@ -108,13 +134,6 @@ $cronAt = is_array($cron) ? ($cron['at'] ?? null) : null;
   <?php endif; ?>
 </section>
 <?php else: ?>
-<div class="pq">
-  <p class="pq__now" role="status"><?php if ($callable !== null): ?><span class="dot<?= $callable > 0 ? ' is-ok' : ' dot--warn' ?>"></span><?= $callable > 0 ? '<b>' . $e(Fmt::num($callable)) . '</b> se pueden llamar ahora (hora local permitida y con teléfono); van primero.' : 'Ahora nadie de esta lista está en horario permitido.' ?><?php endif; ?></p>
-  <div class="pq__a">
-    <?php if ($callable !== null): ?><a class="seg__i<?= $f['now'] === '1' ? ' is-on' : '' ?>" href="<?= $e('/prospectos' . Ui::qs(array_merge(array_diff_key($qsBase, ['now' => 1, 'page' => 1]), $f['now'] === '1' ? [] : ['now' => '1']))) ?>"<?= $f['now'] === '1' ? ' aria-current="page"' : '' ?>>Solo llamables ahora</a><?php endif; ?>
-    <label class="perpage"><span>Por página</span><select data-per aria-label="Prospectos por página"><?php foreach (Prospects::PER as $n): ?><option value="<?= $e($n) ?>"<?= $per === $n ? ' selected' : '' ?>><?= $e($n) ?></option><?php endforeach; ?></select></label>
-  </div>
-</div>
 <div class="pr-head" aria-hidden="true"><span>Estado</span><span>Transportista</span><span>Ubicación y hora local</span><span>Flota</span><span>Autoridad</span><span>Intentos</span></div>
 <ol class="plist" aria-label="Prospectos">
 <?php foreach ($rows as $r):
@@ -171,7 +190,7 @@ $cronAt = is_array($cron) ? ($cron['at'] ?? null) : null;
             <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="back" value="<?= $e($back) ?>">
             <div class="pc__fields">
               <label class="field"><span>Nota (opcional)</span><input type="text" name="note" maxlength="500" autocomplete="off" placeholder="Qué dijo, a qué hora volver a llamar…"></label>
-              <label class="field"><span>Siguiente intento (ET, opcional)</span><input type="date" lang="es" name="next" min="<?= $e($todayEt) ?>"></label>
+              <div class="field pc__next"><label for="nx-<?= $e($id) ?>">Siguiente intento (ET, opcional)</label><input id="nx-<?= $e($id) ?>" type="date" lang="es" name="next" min="<?= $e($todayEt) ?>"><span class="qd" data-qd hidden><button type="button" data-days="1">Mañana</button><button type="button" data-days="3">En 3 días</button><button type="button" data-days="7">En 1 semana</button></span></div>
             </div>
             <div class="pc__btns" role="group" aria-label="Registrar el resultado de la llamada a <?= $e($name) ?>">
               <?php foreach (Prospects::RESULTS as $k => $label): ?>

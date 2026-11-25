@@ -46,6 +46,14 @@ $tip = static fn(string $t): string => Ui::tip($t);
   <div class="acts__b" data-live="actions"><?php require __DIR__ . '/_dash_actions.php'; ?></div>
 </section>
 
+<?php if (!empty($firstRun)): ?>
+<section class="card empty" aria-labelledby="h-first">
+  <svg class="empty__star" aria-hidden="true"><use href="#i-star"/></svg>
+  <h3 id="h-first">Aquí verás tus leads en cuanto llegue el primero</h3>
+  <p>Los gráficos de leads por semana, por fuente y la actividad aparecen solos con el primer lead. Mientras tanto, los prospectos de FMCSA ya están listos para llamar.</p>
+  <p class="page-head__a"><a class="btn btn--secondary" href="/prospectos"><?= Ui::icon('phone') ?><span class="btn__t">Ir a prospectos</span></a><a class="btn btn--ghost" href="/leads">Cómo llegan los leads</a></p>
+</section>
+<?php else: ?>
 <div class="grid grid--main">
   <section class="card chart" aria-labelledby="h-chart" data-tabs>
     <header class="card__h"><h2 class="label" id="h-chart">Leads por semana</h2><?= $tip('Leads recibidos por semana (lunes a domingo, hora del este), separados entre owner-operators y carriers, y company drivers. El último periodo está en curso: no entra en el promedio.') ?></header>
@@ -140,7 +148,10 @@ $tip = static fn(string $t): string => Ui::tip($t);
   <?php endif; ?>
 </section>
 
-<div class="grid grid--3">
+<?php endif; ?>
+
+<div class="grid <?= !empty($firstRun) ? 'grid--main' : 'grid--3' ?>">
+  <?php if (empty($firstRun)): ?>
   <section class="card" aria-labelledby="h-heat">
     <header class="card__h"><h2 class="label" id="h-heat">Actividad</h2><?= $tip('Leads recibidos por día de la semana en las últimas 13 semanas (hora del este). Más intenso = más leads; los puntos huecos son días sin leads.') ?></header>
     <div class="card__b">
@@ -160,6 +171,7 @@ $tip = static fn(string $t): string => Ui::tip($t);
       </dl>
     </div>
   </section>
+  <?php endif; ?>
 
   <section class="card" aria-labelledby="h-today">
     <header class="card__h"><h2 class="label" id="h-today">Hoy</h2><?= $tip('Tareas vencidas o con vencimiento hoy y citas de hoy, en hora del este.') ?></header>

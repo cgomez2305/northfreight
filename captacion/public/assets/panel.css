@@ -379,3 +379,4 @@ a.pg__n:hover{background:var(--sunk)}
 .pg__n.is-off{opacity:.4}
 .pg__gap{color:var(--ink-3);padding:0 4px}
 .pg .ic{width:16px;height:16px}
+@media (min-width:761px) and (max-height:820px){.side{gap:8px;padding-block:10px}.side__group{padding-top:10px}.nav-i{min-height:30px}.sys small{display:none}.sys{padding:7px 12px}.side__foot{padding-top:8px;gap:2px}.user{padding:3px 6px}}
