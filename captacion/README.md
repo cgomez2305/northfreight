@@ -1081,6 +1081,7 @@ Pedido de Carlos: «empieza por todas las de captación saliente y operación; n
 - Sin títulos de grupo: las secciones se separan con filetes (`.side__sep`). «Vistas» se pliega con un botón (`aria-expanded`, se recuerda en `localStorage`; si la vista activa está dentro, se queda abierta).
 - «Contraer» pasa a un botón de icono junto al logo (solo ≥1100 px); el logo pierde el selector de espacio de trabajo que no hacía nada.
 - La tarjeta «Estado del sistema» desaparece: es un punto ámbar en el avatar cuando hay avisos y una opción con su estado en el menú de la cuenta.
+- Menú de la cuenta con ancho fijo de 280 px (antes heredaba el de la barra y cortaba «Auto» y partía los textos), en tres bloques (quién eres y el tema · sistema y atajos · salir) y con los iconos y el punto de estado en la misma columna.
 - Nombres accesibles para buscador y cuenta también en el riel (antes el texto oculto dejaba los botones sin nombre).
 - El modo riel (tablet 761 a 1099 px y barra contraída) es UNA regla con container query (`@container side (max-width:100px)`) en lugar de dos copias: `panel.css` pasa de 30,5 a 28,7 KB.
 

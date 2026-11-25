@@ -128,12 +128,15 @@ kbd{font:400 var(--fs-xs)/1 var(--f-mono);padding:3px 5px;border-radius:var(--r-
 .dd{position:relative}
 .dd__panel{position:absolute;right:0;top:calc(100% + 6px);min-width:220px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);box-shadow:var(--shadow-pop);z-index:50;overflow:hidden}
 .dd__panel[hidden]{display:none}
-.dd__panel--up{top:auto;bottom:calc(100% + 6px);left:0;right:0}
+.dd__panel--up{top:auto;bottom:calc(100% + 6px);left:0;right:auto;width:280px;max-width:calc(100vw - 24px)}
 .dd__head{display:flex;flex-direction:column;padding:12px 14px;border-bottom:1px solid var(--line)}
 .dd__head small{color:var(--ink-3);font-size:var(--fs-sm)}
 .dd__item{display:flex;align-items:center;gap:10px;width:100%;min-height:40px;padding:0 14px;background:none;border:0;cursor:pointer;color:var(--ink);text-align:left}
 .dd__item:hover{background:var(--sunk)}
-.dd__item .ic{color:var(--ink-3)}
+.dd__item .ic{color:var(--ink-3);flex:none}
+.dd__ic{width:16px;height:16px;display:inline-grid;place-items:center;flex:none}
+.dd__grp{padding:4px 0;border-top:1px solid var(--line)}
+.dd__theme .seg__i{gap:6px;padding:0 6px}
 .dd__bar{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--line)}
 .link{background:none;border:0;padding:6px 0;color:var(--accent-ink);cursor:pointer;font-size:var(--fs-sm);font-weight:500}
 .link:hover{text-decoration:underline}
@@ -258,7 +261,7 @@ table.sr{display:block}
 .nav-i__n{margin-left:auto;font:400 var(--fs-xs) var(--f-sans);color:var(--ink-3);font-variant-numeric:tabular-nums}
 .thm .ic{display:none}
 html:not([data-theme-pref]) .thm__auto,[data-theme-pref=auto] .thm__auto,[data-theme-pref=light] .thm__sun,[data-theme-pref=dark] .thm__moon{display:block}
-.dd__theme{display:flex;flex-direction:column;gap:8px;padding:10px 14px;border-bottom:1px solid var(--line)}
+.dd__theme{display:flex;flex-direction:column;gap:8px;padding:10px 14px 12px}
 .seg--tight{display:flex}
 .seg--tight .seg__i{flex:1;justify-content:center;min-height:30px;padding:0 8px}
 .dd__item kbd{margin-left:auto}
@@ -273,7 +276,6 @@ html:not([data-theme-pref]) .thm__auto,[data-theme-pref=auto] .thm__auto,[data-t
 .nav-i__t{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;flex:none}
 .nav-i .badge{position:absolute;top:2px;right:2px;min-width:16px;height:16px;padding:0 3px;font-size:9.5px;line-height:16px;margin:0}
 .user{justify-content:center;padding:6px 0}
-.dd__panel--up{left:0;right:auto;min-width:268px}
 }
 @media (min-width:761px) and (max-height:820px){.side{gap:8px;padding-block:10px}.nav-i{min-height:30px}.side__sep{margin-block:5px}.side__foot{padding-top:8px}.user{padding:3px 6px}}
 @media (min-width:761px){
