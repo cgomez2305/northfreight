@@ -53,7 +53,8 @@ final class HandoffCard
             'stage'         => Catalog::stageLabel((string) ($lead['pipeline'] ?? 'A'), $lead['stage'] ?? null),
             'temperature'   => Catalog::label(Catalog::TEMPS, $lead['temperature'] ?? null),
             'score'         => (int) ($lead['score'] ?? 0),
-            'breakdown'     => array_map(static fn($i) => ['label' => (string) ($i['label'] ?? ''), 'points' => (int) ($i['points'] ?? 0), 'note' => Catalog::scoreNote((string) ($i['note'] ?? ''))], (array) ($bd['items'] ?? [])),
+            'breakdown'     => array_map(static fn($i) => ['label' => Catalog::SCORE_LABELS[(string) ($i['key'] ?? '')] ?? (string) ($i['label'] ?? ''),   // fase AT: con tildes (las de Scoring van sin)
+                 'points' => (int) ($i['points'] ?? 0), 'note' => Catalog::scoreNote((string) ($i['note'] ?? ''))], (array) ($bd['items'] ?? [])),
             'fmcsa'         => $fm ? [
                 'found' => (bool) ($fm['found'] ?? false), 'authority' => Catalog::label(Catalog::AUTHORITY, $fm['authority_status'] ?? null), 'insured' => $fm['insured'] ?? null,
                 'power_units' => $fm['power_units'] ?? null, 'drivers' => $fm['drivers'] ?? null, 'legal_name' => $fm['legal_name'] ?? null,
@@ -114,7 +115,7 @@ final class HandoffCard
         } else {
             $sec['FMCSA'] = [['Estado', 'sin consulta a FMCSA' . ($c['red_flags'] ? ' · banderas: ' . implode(', ', $c['red_flags']) : '')]];
         }
-        $sec['Preferencias declaradas'] = [['Medio de contacto', $dash($c['contact_pref'])], ['Mejor horario', $dash($c['best_time'])], ['Avisos del sistema', $dash($c['flags'])]];
+        $sec['Preferencias declaradas'] = [['Medio de contacto', $dash(['call' => 'Llamada', 'whatsapp' => 'WhatsApp', 'text' => 'Texto', 'email' => 'Correo'][(string) $c['contact_pref']] ?? $c['contact_pref'])], ['Mejor horario', $dash(['morning' => 'Mañana', 'afternoon' => 'Tarde', 'evening' => 'Noche', 'any' => 'Cualquier hora'][(string) $c['best_time']] ?? $c['best_time'])], ['Avisos del sistema', $dash($c['flags'])]];
         $calls = [];
         foreach ($c['calls'] as $x) {
             $calls[] = [Fmt::dateTime($x['at']), $x['outcome'] . ($x['minutes'] !== null ? ' · ' . $x['minutes'] . ' min' : '') . ($x['note'] ? ' · ' . $x['note'] : '')];
@@ -159,36 +160,45 @@ final class HandoffCard
         return $out . "\nLos documentos de los conductores NO pasan por este sistema: se piden y se guardan en el flujo de NorthStar.\n";
     }
 
+    /**
+     * Ficha HTML del correo de entrega a NorthStar. Fase AT: mismo lenguaje visual que los correos a leads (EmailLayout): marca en texto sobre la tarjeta,
+     * fuente del sistema, títulos en frase normal (sin mayúsculas forzadas), datos en dos columnas y los botones de confirmación arriba.
+     */
     public static function html(array $c, array $handoff): string
     {
+        $f = "-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif";
         $test = ($handoff['reason'] ?? '') === 'test';
         $u = $handoff['urls'] ?? [];
-        $h = '<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Lead presentado a NorthStar</title></head>'
-            . '<body style="margin:0;background:#F1F4F8;font-family:Arial,Helvetica,sans-serif;color:#0A1B2E">'
-            . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F1F4F8"><tr><td align="center" style="padding:24px 12px">'
-            . '<table role="presentation" width="640" cellpadding="0" cellspacing="0" style="max-width:640px;width:100%;background:#FFFFFF;border:1px solid #E1E7EF;border-radius:14px">'
-            . '<tr><td style="background:#0A1D33;padding:20px 28px;border-radius:14px 14px 0 0"><span style="font:700 20px Arial,sans-serif;color:#FFFFFF;letter-spacing:.04em">NORTH<span style="color:#06A6CC">STAR</span></span>'
-            . '<span style="font:12px Arial,sans-serif;color:#C2D0E0;margin-left:10px">CAPTACIÓN</span></td></tr>'
-            . '<tr><td style="padding:24px 28px 8px">' . ($test ? '<p style="margin:0 0 12px;padding:8px 12px;background:#FEF1DC;color:#8A4B0B;border-radius:8px;font-size:13px"><b>PRUEBA DE ENTREGA</b>: lead ficticio, no hay nada que confirmar.</p>' : '')
-            . '<p style="margin:0;font:12px Arial,sans-serif;color:#586A80;letter-spacing:.08em">LEAD PRESENTADO A NORTHSTAR' . (($handoff['version'] ?? 1) > 1 ? ' · REENVÍO ' . (int) $handoff['version'] : '') . '</p>'
-            . '<h1 style="margin:4px 0 6px;font:700 28px Arial,sans-serif;color:#0A1B2E">' . self::e($c['name']) . '</h1>'
-            . '<p style="margin:0;color:#3B4D63;font-size:15px">' . self::e($c['profile_label']) . ' · Puntuación <b>' . (int) $c['score'] . '/100</b> (' . self::e($c['temperature']) . ')'
-            . ($c['red_flags'] ? ' · <b style="color:#B42318">Banderas rojas: ' . self::e(implode(', ', $c['red_flags'])) . '</b>' : '') . '</p></td></tr>';
+        $h = '<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light"><title>Lead presentado a NorthStar</title>'
+            . '<style>@media (max-width:660px){.ns-card{padding-left:22px!important;padding-right:22px!important}.ns-k{display:block!important;width:auto!important;padding-bottom:0!important}.ns-v{display:block!important}}</style></head>'
+            . '<body style="margin:0;background:#F3F4F6;color:#1F2933">'
+            . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F3F4F6"><tr><td align="center" style="padding:32px 12px">'
+            . '<table role="presentation" width="640" cellpadding="0" cellspacing="0" style="width:100%;max-width:640px">'
+            . '<tr><td style="padding:0 32px 16px;font:800 19px/1 ' . $f . ';letter-spacing:.04em;color:#0A1D33">NORTH<span style="color:#0789A8">STAR</span><span style="font:500 11px ' . $f . ';letter-spacing:.08em;color:#6B7280;padding-left:8px">CAPTACIÓN</span></td></tr>'
+            . '<tr><td class="ns-card" style="padding:30px 32px 8px;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:12px 12px 0 0;border-bottom:0">'
+            . ($test ? '<p style="margin:0 0 16px;padding:10px 14px;background:#FEF3C7;color:#8A4B0B;border-radius:8px;font:400 14px/1.5 ' . $f . '"><b>Prueba de entrega</b>: lead ficticio, no hay nada que confirmar.</p>' : '')
+            . '<p style="margin:0;font:500 13px ' . $f . ';color:#6B7280">Lead presentado a NorthStar' . (($handoff['version'] ?? 1) > 1 ? ' · reenvío ' . (int) $handoff['version'] : '') . '</p>'
+            . '<h1 style="margin:6px 0 8px;font:700 26px/1.25 ' . $f . ';color:#1F2933">' . self::e($c['name']) . '</h1>'
+            . '<p style="margin:0;font:400 15px/1.6 ' . $f . ';color:#374151">' . self::e($c['profile_label']) . ' · Puntuación <b>' . (int) $c['score'] . '/100</b> (' . self::e($c['temperature']) . ')'
+            . ($c['red_flags'] ? '<br><b style="color:#B42318">Banderas rojas: ' . self::e(implode(', ', $c['red_flags'])) . '</b>' : '') . '</p>';
         if (!empty($u['signed'])) {
-            $h .= '<tr><td style="padding:16px 28px 4px"><table role="presentation" cellpadding="0" cellspacing="0"><tr>'
-                . '<td style="padding-right:10px"><a href="' . self::e($u['signed']) . '" style="display:inline-block;background:#0A1D33;color:#FFFFFF;text-decoration:none;font:700 15px Arial,sans-serif;padding:13px 24px;border-radius:999px">Firmó</a></td>'
-                . '<td><a href="' . self::e($u['rejected']) . '" style="display:inline-block;background:#FFFFFF;color:#0A1D33;text-decoration:none;font:700 15px Arial,sans-serif;padding:12px 22px;border:2px solid #0A1D33;border-radius:999px">Lo rechazamos</a></td>'
-                . '</tr></table><p style="margin:8px 0 0;font-size:12px;color:#586A80">Un clic, sin iniciar sesión. Cada enlace se usa una sola vez y caduca a los 30 días.</p></td></tr>';
+            $h .= '<table role="presentation" cellpadding="0" cellspacing="0" style="margin:20px 0 6px"><tr>'
+                . '<td style="padding-right:10px;border-radius:8px;background:#0A1D33"><a href="' . self::e($u['signed']) . '" style="display:inline-block;padding:13px 22px;font:600 15px ' . $f . ';color:#FFFFFF;text-decoration:none;border-radius:8px">Firmó</a></td>'
+                . '<td style="padding-left:10px"><a href="' . self::e($u['rejected']) . '" style="display:inline-block;padding:12px 20px;font:600 15px ' . $f . ';color:#0A1D33;text-decoration:none;border:1px solid #0A1D33;border-radius:8px">Lo rechazamos</a></td>'
+                . '</tr></table><p style="margin:0;font:400 13px/1.5 ' . $f . ';color:#6B7280">Un clic, sin iniciar sesión. Cada enlace se usa una sola vez y caduca a los 30 días.</p>';
         }
+        $h .= '</td></tr>';
         foreach (self::sections($c) as $title => $rows) {
-            $h .= '<tr><td style="padding:18px 28px 0"><p style="margin:0 0 6px;font:700 11px Arial,sans-serif;letter-spacing:.1em;color:#036E8A;border-bottom:1px solid #E1E7EF;padding-bottom:6px">' . self::e(mb_strtoupper($title)) . '</p>'
+            $h .= '<tr><td class="ns-card" style="padding:22px 32px 0;background:#FFFFFF;border-left:1px solid #E5E7EB;border-right:1px solid #E5E7EB">'
+                . '<p style="margin:0 0 8px;padding-bottom:8px;border-bottom:1px solid #E5E7EB;font:600 14px ' . $f . ';color:#0A6F8C">' . self::e($title) . '</p>'
                 . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0">';
             foreach ($rows as [$k, $v]) {
-                $h .= '<tr><td valign="top" style="width:38%;padding:3px 10px 3px 0;font-size:13px;color:#586A80">' . self::e(ltrim((string) $k, ' ·')) . '</td><td valign="top" style="padding:3px 0;font-size:14px;color:#0A1B2E">' . nl2br(self::e($v)) . '</td></tr>';
+                $h .= '<tr><td class="ns-k" valign="top" style="width:38%;padding:4px 12px 4px 0;font:400 13px/1.5 ' . $f . ';color:#6B7280">' . self::e(ltrim((string) $k, ' ·')) . '</td>'
+                    . '<td class="ns-v" valign="top" style="padding:4px 0 8px;font:400 15px/1.5 ' . $f . ';color:#1F2933">' . nl2br(self::e($v)) . '</td></tr>';
             }
             $h .= '</table></td></tr>';
         }
-        return $h . '<tr><td style="padding:22px 28px 26px"><p style="margin:0;font-size:12px;color:#586A80">Los documentos de los conductores no pasan por este sistema: se piden y se guardan en el flujo de NorthStar.</p></td></tr></table></td></tr></table></body></html>';
+        return $h . '<tr><td class="ns-card" style="padding:22px 32px 28px;background:#FFFFFF;border:1px solid #E5E7EB;border-top:0;border-radius:0 0 12px 12px"><p style="margin:0;font:400 13px/1.5 ' . $f . ';color:#6B7280">Los documentos de los conductores no pasan por este sistema: se piden y se guardan en el flujo de NorthStar.</p></td></tr></table></td></tr></table></body></html>';
     }
 
     /** Ficha para el webhook (claves estables en ingles; sin textos de pantalla salvo etiquetas). */

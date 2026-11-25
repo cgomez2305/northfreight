@@ -1100,3 +1100,13 @@ Pedido de Carlos: «empieza por todas las de captación saliente y operación; n
 **Calendario móvil**: en el mes, la agenda del día va bajo la cuadrícula (tocar un día la cambia sin recargar; sin JS, el día elegido) y una tarea se mueve con el dedo manteniéndola pulsada 0,35 s y arrastrándola a otro día (el desplazamiento normal sigue funcionando).
 
 Prueba: `52_fase_at` (con un servidor IMAP falso, `tests/lib/imap_mock.php`). Sin probar en un buzón real: el primer encendido conviene hacerlo mirando «Última lectura» en Ajustes de envío. El arrastre táctil solo se probó por código (Playwright no simula mantener pulsado y arrastrar).
+
+### 33.1 Diseño de los correos (fase AT)
+
+Carlos: «que las plantillas de correo se vean limpias y la información se lea lo mejor posible». Todos los correos a leads y prospectos (secuencias, recordatorios de cita, envíos desde la ficha y campañas en lote) usan `Services/EmailLayout`:
+- una columna de 600 px con tablas y estilos en línea, sin imágenes (muchos clientes las bloquean); la marca NORTHSTAR en texto sobre la tarjeta blanca; fuente del sistema a 16 px con interlineado 1,65;
+- una línea que solo lleva un enlace de la plantilla (`{link_calculadora}`, `{link_web}`, `{link_referido}`, `{cita_enlace}`, también «Link: …» o «…tu enlace: …» al final de la línea) se convierte en un botón con un texto que dice qué hace («Join the call», «Abrir la calculadora de rate per mile»…); el enlace de referido muestra además la URL debajo para copiarla;
+- la fecha de la cita (`{cita_fecha}` sola en su párrafo) va en un recuadro destacado; las líneas con «- » forman una lista; `**texto**` pone negrita; las URL sueltas y el WhatsApp son enlaces;
+- la firma «NorthStar Freight Solutions» en negrita; texto de vista previa oculto con la primera frase útil (no el saludo);
+- el pie legal (empresa, dirección en una línea, motivo y baja de un clic) va fuera de la tarjeta, pequeño y en gris.
+El texto plano de cada correo no cambia. La ficha que se entrega a NorthStar (`HandoffCard::html`) usa el mismo lenguaje visual, sin mayúsculas forzadas, con las etiquetas de puntuación con tildes y las preferencias legibles («Texto», «Cualquier hora» en lugar de «text», «any»).

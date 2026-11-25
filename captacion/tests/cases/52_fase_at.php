@@ -170,6 +170,19 @@ return static function (array $ctx): void {
     $cj = (string) file_get_contents($root . '/public/assets/calendario.js');
     T::ok(str_contains($cj, "e.pointerType !== 'touch'") && str_contains($cj, "'touchmove'") && str_contains($cj, 'passive: false'), '  y mover una tarea con el dedo (mantener pulsado y arrastrar)');
 
+    // ------------------------------------------------------------------ Diseño de los correos (EmailLayout)
+    $tpl = ['subject' => 'Your call', 'body' => "Hi {nombre},\n\nThis is a reminder of your call:\n\n{cita_fecha}\n\nLink: {cita_enlace}\n\nTry it here:\n{link_calculadora}\n\nShare it: {link_referido}\n\n- One desk\n- **Every** load\n\nWhatsApp: {whatsapp}\n\nNorthStar Freight Solutions"];
+    $mail = \Captacion\Services\Templates::render($tpl, ['first_name' => 'Ana', 'state' => 'TX'], 'en', 'https://panel.test/u/X',
+        ['{cita_fecha}' => 'Thursday, November 27 · 10:30 a.m. ET', '{cita_enlace}' => 'https://cal.com/ns/abc', '{link_referido}' => 'https://northstarfreightsolutions.us/careers/?ref=ANA-1234']);
+    $hm = $mail['html'];
+    T::ok(str_contains($hm, '>Join the call</a>') && str_contains($hm, '>Open the rate per mile calculator</a>') && str_contains($hm, '>Open your referral link</a>') && !str_contains($hm, 'Link: '), 'diseño de los correos: las líneas que son solo un enlace se convierten en botones que dicen qué hacen');
+    T::ok(str_contains($hm, 'Share it:</p>') || str_contains($hm, 'Share it:<'), '  el texto que va delante del enlace se conserva');
+    T::ok(str_contains($hm, 'font:600 17px') && str_contains($hm, 'Thursday, November 27 · 10:30 a.m. ET'), '  la fecha de la cita va destacada');
+    T::ok(str_contains($hm, '<li style') && str_contains($hm, '<b>Every</b>') && str_contains($hm, 'https://wa.me/18636513322'), '  listas, negritas y WhatsApp como enlace');
+    T::ok(preg_match('#<div style="display:none;max-height:0[^"]*">This is a reminder of your call:</div>#', $hm) === 1, '  vista previa oculta con la primera frase útil (no el saludo)');
+    T::ok(str_contains($hm, 'NorthStar Freight Solutions LLC · 30 N Gould St') && str_contains($hm, 'Unsubscribe in one click</a>') && !preg_match('/<img(?![^>]*width="1")/', $hm), '  pie con empresa, dirección en una línea y baja; sin imágenes (salvo el píxel)');
+    T::ok(str_contains($mail['text'], 'https://cal.com/ns/abc') && str_contains($mail['text'], 'Link: https://cal.com/ns/abc'), '  el texto plano no cambia');
+
     foreach (['IMAP_HOST', 'IMAP_PORT', 'IMAP_USER', 'IMAP_PASS', 'IMAP_SECURE'] as $k) {
         Env::set($k, null);
     }
