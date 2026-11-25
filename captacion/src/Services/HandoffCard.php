@@ -174,8 +174,8 @@ final class HandoffCard
             . '<body style="margin:0;background:#F3F4F6;color:#1F2933">'
             . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F3F4F6"><tr><td align="center" style="padding:32px 12px">'
             . '<table role="presentation" width="640" cellpadding="0" cellspacing="0" style="width:100%;max-width:640px">'
-            . '<tr><td style="padding:0 32px 16px;font:800 19px/1 ' . $f . ';letter-spacing:.04em;color:#0A1D33">NORTH<span style="color:#0789A8">STAR</span><span style="font:500 11px ' . $f . ';letter-spacing:.08em;color:#6B7280;padding-left:8px">CAPTACIÓN</span></td></tr>'
-            . '<tr><td class="ns-card" style="padding:30px 32px 8px;background:#FFFFFF;border:1px solid #E5E7EB;border-radius:12px 12px 0 0;border-bottom:0">'
+            . EmailLayout::logoRow(32, 'CAPTACIÓN')
+            . '<tr><td class="ns-card" style="padding:28px 32px 8px;background:#FFFFFF;border:1px solid #E5E7EB;border-top:0;border-bottom:0">'
             . ($test ? '<p style="margin:0 0 16px;padding:10px 14px;background:#FEF3C7;color:#8A4B0B;border-radius:8px;font:400 14px/1.5 ' . $f . '"><b>Prueba de entrega</b>: lead ficticio, no hay nada que confirmar.</p>' : '')
             . '<p style="margin:0;font:500 13px ' . $f . ';color:#6B7280">Lead presentado a NorthStar' . (($handoff['version'] ?? 1) > 1 ? ' · reenvío ' . (int) $handoff['version'] : '') . '</p>'
             . '<h1 style="margin:6px 0 8px;font:700 26px/1.25 ' . $f . ';color:#1F2933">' . self::e($c['name']) . '</h1>'

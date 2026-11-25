@@ -1104,7 +1104,7 @@ Prueba: `52_fase_at` (con un servidor IMAP falso, `tests/lib/imap_mock.php`). Si
 ### 33.1 Diseño de los correos (fase AT)
 
 Carlos: «que las plantillas de correo se vean limpias y la información se lea lo mejor posible». Todos los correos a leads y prospectos (secuencias, recordatorios de cita, envíos desde la ficha y campañas en lote) usan `Services/EmailLayout`:
-- una columna de 600 px con tablas y estilos en línea, sin imágenes (muchos clientes las bloquean); la marca NORTHSTAR en texto sobre la tarjeta blanca; fuente del sistema a 16 px con interlineado 1,65;
+- una columna de 600 px con tablas y estilos en línea; arriba, en una franja navy, el logo REAL de la web (isotipo + NORTHSTAR + FREIGHT SOLUTIONS capturado del encabezado del sitio a 3×, PNG en `assets/img/email/logo-white.png` del sitio, porque Gmail y Outlook no muestran SVG; con imágenes bloqueadas se lee el texto alternativo en blanco; `logo-dark.png` es la variante para fondo claro); es la única imagen del correo; fuente del sistema a 16 px con interlineado 1,65;
 - una línea que solo lleva un enlace de la plantilla (`{link_calculadora}`, `{link_web}`, `{link_referido}`, `{cita_enlace}`, también «Link: …» o «…tu enlace: …» al final de la línea) se convierte en un botón con un texto que dice qué hace («Join the call», «Abrir la calculadora de rate per mile»…); el enlace de referido muestra además la URL debajo para copiarla;
 - la fecha de la cita (`{cita_fecha}` sola en su párrafo) va en un recuadro destacado; las líneas con «- » forman una lista; `**texto**` pone negrita; las URL sueltas y el WhatsApp son enlaces;
 - la firma «NorthStar Freight Solutions» en negrita; texto de vista previa oculto con la primera frase útil (no el saludo);

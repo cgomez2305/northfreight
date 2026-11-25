@@ -95,11 +95,22 @@ final class EmailLayout
             . '<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:' . self::BG . ';mso-hide:all">' . self::e($pre) . '</div>'
             . '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:' . self::BG . '"><tr><td align="center" style="padding:32px 12px">'
             . '<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px">'
-            . '<tr><td class="ns-pad" style="padding:0 40px 16px;font:800 19px/1 ' . self::FONT . ';letter-spacing:.04em;color:' . self::NAVY . '">NORTH<span style="color:#0789A8">STAR</span>'
-            . '<span style="font:500 11px ' . self::FONT . ';letter-spacing:.08em;color:' . self::MUTED . ';padding-left:8px">FREIGHT SOLUTIONS</span></td></tr>'
-            . '<tr><td class="ns-card" style="padding:36px 40px 30px;background:#FFFFFF;border:1px solid ' . self::LINE . ';border-radius:12px">' . implode('', $blocks) . '</td></tr>'
+            . self::logoRow(40)
+            . '<tr><td class="ns-card" style="padding:34px 40px 30px;background:#FFFFFF;border:1px solid ' . self::LINE . ';border-top:0;border-radius:0 0 12px 12px">' . implode('', $blocks) . '</td></tr>'
             . '<tr><td class="ns-pad" style="padding:20px 40px 0;font:400 12px/1.6 ' . self::FONT . ';color:' . self::MUTED . '">' . $footerHtml . '</td></tr>'
             . '</table>' . $px . '</td></tr></table></body></html>';
+    }
+
+    /**
+     * Logo REAL de la web (isotipo + NORTHSTAR + FREIGHT SOLUTIONS, capturado del encabezado del sitio a 3×) en una franja navy, como en el sitio.
+     * PNG (Gmail y Outlook no muestran SVG) servido desde el dominio: assets/img/email/logo-white.png. Con las imágenes bloqueadas se lee el texto alternativo en blanco.
+     */
+    public static function logoRow(int $padX, string $sub = ''): string
+    {
+        return '<tr><td class="ns-pad" style="padding:22px ' . $padX . 'px;background:' . self::NAVY . ';border-radius:12px 12px 0 0">'
+            . '<img src="' . Templates::SITE . '/assets/img/email/logo-white.png" width="210" height="60" alt="NorthStar Freight Solutions" style="display:block;width:210px;height:60px;border:0;outline:none;text-decoration:none;color:#FFFFFF;font:700 18px ' . self::FONT . '">'
+            . ($sub !== '' ? '<p style="margin:10px 0 0;font:500 12px ' . self::FONT . ';letter-spacing:.06em;color:#B9C8D8">' . self::e($sub) . '</p>' : '')
+            . '</td></tr>';
     }
 
     /** Párrafo con listas («- »), negritas (**texto**), URL y WhatsApp como enlaces. */

@@ -180,7 +180,8 @@ return static function (array $ctx): void {
     T::ok(str_contains($hm, 'font:600 17px') && str_contains($hm, 'Thursday, November 27 · 10:30 a.m. ET'), '  la fecha de la cita va destacada');
     T::ok(str_contains($hm, '<li style') && str_contains($hm, '<b>Every</b>') && str_contains($hm, 'https://wa.me/18636513322'), '  listas, negritas y WhatsApp como enlace');
     T::ok(preg_match('#<div style="display:none;max-height:0[^"]*">This is a reminder of your call:</div>#', $hm) === 1, '  vista previa oculta con la primera frase útil (no el saludo)');
-    T::ok(str_contains($hm, 'NorthStar Freight Solutions LLC · 30 N Gould St') && str_contains($hm, 'Unsubscribe in one click</a>') && !preg_match('/<img(?![^>]*width="1")/', $hm), '  pie con empresa, dirección en una línea y baja; sin imágenes (salvo el píxel)');
+    T::ok(str_contains($hm, 'NorthStar Freight Solutions LLC · 30 N Gould St') && str_contains($hm, 'Unsubscribe in one click</a>') && substr_count($hm, '<img') === 1 && str_contains($hm, 'src="https://northstarfreightsolutions.us/assets/img/email/logo-white.png"') && str_contains($hm, 'alt="NorthStar Freight Solutions"'), '  pie con empresa, dirección en una línea y baja; la única imagen es el logo real de la web (con texto alternativo)');
+    T::ok(is_file(dirname($root) . '/assets/img/email/logo-white.png') && getimagesize(dirname($root) . '/assets/img/email/logo-white.png')[0] >= 420, '  el logo existe en el sitio a 2× o más (nítido en retina)');
     T::ok(str_contains($mail['text'], 'https://cal.com/ns/abc') && str_contains($mail['text'], 'Link: https://cal.com/ns/abc'), '  el texto plano no cambia');
 
     foreach (['IMAP_HOST', 'IMAP_PORT', 'IMAP_USER', 'IMAP_PASS', 'IMAP_SECURE'] as $k) {
