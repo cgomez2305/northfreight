@@ -121,3 +121,45 @@
 @media (pointer:coarse){.qd button{min-height:44px}}
 .pr__rep{display:inline-flex;align-items:center;gap:5px;font-size:var(--fs-xs);font-weight:500;color:var(--accent-ink)}
 .pr__rep .ic{width:13px;height:13px}
+/* Fase AU: meta diaria, prioridad, guion, datos de la llamada, hora de rellamada y Modo llamada */
+.pgoal{display:flex;align-items:center;flex-wrap:wrap;gap:6px 16px;margin:4px 0 14px;font-size:var(--fs-sm);color:var(--ink-2)}
+.pgoal__n b{font-size:var(--fs-md);color:var(--ink);font-variant-numeric:tabular-nums}
+.pgoal__bar{flex:0 1 180px;height:6px;border-radius:var(--r-pill);background:var(--sunk);overflow:hidden}
+.pgoal__fill{display:block;height:100%;width:0;background:var(--accent)}
+.pgoal__fill--10{width:10%}.pgoal__fill--20{width:20%}.pgoal__fill--30{width:30%}.pgoal__fill--40{width:40%}.pgoal__fill--50{width:50%}.pgoal__fill--60{width:60%}.pgoal__fill--70{width:70%}.pgoal__fill--80{width:80%}.pgoal__fill--90{width:90%}.pgoal__fill--100{width:100%;background:var(--ok-dot)}
+.pgoal__k{display:flex;flex-wrap:wrap;gap:4px 14px}
+.pgoal__k b{color:var(--ink);font-variant-numeric:tabular-nums}
+.dot--high{background:var(--accent)}.dot--mid{background:var(--warm-dot)}.dot--low{background:var(--ink-4)}
+.pr__st{display:flex;flex-direction:column;align-items:flex-start;gap:4px}
+.pr__pri{display:inline-flex;align-items:center;gap:5px;font-size:var(--fs-xs);color:var(--accent-ink)}
+.pc__why{display:flex;flex-direction:column;gap:2px;font-size:var(--fs-sm)}
+.pc__wt{display:inline-flex;align-items:center;gap:6px;font-weight:500;color:var(--ink)}
+.pc__script,.pc__q{border:1px solid var(--line);border-radius:var(--r-card);background:var(--surface)}
+.pc__script>summary,.pc__q>summary{display:flex;align-items:center;gap:8px;min-height:44px;padding:0 12px;cursor:pointer;font-weight:500;color:var(--ink-2);list-style:none}
+.pc__script>summary::-webkit-details-marker,.pc__q>summary::-webkit-details-marker{display:none}
+.pc__script>summary .ic{width:16px;height:16px;color:var(--ink-3)}
+.pc__sl{margin:0 12px 8px}
+.pc__sc{padding:0 14px 14px;font-size:var(--fs-md);line-height:1.55;color:var(--ink-2);max-height:420px;overflow:auto}
+.js .pc__sc:not(.is-on){display:none}
+.pc__sc h4{margin:12px 0 4px;font-size:var(--fs-sm);font-weight:600;color:var(--ink)}
+.pc__sc h4:first-child{margin-top:4px}
+.pc__sc ul{display:flex;flex-direction:column;gap:4px;padding-left:18px;list-style:disc}
+.pc__sc p+p{margin-top:6px}
+.pc__qg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px 12px;padding:0 12px 12px}
+.pc__eq{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;border:0;padding:0;margin:0}
+.pc__eq legend{width:100%;font-size:var(--fs-sm);color:var(--ink-3);margin-bottom:4px}
+.pc__nx{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px}
+.pc__nx input[type=date]{flex:0 1 180px;min-width:0}
+.pc__nx input[type=time]{flex:0 0 112px}
+.pc__nxh{font-size:var(--fs-xs);color:var(--ink-3)}
+.rbtn--voicemail .ic{color:var(--ink-3)}
+.rbtn--wrong_number .ic{color:var(--warn)}
+.pcall{padding:0;overflow:hidden}
+.pcall__h{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:16px 16px 0}
+.pcall__n{font-size:var(--fs-xl);font-weight:600;color:var(--ink);line-height:1.2}
+.pcall__m{margin-top:4px;font-size:var(--fs-sm);color:var(--ink-3)}
+@media (max-width:760px){.pc__qg{grid-template-columns:minmax(0,1fr)}.pcall__h{flex-direction:column}}
+.pc__res .pc__fields{grid-template-columns:minmax(0,1fr)}
+@media (min-width:1000px){.pcall__b{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:760px){.pr__st{align-items:flex-end}}
+.pcall .pc__qg{grid-template-columns:repeat(2,minmax(0,1fr))}

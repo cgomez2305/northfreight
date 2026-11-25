@@ -125,6 +125,9 @@ final class Sequences
     /** A12: al firmar (siempre; el envio sigue sujeto a las reglas de arriba). */
     public static function enrollReferral(int $leadId, int $signedAt): ?int
     {
+        if (!Referrals::enabled()) {   // fase AU: módulo de referidos apagado
+            return null;
+        }
         $lead = Lead::find($leadId);
         if ($lead === null || !self::eligibleEmail($lead)) {
             return null;

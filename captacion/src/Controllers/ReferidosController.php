@@ -16,10 +16,25 @@ final class ReferidosController extends Responder
     {
         $user = self::user();
         self::requireAdmin($user);
+        $uid = (int) $user['id'];
+        if ($a === 'module' && $b === null) {   // fase AU: encender o apagar el módulo
+            self::requirePost('/referidos');
+            $on = ($_POST['on'] ?? '') === '1';
+            Referrals::setEnabled($on, $uid);
+            self::flash(true, $on ? 'Módulo de referidos activado: vuelve al menú y los códigos que lleguen del sitio cuentan otra vez.' : 'Módulo de referidos desactivado. Los datos se conservan; puedes activarlo de nuevo aquí.');
+            self::redirect('/referidos');
+        }
+        if (!Referrals::enabled()) {
+            if ($a === null) {
+                self::page('referidos_off', $user, 'referidos', [['Referidos', null]], ['title' => 'Referidos', 'css' => ['referidos'], 'js' => [],
+                    'counts' => ['codes' => (int) \Captacion\Db::value('SELECT COUNT(*) FROM referral_codes'), 'refs' => (int) \Captacion\Db::value('SELECT COUNT(*) FROM referrals')]]);
+            }
+            self::flash(false, 'El módulo de referidos está desactivado.');
+            self::redirect('/referidos');
+        }
         if ($a === null) {
             self::index($user);
         }
-        $uid = (int) $user['id'];
         if ($a === 'new' && $b === null) {
             self::requirePost('/referidos');
             $r = Referrals::createCode($_POST['owner_name'] ?? '', $_POST['lead_id'] ?? null, $_POST['code'] ?? '', $_POST['bonus_amount'] ?? null, $_POST['note'] ?? '', $uid);

@@ -1110,3 +1110,26 @@ Carlos: «que las plantillas de correo se vean limpias y la información se lea 
 - la firma «NorthStar Freight Solutions» en negrita; texto de vista previa oculto con la primera frase útil (no el saludo);
 - el pie legal (empresa, dirección en una línea, motivo y baja de un clic) va fuera de la tarjeta, pequeño y en gris.
 El texto plano de cada correo no cambia. La ficha que se entrega a NorthStar (`HandoffCard::html`) usa el mismo lenguaje visual, sin mayúsculas forzadas, con las etiquetas de puntuación con tildes y las preferencias legibles («Texto», «Cualquier hora» en lugar de «text», «any»).
+
+## 34. Referidos apagados y prospección en frío al máximo (fase AU, 2026-11-25)
+
+Carlos: «al momento desactiva el módulo de referidos, y enfoquémonos en optimizar al máximo el manejo de los prospectos». Riesgos, reglas y práctica del sector en `docs/prospeccion-en-frio.md`.
+
+**Referidos (interruptor `modules.referrals`, APAGADO por defecto; `Referrals::enabled()`):** fuera del menú y de la paleta, los `?ref=` del sitio se ignoran (sin enlace ni puntos), no se inscribe a nadie en A12, no hay bonos ni avisos. Los datos se conservan; `/referidos` explica el estado y permite activarlo o desactivarlo (`POST /referidos/module`). Configuración > Canales lo enlaza.
+
+**Llamadas (`/prospectos`):**
+- **Prioridad** (`Prospects::prioritySql`/`priorityInfo`): respondió a un correo y no se le llamó +50, abrió un enlace después de la última llamada +30, rellamada pedida que ya llegó +25, seguimiento de «Conversó» o «Interesado» que toca +20, flota 1 a 5 +12 (6 a 10 +8), autoridad ≤30 días +15 (≤90 +10, ≤180 +5), carga general +10, con correo +3, −4 por intento. Orden de las pestañas por llamar: llamables ahora, prioridad, autoridad más reciente. Cada fila dice por qué (y «Prioridad alta» desde 45).
+- **Resultados nuevos:** «Dejé mensaje» (`voicemail`, cuenta como intento) y «Número equivocado» (`wrong_number`, cierra sin «no llamar»; se reabre a mano).
+- **Rellamada con hora** (`next_time`): hora LOCAL del prospecto (zona principal del estado), validada contra 8 a. m. a 9 p. m. y que sea futura; `callback_exact = 1`. Sin hora sigue 9:00 a. m. ET.
+- **Datos de la llamada** (`qual`, JSON con lista blanca: contacto, correo dado por teléfono, equipo, cuenta de Relay, si tiene dispatcher, mejor horario). Al convertir pasan al lead (nombre, correo, `equipment_types` con `amazon-relay` si tiene cuenta, `best_time`) con una nota que resume lo anotado y la última nota.
+- **«Interesado» convierte en lead** en el mismo clic (`prospects.config.auto_convert`, por defecto sí).
+- **Guion** (`ProspectScript`, ajuste `prospects.script` {en, es, lang}): editable en Configuración > Prospectos, variables `{empresa} {ciudad} {estado} {flota} {mc} {agente} {whatsapp} {web}`; el de fábrica dice que no se llama de FMCSA, da precios como estimación y manda a «No llamar más» a quien lo pida.
+- **Meta diaria** (`daily_goal`, 40 por defecto, 0 = sin meta) y conteo del día (`Prospects::todayStats`).
+- **Modo llamada** (`/prospectos/llamar`): un prospecto a la vez, el siguiente llamable por prioridad (`Prospects::nextForCall`), guion abierto al lado, «Saltar» con `?skip=ids`.
+- **Reglas en pantalla** reescritas: solo a mano, sin voces grabadas ni IA ni SMS, presentarse, no decir que se llama de FMCSA/DOT/Amazon, no grabar sin permiso, celulares personales como pendiente de abogado.
+
+**Correo automático tras no contestar** (`ProspectAutoMail`, ajuste `prospects.automail`, APAGADO por defecto; tabla `prospect_auto_mails`; job `prospect_auto_mail`): al registrar «Sin respuesta» o «Dejé mensaje» con correo, uno por prospecto, 10 minutos después; omite si en ese rato cambia el resultado, «No llamar más», «No interesado», convertido, baja, supresión o periodo de espera; comparte el tope por hora de los correos en lote (`ProspectMail::sentLastHour` cuenta los dos); no se enciende sin dirección física y SMTP; prueba al correo del administrador.
+
+**Más fuentes** (`ProspectSources`): «Añadir por USDOT» (censo + última concesión de Socrata, `source = manual`, origen en el historial) e «Importar CSV» (encabezados reconocidos: usdot/dot/dot_number, mc, name/company, dba, phone, email, state, city, fleet/power_units, authority_date; hasta 2.000 filas y 2 MB; `source = csv`). Ambos rechazan USDOT repetidos o que ya son lead y teléfonos de «No llamar más», borrados a petición o ya listados.
+
+Migración `020_prospeccion.sql` (`qual`, `callback_exact`, `prospect_auto_mails`). Prueba `53_fase_au` (77 comprobaciones); `24_referrals_jobs` enciende el módulo al empezar. NO se hizo, a propósito: marcador automático, llamadas con IA, SMS y WhatsApp en frío (necesitan consentimiento previo por escrito y abogado).

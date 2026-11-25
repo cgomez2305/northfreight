@@ -15,6 +15,8 @@ $empty = !$ov['codes'] && !$ov['referrals'];
     <p class="sub">Códigos de referido, los leads que llegan con ellos y los bonos por pagar.</p>
   </div>
   <div class="page-head__a">
+    <form method="post" action="/referidos/module"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="on" value="0">
+      <button class="btn btn--ghost" type="submit" data-confirm-title="¿Desactivar referidos?" data-confirm-label="Desactivar" data-confirm="Sale del menú y los códigos que lleguen del sitio dejan de contar. Los datos se conservan y puedes activarlo otra vez."><span class="btn__t">Desactivar módulo</span></button></form>
     <button class="btn btn--primary" type="button" data-open="#code-new"><span class="btn__t">Nuevo código</span></button>
   </div>
 </div>

@@ -35,7 +35,7 @@ return static function (array $ctx): void {
     T::ok(preg_match('#<script nonce="[^"]+" src="/assets/ctl\.js\?v=[^"]+" defer data-css-v="#', $d) === 1, 'el layout carga ctl.js con nonce (y ctl.css diferida)');
     $side = (string) preg_replace('#^.*?<aside class="side"(.*?)</aside>.*$#s', '$1', $d);
     preg_match_all('#<a class="nav-i(?! nav-i--view)[^"]*" href="([^"]+)"#', $side, $m);
-    T::eq($m[1], ['/', '/leads', '/tareas', '/prospectos', '/referidos', '/vacantes', '/reportes', '/comunicaciones', '/config', '/actividad'], 'menú del administrador: 10 accesos, uno por sección (antes 15 más la Bandeja)');
+    T::eq($m[1], ['/', '/leads', '/tareas', '/prospectos', '/vacantes', '/reportes', '/comunicaciones', '/config', '/actividad'], 'menú del administrador: 9 accesos, uno por sección (antes 15 más la Bandeja; Referidos sale con el módulo apagado, fase AU)');
     T::ok(!str_contains($side, 'data-inbox') && str_contains($d, 'data-notes'), '  sin botón «Bandeja»: la campana de arriba ya es la bandeja');
     $p = $s->get('/pipeline')['body'];
     T::ok(preg_match('#<a class="nav-i is-on" href="[^"]+" data-tip="Leads"#', $p) === 1, '  en el Tablero se marca Leads (el Tablero es un modo de Leads)');

@@ -14,7 +14,7 @@
       rows.forEach(function (o) { if (o !== d && o.open) o.open = false; });
     });
   });
-  document.querySelectorAll('.pc form').forEach(function (f) {
+  document.querySelectorAll('.pc form, .pcall form').forEach(function (f) {
     f.addEventListener('submit', function () {
       var li = f.closest('.pc'), nx = li && li.nextElementSibling;
       try { if (f.hasAttribute('data-pr-form') && nx && nx.id) sessionStorage.setItem(KEY, nx.id); } catch (e) {}
@@ -28,6 +28,22 @@
     var li = document.getElementById(want), d = li ? li.querySelector('details[data-pr]') : rows[0];
     if (d) { d.open = true; var s = d.querySelector('summary'); if (s) { s.focus({ preventScroll: true }); s.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' }); } }
   }
+
+  // Guion: inglés o español (sin JS se ven los dos; el idioma elegido se recuerda en este navegador)
+  var LK = 'ns-script-lang';
+  document.querySelectorAll('[data-script]').forEach(function (box) {
+    var seg = box.querySelector('[data-script-lang]');
+    if (!seg) return;
+    seg.hidden = false;
+    var show = function (l) {
+      box.querySelectorAll('[data-sc]').forEach(function (d) { d.classList.toggle('is-on', d.getAttribute('data-sc') === l); });
+      seg.querySelectorAll('button').forEach(function (b) { var on = b.getAttribute('data-lang') === l; b.classList.toggle('is-on', on); b.setAttribute('aria-pressed', on ? 'true' : 'false'); });
+    };
+    var saved = null;
+    try { saved = localStorage.getItem(LK); } catch (e) {}
+    if (saved === 'en' || saved === 'es') show(saved);
+    seg.querySelectorAll('button').forEach(function (b) { b.addEventListener('click', function () { var l = b.getAttribute('data-lang'); show(l); try { localStorage.setItem(LK, l); } catch (e) {} }); });
+  });
 
   // Por página
   var per = document.querySelector('.pbar [data-per]');

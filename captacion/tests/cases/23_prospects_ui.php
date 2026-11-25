@@ -133,7 +133,7 @@ return static function (array $ctx): void {
     T::ok(!in_array('fmcsa_cron', array_map(static fn($n) => explode(':', $n['key'])[0], Notifications::all((int) $uid)), true), '  con la búsqueda apagada no avisa del cron');
     Settings::set('prospects.config', ProspectConfig::DEFAULTS);
     $home = $s->get('/');
-    T::ok(str_contains($home['body'], 'href="/prospectos"') && str_contains($home['body'], 'href="/referidos"') && str_contains($home['body'], 'href="/vacantes"'), 'barra lateral: Prospectos, Referidos y Vacantes (administrador)');
+    T::ok(str_contains($home['body'], 'href="/prospectos"') && !str_contains($home['body'], 'href="/referidos"') && str_contains($home['body'], 'href="/vacantes"'), 'barra lateral: Prospectos y Vacantes (administrador); Referidos no, porque el módulo viene apagado (fase AU)');
 
     // ------------------------------------------------------------------ Configuracion > Prospectos
     $c = $s->get('/config?tab=prospectos');

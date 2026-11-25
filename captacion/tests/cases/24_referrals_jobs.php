@@ -25,6 +25,7 @@ use CaptacionTests\T;
  */
 return static function (array $ctx): void {
     T::reset(true);
+    Fx::setting('modules.referrals', true);   // fase AU: el módulo viene apagado por defecto
     $work = $ctx['work'];
     $repo = dirname($ctx['root']);
     $count = static fn(string $t, string $where = '1=1') => (int) Db::value("SELECT COUNT(*) FROM $t WHERE $where");
@@ -213,6 +214,7 @@ return static function (array $ctx): void {
 
     // ======================================================================= VACANTES
     T::reset(true);
+    Fx::setting('modules.referrals', true);   // fase AU: el módulo viene apagado por defecto
     $admin = Panel::user('admin');
     $uid = (int) $admin['id'];
     $siteStorage = "$dir/storage";
@@ -448,4 +450,5 @@ return static function (array $ctx): void {
     Infra::stop('site-jobs');
     Env::set('SITE_STORAGE_DIR', null);
     T::reset(true);
+    Fx::setting('modules.referrals', true);   // fase AU: el módulo viene apagado por defecto
 };

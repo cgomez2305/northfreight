@@ -530,10 +530,16 @@ final class ProspectMail
 
     // --- Envío (job prospect_mail_tick) --------------------------------------------------------------------------------------------
 
-    private static function sentLastHour(int $now): int
+    /** Correos a prospectos enviados en la última hora: campañas (1.º y 2.º) y, desde la fase AU, los automáticos tras no contestar (comparten el tope). */
+    public static function sentLastHour(int $now): int
     {
+        $auto = 0;
+        try {
+            $auto = (int) Db::value("SELECT COUNT(*) FROM prospect_auto_mails WHERE status = 'sent' AND sent_at > ?", [Clock::at($now - 3600)]);
+        } catch (\Throwable) {   // entre el despliegue y la migración 020
+        }
         return (int) Db::value("SELECT COUNT(*) FROM prospect_campaign_recipients WHERE status = 'sent' AND sent_at > ?", [Clock::at($now - 3600)])
-            + (int) Db::value("SELECT COUNT(*) FROM prospect_campaign_recipients WHERE fu_status = 'sent' AND fu_sent_at > ?", [Clock::at($now - 3600)]);
+            + (int) Db::value("SELECT COUNT(*) FROM prospect_campaign_recipients WHERE fu_status = 'sent' AND fu_sent_at > ?", [Clock::at($now - 3600)]) + $auto;
     }
 
     private static function pauseFor(int $id, string $why): void

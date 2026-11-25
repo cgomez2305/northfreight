@@ -120,7 +120,7 @@ abstract class Responder
         $hot = $viewer ? 0 : (int) Db::value("SELECT COUNT(*) FROM leads WHERE deleted_at IS NULL AND temperature = 'hot' AND first_contact_at IS NULL AND stage = 'new'");
         self::html($view, $vars + [
             'shell' => true, 'user' => $user, 'csrf' => Session::csrf(), 'active' => $active, 'crumbs' => $crumbs, 'bell' => $notes,
-            'unread' => Notifications::unread($notes), 'hotBadge' => $hot, 'overdueBadge' => $viewer ? 0 : Tasks::overdueCount(), 'isAdmin' => ($user['role'] ?? '') === 'admin', 'isViewer' => $viewer, 'followBadge' => ($user['role'] ?? '') === 'admin' ? Prospects::followupsDue(Clock::time())['n'] : 0, 'bonusBadge' => ($user['role'] ?? '') === 'admin' ? Referrals::pendingApproval() : 0, 'flash' => self::takeFlash(),
+            'unread' => Notifications::unread($notes), 'hotBadge' => $hot, 'overdueBadge' => $viewer ? 0 : Tasks::overdueCount(), 'isAdmin' => ($user['role'] ?? '') === 'admin', 'isViewer' => $viewer, 'followBadge' => ($user['role'] ?? '') === 'admin' ? Prospects::followupsDue(Clock::time())['n'] : 0, 'bonusBadge' => ($user['role'] ?? '') === 'admin' ? Referrals::pendingApproval() : 0, 'refOn' => Referrals::enabled(), 'flash' => self::takeFlash(),
             'sysOk' => !array_filter($notes, static fn($n) => in_array($n['kind'], ['bad', 'warn'], true)),
             'prefs' => Prefs::all($uid), 'navViews' => $views, 'cmds' => $viewer ? [] : Commands::forUser($user, array_map(static fn($v) => $v + ['href' => SavedViews::href($v)], [...SavedViews::system(), ...SavedViews::mine($uid)])),
         ], $status);

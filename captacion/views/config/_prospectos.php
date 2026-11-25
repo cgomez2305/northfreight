@@ -72,3 +72,53 @@ $c = is_array($pRun) ? ($pRun['counters'] ?? []) : [];
   <footer class="card__f"><span class="muted">Lo ya listado no se duplica al repasar la ventana.</span>
     <form method="post" action="/config/prospects/window"><input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><button class="btn btn--secondary" type="submit"<?= $locked ? ' disabled' : '' ?>><?= Ui::icon('refresh') ?>Revisar toda la ventana otra vez</button></form></footer>
 </section>
+
+<?php /* Fase AU: llamadas, guion y correo tras no contestar */ $pa = $pAuto; $ps = $pAutoStats; ?>
+<form method="post" action="/config/prospects/calls" class="cfg-form" novalidate>
+  <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>">
+  <fieldset class="cfg-fs"<?= $locked ? ' disabled' : '' ?>>
+    <section class="card cfg-card" aria-labelledby="pl-t">
+      <header class="card__h"><h2 class="label" id="pl-t">Llamadas</h2></header>
+      <div class="card__b pf-grid">
+        <label class="field"><span>Meta de llamadas por día (equipo)</span><input type="text" name="daily_goal" value="<?= $e($pc['daily_goal']) ?>" inputmode="numeric" maxlength="3" autocomplete="off"><small>Se ve arriba de la lista y en el Modo llamada. 0 = sin meta.</small></label>
+        <label class="tgl pf-all"><input type="checkbox" name="auto_convert" value="1"<?= $pc['auto_convert'] ? ' checked' : '' ?>><span class="tgl__t"><b>«Interesado» lo convierte en lead en el mismo clic</b><small>Pasa a Leads en «Contactado» con lo anotado en la llamada (contacto, correo, equipo, Relay) y la última nota. Sin mensajes ni alertas.</small></span></label>
+      </div>
+      <footer class="card__f"><span class="muted">El orden de la lista lo explica cada fila.</span><button class="btn btn--primary" type="submit"><span class="btn__t">Guardar</span></button></footer>
+    </section>
+  </fieldset>
+</form>
+
+<form method="post" action="/config/prospects/script" class="cfg-form" novalidate>
+  <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>">
+  <fieldset class="cfg-fs"<?= $locked ? ' disabled' : '' ?>>
+    <section class="card cfg-card" aria-labelledby="pg-t">
+      <header class="card__h"><h2 class="label" id="pg-t">Guion de la llamada</h2></header>
+      <div class="card__b">
+        <p class="muted pf-hint">Se abre dentro de cada prospecto y en el Modo llamada. «# Título» abre una sección y «- » hace una lista. Variables: <?php foreach (\Captacion\Services\ProspectScript::VARS as $k => $l): ?><code title="<?= $e($l) ?>"><?= $e($k) ?></code> <?php endforeach; ?>. Afirma solo lo que NorthStar hace hoy; los precios, como estimación.</p>
+        <div class="pg-grid">
+          <label class="field"><span>English</span><textarea name="script_en" rows="14" maxlength="6000"><?= $e($pScript['en']) ?></textarea></label>
+          <label class="field"><span>Español</span><textarea name="script_es" rows="14" maxlength="6000"><?= $e($pScript['es']) ?></textarea></label>
+        </div>
+        <label class="field pg-lang"><span>Se abre primero en</span><select name="lang"><?php foreach (\Captacion\Services\ProspectScript::LANGS as $k => $l): ?><option value="<?= $e($k) ?>"<?= $pScript['lang'] === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
+      </div>
+      <footer class="card__f"><button class="btn btn--ghost" type="submit" name="restore" value="1" data-confirm-title="¿Restaurar el guion de fábrica?" data-confirm-label="Restaurar" data-confirm="Se pierden los cambios hechos a los dos guiones.">Restaurar el de fábrica</button><button class="btn btn--primary" type="submit"><span class="btn__t">Guardar guion</span></button></footer>
+    </section>
+  </fieldset>
+</form>
+
+<form method="post" action="/config/prospects/automail" class="cfg-form" novalidate>
+  <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>">
+  <fieldset class="cfg-fs"<?= $locked ? ' disabled' : '' ?>>
+    <section class="card cfg-card" aria-labelledby="pa-t">
+      <header class="card__h"><h2 class="label" id="pa-t">Correo automático tras no contestar</h2></header>
+      <div class="card__b">
+        <p class="muted pf-hint">Al registrar «Sin respuesta» o «Dejé mensaje», si el prospecto tiene correo, sale este correo 10 minutos después (uno por prospecto, como mucho). Mismas reglas que los correos en lote: dirección física, baja de un clic, periodo de espera y tope por hora compartido. Nunca a «No llamar más», «No interesado», convertidos ni bajas.</p>
+        <?php if ($pBlockers): ?><p class="flash flash--bad" role="alert"><?= Ui::icon('alert') ?><?= $e($pBlockers[0]) ?></p><?php endif; ?>
+        <label class="tgl"><input type="checkbox" name="enabled" value="1"<?= $pa['enabled'] ? ' checked' : '' ?>><span class="tgl__t"><b>Encendido</b><small><?= $e($ps['sent7']) ?> enviados en los últimos 7 días · <?= $e($ps['sent']) ?> en total<?= $ps['skipped'] ? ' · ' . $e($ps['skipped']) . ' omitidos' : '' ?><?= $ps['failed'] ? ' · ' . $e($ps['failed']) . ' fallidos' : '' ?></small></span></label>
+        <label class="field"><span>Asunto</span><input type="text" name="subject" maxlength="190" value="<?= $e($pa['subject']) ?>" autocomplete="off"></label>
+        <label class="field"><span>Texto (en inglés: los transportistas están en EE. UU.)</span><textarea name="body" rows="9" maxlength="8000"><?= $e($pa['body']) ?></textarea><small>Variables: <?php foreach (\Captacion\Services\ProspectMail::VARS as $k => $l): ?><code title="<?= $e($l) ?>"><?= $e($k) ?></code> <?php endforeach; ?></small></label>
+      </div>
+      <footer class="card__f"><button class="btn btn--ghost" type="submit" formaction="/config/prospects/automailtest">Enviarme una prueba (lo guardado)</button><button class="btn btn--primary" type="submit"><span class="btn__t">Guardar</span></button></footer>
+    </section>
+  </fieldset>
+</form>

@@ -353,7 +353,7 @@ final class ProspectImport
         return $out;
     }
 
-    private static function buildRow(array $g, array $cr, ?string $phone, string $today): array
+    public static function buildRow(array $g, array $cr, ?string $phone, string $today): array
     {
         $clean = static fn(mixed $v, int $max): ?string => ($s = mb_substr(trim((string) preg_replace('/\s+/u', ' ', mb_scrub((string) $v))), 0, $max)) !== '' ? $s : null;
         $email = strtolower(trim((string) ($cr['email_address'] ?? '')));

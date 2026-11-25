@@ -44,6 +44,7 @@ final class JobHandlers
             'outbound_webhook'        => [OutboundWebhooks::class, 'deliver'],
             'prospect_mail_tick'      => [ProspectMail::class, 'tick'],   // fase AQ: correos en lote a prospectos
             'prospect_reply_scan'     => [ProspectReplies::class, 'job'],   // fase AT: respuestas leídas del buzón
+            'prospect_auto_mail'      => [ProspectAutoMail::class, 'job'],   // fase AU: correo tras una llamada sin respuesta
         ];
     }
 

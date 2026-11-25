@@ -249,7 +249,7 @@ return static function (array $ctx): void {
     Clock::travel($utc('2026-11-06 15:00') - time());
     $f = Prospects::filters([]);
     $ids = array_column(Prospects::page($f, Clock::time(), 1, 25)['rows'], 'id');
-    T::ok(in_array((string) $pid, array_map('strval', $ids), true) && (string) $ids[0] === (string) $pid, 'resultado: al llegar la fecha vuelve a la lista de hoy, primero (los reintentos van antes)');
+    T::ok(in_array((string) $pid, array_map('strval', $ids), true), 'resultado: al llegar la fecha vuelve a la lista de hoy (fase AU: el orden lo da la prioridad, ya no «los reintentos primero»)');
     Prospects::record($pid, 'no_answer', null, '2026-11-09', $uid);
     $r = Prospects::record($pid, 'no_answer', null, '', $uid);
     $p = Prospects::find($pid);

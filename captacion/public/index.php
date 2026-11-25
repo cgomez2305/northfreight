@@ -147,9 +147,9 @@ switch (true) {
         ActividadController::route($m[1] ?? null);
     case preg_match('#^/prospectos/correos(?:/(nueva|ajustes|\d{1,12})(?:/([a-z]{4,10}))?)?$#', $path, $m) === 1:   // fase AQ: correos en lote a prospectos
         ProspectMailController::route(($m[1] ?? '') !== '' ? $m[1] : null, ($m[2] ?? '') !== '' ? $m[2] : null);
-    case preg_match('#^/prospectos(?:/(export|\d{1,12})(?:/(result|convert|reopen))?)?$#', $path, $m) === 1:
+    case preg_match('#^/prospectos(?:/(export|add|import|llamar|\d{1,12})(?:/(result|convert|reopen))?)?$#', $path, $m) === 1:
         ProspectosController::route(($m[1] ?? '') !== '' ? $m[1] : null, ($m[2] ?? '') !== '' ? $m[2] : null);
-    case preg_match('#^/referidos(?:/(new|confirm|\d{1,12})(?:/([a-z]{3,10}))?)?$#', $path, $m) === 1:
+    case preg_match('#^/referidos(?:/(new|confirm|module|\d{1,12})(?:/([a-z]{3,10}))?)?$#', $path, $m) === 1:
         ReferidosController::route(($m[1] ?? '') !== '' ? $m[1] : null, ($m[2] ?? '') !== '' ? $m[2] : null);
     case preg_match('#^/vacantes(?:/(new|\d{1,12})(?:/([a-z]{3,10}))?)?$#', $path, $m) === 1:
         VacantesController::route(($m[1] ?? '') !== '' ? $m[1] : null, ($m[2] ?? '') !== '' ? $m[2] : null);

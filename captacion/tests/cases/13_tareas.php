@@ -118,6 +118,9 @@ return static function (array $ctx): void {
     $over = Tasks::create('Vencida para la campana', $local($now - 7200), 2, $lead, $uid);
     T::ok(count(array_filter(Notifications::all($uid), static fn($n) => str_starts_with($n['key'], 'tasks_overdue:1:'))) === 1, 'campana: aviso de tareas vencidas con su conteo');
     Clock::travel(0);
+    if (isset($over['id'])) {   // fase AU: la vencida debe seguir vencida con el reloj real (antes dependía de la hora del día a la que corría la prueba)
+        Db::run('UPDATE tasks SET due_at = ? WHERE id = ?', [Clock::at(time() - 7200), (int) $over['id']]);
+    }
     Tasks::resetCache();
 
     // ------------------------------------------------------------------ HTTP

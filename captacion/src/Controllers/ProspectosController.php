@@ -12,7 +12,10 @@ use Captacion\Clock;
 use Captacion\Services\ActivityLog;
 use Captacion\Services\Csv;
 use Captacion\Services\ProspectConfig;
+use Captacion\Services\ProspectAutoMail;
 use Captacion\Services\ProspectImport;
+use Captacion\Services\ProspectScript;
+use Captacion\Services\ProspectSources;
 use Captacion\Services\Prospects;
 use Captacion\Services\Settings;
 
@@ -27,6 +30,24 @@ final class ProspectosController extends Responder
         }
         if ($a === 'export' && $b === null) {
             self::export($user);
+        }
+        if ($a === 'llamar' && $b === null) {
+            self::callMode($user);
+        }
+        if (in_array($a, ['add', 'import'], true) && $b === null) {
+            self::requirePost('/prospectos');
+            $r = $a === 'add'
+                ? ProspectSources::addByUsdot($_POST['usdot'] ?? '', $_POST['origin'] ?? '', (int) $user['id'])
+                : (is_array($_FILES['file'] ?? null) && ($_FILES['file']['error'] ?? 1) === UPLOAD_ERR_OK && is_uploaded_file((string) $_FILES['file']['tmp_name'])
+                    ? ProspectSources::importCsv((string) $_FILES['file']['tmp_name'], $_POST['origin'] ?? '', (int) $user['id'])
+                    : ['ok' => false, 'msg' => 'Elige un archivo CSV (hasta 2 MB).']);
+            self::flash($r['ok'], $r['msg']);
+            $to = '/prospectos' . ($a === 'import' && $r['ok'] ? '?tab=to_call' : '');
+            if (isset($r['id']) && ($p = \Captacion\Db::one('SELECT usdot, status FROM prospects_fmcsa WHERE id = ?', [(int) $r['id']])) !== null) {   // lleva a la fila del prospecto en su pestaña
+                $tab = $p['status'] === 'no_answer_closed' ? 'no_answer' : (string) $p['status'];
+                $to = '/prospectos?' . http_build_query(['tab' => $tab, 'q' => $p['usdot']]) . '#p-' . (int) $r['id'];
+            }
+            self::redirect($to);
         }
         if (ctype_digit($a) && in_array($b, ['result', 'convert', 'reopen'], true)) {
             self::act($user, (int) $a, (string) $b);
@@ -46,9 +67,35 @@ final class ProspectosController extends Responder
         $cron = Settings::get('cron.prospects');
         self::page('prospectos', $user, 'prospectos', [['Prospectos', null]], [
             'title' => 'Prospectos', 'css' => ['prospectos'], 'js' => ['prospectos'], 'f' => $f, 'per' => $per, 'list' => $page, 'counts' => Prospects::counts($f, $now), 'stateFacets' => Prospects::stateFacets(),
-            'callable' => in_array($f['tab'], ['today', 'to_call', 'no_answer'], true) ? Prospects::callableCount($f, $now) : null, 'history' => Prospects::historyFor(array_column($page['rows'], 'id')), 'mailed' => \Captacion\Services\ProspectMail::lastFor(array_column($page['rows'], 'id')), 'now' => $now, 'summary' => Prospects::summary($now), 'cfg' => $cfg, 'run' => $run,
+            'callable' => in_array($f['tab'], ['today', 'to_call', 'no_answer'], true) ? Prospects::callableCount($f, $now) : null, 'history' => Prospects::historyFor(array_column($page['rows'], 'id')), 'mailed' => \Captacion\Services\ProspectMail::lastFor(array_column($page['rows'], 'id')), 'autoMails' => ProspectAutoMail::lastFor(array_column($page['rows'], 'id')), 'now' => $now,
+            'stats' => Prospects::todayStats($now, (int) $user['id']), 'script' => ProspectScript::get(), 'agent' => self::agent($user), 'summary' => Prospects::summary($now), 'cfg' => $cfg, 'run' => $run,
             'cron' => is_array($cron) ? $cron : null, 'totalAll' => (int) \Captacion\Db::value('SELECT COUNT(*) FROM prospects_fmcsa WHERE deleted_at IS NULL'),
             'back' => '/prospectos' . self::qs($f, $per, $page['page']),
+        ]);
+    }
+
+    /** Nombre de pila para el guion. */
+    private static function agent(array $user): string
+    {
+        return (string) strtok(trim((string) ($user['name'] ?? '')), ' ');
+    }
+
+    /**
+     * Fase AU: Modo llamada. Un prospecto a la vez, el siguiente de la «Lista de hoy» que se puede llamar YA, por prioridad, con el guion abierto. Al registrar el
+     * resultado vuelve aquí y aparece el siguiente. «Saltar» lo deja para después en esta sesión (?skip=ids, sin datos personales en la URL).
+     */
+    private static function callMode(array $user): never
+    {
+        $now = Clock::time();
+        $skip = array_slice(array_values(array_filter(array_map('intval', explode(',', is_string($_GET['skip'] ?? null) ? $_GET['skip'] : '')))), 0, 100);
+        $n = Prospects::nextForCall($now, $skip);
+        $row = $n['row'];
+        $back = '/prospectos/llamar' . ($skip ? '?skip=' . implode(',', $skip) : '');
+        self::page('prospectos_llamar', $user, 'prospectos', [['Prospectos', '/prospectos'], ['Modo llamada', null]], [
+            'title' => 'Modo llamada', 'css' => ['prospectos'], 'js' => ['prospectos'], 'row' => $row, 'left' => $n['left'], 'skip' => $skip, 'now' => $now, 'back' => $back,
+            'history' => $row !== null ? Prospects::historyFor([(int) $row['id']]) : [], 'mailed' => $row !== null ? \Captacion\Services\ProspectMail::lastFor([(int) $row['id']]) : [],
+            'autoMails' => $row !== null ? ProspectAutoMail::lastFor([(int) $row['id']]) : [], 'stats' => Prospects::todayStats($now, (int) $user['id']), 'script' => ProspectScript::get(), 'agent' => self::agent($user),
+            'counts' => Prospects::counts(Prospects::filters([]), $now),
         ]);
     }
 
@@ -66,7 +113,7 @@ final class ProspectosController extends Responder
     private static function backUrl(): string
     {
         $b = is_string($_POST['back'] ?? null) ? $_POST['back'] : '/prospectos';
-        return preg_match('#^/prospectos(\?[A-Za-z0-9_%=&.\-+~]{0,200})?$#', $b) === 1 ? $b : '/prospectos';
+        return preg_match('#^/prospectos(/llamar)?(\?[A-Za-z0-9_%=&.\-+~,]{0,400})?$#', $b) === 1 ? $b : '/prospectos';
     }
 
     private static function act(array $user, int $id, string $action): never
@@ -75,7 +122,8 @@ final class ProspectosController extends Responder
         self::requirePost($back);
         $uid = (int) $user['id'];
         $r = match ($action) {
-            'result'  => Prospects::record($id, is_string($_POST['result'] ?? null) ? $_POST['result'] : '', $_POST['note'] ?? '', $_POST['next'] ?? '', $uid),
+            'result'  => Prospects::record($id, is_string($_POST['result'] ?? null) ? $_POST['result'] : '', $_POST['note'] ?? '', $_POST['next'] ?? '', $uid, $_POST['next_time'] ?? '',
+                is_array($_POST['q'] ?? null) && ($_POST['q']['_on'] ?? '') === '1' ? $_POST['q'] : null),
             'convert' => Prospects::convert($id, $uid),
             'reopen'  => Prospects::reopen($id, $uid),
         };

@@ -14,3 +14,8 @@
 .pf-meta dt{font:500 12px/1.2 var(--f-sans);color:var(--ink-3);margin-bottom:3px}
 .pf-meta dd{margin:0;font-size:14px;color:var(--ink)}
 @media (max-width:900px){.pf-grid,.pf-meta{grid-template-columns:minmax(0,1fr)}}
+/* Fase AU: guion y correo tras no contestar */
+.pg-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.pg-grid textarea{font:400 var(--fs-sm)/1.5 var(--f-mono);min-height:280px}
+.pg-lang{max-width:240px;margin-top:10px}
+@media (max-width:900px){.pg-grid{grid-template-columns:minmax(0,1fr)}}

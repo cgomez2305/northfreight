@@ -74,7 +74,7 @@ $ni = static function (string $href, string $icon, string $label, string $key, a
       <?php if ($isAdmin): ?>
       <hr class="side__sep">
       <?= $ni('/prospectos', 'phone', 'Prospectos', in_array($active, ['prospectos', 'pmail'], true) ? $active : 'prospectos', ['badge' => (int) ($followBadge ?? 0), 'title' => 'Seguimientos de hoy', 'sr' => 'seguimientos de hoy']) ?>
-      <?= $ni('/referidos', 'user-plus', 'Referidos', 'referidos', ['badge' => (int) ($bonusBadge ?? 0), 'cls' => 'hot', 'title' => 'Bonos por aprobar', 'sr' => 'bonos por aprobar']) ?>
+      <?php if (!empty($refOn)): ?><?= $ni('/referidos', 'user-plus', 'Referidos', 'referidos', ['badge' => (int) ($bonusBadge ?? 0), 'cls' => 'hot', 'title' => 'Bonos por aprobar', 'sr' => 'bonos por aprobar']) ?><?php endif; ?>
       <?= $ni('/vacantes', 'file', 'Vacantes', 'vacantes') ?>
       <hr class="side__sep">
       <?= $ni('/reportes', 'bar-chart', 'Reportes', in_array($active, ['reportes', 'informes'], true) ? $active : 'reportes') ?>

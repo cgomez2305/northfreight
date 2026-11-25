@@ -84,6 +84,10 @@ final class ConfigController extends Responder
             'users/activate'      => self::usersAction($user, 'activate'),
             'prospects/save'      => self::prospectsSave($user),
             'prospects/window'    => self::prospectsWindow($user),
+            'prospects/calls'     => self::prospectsCalls($user),   // fase AU
+            'prospects/script'    => self::prospectsScript($user),
+            'prospects/automail'  => self::prospectsAutomail($user, false),
+            'prospects/automailtest' => self::prospectsAutomail($user, true),
             'canales/meta'        => self::canalesSave($user, 'meta'),
             'canales/calcom'      => self::canalesSave($user, 'calcom'),
             'canales/twilio'      => self::canalesSave($user, 'twilio'),
@@ -166,6 +170,8 @@ final class ConfigController extends Responder
             'prospectos'    => [
                 'pc' => ProspectConfig::get(), 'pRun' => ProspectImport::state(), 'pComplete' => ProspectImport::completeUntil(), 'pCron' => Settings::get('cron.prospects'),
                 'pSocrata' => Integrations::last('socrata'), 'pToken' => (new \Captacion\Services\SocrataClient())->hasToken(), 'pForm' => null,
+                'pScript' => \Captacion\Services\ProspectScript::get(), 'pAuto' => \Captacion\Services\ProspectAutoMail::settings(), 'pAutoStats' => \Captacion\Services\ProspectAutoMail::stats($now),
+                'pBlockers' => \Captacion\Services\ProspectMail::blockers(),
             ],
         };
         self::page('config', $user, 'config', [['Configuración', '/config'], [self::TABS[$tab], null]], $over + $vars, $status);
@@ -375,6 +381,41 @@ final class ConfigController extends Responder
             ProspectImport::resetWindow();   // la proxima corrida vuelve a evaluar toda la ventana con los filtros nuevos
         }
         self::flash(true, !$changed ? 'No había cambios que guardar.' : 'Filtros guardados.' . ($widened ? ' La próxima corrida vuelve a revisar toda la ventana con los filtros nuevos.' : ''));
+        self::redirect($back);
+    }
+
+    /** Fase AU: meta diaria de llamadas y «Interesado» convierte en lead. */
+    private static function prospectsCalls(array $user): never
+    {
+        $back = self::guardPost('prospectos', true, '#pl-t');
+        $v = ProspectConfig::normalize(['daily_goal' => $_POST['daily_goal'] ?? '', 'auto_convert' => isset($_POST['auto_convert']) ? '1' : '0']);
+        if ($v['errors']) {
+            self::flash(false, reset($v['errors']));
+            self::redirect($back);
+        }
+        $before = ProspectConfig::get();
+        $after = $v['clean'] + $before;
+        Settings::set('prospects.config', $after);
+        ActivityLog::settingsChange((int) $user['id'], 'prospects', $before, $after);
+        self::flash(true, 'Ajustes de las llamadas guardados.');
+        self::redirect($back);
+    }
+
+    private static function prospectsScript(array $user): never
+    {
+        $back = self::guardPost('prospectos', true, '#pg-t');
+        $in = isset($_POST['restore']) ? ['en' => '', 'es' => '', 'lang' => $_POST['lang'] ?? 'en'] : ['en' => $_POST['script_en'] ?? '', 'es' => $_POST['script_es'] ?? '', 'lang' => $_POST['lang'] ?? 'en'];
+        $r = \Captacion\Services\ProspectScript::save($in, (int) $user['id']);
+        self::flash($r['ok'], isset($_POST['restore']) && $r['ok'] ? 'Guion de fábrica restaurado.' : $r['msg']);
+        self::redirect($back);
+    }
+
+    private static function prospectsAutomail(array $user, bool $test): never
+    {
+        $back = self::guardPost('prospectos', !$test, '#pa-t');
+        $r = $test ? \Captacion\Services\ProspectAutoMail::sendTest((string) $user['email'], (int) $user['id'])
+            : \Captacion\Services\ProspectAutoMail::save(['enabled' => isset($_POST['enabled']) ? '1' : '0', 'subject' => $_POST['subject'] ?? '', 'body' => $_POST['body'] ?? ''], (int) $user['id']);
+        self::flash($r['ok'], $r['msg']);
         self::redirect($back);
     }
 

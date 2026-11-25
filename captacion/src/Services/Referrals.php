@@ -43,6 +43,23 @@ final class Referrals
         return self::siteUrl() . '/careers/?ref=' . rawurlencode($code);
     }
 
+    /**
+     * Fase AU (2026-11-25, Carlos: «al momento desactiva el módulo de referidos»): interruptor del módulo, APAGADO por defecto. Apagado: no aparece en el menú ni en
+     * la paleta, los códigos que lleguen del sitio se ignoran (sin enlace, sin puntos de referido), no se inscribe a nadie en A12, no se crean bonos ni avisos.
+     * Los datos ya guardados no se tocan y vuelven a verse al encenderlo en /referidos.
+     */
+    public static function enabled(): bool
+    {
+        return Settings::get('modules.referrals', false) === true;
+    }
+
+    public static function setEnabled(bool $on, int $userId): void
+    {
+        $before = self::enabled();
+        Settings::set('modules.referrals', $on);
+        ActivityLog::settingsChange($userId, 'modules', ['referrals' => $before], ['referrals' => $on]);
+    }
+
     public static function bonusConfirmed(): bool
     {
         return Settings::get('referrals.bonus_confirmed', false) === true;
@@ -89,7 +106,7 @@ final class Referrals
     public static function find(mixed $raw): ?array
     {
         $c = self::normalize($raw);
-        if ($c === null) {
+        if ($c === null || !self::enabled()) {
             return null;
         }
         $r = self::byCode($c);
@@ -209,7 +226,7 @@ final class Referrals
     /** El lead avanzo de etapa: «Referido» pasa a «Calificado». */
     public static function onStage(int $leadId, string $stage): void
     {
-        if (!in_array($stage, self::QUALIFYING, true)) {
+        if (!in_array($stage, self::QUALIFYING, true) || !self::enabled()) {
             return;
         }
         Db::run("UPDATE referrals SET status = 'qualified', qualified_at = ? WHERE lead_id = ? AND status = 'referred'", [Clock::now(), $leadId]);
@@ -218,6 +235,9 @@ final class Referrals
     /** El lead firmo: el referido pasa a «Firmado», el bono a «pendiente de aprobar» y se avisa a Carlos. Idempotente. */
     public static function onSigned(array $lead, ?int $userId): void
     {
+        if (!self::enabled()) {
+            return;
+        }
         $leadId = (int) $lead['id'];
         $ref = Db::one('SELECT r.*, c.code, c.owner_name, c.owner_lead_id, c.bonus_amount AS code_amount FROM referrals r JOIN referral_codes c ON c.id = r.referral_code_id WHERE r.lead_id = ? FOR UPDATE', [$leadId]);
         if ($ref === null || $ref['status'] === 'signed') {
@@ -253,7 +273,7 @@ final class Referrals
 
     public static function pendingApproval(): int
     {
-        return (int) Db::value("SELECT COUNT(*) FROM referrals WHERE bonus_status = 'pending'");
+        return self::enabled() ? (int) Db::value("SELECT COUNT(*) FROM referrals WHERE bonus_status = 'pending'") : 0;
     }
 
     /**

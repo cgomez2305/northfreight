@@ -16,6 +16,7 @@ use CaptacionTests\T;
 /** Q3-A: entrega a NorthStar (correo, webhook firmado, reintentos), idempotencia y confirmacion sin login (/c/{token}) o desde la ficha. */
 return static function (array $ctx): void {
     T::reset(true);
+    Fx::setting('modules.referrals', true);   // fase AU: A12 solo con el módulo de referidos encendido
     Settings::set('handoff', []);
     Settings::clear();
     $work = $ctx['work'];
@@ -345,4 +346,5 @@ return static function (array $ctx): void {
     Settings::set('handoff', []);
     Clock::travel(0);
     T::reset(true);
+    Fx::setting('modules.referrals', true);   // fase AU: A12 solo con el módulo de referidos encendido
 };

@@ -8,6 +8,8 @@
  *   require_phone    solo carriers con telefono valido
  *   cargo            [] = cualquiera; si no, categorias de CARGO (basta con una); si el filtro esta activo y FMCSA no trae banderas de carga, se descarta
  *   daily_cap        tope de prospectos NUEVOS por dia (hora de Nueva York), 1 a 500
+ *   daily_goal       fase AU: meta de llamadas por día del equipo (0 = sin meta), 0 a 500
+ *   auto_convert     fase AU: al marcar «Interesado» el prospecto se convierte en lead en el mismo clic (por defecto sí)
  * FMCSA publica la carga que declara el carrier (banderas crgo_*), no el tipo de equipo: dry van, reefer o flatbed no existen como dato.
  */
 
@@ -17,7 +19,7 @@ namespace Captacion\Services;
 
 final class ProspectConfig
 {
-    public const DEFAULTS = ['enabled' => true, 'max_age_months' => 12, 'states' => [], 'max_fleet' => 10, 'require_phone' => true, 'cargo' => [], 'daily_cap' => 40, 'relist_months' => 0];
+    public const DEFAULTS = ['enabled' => true, 'max_age_months' => 12, 'states' => [], 'max_fleet' => 10, 'require_phone' => true, 'cargo' => [], 'daily_cap' => 40, 'relist_months' => 0, 'daily_goal' => 40, 'auto_convert' => true];
     /** Fase AT: «No interesado» vuelve a «Por llamar» pasados estos meses (0 = nunca). «No llamar más» jamás vuelve. */
     public const RELIST = [0 => 'Nunca', 3 => 'A los 3 meses', 6 => 'A los 6 meses', 12 => 'A los 12 meses'];
 
@@ -54,6 +56,9 @@ final class ProspectConfig
         if (array_key_exists('enabled', $in)) {
             $clean['enabled'] = filter_var($in['enabled'], FILTER_VALIDATE_BOOLEAN);
         }
+        if (array_key_exists('auto_convert', $in)) {
+            $clean['auto_convert'] = filter_var($in['auto_convert'], FILTER_VALIDATE_BOOLEAN);
+        }
         if (array_key_exists('require_phone', $in)) {
             $clean['require_phone'] = filter_var($in['require_phone'], FILTER_VALIDATE_BOOLEAN);
         }
@@ -74,6 +79,7 @@ final class ProspectConfig
         $int('max_age_months', 1, 24, 'La antigüedad máxima (meses)');
         $int('max_fleet', 1, 100, 'La flota máxima');
         $int('daily_cap', 1, 500, 'El tope diario');
+        $int('daily_goal', 0, 500, 'La meta diaria de llamadas');
         if (array_key_exists('relist_months', $in)) {
             $rm = (int) (is_scalar($in['relist_months']) ? $in['relist_months'] : -1);
             if (isset(self::RELIST[$rm])) {

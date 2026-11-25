@@ -23,6 +23,7 @@ use CaptacionTests\T;
 /** Q3-E: plantillas EN/ES, secuencias A6/A12 (consentimiento, direccion fisica, marcadores, topes, pausa A7, baja de un clic) con un SMTP simulado. */
 return static function (array $ctx): void {
     T::reset(true);
+    Fx::setting('modules.referrals', true);   // fase AU: A12 solo con el módulo de referidos encendido
     Db::pdo()->exec('DELETE FROM email_templates');
     Templates::resetEnsure();
     Settings::set('mail', []);
@@ -437,4 +438,5 @@ return static function (array $ctx): void {
     Settings::set('mail', []);
     Clock::travel(0);
     T::reset(true);
+    Fx::setting('modules.referrals', true);   // fase AU: A12 solo con el módulo de referidos encendido
 };

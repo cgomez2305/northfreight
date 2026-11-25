@@ -10,6 +10,7 @@ $chan = ['call' => 'Llamada', 'sms' => 'SMS', 'email' => 'Correo', 'whatsapp' =>
 $btn = static fn(string $t): string => '<button class="btn btn--primary" type="submit"><span class="btn__t">' . $t . '</span></button>';
 ?>
 <p class="cfg-intro">Ajustes de los canales que entran por webhook. Las llaves y contraseñas NO se editan aquí: viven en <code>config/.env</code> (estado y botón «Probar» en la pestaña Integraciones).</p>
+<p class="cfg-intro">Programa de referidos: <b><?= \Captacion\Services\Referrals::enabled() ? 'activado' : 'desactivado' ?></b>. <a class="link" href="/referidos"><?= \Captacion\Services\Referrals::enabled() ? 'Gestionar' : 'Activarlo' ?></a></p>
 
 <form method="post" action="/config/canales/meta" class="cfg-form" id="cn-meta" novalidate>
   <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>">

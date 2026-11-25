@@ -54,6 +54,9 @@ final class SocrataFixture
             if (preg_match("/status_change_date<'(\d{8})' OR \(status_change_date='(\d{8})' AND docket_number>'([^']*)'\)/", $where, $c) === 1) {
                 $rows = array_values(array_filter($rows, static fn($r) => $r['status_change_date'] < $c[1] || ($r['status_change_date'] === $c[2] && strcmp($r['docket_number'], $c[3]) > 0)));
             }
+            if (preg_match("/usdot_number='(\d+)'/", $where, $u) === 1) {   // fase AU: «Añadir por USDOT» pide la última concesión de un carrier
+                $rows = array_values(array_filter($rows, static fn($r) => (string) $r['usdot_number'] === $u[1]));
+            }
             usort($rows, static fn($a, $b) => [$b['status_change_date'], $a['docket_number']] <=> [$a['status_change_date'], $b['docket_number']]);
             $rows = array_slice($rows, 0, $limit);
             return ['status' => 200, 'body' => json_encode(array_map(static fn($r) => array_intersect_key($r, array_flip(['docket_number', 'usdot_number', 'status_change_date'])), $rows))];

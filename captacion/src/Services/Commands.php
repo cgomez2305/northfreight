@@ -17,8 +17,11 @@ final class Commands
         if (($user['role'] ?? '') !== 'admin') {
             return [];
         }
-        $screens = [['Dashboard', '/'], ['Leads · Lista', '/leads'], ['Pipeline · Tablero', '/pipeline'], ['Leads · Tabla', '/tabla'], ['Leads · Calendario', '/calendario'], ['Leads · Cronología', '/cronologia'], ['Tareas', '/tareas'], ['Prospectos', '/prospectos'], ['Referidos', '/referidos'], ['Vacantes', '/vacantes'],
+        $screens = [['Dashboard', '/'], ['Leads · Lista', '/leads'], ['Pipeline · Tablero', '/pipeline'], ['Leads · Tabla', '/tabla'], ['Leads · Calendario', '/calendario'], ['Leads · Cronología', '/cronologia'], ['Tareas', '/tareas'], ['Prospectos', '/prospectos'], ['Correos a prospectos', '/prospectos/correos'], ['Modo llamada', '/prospectos/llamar'], ['Vacantes', '/vacantes'],
             ['Reportes', '/reportes'], ['Informes', '/informes'], ['Comunicaciones', '/comunicaciones'], ['Configuración', '/config'], ['Actividad', '/actividad'], ['Importar leads (CSV)', '/importar']];
+        if (Referrals::enabled()) {
+            array_splice($screens, 10, 0, [['Referidos', '/referidos']]);
+        }
         $v = [];
         foreach ($views as $x) {
             $v[] = [(string) $x['name'], (string) $x['href']];
