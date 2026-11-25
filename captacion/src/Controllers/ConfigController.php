@@ -170,7 +170,8 @@ final class ConfigController extends Responder
             'prospectos'    => [
                 'pc' => ProspectConfig::get(), 'pRun' => ProspectImport::state(), 'pComplete' => ProspectImport::completeUntil(), 'pCron' => Settings::get('cron.prospects'),
                 'pSocrata' => Integrations::last('socrata'), 'pToken' => (new \Captacion\Services\SocrataClient())->hasToken(), 'pForm' => null,
-                'pScript' => \Captacion\Services\ProspectScript::get(), 'pAuto' => \Captacion\Services\ProspectAutoMail::settings(), 'pAutoStats' => \Captacion\Services\ProspectAutoMail::stats($now),
+                'pScript' => \Captacion\Services\ProspectScript::get(), 'pAuto' => array_map(static fn($k) => \Captacion\Services\ProspectAutoMail::settings($k), array_combine($ak = array_keys(\Captacion\Services\ProspectAutoMail::KINDS), $ak)),
+                'pAutoStats' => array_map(static fn($k) => \Captacion\Services\ProspectAutoMail::stats($now, $k), array_combine($ak, $ak)),
                 'pBlockers' => \Captacion\Services\ProspectMail::blockers(),
             ],
         };
@@ -362,12 +363,12 @@ final class ConfigController extends Responder
     {
         $back = self::guardPost('prospectos');
         $in = [
-            'enabled' => isset($_POST['enabled']) ? '1' : '0', 'require_phone' => isset($_POST['require_phone']) ? '1' : '0', 'max_age_months' => $_POST['max_age_months'] ?? '', 'max_fleet' => $_POST['max_fleet'] ?? '',
+            'enabled' => isset($_POST['enabled']) ? '1' : '0', 'require_phone' => isset($_POST['require_phone']) ? '1' : '0', 'max_age_months' => $_POST['max_age_months'] ?? '', 'min_age_months' => $_POST['min_age_months'] ?? '0', 'max_fleet' => $_POST['max_fleet'] ?? '',
             'daily_cap' => $_POST['daily_cap'] ?? '', 'states' => is_array($_POST['states'] ?? null) ? array_slice($_POST['states'], 0, 60) : [], 'cargo' => is_array($_POST['cargo'] ?? null) ? array_slice($_POST['cargo'], 0, 10) : [],
             'relist_months' => $_POST['relist_months'] ?? '0',
         ];
         $v = ProspectConfig::normalize($in);
-        if ($v['errors'] || count($v['clean']) < 8) {
+        if ($v['errors'] || count($v['clean']) < 9) {
             self::flash(false, $v['errors'] ? 'Revisa los campos marcados.' : 'Faltan datos del formulario.');
             self::index($user, ['errors' => $v['errors'], 'pForm' => $in], 422, 'prospectos');
         }
@@ -375,7 +376,7 @@ final class ConfigController extends Responder
         $after = $v['clean'] + $before;
         Settings::set('prospects.config', $after);
         $changed = ActivityLog::settingsChange((int) $user['id'], 'prospects', $before, $after);
-        $filters = ['max_age_months', 'states', 'max_fleet', 'require_phone', 'cargo'];
+        $filters = ['max_age_months', 'min_age_months', 'states', 'max_fleet', 'require_phone', 'cargo'];
         $widened = $changed && array_filter($filters, static fn($k) => $before[$k] !== $after[$k]);
         if ($widened) {
             ProspectImport::resetWindow();   // la proxima corrida vuelve a evaluar toda la ventana con los filtros nuevos
@@ -388,7 +389,8 @@ final class ConfigController extends Responder
     private static function prospectsCalls(array $user): never
     {
         $back = self::guardPost('prospectos', true, '#pl-t');
-        $v = ProspectConfig::normalize(['daily_goal' => $_POST['daily_goal'] ?? '', 'auto_convert' => isset($_POST['auto_convert']) ? '1' : '0']);
+        $v = ProspectConfig::normalize(['daily_goal' => $_POST['daily_goal'] ?? '', 'auto_convert' => isset($_POST['auto_convert']) ? '1' : '0',
+            'max_attempts' => $_POST['max_attempts'] ?? '3', 'retry_spacing' => $_POST['retry_spacing'] ?? 'next_day']);
         if ($v['errors']) {
             self::flash(false, reset($v['errors']));
             self::redirect($back);
@@ -412,9 +414,11 @@ final class ConfigController extends Responder
 
     private static function prospectsAutomail(array $user, bool $test): never
     {
-        $back = self::guardPost('prospectos', !$test, '#pa-t');
-        $r = $test ? \Captacion\Services\ProspectAutoMail::sendTest((string) $user['email'], (int) $user['id'])
-            : \Captacion\Services\ProspectAutoMail::save(['enabled' => isset($_POST['enabled']) ? '1' : '0', 'subject' => $_POST['subject'] ?? '', 'body' => $_POST['body'] ?? ''], (int) $user['id']);
+        $kind = is_string($_POST['kind'] ?? null) && isset(\Captacion\Services\ProspectAutoMail::KINDS[$_POST['kind']]) ? $_POST['kind'] : 'missed';
+        $back = self::guardPost('prospectos', !$test, '#pa-' . $kind);
+        $r = $test ? \Captacion\Services\ProspectAutoMail::sendTest((string) $user['email'], (int) $user['id'], $kind)
+            : \Captacion\Services\ProspectAutoMail::save(['enabled' => isset($_POST['enabled']) ? '1' : '0', 'subject' => $_POST['subject'] ?? '', 'body' => $_POST['body'] ?? '',
+                'subject_es' => $_POST['subject_es'] ?? '', 'body_es' => $_POST['body_es'] ?? ''], (int) $user['id'], $kind);
         self::flash($r['ok'], $r['msg']);
         self::redirect($back);
     }

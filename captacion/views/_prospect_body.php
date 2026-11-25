@@ -13,16 +13,17 @@ use Captacion\Services\Prospects;
 $mode ??= 'list';
 $q = is_array($r['qual'] ?? null) ? $r['qual'] : [];
 $sv = ProspectScript::vars($r, (string) ($agent ?? ''));
-$am = $autoMails[$id] ?? null;
+$am = $autoMails[$id] ?? [];   // fase AW: [tipo => fila] de la cadencia
+$sl = isset(Prospects::LANGS[(string) ($r['lang'] ?? '')]) ? (string) $r['lang'] : $script['lang'];   // fase AW: el guion se abre en el idioma que prefiere el prospecto
 ob_start();
 ?>
           <details class="pc__script" data-script<?= $mode === 'call' ? ' open' : '' ?>>
             <summary><?= Ui::icon('file') ?>Guion de la llamada</summary>
             <div class="pc__sl seg seg--tight" role="group" aria-label="Idioma del guion" data-script-lang hidden>
-              <?php foreach (ProspectScript::LANGS as $l => $ll): ?><button class="seg__i<?= $script['lang'] === $l ? ' is-on' : '' ?>" type="button" data-lang="<?= $e($l) ?>" aria-pressed="<?= $script['lang'] === $l ? 'true' : 'false' ?>"><?= $e($ll) ?></button><?php endforeach; ?>
+              <?php foreach (ProspectScript::LANGS as $l => $ll): ?><button class="seg__i<?= $sl === $l ? ' is-on' : '' ?>" type="button" data-lang="<?= $e($l) ?>" aria-pressed="<?= $sl === $l ? 'true' : 'false' ?>"><?= $e($ll) ?></button><?php endforeach; ?>
             </div>
             <?php foreach (ProspectScript::LANGS as $l => $ll): ?>
-              <div class="pc__sc<?= $script['lang'] === $l ? ' is-on' : '' ?>" data-sc="<?= $e($l) ?>" lang="<?= $e($l) ?>"><?= ProspectScript::html($script[$l], $sv) ?></div>
+              <div class="pc__sc<?= $sl === $l ? ' is-on' : '' ?>" data-sc="<?= $e($l) ?>" lang="<?= $e($l) ?>"><?= ProspectScript::html($script[$l], $sv) ?></div>
             <?php endforeach; ?>
           </details>
 <?php $scriptHtml = (string) ob_get_clean(); if (!$open) { $scriptHtml = ''; } ?>
@@ -53,7 +54,7 @@ ob_start();
               <details class="pc__ph"><summary>Ver teléfono</summary><span class="mono"><?= $e(Fmt::phone($r['phone'])) ?></span></details>
             <?php endif; ?>
             <?php if (!$dnc && ($r['attempts'] > 0 || $nextLabel !== null)): ?>
-              <p class="pc__att"><?= (int) $r['attempts'] > 0 ? 'Intentos sin respuesta: <b>' . $e($r['attempts']) . ' de ' . Prospects::MAX_ATTEMPTS . '</b>' : '' ?><?= $nextLabel !== null ? ((int) $r['attempts'] > 0 ? ' · ' : '') . ((int) ($r['callback_exact'] ?? 0) === 1 ? 'Pidió que lo llamaran: ' : 'Siguiente intento: ') . '<b>' . $e($nextLabel) . '</b>' : '' ?></p>
+              <p class="pc__att"><?= (int) $r['attempts'] > 0 ? 'Intentos sin respuesta: <b>' . $e($r['attempts']) . ' de ' . Prospects::maxAttempts() . '</b>' : '' ?><?= $nextLabel !== null ? ((int) $r['attempts'] > 0 ? ' · ' : '') . ((int) ($r['callback_exact'] ?? 0) === 1 ? 'Pidió que lo llamaran: ' : 'Siguiente intento: ') . '<b>' . $e($nextLabel) . '</b>' : '' ?></p>
             <?php endif; ?>
           </div>
           <?php endif; ?>
@@ -69,11 +70,12 @@ ob_start();
                 <span class="pc__nx"><input id="nx-<?= $e($id) ?>" type="date" lang="es" name="next" min="<?= $e($todayEt) ?>"><input type="time" lang="es" name="next_time" step="900" min="08:00" max="20:45" aria-label="Hora de allá (opcional)" title="Hora de allá: la que pidió el prospecto (opcional)"><span class="qd" data-qd hidden><button type="button" data-days="1">Mañana</button><button type="button" data-days="3">En 3 días</button><button type="button" data-days="7">En 1 semana</button></span></span>
                 <small class="pc__nxh">Con hora: es la hora local del prospecto. Sin hora: 9:00 a. m. ET.</small></div>
             </div>
-            <details class="pc__q"<?= $q || $mode === 'call' ? ' open' : '' ?>>
-              <summary>Datos de la llamada<?= $q ? ' <span class="muted">(' . $e(count($q)) . ')</span>' : '' ?></summary>
+            <details class="pc__q"<?= $q || !empty($r['lang']) || $mode === 'call' ? ' open' : '' ?>>
+              <summary>Datos de la llamada<?= ($nq = count($q) + (isset(Prospects::LANGS[(string) ($r['lang'] ?? '')]) ? 1 : 0)) ? ' <span class="muted">(' . $e($nq) . ')</span>' : '' ?></summary>
               <input type="hidden" name="q[_on]" value="1">
               <div class="pc__qg">
                 <label class="field"><span>Contacto</span><input type="text" name="q[contact_name]" maxlength="80" autocomplete="off" value="<?= $e($q['contact_name'] ?? '') ?>" placeholder="Nombre de quien atendió"></label>
+                <label class="field"><span>Idioma que prefiere</span><select name="q[lang]"><option value="">Sin saber</option><?php foreach (Prospects::LANGS as $k => $l): ?><option value="<?= $e($k) ?>"<?= ($r['lang'] ?? '') === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
                 <label class="field"><span>Correo que dio por teléfono</span><input type="email" name="q[email]" maxlength="190" autocomplete="off" value="<?= $e($q['email'] ?? '') ?>" placeholder="<?= $e($r['email'] ?? 'correo@ejemplo.com') ?>"></label>
                 <label class="field"><span>Cuenta de Amazon Relay</span><select name="q[relay]"><option value="">Sin dato</option><?php foreach (Prospects::YESNO as $k => $l): ?><option value="<?= $e($k) ?>"<?= ($q['relay'] ?? '') === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
                 <label class="field"><span>Ya tiene dispatcher</span><select name="q[dispatcher]"><option value="">Sin dato</option><?php foreach (Prospects::YESNO as $k => $l): ?><option value="<?= $e($k) ?>"<?= ($q['dispatcher'] ?? '') === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
@@ -101,12 +103,13 @@ ob_start();
             <div><dt>Conductores</dt><dd><?= $r['drivers'] !== null && (int) $r['drivers'] > 0 && (int) $r['drivers'] < 500 ? $e($r['drivers']) : '—' ?></dd></div>
             <div><dt>Carga declarada</dt><dd><?= $cats ? $e(implode(' · ', array_map(static fn($c) => ProspectConfig::CARGO[$c][0], array_slice($cats, 0, 3)))) : '—' ?></dd></div>
             <?php if (($r['source'] ?? 'socrata') !== 'socrata'): ?><div><dt>Origen</dt><dd><?= $e(Prospects::SOURCES[$r['source']] ?? $r['source']) ?></dd></div><?php endif; ?>
+            <?php if (isset(Prospects::LANGS[(string) ($r['lang'] ?? '')])): ?><div><dt>Idioma que prefiere</dt><dd><?= $e(Prospects::LANGS[$r['lang']]) ?></dd></div><?php endif; ?>
             <?php foreach (Prospects::qualRows($q) as [$k, $v]): ?><div><dt><?= $e($k) ?></dt><dd><?= $e($v) ?></dd></div><?php endforeach; ?>
             <?php if ($r['email']): ?><div class="pc__mail"><dt>Correo en FMCSA</dt><dd class="mono"><?= $e($r['email']) ?></dd></div><?php endif; ?>
             <?php if (!empty($r['email_opt_out_at'])): ?><div class="pc__mail"><dt>Correos</dt><dd>Se dio de baja el <?= $e(Fmt::date((string) $r['email_opt_out_at'])) ?></dd></div>
             <?php elseif (isset($mailed[$id])): ?><div class="pc__mail"><dt>Último correo en lote</dt><dd><?= $e(Fmt::date($mailed[$id]['sent_at'])) ?> · <?= $e($mailed[$id]['name']) ?><small><?= !empty($mailed[$id]['replied']) ? 'Respondió' : (!empty($mailed[$id]['clicked']) ? 'Hizo clic en un enlace' : ($mailed[$id]['opened'] ? 'Lo abrió' : 'Sin abrir todavía')) ?></small></dd></div><?php endif; ?>
             <?php if (isset($vlast[$id])): $vl = $vlast[$id]; ?><div><dt>Última llamada por Vonage</dt><dd><?= $e(Fmt::date((string) $vl['created_at'])) ?> · <?= $vl['answered_at'] !== null ? 'contestó' . ((int) $vl['duration'] > 0 ? ' · ' . $e(Fmt::dur((int) $vl['duration'])) : '') : $e(mb_strtolower(\Captacion\Services\Vonage::STATUS_LABELS[$vl['status']] ?? $vl['status'])) ?></dd></div><?php endif; ?>
-            <?php if ($am !== null): ?><div class="pc__mail"><dt>Correo tras no contestar</dt><dd><?= $am['status'] === 'sent' ? 'Enviado el ' . $e(Fmt::date((string) $am['sent_at'])) : ($am['status'] === 'queued' ? 'Sale en unos minutos' : ($am['status'] === 'failed' ? 'Falló el envío' : 'No se envió: ' . $e((string) $am['skip_reason']))) ?></dd></div><?php endif; ?>
+            <?php foreach (\Captacion\Services\ProspectAutoMail::KINDS as $ak => [$alabel]): if (!isset($am[$ak])) { continue; } $a1 = $am[$ak]; ?><div class="pc__mail"><dt><?= $e($alabel) ?></dt><dd><?= $a1['status'] === 'sent' ? 'Enviado el ' . $e(Fmt::date((string) $a1['sent_at'])) : ($a1['status'] === 'queued' ? 'Programado' : ($a1['status'] === 'failed' ? 'Falló el envío' : 'No se envió: ' . $e((string) $a1['skip_reason']))) ?></dd></div><?php endforeach; ?>
           </dl>
           <?php if (!$dnc): ?>
           <div class="pc__f">

@@ -64,16 +64,16 @@ final class ProspectMailController extends Responder
         $now = Clock::time();
         if ($form === null) {
             if ($c !== null) {
-                $form = ['name' => $c['name'], 'subject' => $c['subject'], 'body' => $c['body'], 'segment' => $c['segment'], 'followup_days' => (int) ($c['followup_days'] ?? 0),
+                $form = ['name' => $c['name'], 'subject' => $c['subject'], 'body' => $c['body'], 'segment' => $c['segment'], 'lang' => ($c['lang'] ?? 'en') === 'es' ? 'es' : 'en', 'followup_days' => (int) ($c['followup_days'] ?? 0),
                     'followup_subject' => (string) ($c['followup_subject'] ?? ''), 'followup_body' => (string) ($c['followup_body'] ?? '')];
             } else {
                 $st = is_string($_GET['inicio'] ?? null) && isset(ProspectMail::STARTERS[$_GET['inicio']]) ? ProspectMail::STARTERS[$_GET['inicio']] : null;
-                $form = ['name' => $st !== null ? $st['label'] : '', 'subject' => $st['subject'] ?? '', 'body' => $st['body'] ?? '', 'segment' => ProspectMail::segment($st['segment'] ?? $_GET), 'followup_days' => 0, 'followup_subject' => '', 'followup_body' => ''];
+                $form = ['name' => $st !== null ? $st['label'] : '', 'subject' => $st['subject'] ?? '', 'body' => $st['body'] ?? '', 'segment' => ProspectMail::segment($st['segment'] ?? $_GET), 'lang' => ($st['lang'] ?? 'en') === 'es' ? 'es' : 'en', 'followup_days' => 0, 'followup_subject' => '', 'followup_body' => ''];
             }
         }
         $aud = ProspectMail::audience($form['segment'], $now);
         $sampleP = ProspectMail::sample($form['segment'], $now);
-        $preview = ProspectMail::render(['subject' => $form['subject'], 'body' => $form['body']], $sampleP, '(enlace de baja de cada prospecto)');
+        $preview = ProspectMail::render(['subject' => $form['subject'], 'body' => $form['body'], 'lang' => $form['lang'] ?? 'en'], $sampleP, '(enlace de baja de cada prospecto)');
         $crumb = $c !== null ? $c['name'] : 'Nueva campaña';
         self::page('pmail/form', $user, 'pmail', [['Prospectos', '/prospectos'], ['Correos en lote', self::BASE], [$crumb, null]], [
             'title' => $crumb, 'css' => ['comms', 'pmail'], 'js' => ['pmail'], 'c' => $c, 'form' => $form, 'errors' => $errors, 'aud' => $aud, 'preview' => $preview,

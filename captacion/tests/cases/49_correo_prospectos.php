@@ -57,7 +57,7 @@ return static function (array $ctx): void {
 
     // ------------------------------------------------------------------ Segmento y destinatarios
     $seg = ProspectMail::segment(['fl' => '6+', 'us' => 'zz', 'ag' => '99', 'tab' => 'dnc']);
-    T::eq($seg, ['tab' => '', 'us' => '', 'fl' => '6+', 'ag' => 0], 'segmento: lista blanca (estado inválido, antigüedad inválida y «No llamar más» se descartan)');
+    T::eq($seg, ['tab' => '', 'us' => '', 'fl' => '6+', 'ag' => 0, 'lg' => ''], 'segmento: lista blanca (estado inválido, antigüedad inválida y «No llamar más» se descartan)');
     $a = ProspectMail::audience($seg, $now);
     $ids = array_map(static fn($r) => (int) $r['id'], $a['rows']);
     sort($ids);

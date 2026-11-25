@@ -3,12 +3,15 @@
  * Filtros de los prospectos FMCSA (Configuracion > Prospectos). Un solo ajuste JSON `prospects.config`; sin valor se usan DEFAULTS.
  *   enabled          la corrida diaria busca prospectos nuevos (apagarla no borra nada)
  *   max_age_months   antiguedad maxima de la autoridad (1 a 24)
+ *   min_age_months   fase AW: antiguedad minima (0 a 23, menor que la maxima). Con 3 y 24 entran carriers que ya pasaron los primeros meses solos
  *   states           [] = todo EE. UU.; si no, solo esos estados
  *   max_fleet        unidades motrices maximas (1 a 100); un dato de flota ausente NO descarta
  *   require_phone    solo carriers con telefono valido
  *   cargo            [] = cualquiera; si no, categorias de CARGO (basta con una); si el filtro esta activo y FMCSA no trae banderas de carga, se descarta
  *   daily_cap        tope de prospectos NUEVOS por dia (hora de Nueva York), 1 a 500
  *   daily_goal       fase AU: meta de llamadas por día del equipo (0 = sin meta), 0 a 500
+ *   max_attempts     fase AW: intentos sin respuesta antes de cerrar (3 a 6)
+ *   retry_spacing    fase AW: espaciado de los reintentos (clave de Prospects::SPACING)
  *   auto_convert     fase AU: al marcar «Interesado» el prospecto se convierte en lead en el mismo clic (por defecto sí)
  * FMCSA publica la carga que declara el carrier (banderas crgo_*), no el tipo de equipo: dry van, reefer o flatbed no existen como dato.
  */
@@ -19,7 +22,7 @@ namespace Captacion\Services;
 
 final class ProspectConfig
 {
-    public const DEFAULTS = ['enabled' => true, 'max_age_months' => 12, 'states' => [], 'max_fleet' => 10, 'require_phone' => true, 'cargo' => [], 'daily_cap' => 40, 'relist_months' => 0, 'daily_goal' => 40, 'auto_convert' => true];
+    public const DEFAULTS = ['enabled' => true, 'max_age_months' => 12, 'min_age_months' => 0, 'states' => [], 'max_fleet' => 10, 'require_phone' => true, 'cargo' => [], 'daily_cap' => 40, 'relist_months' => 0, 'daily_goal' => 40, 'auto_convert' => true, 'max_attempts' => 3, 'retry_spacing' => 'next_day'];
     /** Fase AT: «No interesado» vuelve a «Por llamar» pasados estos meses (0 = nunca). «No llamar más» jamás vuelve. */
     public const RELIST = [0 => 'Nunca', 3 => 'A los 3 meses', 6 => 'A los 6 meses', 12 => 'A los 12 meses'];
 
@@ -77,9 +80,18 @@ final class ProspectConfig
             $err[$k] = $label . ' debe ser un número entre ' . $min . ' y ' . $max . '.';
         };
         $int('max_age_months', 1, 24, 'La antigüedad máxima (meses)');
+        $int('min_age_months', 0, 23, 'La antigüedad mínima (meses)');
         $int('max_fleet', 1, 100, 'La flota máxima');
         $int('daily_cap', 1, 500, 'El tope diario');
         $int('daily_goal', 0, 500, 'La meta diaria de llamadas');
+        $int('max_attempts', 3, 6, 'Los intentos sin respuesta');
+        if (array_key_exists('retry_spacing', $in)) {
+            if (is_string($in['retry_spacing']) && isset(Prospects::SPACING[$in['retry_spacing']])) {
+                $clean['retry_spacing'] = $in['retry_spacing'];
+            } else {
+                $err['retry_spacing'] = 'Elige un espaciado de la lista.';
+            }
+        }
         if (array_key_exists('relist_months', $in)) {
             $rm = (int) (is_scalar($in['relist_months']) ? $in['relist_months'] : -1);
             if (isset(self::RELIST[$rm])) {
@@ -114,6 +126,10 @@ final class ProspectConfig
                 }
             }
             $clean['cargo'] = array_keys($cargo);
+        }
+        if (isset($clean['min_age_months'], $clean['max_age_months']) && $clean['min_age_months'] >= $clean['max_age_months']) {
+            $err['min_age_months'] = 'La antigüedad mínima debe ser menor que la máxima.';
+            unset($clean['min_age_months']);
         }
         return ['clean' => $clean, 'errors' => $err];
     }

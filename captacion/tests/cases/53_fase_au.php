@@ -249,7 +249,7 @@ return static function (array $ctx): void {
     T::eq(Referrals::enabled(), false, '  y desactivarlo lo apaga otra vez');
     T::ok($s->unlock($aid, 'prospectos'), 'configuración: desbloqueo');
     $cfg = $s->get('/config?tab=prospectos')['body'];
-    T::ok(str_contains($cfg, 'Guion de la llamada') && str_contains($cfg, 'Correo automático tras no contestar') && str_contains($cfg, 'Meta de llamadas por día'), '  la pestaña Prospectos tiene llamadas, guion y correo tras no contestar');
+    T::ok(str_contains($cfg, 'Guion de la llamada') && str_contains($cfg, 'Correo tras no contestar') && str_contains($cfg, 'Meta de llamadas por día'), '  la pestaña Prospectos tiene llamadas, guion y correo tras no contestar');
     $r = $s->post('/config/prospects/calls', ['_csrf' => $s->csrfOf($cfg), 'daily_goal' => '25']);
     Settings::clear();
     T::ok($r['status'] === 303 && ProspectConfig::get()['daily_goal'] === 25 && ProspectConfig::get()['auto_convert'] === false, '  guardar meta 25 y «Interesado convierte» apagado');

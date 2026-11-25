@@ -16,6 +16,13 @@ final class ProspectReport
 {
     public const FLEET_BUCKETS = ['1' => '1 unidad', '2-5' => '2 a 5', '6+' => '6 o más', '?' => 'Sin dato'];
     public const AGE_BUCKETS = ['3' => '3 meses o menos', '6' => '4 a 6 meses', '12' => '7 a 12 meses', '+' => 'Más de 12 meses', '?' => 'Sin fecha'];
+    /** Fase AW: idioma que prefiere el prospecto (anotado en la llamada). */
+    public const LANG_BUCKETS = ['en' => 'Inglés', 'es' => 'Español', '?' => 'Sin anotar'];
+    /** Fase AW: franjas de hora LOCAL del prospecto (las llamadas solo se permiten de 8 a. m. a 9 p. m.). [desde, hasta) en horas. */
+    public const HOUR_BUCKETS = ['8-10' => [8, 10, '8 a 10 a. m.'], '10-12' => [10, 12, '10 a. m. a 12 p. m.'], '12-14' => [12, 14, '12 a 2 p. m.'], '14-16' => [14, 16, '2 a 4 p. m.'],
+        '16-18' => [16, 18, '4 a 6 p. m.'], '18-21' => [18, 21, '6 a 9 p. m.']];
+    /** Llamadas mínimas en una franja para señalarla como la mejor. */
+    public const HOUR_MIN = 10;
 
     /**
      * @return array{calls:int,prospects:int,by_result:array<string,int>,reached:int,reach_pct:?float,interested:int,converted:int,
@@ -56,6 +63,8 @@ final class ProspectReport
         $now = Clock::time();
         $expr = match ($dim) {
             'fleet' => "CASE WHEN p.fleet_size IS NULL THEN '?' WHEN p.fleet_size <= 1 THEN '1' WHEN p.fleet_size <= 5 THEN '2-5' ELSE '6+' END",
+            'lang' => "CASE WHEN p.lang IN ('en', 'es') THEN p.lang ELSE '?' END",
+            'source' => "COALESCE(NULLIF(p.source, ''), 'socrata')",
             'age' => 'CASE WHEN p.authority_granted_at IS NULL THEN \'?\' WHEN p.authority_granted_at >= ? THEN \'3\' WHEN p.authority_granted_at >= ? THEN \'6\' WHEN p.authority_granted_at >= ? THEN \'12\' ELSE \'+\' END',
             default => "COALESCE(NULLIF(p.state, ''), '?')",
         };
@@ -73,7 +82,9 @@ final class ProspectReport
                JOIN prospects_fmcsa p ON p.id = x.prospect_id GROUP BY k ORDER BY called DESC LIMIT 60",
             $params
         );
-        $labels = $dim === 'fleet' ? self::FLEET_BUCKETS : ($dim === 'age' ? self::AGE_BUCKETS : []);
+        $labels = match ($dim) {
+            'fleet' => self::FLEET_BUCKETS, 'age' => self::AGE_BUCKETS, 'lang' => self::LANG_BUCKETS, 'source' => Prospects::SOURCES, default => [],
+        };
         $out = [];
         foreach ($rows as $r) {
             $k = (string) $r['k'];
@@ -85,6 +96,52 @@ final class ProspectReport
             usort($out, static fn($x, $y) => ($order[$x['key']] ?? 99) <=> ($order[$y['key']] ?? 99));
         }
         return $out;
+    }
+
+    /**
+     * Fase AW: a qué hora contestan. Llamadas del rango por franja de hora LOCAL del prospecto (la zona principal de su estado): cuántas, cuántas contestó alguien
+     * y el porcentaje. 'best' = la franja con más contestadas en proporción entre las que tienen al menos HOUR_MIN llamadas (null si ninguna llega).
+     * @return array{rows:list<array{key:string,label:string,calls:int,reached:int,pct:?float}>,best:?string,unknown:int}
+     */
+    public static function hours(int $from, int $to): array
+    {
+        $acc = array_fill_keys(array_keys(self::HOUR_BUCKETS), ['calls' => 0, 'reached' => 0]);
+        $unknown = 0;
+        $zones = [];
+        $rows = Db::all('SELECT c.result, c.created_at, p.state FROM prospect_calls c JOIN prospects_fmcsa p ON p.id = c.prospect_id
+                          WHERE c.created_at >= ? AND c.created_at < ? AND c.result IN (' . implode(',', array_map(static fn($k) => Db::pdo()->quote($k), array_keys(Prospects::RESULTS))) . ') LIMIT 50000',
+            [Clock::at($from), Clock::at($to)]);
+        foreach ($rows as $r) {
+            $st = strtoupper((string) $r['state']);
+            $zones[$st] ??= UsTimeZones::zones($st)[0] ?? '';
+            $ts = Clock::parse((string) $r['created_at']);
+            if ($zones[$st] === '' || $ts === null) {
+                $unknown++;
+                continue;
+            }
+            $h = (int) (new \DateTimeImmutable('@' . (int) $ts))->setTimezone(new \DateTimeZone($zones[$st]))->format('G');
+            foreach (self::HOUR_BUCKETS as $k => [$a, $b]) {
+                if ($h >= $a && $h < $b) {
+                    $acc[$k]['calls']++;
+                    $acc[$k]['reached'] += in_array($r['result'], Prospects::SPOKE, true) ? 1 : 0;
+                    continue 2;
+                }
+            }
+            $unknown++;   // fuera del horario permitido (no debería pasar: el botón Llamar no deja)
+        }
+        $out = [];
+        $best = null;
+        $bestPct = -1.0;
+        foreach (self::HOUR_BUCKETS as $k => [, , $label]) {
+            $c = $acc[$k]['calls'];
+            $pct = $c > 0 ? $acc[$k]['reached'] / $c : null;
+            $out[] = ['key' => $k, 'label' => $label, 'calls' => $c, 'reached' => $acc[$k]['reached'], 'pct' => $pct];
+            if ($c >= self::HOUR_MIN && $pct !== null && $pct > $bestPct) {
+                $best = $k;
+                $bestPct = $pct;
+            }
+        }
+        return ['rows' => $out, 'best' => $best, 'unknown' => $unknown];
     }
 
     /** Campañas con envíos en el rango y sus resultados. @return list<array{name:string,sent:int,opened:int,clicked:int,replied:int}> */

@@ -47,10 +47,13 @@ final class ProspectImport
     }
 
     /** Parametros SoQL de la consulta de concesiones (publico: lo usan las pruebas y el servidor simulado). */
-    public static function grantsParams(string $since, ?array $cursor, int $limit): array
+    public static function grantsParams(string $since, ?array $cursor, int $limit, ?string $until = null): array
     {
         $esc = static fn(string $s): string => str_replace("'", "''", $s);
         $where = "op_auth_type='" . self::AUTH_TYPE . "' AND op_auth_status='Active' AND upper(reason)='GRANTED' AND status_change_date>='" . $esc($since) . "'";
+        if ($until !== null) {   // fase AW: antigüedad mínima
+            $where .= " AND status_change_date<='" . $esc($until) . "'";
+        }
         if ($cursor !== null) {
             $where .= " AND (status_change_date<'" . $esc($cursor['d']) . "' OR (status_change_date='" . $esc($cursor['d']) . "' AND docket_number>'" . $esc($cursor['k']) . "'))";
         }
@@ -122,12 +125,14 @@ final class ProspectImport
     {
         $start = (new \DateTimeImmutable($today . ' 00:00:00', new \DateTimeZone('America/New_York')))->modify('-' . (int) $cfg['max_age_months'] . ' months');
         $since = $start->format('Ymd');
+        $min = (int) ($cfg['min_age_months'] ?? 0);
+        $until = $min > 0 ? (new \DateTimeImmutable($today . ' 00:00:00', new \DateTimeZone('America/New_York')))->modify('-' . $min . ' months')->format('Ymd') : null;
         $cu = self::completeUntil();
         if ($cu !== null) {
             $back = (new \DateTimeImmutable($cu . ' 00:00:00', new \DateTimeZone('America/New_York')))->modify('-' . self::OVERLAP_DAYS . ' days')->format('Ymd');
             $since = max($since, $back);
         }
-        return ['day' => $today, 'since' => $since, 'cursor' => null, 'finished' => false, 'capped' => false, 'started_at' => Clock::at($now), 'updated_at' => Clock::at($now), 'pages' => 0, 'requests' => 0,
+        return ['day' => $today, 'since' => $since, 'until' => $until, 'cursor' => null, 'finished' => false, 'capped' => false, 'started_at' => Clock::at($now), 'updated_at' => Clock::at($now), 'pages' => 0, 'requests' => 0,
             'counters' => ['read' => 0, 'new' => 0] + array_fill_keys(array_keys(self::REASONS), 0), 'error' => null, 'resumed' => 0];
     }
 
@@ -162,7 +167,7 @@ final class ProspectImport
                     break;   // sigue en la proxima hora desde el cursor
                 }
                 $pagesThisCall++;
-                $rows = $client->query(self::GRANTS_DATASET, self::grantsParams((string) $run['since'], $run['cursor'], $pageSize));
+                $rows = $client->query(self::GRANTS_DATASET, self::grantsParams((string) $run['since'], $run['cursor'], $pageSize, isset($run['until']) && is_string($run['until']) ? $run['until'] : null));
                 $run['pages']++;
                 if (!$rows) {
                     $run['finished'] = true;
@@ -197,7 +202,8 @@ final class ProspectImport
         if (!empty($run['finished'])) {
             $run['finished_at'] = Clock::now();
             if (!$run['capped'] && $run['error'] === null) {
-                Settings::set(self::COMPLETE_KEY, $today);
+                $u = isset($run['until']) && is_string($run['until']) && preg_match('/^(\d{4})(\d{2})(\d{2})$/', $run['until'], $m) === 1 ? "$m[1]-$m[2]-$m[3]" : $today;
+                Settings::set(self::COMPLETE_KEY, $u);   // con antigüedad mínima la ventana completa llega hasta esa fecha de concesión, no hasta hoy
             }
         }
         Settings::set(self::RUN_KEY, $run);
@@ -281,7 +287,7 @@ final class ProspectImport
             }
             $row = self::buildRow($g, $cr, $phone, $today);
             try {
-                Db::insert('prospects_fmcsa', $row);
+                $newId = (int) Db::insert('prospects_fmcsa', $row);
             } catch (\PDOException $e) {
                 if ((string) $e->getCode() === '23000') {
                     $c['known']++;   // otra corrida lo metio entre la consulta y el alta
@@ -290,6 +296,7 @@ final class ProspectImport
                 throw $e;
             }
             $prospPhone[$phone ?? ''] = true;
+            ProspectAutoMail::queue($newId, 0, 'intro');   // fase AW: correo de presentación (si está encendido y tiene correo; nunca lanza)
             $listedToday++;
             $c['new']++;
         }

@@ -31,26 +31,30 @@ $canLaunch = !$isNew && !$blockers;
     <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>">
     <header class="card__h"><h2 class="label">Segmento y mensaje</h2><?php if ($isNew): ?><span class="pm-st">Empezar con: <?php foreach (ProspectMail::STARTERS as $k => $s): ?><a class="link" href="/prospectos/correos/nueva?inicio=<?= $e($k) ?>"><?= $e($s['label']) ?></a><?php endforeach; ?></span><?php endif; ?></header>
     <div class="card__b cm-fields">
-      <label class="field<?= isset($errors['name']) ? ' has-err' : '' ?>"><span>Nombre de la campaña (solo lo ves tú)</span><input type="text" name="name" value="<?= $e($form['name']) ?>" maxlength="120" required<?= $fe('name') ?>><?= $em('name') ?></label>
+      <div class="pm-row">
+        <label class="field<?= isset($errors['name']) ? ' has-err' : '' ?>"><span>Nombre de la campaña (solo lo ves tú)</span><input type="text" name="name" value="<?= $e($form['name']) ?>" maxlength="120" required<?= $fe('name') ?>><?= $em('name') ?></label>
+        <label class="field"><span>Idioma del correo</span><select name="lang"><?php foreach (ProspectMail::LANGS as $k => $l): ?><option value="<?= $e($k) ?>"<?= ($form['lang'] ?? 'en') === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
+      </div>
       <fieldset class="pm-seg">
         <legend>¿A quién?</legend>
         <label class="field"><span>Flota</span><select name="fl" data-recount><option value="">Cualquiera</option><?php foreach (Prospects::FLEETS as $k => $l): ?><option value="<?= $e($k) ?>"<?= $seg['fl'] === (string) $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
         <label class="field"><span>Estado (EE. UU.)</span><select name="us" data-recount><option value="">Todos</option><?php foreach (UsStates::NAMES as $k => $l): ?><option value="<?= $e($k) ?>"<?= $seg['us'] === $k ? ' selected' : '' ?>><?= $e($k) ?> · <?= $e($l) ?></option><?php endforeach; ?></select></label>
         <label class="field"><span>Autoridad</span><select name="ag" data-recount><option value="">Cualquier antigüedad</option><?php foreach (Prospects::AGES as $k => $l): ?><option value="<?= $e($k) ?>"<?= (int) $seg['ag'] === (int) $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
         <label class="field"><span>Estado del prospecto</span><select name="tab" data-recount><?php foreach (ProspectMail::SEG_TABS as $k => $l): ?><option value="<?= $e($k) ?>"<?= $seg['tab'] === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
+        <label class="field"><span>Idioma que prefieren</span><select name="lg" data-recount><?php foreach (ProspectMail::SEG_LANGS as $k => $l): ?><option value="<?= $e($k) ?>"<?= ($seg['lg'] ?? '') === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
         <button class="btn btn--secondary btn--sm pm-seg__b" type="submit" name="do" value="count" data-count-btn><?= Ui::icon('refresh') ?><span class="btn__t">Contar destinatarios</span></button>
       </fieldset>
       <label class="field<?= isset($errors['subject']) ? ' has-err' : '' ?>"><span>Asunto</span><input type="text" name="subject" value="<?= $e($form['subject']) ?>" maxlength="190" required<?= $fe('subject') ?>><?= $em('subject') ?></label>
       <label class="field<?= isset($errors['body']) ? ' has-err' : '' ?>"><span>Mensaje (texto plano; deja una línea en blanco entre párrafos)</span><textarea name="body" id="pm-body" rows="14" maxlength="20000" required<?= $fe('body') ?>><?= $e($form['body']) ?></textarea><?= $em('body') ?></label>
       <div class="pm-vars"><span class="muted">Variables (pulsa para insertar):</span><?php foreach (ProspectMail::VARS as $k => $l): if ($k === '{link_baja}') { continue; } ?><button class="pm-var" type="button" data-var="<?= $e($k) ?>" title="<?= $e($l) ?>"><?= $e($k) ?></button><?php endforeach; ?></div>
-      <p class="muted">El pie con la dirección física, el motivo del correo y la baja de un clic se añade siempre. Los transportistas están en EE. UU.: escribe en inglés.</p>
+      <p class="muted">El pie con la dirección física, el motivo del correo y la baja de un clic se añade siempre, en el idioma del correo. Para escribir en español, elige «Prefieren español» en el segmento: el idioma se anota en cada llamada.</p>
       <fieldset class="pm-seg pm-fu">
         <legend>Segundo correo</legend>
         <label class="field"><span>¿Cuándo?</span><select name="followup_days" data-fu><?php foreach (ProspectMail::FOLLOWUP_DAYS as $k => $l): ?><option value="<?= $e($k) ?>"<?= (int) ($form['followup_days'] ?? 0) === (int) $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
         <p class="muted pm-fu__h">Solo a quien no abrió el primero, no hizo clic ni respondió. Usa el mismo tope por hora.</p>
         <div class="pm-fu__f" data-fu-fields>
-          <label class="field<?= isset($errors['followup_subject']) ? ' has-err' : '' ?>"><span>Asunto del segundo correo</span><input type="text" name="followup_subject" value="<?= $e(($form['followup_subject'] ?? '') !== '' ? $form['followup_subject'] : 'Following up: dispatch for {empresa}') ?>" maxlength="190"<?= $fe('followup_subject') ?>><?= $em('followup_subject') ?></label>
-          <label class="field<?= isset($errors['followup_body']) ? ' has-err' : '' ?>"><span>Mensaje del segundo correo</span><textarea name="followup_body" rows="8" maxlength="20000"<?= $fe('followup_body') ?>><?= $e(($form['followup_body'] ?? '') !== '' ? $form['followup_body'] : str_replace('\n', "\n", ProspectMail::FOLLOWUP_BODY)) ?></textarea><?= $em('followup_body') ?></label>
+          <label class="field<?= isset($errors['followup_subject']) ? ' has-err' : '' ?>"><span>Asunto del segundo correo</span><input type="text" name="followup_subject" value="<?= $e(($form['followup_subject'] ?? '') !== '' ? $form['followup_subject'] : ProspectMail::FOLLOWUP_SUBJECT[($form['lang'] ?? 'en') === 'es' ? 'es' : 'en']) ?>" maxlength="190"<?= $fe('followup_subject') ?>><?= $em('followup_subject') ?></label>
+          <label class="field<?= isset($errors['followup_body']) ? ' has-err' : '' ?>"><span>Mensaje del segundo correo</span><textarea name="followup_body" rows="8" maxlength="20000"<?= $fe('followup_body') ?>><?= $e(($form['followup_body'] ?? '') !== '' ? $form['followup_body'] : str_replace('\n', "\n", ($form['lang'] ?? 'en') === 'es' ? ProspectMail::FOLLOWUP_BODY_ES : ProspectMail::FOLLOWUP_BODY)) ?></textarea><?= $em('followup_body') ?></label>
         </div>
       </fieldset>
     </div>

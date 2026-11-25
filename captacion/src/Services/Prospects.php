@@ -35,7 +35,16 @@ final class Prospects
     public const RESULT_ICONS = ['no_answer' => 'phone', 'voicemail' => 'inbox', 'talked' => 'chat', 'interested' => 'star', 'not_interested' => 'x', 'wrong_number' => 'alert', 'dnc' => 'shield'];
     /** Origen del prospecto (columna source). */
     public const SOURCES = ['socrata' => 'FMCSA · autoridades nuevas', 'manual' => 'Añadido a mano', 'csv' => 'Importado de CSV', 'demo' => 'Demostración'];
+    /** Intentos sin respuesta por defecto antes de cerrar (fase AW: configurable de 3 a 6 en Configuración > Prospectos, `maxAttempts()`). */
     public const MAX_ATTEMPTS = 3;
+    /** Fase AW: idioma que prefiere el transportista (columna lang; NULL = sin saber). */
+    public const LANGS = ['en' => 'Inglés', 'es' => 'Español'];
+    /** Fase AW: espaciado de los intentos sin respuesta, en días hábiles tras el intento n (el último valor se repite). */
+    public const SPACING = [
+        'next_day' => ['Al siguiente día hábil', [1]],
+        'spread' => ['A los 2, 3 y 5 días hábiles (recomendado)', [2, 3, 5]],
+        'wide' => ['A los 3, 5 y 7 días hábiles', [3, 5, 7]],
+    ];
     public const PER = [25, 50, 100];
     public const FLEETS = ['1' => '1 unidad', '2-5' => '2 a 5', '6+' => '6 o más'];
     public const AGES = [3 => '3 meses o menos', 6 => '6 meses o menos', 12 => '12 meses o menos'];
@@ -411,6 +420,34 @@ final class Prospects
     // --- Acciones -------------------------------------------------------------------------------------------------------
 
     /** Siguiente dia habil a las 9:00 a. m. ET (UTC). */
+    /** Fase AW: intentos sin respuesta antes de cerrar (Configuración > Prospectos > Cadencia de llamadas). */
+    public static function maxAttempts(): int
+    {
+        return ProspectConfig::get()['max_attempts'];
+    }
+
+    /** Fase AW: cuándo vuelve a la lista tras el intento n sin respuesta (9:00 a. m. ET del día hábil que toque según el espaciado configurado). */
+    public static function retryAt(int $now, int $attempt): string
+    {
+        $days = self::SPACING[ProspectConfig::get()['retry_spacing']][1] ?? [1];
+        $n = (int) ($days[max(0, min($attempt, count($days)) - 1)] ?? 1);
+        $d = (new \DateTimeImmutable('@' . $now))->setTimezone(new \DateTimeZone('America/New_York'));
+        for ($i = 0; $i < $n; $i++) {
+            $d = $d->modify('+1 day');
+            while (in_array((int) $d->format('N'), [6, 7], true)) {
+                $d = $d->modify('+1 day');
+            }
+        }
+        return self::etToUtc($d->format('Y-m-d') . 'T09:00') ?? Clock::at($now + 86400 * $n);
+    }
+
+    /** «Vuelve a la lista el viernes 27.» (fecha ET del siguiente intento, sea la del espaciado o la elegida a mano). */
+    private static function retryLabel(string $when): string
+    {
+        $d = $when !== '' ? Fmt::et($when) : null;
+        return $d === null ? 'Vuelve a la lista más adelante.' : 'Vuelve a la lista el ' . mb_strtolower(Fmt::weekdayLong((int) $d->format('N'))) . ' ' . $d->format('j') . '.';
+    }
+
     public static function nextBusinessDay(int $now): string
     {
         $d = (new \DateTimeImmutable('@' . $now))->setTimezone(new \DateTimeZone('America/New_York'))->modify('+1 day');
@@ -434,6 +471,11 @@ final class Prospects
             return self::fail('La hora del siguiente intento no es válida.');
         }
         $qual = null;
+        $lang = false;   // false = el formulario no trae el campo (no se toca)
+        if ($qualIn !== null && array_key_exists('lang', $qualIn)) {
+            $lang = is_string($qualIn['lang']) && isset(self::LANGS[$qualIn['lang']]) ? $qualIn['lang'] : '';
+            unset($qualIn['lang']);
+        }
         if ($qualIn !== null) {
             $q = self::normalizeQual($qualIn);
             if ($q['error'] !== null) {
@@ -454,7 +496,7 @@ final class Prospects
             }
         }
         try {
-            $r = Db::transaction(static function () use ($id, $result, $note, $next, $userId, $nextTime, $nextDate, $qual): array {
+            $r = Db::transaction(static function () use ($id, $result, $note, $next, $userId, $nextTime, $nextDate, $qual, $lang): array {
                 $p = Db::one('SELECT * FROM prospects_fmcsa WHERE id = ? AND deleted_at IS NULL FOR UPDATE', [$id]);
                 if ($p === null) {
                     return self::fail('El prospecto no existe.');
@@ -480,6 +522,9 @@ final class Prospects
                 if ($qual !== null) {
                     $u['qual'] = $qual ?: null;
                 }
+                if ($lang !== false) {   // fase AW: idioma anotado en la llamada ('' = sin saber)
+                    $u['lang'] = $lang !== '' ? $lang : null;
+                }
                 $status = $result;
                 if ($result === 'wrong_number') {   // número equivocado: se cierra (sin «no llamar»: el número no es de este carrier); se reabre a mano si aparece otro
                     $status = 'no_answer_closed';
@@ -488,12 +533,12 @@ final class Prospects
                     $status = 'no_answer';
                     $attempts++;
                     $u['attempts'] = $attempts;
-                    if ($attempts >= self::MAX_ATTEMPTS) {
+                    if ($attempts >= self::maxAttempts()) {
                         $status = 'no_answer_closed';
                         $u = ['closed_at' => $now, 'next_call_at' => null, 'callback_exact' => 0] + $u;
                         $next = null;
                     } else {
-                        $next ??= self::nextBusinessDay(Clock::time());
+                        $next ??= self::retryAt(Clock::time(), $attempts);
                         $u['next_call_at'] = $next;
                     }
                 } else {
@@ -517,8 +562,8 @@ final class Prospects
                 $when = $u['next_call_at'] ?? null;
                 $msg = match (true) {
                     $result === 'wrong_number' => 'Número equivocado: el prospecto se cerró. Si consigues otro teléfono, reábrelo.',
-                    $status === 'no_answer_closed' => 'Tercer intento sin respuesta: el prospecto pasó a «Sin respuesta (cerrada)». Puedes reabrirlo a mano.',
-                    $status === 'no_answer' => ($result === 'voicemail' ? 'Mensaje de voz registrado' : 'Sin respuesta registrada') . ' (intento ' . $attempts . ' de ' . self::MAX_ATTEMPTS . '). ' . ($exact ? 'Vuelve a la lista a la hora pedida.' : 'Se vuelve a listar el siguiente día hábil.'),
+                    $status === 'no_answer_closed' => 'Intento ' . $attempts . ' de ' . self::maxAttempts() . ' sin respuesta: el prospecto pasó a «Sin respuesta (cerrada)». Puedes reabrirlo a mano.',
+                    $status === 'no_answer' => ($result === 'voicemail' ? 'Mensaje de voz registrado' : 'Sin respuesta registrada') . ' (intento ' . $attempts . ' de ' . self::maxAttempts() . '). ' . ($exact ? 'Vuelve a la lista a la hora pedida.' : self::retryLabel((string) $when)),
                     default => match ($status) {
                     'dnc' => 'Marcado «No llamar más». No volverá a listarse.',
                     'interested' => 'Marcado como interesado. Conviértelo en lead para seguirlo.',
@@ -538,6 +583,9 @@ final class Prospects
         try {
             if (in_array($result, self::MISSED, true)) {
                 ProspectAutoMail::queue($id, $userId);
+            }
+            if (($r['status'] ?? '') === 'no_answer_closed' && $result !== 'wrong_number') {   // fase AW: se agotaron los intentos: último correo de la cadencia
+                ProspectAutoMail::queue($id, $userId, 'breakup');
             }
             if ($result === 'interested' && ProspectConfig::get()['auto_convert']) {
                 $c = self::convert($id, $userId);
@@ -714,7 +762,7 @@ final class Prospects
             'email' => (string) ($q['email'] ?? $p['email']), 'equipment_types' => array_values(array_merge((array) ($q['equipment'] ?? []), ($q['relay'] ?? '') === 'yes' ? ['amazon-relay'] : [])),
             'best_time' => (string) ($q['best_time'] ?? ''),
             'state' => (string) $p['state'], 'city' => (string) $p['city'], 'usdot' => (string) $p['usdot'], 'truck_count' => $units !== null && $units >= 1 ? $units : null, 'authority_status' => 'active',
-            'language' => 'en', 'consent' => ['given' => false],
+            'language' => ($p['lang'] ?? '') === 'es' ? 'es' : 'en', 'consent' => ['given' => false],
         ];
         try {
             $r = LeadIngest::handle($payload, 'fmcsa_outbound', ['quiet' => true, 'skip_antispam' => true, 'fmcsa_data' => $fm]);

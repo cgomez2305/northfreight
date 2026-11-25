@@ -100,12 +100,20 @@ Además:
 
 El CRM puede llamar por la Voice API de Vonage desde el navegador («clic para llamar»: un clic, una llamada, un número, una persona al teléfono). Para la ley sigue siendo una llamada manual: no hay marcador, ni detección de contestador, ni mensaje grabado. El prospecto ve el número de EE. UU. de NorthStar en lugar de uno extranjero, y el servidor vuelve a comprobar el horario y la lista de no llamar justo antes de marcar. No se graba.
 
+### Más leads (fase AW)
+
+- **Búsqueda por rango de antigüedad:** además de las autoridades nuevas, se puede buscar a carriers de, por ejemplo, 3 a 24 meses. Ya pasaron el primer golpe, reciben muchas menos llamadas de otros dispatchers y suelen estar más dispuestos a pagar por ayuda.
+- **Idioma:** quien llama pregunta «Do you prefer English or Spanish?» y lo anota. El guion, los correos y las campañas usan ese idioma. Nunca se adivina por el apellido.
+- **Intentos repartidos:** se puede subir a 4, 5 o 6 intentos y espaciarlos (2, 3 y 5 días hábiles). Repartir los intentos en dos semanas contesta más que llamar tres días seguidos.
+- **Cadencia de correos (apagada por defecto):** presentación al entrar en la lista, correo tras no contestar y un último correo al agotar los intentos, con al menos 2 días entre ellos, en inglés o español. Mismas reglas de CAN-SPAM que las campañas. No se envía la presentación a listas CSV.
+- **Medir:** Reportes muestra la conversión por idioma y por origen y a qué hora local contestan más, para llamar cuando más contestan.
+
 ## 6. Ideas para más adelante
 
 - Cruzar la lista nacional DNC (con suscripción SAN) antes de que un prospecto entre a la lista.
 - Llamadas con IA **solo para quien ya dio su consentimiento por escrito** (por ejemplo, recordatorios a leads que lo aceptaron en el formulario), nunca en frío.
 - Un dominio aparte para la prospección por correo si el volumen pasa de unas decenas al día.
-- Medir la tasa de contacto por hora local y por día de la semana para llamar cuando más contestan.
+- Medir la tasa de contacto por día de la semana (la hora local ya se mide desde la fase AW).
 
 ## 7. Fuentes consultadas
 

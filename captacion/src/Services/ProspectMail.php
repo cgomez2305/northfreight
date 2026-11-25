@@ -37,21 +37,44 @@ final class ProspectMail
     ];
     /** Fase AT: segundo correo a los N días a quien no abrió, no hizo clic ni respondió (0 = sin segundo correo). */
     public const FOLLOWUP_DAYS = [0 => 'Sin segundo correo', 3 => 'A los 3 días', 5 => 'A los 5 días', 7 => 'A los 7 días', 10 => 'A los 10 días'];
+    /** Fase AW: segmento por idioma preferido (lo anota quien llama; sin dato cuenta como «no prefiere español»). */
+    public const SEG_LANGS = ['' => 'Cualquier idioma', 'es' => 'Prefieren español', 'en' => 'No prefieren español'];
+    /** Fase AW: idioma del correo (pie, baja y variables). */
+    public const LANGS = ['en' => 'Inglés', 'es' => 'Español'];
+    public const FOLLOWUP_SUBJECT = ['en' => 'Following up: dispatch for {empresa}', 'es' => 'Seguimiento: dispatch para {empresa}'];
+    public const FOLLOWUP_BODY_ES = "Hola:\n\nTe escribo de nuevo por mi correo de la semana pasada. Si el dispatch de {empresa} está entre tus pendientes, en NorthStar reservamos cargas de Amazon Relay y dry van, seguimos cada viaje y llevamos el papeleo en orden.\n\nBasta con responder este correo o escribirnos por WhatsApp al {whatsapp} para empezar.\n\nNorthStar Freight Solutions";
     public const FOLLOWUP_BODY = "Hi,\n\nJust following up on my note from last week. If dispatch support for {empresa} is on your list, NorthStar can book Amazon Relay and dry van loads, follow every trip and keep the paperwork organized.\n\nA quick reply or a WhatsApp message at {whatsapp} is enough to start.\n\nNorthStar Freight Solutions";
     /** Destinos de los enlaces con conteo de clics (/r/{token}): solo estos, nunca una URL que llegue de fuera. */
     public const CLICK_TARGETS = [1 => '/resources/rate-per-mile-calculator/', 2 => '/'];
+    public const WHY_ES = 'Recibes este correo porque tu empresa figura como transportista en el registro público de FMCSA. Si prefieres no volver a saber de NorthStar, usa el enlace de abajo.';
     public const WHY = 'You are receiving this email because your company is listed as a motor carrier in the public FMCSA registry. If you would rather not hear from NorthStar again, use the link below.';
     /** Textos de partida (inglés: los transportistas están en EE. UU.). Solo afirman lo que NorthStar hace hoy (CLAUDE.md §8.2): Amazon Relay y dry van, MC nuevos, 24/7. */
     public const STARTERS = [
         'owner' => [
-            'label' => 'Owner-operators (1 camión)', 'segment' => ['fl' => '1'],
+            'label' => 'Owner-operators (1 camión)', 'segment' => ['fl' => '1'], 'lang' => 'en',
             'subject' => 'Dispatch for {empresa}: Amazon Relay and dry van',
             'body' => "Hi,\n\nI'm reaching out from NorthStar Freight Solutions, a remote dispatch desk for owner-operators and small fleets. We work with new MC numbers.\n\nWe book Amazon Relay and dry van loads, follow every trip and keep the paperwork organized (rate confirmations, BOLs and PODs), so you can focus on driving.\n\nIf you want to talk about your truck in {estado}, just reply to this email or message us on WhatsApp at {whatsapp}.\n\nNorthStar Freight Solutions",
         ],
         'fleet' => [
-            'label' => 'Flotas (6 camiones o más)', 'segment' => ['fl' => '6+'],
+            'label' => 'Flotas (6 camiones o más)', 'segment' => ['fl' => '6+'], 'lang' => 'en',
             'subject' => 'A dispatch desk for {empresa}',
             'body' => "Hi,\n\nI'm reaching out from NorthStar Freight Solutions. We run a remote dispatch desk for carriers: Amazon Relay and dry van loads booked, every trip followed and the paperwork kept on file, with dispatch coverage 24/7.\n\nWith {flota} on the road, one desk that handles booking, tracking and back office can take a lot off your team.\n\nIf it makes sense, reply to this email or message us on WhatsApp at {whatsapp} and we can talk about your lanes.\n\nNorthStar Freight Solutions",
+        ],
+        // fase AW: MC recién emitidos (la FAQ de Relay del sitio ya afirma que se trabaja con autoridades nuevas; no se afirma qué exige Amazon)
+        'new_mc' => [
+            'label' => 'MC nuevos (3 meses o menos)', 'segment' => ['ag' => 3], 'lang' => 'en',
+            'subject' => 'New MC? Let\'s get {empresa} moving',
+            'body' => "Hi,\n\nCongratulations on your new authority. Many brokers ask for some months of history before they give loads to a new MC, so the first weeks can be slow.\n\nNorthStar Freight Solutions works with new MC numbers. We dispatch Amazon Relay and dry van loads, follow every trip and keep the paperwork organized, so you can focus on driving.\n\nIf you want to talk about getting your truck moving in {estado}, reply to this email or message us on WhatsApp at {whatsapp}. You can check your numbers with our free rate per mile calculator:\n{link_calculadora}\n\nNorthStar Freight Solutions",
+        ],
+        'owner_es' => [
+            'label' => 'En español: owner-operators', 'segment' => ['fl' => '1', 'lg' => 'es'], 'lang' => 'es',
+            'subject' => 'Dispatch para {empresa}: Amazon Relay y dry van',
+            'body' => "Hola:\n\nTe escribo de NorthStar Freight Solutions, un equipo de dispatch remoto para owner-operators y flotas pequeñas. Trabajamos con MC nuevos y atendemos en inglés y en español.\n\nReservamos cargas de Amazon Relay y dry van, seguimos cada viaje y llevamos el papeleo en orden (rate confirmations, BOL y POD), para que tú te concentres en manejar.\n\nSi quieres hablar de tu camión en {estado}, responde este correo o escríbenos por WhatsApp al {whatsapp}.\n\nNorthStar Freight Solutions",
+        ],
+        'fleet_es' => [
+            'label' => 'En español: flotas', 'segment' => ['fl' => '2-5', 'lg' => 'es'], 'lang' => 'es',
+            'subject' => 'Un equipo de dispatch para {empresa}',
+            'body' => "Hola:\n\nTe escribo de NorthStar Freight Solutions. Llevamos el dispatch de transportistas desde un equipo remoto: reservamos cargas de Amazon Relay y dry van, seguimos cada viaje y guardamos el papeleo, con cobertura de dispatch 24/7, en inglés y en español.\n\nCon {flota} en la carretera, un solo equipo que se encargue de reservar, dar seguimiento y del back office te quita mucho trabajo.\n\nSi te parece, responde este correo o escríbenos por WhatsApp al {whatsapp} y hablamos de tus rutas.\n\nNorthStar Freight Solutions",
         ],
     ];
 
@@ -117,7 +140,8 @@ final class ProspectMail
     {
         $f = Prospects::filters($in);
         $tab = is_string($in['tab'] ?? null) && isset(self::SEG_TABS[$in['tab']]) ? $in['tab'] : '';
-        return ['tab' => $tab, 'us' => $f['us'], 'fl' => $f['fl'], 'ag' => $f['ag']];
+        $lg = is_string($in['lg'] ?? null) && isset(self::SEG_LANGS[$in['lg']]) ? $in['lg'] : '';
+        return ['tab' => $tab, 'us' => $f['us'], 'fl' => $f['fl'], 'ag' => $f['ag'], 'lg' => $lg];
     }
 
     public static function segmentLabel(array $seg): string
@@ -130,6 +154,9 @@ final class ProspectMail
         }
         if ($seg['tab'] !== '') {
             $p[] = self::SEG_TABS[$seg['tab']];
+        }
+        if (($seg['lg'] ?? '') !== '') {
+            $p[] = self::SEG_LANGS[$seg['lg']];
         }
         return implode(' · ', $p);
     }
@@ -152,6 +179,11 @@ final class ProspectMail
     {
         $f = ['tab' => $seg['tab'] !== '' ? $seg['tab'] : 'today', 'q' => '', 'us' => $seg['us'], 'fl' => $seg['fl'], 'ag' => (int) $seg['ag'], 'ph' => '', 'now' => ''];
         [$w, $p] = Prospects::whereFor($f, $now, $seg['tab'] !== '');
+        if (($seg['lg'] ?? '') === 'es') {   // fase AW
+            $w .= " AND p.lang = 'es'";
+        } elseif (($seg['lg'] ?? '') === 'en') {
+            $w .= " AND (p.lang IS NULL OR p.lang <> 'es')";
+        }
         $inSegment = (int) Db::value('SELECT COUNT(*) FROM prospects_fmcsa p WHERE ' . $w, $p);
         $cool = self::settings()['cooldown_days'];
         $rows = Db::all(
@@ -284,6 +316,7 @@ final class ProspectMail
             'subject' => trim((string) preg_replace('/\s+/', ' ', is_string($in['subject'] ?? null) ? mb_substr($in['subject'], 0, 300) : '')),
             'body' => str_replace("\r\n", "\n", trim(is_string($in['body'] ?? null) ? mb_substr($in['body'], 0, 21000) : '')),
             'segment' => self::segment($in),
+            'lang' => ($in['lang'] ?? 'en') === 'es' ? 'es' : 'en',
             'followup_days' => isset(self::FOLLOWUP_DAYS[(int) ($in['followup_days'] ?? 0)]) ? (int) ($in['followup_days'] ?? 0) : 0,
             'followup_subject' => trim((string) preg_replace('/\s+/', ' ', is_string($in['followup_subject'] ?? null) ? mb_substr($in['followup_subject'], 0, 300) : '')),
             'followup_body' => str_replace("\r\n", "\n", trim(is_string($in['followup_body'] ?? null) ? mb_substr($in['followup_body'], 0, 21000) : '')),
@@ -322,7 +355,7 @@ final class ProspectMail
     public static function create(array $v, int $userId): int
     {
         $now = Clock::now();
-        $id = (int) Db::insert('prospect_campaigns', ['name' => $v['name'], 'segment' => $v['segment'], 'subject' => $v['subject'], 'body' => $v['body'], 'status' => 'draft',
+        $id = (int) Db::insert('prospect_campaigns', ['name' => $v['name'], 'segment' => $v['segment'], 'lang' => $v['lang'] ?? 'en', 'subject' => $v['subject'], 'body' => $v['body'], 'status' => 'draft',
             'followup_days' => $v['followup_days'] ?? 0, 'followup_subject' => ($v['followup_subject'] ?? '') !== '' ? $v['followup_subject'] : null, 'followup_body' => ($v['followup_body'] ?? '') !== '' ? $v['followup_body'] : null,
             'created_by' => $userId, 'created_at' => $now, 'updated_at' => $now]);
         ActivityLog::record('prospect_campaign_create', $userId, 'prospect_campaign', $id, ['segment' => $v['segment']]);
@@ -335,7 +368,7 @@ final class ProspectMail
         if ($c === null || $c['status'] !== 'draft') {
             return self::fail('Solo se puede editar una campaña en borrador.');
         }
-        Db::update('prospect_campaigns', $id, ['name' => $v['name'], 'segment' => $v['segment'], 'subject' => $v['subject'], 'body' => $v['body'], 'updated_at' => Clock::now(),
+        Db::update('prospect_campaigns', $id, ['name' => $v['name'], 'segment' => $v['segment'], 'lang' => $v['lang'] ?? 'en', 'subject' => $v['subject'], 'body' => $v['body'], 'updated_at' => Clock::now(),
             'followup_days' => $v['followup_days'] ?? 0, 'followup_subject' => ($v['followup_subject'] ?? '') !== '' ? $v['followup_subject'] : null, 'followup_body' => ($v['followup_body'] ?? '') !== '' ? $v['followup_body'] : null]);
         ActivityLog::record('prospect_campaign_update', $userId, 'prospect_campaign', $id, ['segment' => $v['segment']]);
         return self::ok('Borrador guardado.');
@@ -355,16 +388,23 @@ final class ProspectMail
     // --- Render --------------------------------------------------------------------------------------------------------------------
 
     /** @return array<string,string> variables de un prospecto */
-    public static function vars(array $p): array
+    public static function vars(array $p, string $lang = 'en'): array
     {
         $name = trim((string) ($p['legal_name'] ?? '')) !== '' ? (string) $p['legal_name'] : (string) ($p['dba'] ?? '');
-        $n = $p['fleet_size'] !== null && $p['fleet_size'] !== '' ? (int) $p['fleet_size'] : 0;
+        $n = ($p['fleet_size'] ?? null) !== null && $p['fleet_size'] !== '' ? (int) $p['fleet_size'] : 0;
+        $es = $lang === 'es';
         return [
-            '{empresa}' => $name !== '' ? Fmt::company($name) : 'your company',
-            '{ciudad}' => trim((string) ($p['city'] ?? '')) !== '' ? ucwords(strtolower((string) $p['city'])) : 'your area',
-            '{estado}' => trim((string) ($p['state'] ?? '')) !== '' ? (string) $p['state'] : 'your state',
-            '{flota}' => $n > 0 ? $n . ($n === 1 ? ' truck' : ' trucks') : 'your trucks',
+            '{empresa}' => $name !== '' ? Fmt::company($name) : ($es ? 'tu empresa' : 'your company'),
+            '{ciudad}' => trim((string) ($p['city'] ?? '')) !== '' ? ucwords(strtolower((string) $p['city'])) : ($es ? 'tu zona' : 'your area'),
+            '{estado}' => trim((string) ($p['state'] ?? '')) !== '' ? (string) $p['state'] : ($es ? 'tu estado' : 'your state'),
+            '{flota}' => $n > 0 ? $n . ($es ? ($n === 1 ? ' camión' : ' camiones') : ($n === 1 ? ' truck' : ' trucks')) : ($es ? 'tus camiones' : 'your trucks'),
         ];
+    }
+
+    /** Motivo del pie según el idioma. */
+    public static function why(string $lang): string
+    {
+        return $lang === 'es' ? self::WHY_ES : self::WHY;
     }
 
     /**
@@ -379,7 +419,8 @@ final class ProspectMail
             $links[$var] = $rid !== null ? Unsub::clickUrl($rid, $t) : Templates::SITE . self::CLICK_TARGETS[$t];
         }
         $tpl = $step === 2 ? ['subject' => (string) ($c['followup_subject'] ?? ''), 'body' => (string) ($c['followup_body'] ?? '')] : ['subject' => (string) $c['subject'], 'body' => (string) $c['body']];
-        return Templates::render($tpl, ['first_name' => '', 'state' => $p['state'] ?? ''], 'en', $unsubUrl, $links + self::vars($p), ['why' => self::WHY, 'pixel' => $pixel]);
+        $lang = ($c['lang'] ?? 'en') === 'es' ? 'es' : 'en';
+        return Templates::render($tpl, ['first_name' => '', 'state' => $p['state'] ?? ''], $lang, $unsubUrl, $links + self::vars($p, $lang), ['why' => self::why($lang), 'pixel' => $pixel]);
     }
 
     /** Prospecto de muestra para la vista previa: el primero del segmento o uno ficticio. */

@@ -51,6 +51,9 @@ final class SocrataFixture
             $since = $s[1] ?? '00000000';
             $rows = array_values(array_filter($this->grants, static fn($r) => ($r['op_auth_status'] ?? '') === 'Active' && strtoupper((string) ($r['reason'] ?? '')) === 'GRANTED'
                 && ($r['op_auth_type'] ?? '') === 'Motor Carrier of Property (Except Household Goods)' && $r['status_change_date'] >= $since));
+            if (preg_match("/status_change_date<='(\d{8})'/", $where, $un) === 1) {   // fase AW: antigüedad mínima
+                $rows = array_values(array_filter($rows, static fn($r) => $r['status_change_date'] <= $un[1]));
+            }
             if (preg_match("/status_change_date<'(\d{8})' OR \(status_change_date='(\d{8})' AND docket_number>'([^']*)'\)/", $where, $c) === 1) {
                 $rows = array_values(array_filter($rows, static fn($r) => $r['status_change_date'] < $c[1] || ($r['status_change_date'] === $c[2] && strcmp($r['docket_number'], $c[3]) > 0)));
             }

@@ -112,6 +112,7 @@ final class ProspectSources
         }
         Db::insert('prospect_calls', ['prospect_id' => $id, 'user_id' => $userId, 'result' => 'added', 'note' => $origin !== '' ? 'Origen: ' . $origin : null, 'attempt_no' => 0, 'created_at' => Clock::now()]);
         ActivityLog::record('prospect_add', $userId, 'prospect', $id, ['source' => $row['source'], 'has_origin' => $origin !== '']);
+        ProspectAutoMail::queue((int) $id, $userId, 'intro');   // fase AW (los CSV no: listas de origen desconocido dañan la reputación del dominio)
         return self::ok($msg, ['id' => $id]);
     }
 
