@@ -507,9 +507,14 @@ final class Dashboard
         // etiquetas de mes sobre las columnas
         $months = [];
         $lastM = -1;
+        $lastAt = -9;
         for ($w = 0; $w < $weeks; $w++) {
             $m = (int) Fmt::et(Fmt::weekStart($now, -($weeks - 1 - $w)))->format('n');
-            $months[] = $m !== $lastM ? Fmt::monthLabel($m) : '';
+            $show = $m !== $lastM && $w - $lastAt >= 3;   // fase AX: dos etiquetas de mes nunca a menos de 3 columnas («agosep» montado)
+            $months[] = $show ? Fmt::monthLabel($m) : '';
+            if ($show) {
+                $lastAt = $w;
+            }
             $lastM = $m;
         }
         return [

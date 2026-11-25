@@ -20,6 +20,9 @@ final class TareasController extends Responder
         $now = Clock::time();
         $tab = is_string($_GET['tab'] ?? null) && isset(Tasks::TABS[$_GET['tab']]) ? $_GET['tab'] : 'today';
         $counts = Tasks::counts($now);
+        if (!isset($_GET['tab']) && $counts['today'] === 0 && $counts['overdue'] > 0) {
+            $tab = 'overdue';   // fase AX: sin nada para hoy y con vencidas, se abre en «Vencidas» (antes «Nada pendiente» con 20 vencidas)
+        }
         $vars = ['title' => 'Tareas', 'css' => ['tareas'], 'js' => ['tareas'], 'tab' => $tab, 'counts' => $counts, 'canWrite' => ($user['role'] ?? '') !== 'viewer', 'now' => $now];
         if ($tab === 'week') {
             $vars['week'] = Tasks::week(is_string($_GET['w'] ?? null) ? $_GET['w'] : null, $now);

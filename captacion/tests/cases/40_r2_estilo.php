@@ -56,7 +56,7 @@ return static function (array $ctx): void {
         // sombras: solo el aro de 1 px del elemento activo o seleccionado, el token de flotantes y los anillos de arrastre/foco
         if (preg_match_all('/box-shadow\s*:\s*([^;}]+)/', $c, $mm)) {
             foreach ($mm[1] as $sh) {
-                if (!preg_match('/^\s*(var\(--shadow-pop\)|none|inset 0 0 0 1px [^,]+|0 0 0 1px [^,]+|1px 0 0 var\(--line\))\s*(!important)?\s*$/', $sh)) {
+                if (!preg_match('/^\s*(var\(--shadow-pop\)|none|inset 0 0 0 1px [^,]+|0 0 0 1px [^,]+|1px 0 0 var\(--line\)|inset -?14px 0 12px -12px var\(--scrim\))\s*(!important)?\s*$/', $sh)) {   // fase AX: aviso de columnas ocultas en el borde de las tablas
                     $bad[] = "$name: sombra no permitida «" . trim($sh) . '»';
                 }
             }

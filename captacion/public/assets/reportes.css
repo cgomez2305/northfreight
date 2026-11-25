@@ -1,5 +1,4 @@
 /* NorthStar Captación · reportes, resultados e informes (/reportes, /resultados, /informes). Encima de panel.css + charts.css (y viz.css en /resultados). Sin estilos en línea (CSP): clases y variables. Incluye la hoja de impresión. */
-/* Q5a: reglas que estaban en panel.css y solo usa esta pantalla */
 .rk{display:flex;flex-wrap:wrap;gap:12px}
 .rk__c{flex:1 1 236px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);padding:16px 20px 20px;display:flex;flex-direction:column;gap:6px;min-width:0}
 .rk__v{font:500 var(--fs-num)/1 var(--f-sans);font-variant-numeric:tabular-nums;letter-spacing:-.02em;overflow-wrap:anywhere}
@@ -28,11 +27,12 @@
 .tbl--rep th.num-c,.tbl--rep td.num-c{text-align:right}
 .tbl--rep tfoot th,.tbl--rep tfoot td{font-weight:500;border-top:1px solid var(--line-2);background:var(--sunk)}
 .tbl--rep .c-act{text-align:right;white-space:nowrap}
+.rep-grid .tbl--rep th,.rep-grid .tbl--rep td{padding-inline:8px;height:auto;padding-block:10px}.rep-grid .tbl--rep th:first-child,.rep-grid .tbl--rep td:first-child{padding-left:18px}.rep-grid .tbl--rep th:last-child,.rep-grid .tbl--rep td:last-child{padding-right:18px}
+.rep-grid .tbl--rep thead th{white-space:normal;line-height:1.25;vertical-align:bottom}
 .rep-acts{list-style:decimal;padding-left:22px;display:grid;gap:10px;font-size:var(--fs-lg);line-height:1.45}
 .rep-print-h{display:none}
 .inl{display:inline-block}
 .q3a{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-/* Q6-I: /resultados con las piezas del dashboard vivo (tarjetas .kpi de viz.css): 3 + 2 en escritorio, 2 por fila y la última a lo ancho por debajo de 1024 */
 .kpis--rs{grid-template-columns:repeat(6,minmax(0,1fr))}
 .kpis--rs .kpi{grid-column:span 2}
 .kpis--rs .kpi:nth-child(n+4){grid-column:span 3}
@@ -52,7 +52,7 @@
   .fn__r .hb{grid-column:1/-1;grid-row:2}
   .rep-range .field{width:100%}
 }
-@container (max-width:520px){
+@container (max-width:460px){
   .tbl--rep tbody tr,.tbl--rep tfoot tr{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;padding:12px 16px;border-bottom:1px solid var(--line)}
   .tbl--rep tbody th.c-n,.tbl--rep tfoot th.c-n{order:-1;grid-column:1/-1;font:500 var(--fs-md) var(--f-sans)}
   .tbl--rep tbody td,.tbl--rep tfoot td{display:flex;justify-content:space-between;gap:8px;font-size:var(--fs-sm);text-align:right}
@@ -85,8 +85,6 @@
 .legend{display:flex;gap:16px;flex-wrap:wrap;font:400 var(--fs-sm)/1.3 var(--f-sans);color:var(--ink-2)}
 .legend li{display:flex;align-items:center;gap:7px}
 @media (max-width:760px){.legend{gap:8px 14px}}
-/* Fase AO: las tablas de Reportes son TABLAS en cuanto caben (> 520 px). panel.css convierte cualquier .tbl en fichas bajo 700 px (pensado para la lista de
-   leads) y aquí dejaba «Páginas de llegada» con los números amontonados encima de la ruta. Filas más bajas: son datos, no fichas de trabajo. */
 .rep-span{grid-column:1/-1}
 .tbl--rep td,.tbl--rep tbody th{height:40px}
 @container (min-width:521px){
@@ -104,6 +102,6 @@
 .rep-out{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
 .rep-out dt{font-size:var(--fs-sm);color:var(--ink-3)}
 .rep-out dd{font-size:var(--fs-xl);font-weight:600;font-variant-numeric:tabular-nums}
-.rep-out small{font-size:var(--fs-xs);color:var(--ink-3)}
+.rep-out small{font-size:var(--fs-xs);font-weight:400;color:var(--ink-3)}
 .rep-res{display:flex;flex-wrap:wrap;gap:6px 16px;margin-top:14px;font-size:var(--fs-sm);color:var(--ink-2)}
 @media (max-width:760px){.rep-out{grid-template-columns:1fr 1fr}}

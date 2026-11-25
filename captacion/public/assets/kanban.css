@@ -1,9 +1,13 @@
 /* NorthStar Captación · kanban (/pipeline). Se carga solo en esa pantalla, encima de panel.css. Sin estilos en línea (CSP): clases y variables. */
 .page-head--kb>div:first-child{flex:1 1 260px;min-width:0}
-.kq{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.kq-row{display:flex;gap:10px 16px;align-items:center;flex-wrap:wrap}
+.kq-row .ptabs{margin:0;padding:0;flex:0 1 auto;min-width:0;max-width:100%}
+.kq{display:flex;gap:10px;align-items:center;flex-wrap:wrap;flex:1 1 640px;min-width:0}
 .kq .seg--wrap{margin:0}
-.kq__s{flex:0 0 210px}
-.kq__q{flex:1 1 240px;min-width:200px;max-width:380px;min-height:44px}
+.kq .seg__i{min-height:32px}
+.kq__s{flex:0 1 170px;min-width:130px}
+.kq select{white-space:nowrap;text-overflow:ellipsis}
+.kq__q{flex:1 1 160px;min-width:140px;max-width:320px;min-height:40px}
 .kq__q input{min-height:42px}
 .js .kq__go{display:none}
 .kb{display:flex;flex-direction:column;gap:12px;min-width:0}
@@ -93,8 +97,8 @@
   .kq .seg--wrap{width:100%;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
   .kq .seg--wrap::-webkit-scrollbar{display:none}
   .kq .seg__i{flex:none}
-  .kq__s{flex:0 0 150px}
-  .kq__q{flex:1 1 150px;min-width:0;max-width:none}
+  .kq__s{flex:1 1 100%;min-width:0}
+  .kq__q{flex:1 1 100%;min-width:0;max-width:none}
   .page-head--kb .page-head__a{width:auto}
   .page-head--kb .btn{width:44px;min-height:44px;padding:0;flex:none}
   .page-head--kb .btn span{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}

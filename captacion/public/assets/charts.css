@@ -31,7 +31,11 @@
 .lc__tip b{display:block;margin-bottom:5px;font-weight:600}
 .lc__tip span{display:flex;align-items:center;gap:7px;color:var(--ink-2)}
 .lc__tip strong{margin-left:auto;padding-left:12px;font:500 12.5px var(--f-sans);font-variant-numeric:tabular-nums;color:var(--ink)}
-.lc__x{grid-column:2;display:grid;grid-auto-flow:column;grid-auto-columns:1fr;font:500 10px var(--f-mono);color:var(--ink-3);text-align:center}
+.lc__x{grid-column:2;display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);font:500 10.5px var(--f-mono);color:var(--ink-3);text-align:center;container:lcx/inline-size}
+.lc__x span{white-space:nowrap}
+@container lcx (max-width:760px){.lc__x span:nth-child(even){visibility:hidden}}
+@container lcx (max-width:1000px){.lc__x:has(span:nth-child(17)) span:not(:nth-child(4n+1)){visibility:hidden}}
+@container lcx (max-width:560px){.lc__x:has(span:nth-child(17)) span:not(:nth-child(7n+1)){visibility:hidden}}
 .segbar{width:100%;height:10px;border-radius:5px;margin:14px 0 16px;display:block;overflow:hidden}
 .segbar rect{shape-rendering:crispEdges}
 .seg-0{fill:var(--seg-0);background:var(--seg-0)}

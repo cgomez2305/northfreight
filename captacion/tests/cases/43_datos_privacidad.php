@@ -436,7 +436,7 @@ return static function (array $ctx): void {
     $hooks = ['btn__t', 'app', 'js', 'srch', 'dlg--confirm'];
     $sheetsOf = static function (string $html): array {
         preg_match_all('#<link rel="stylesheet" href="/assets/([a-z0-9-]+)\.css\?v=#', $html, $m);
-        return array_merge($m[1], str_contains($html, 'src="/assets/ux.js') ? ['ux'] : []);
+        return array_merge($m[1], str_contains($html, 'src="/assets/ux.js') ? ['ux'] : [], str_contains($html, 'src="/assets/ctl.js') ? ['ctl'] : []);
     };
     $sendPage = $panel->get('/leads/' . $SL . '/enviar?tpl=' . $T1);
     $miss = array_values(array_filter($classesOf($sendPage['body']), static fn($c) => !isset($defs($sheetsOf($sendPage['body']))[$c]) && !in_array($c, $hooks, true)));

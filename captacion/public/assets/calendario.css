@@ -4,7 +4,7 @@
 .cal__nav{display:flex;gap:6px}
 .cal__nav .btn{min-width:44px}
 .cal__t{font:600 var(--fs-xl)/1.2 var(--f-sans);letter-spacing:-.01em;flex:1;min-width:150px}
-.cal__m .seg__i{min-height:38px;padding:0 14px}
+.cal__m .seg__i{min-height:32px;padding:0 14px}
 /* el tipo de evento solo se distingue por un punto de 6 px (el mismo en filas, tarjetas y filtros); sin fondos de color */
 .ev--task{--ev-dot:var(--accent)}
 .ev--appt{--ev-dot:var(--ok-dot)}

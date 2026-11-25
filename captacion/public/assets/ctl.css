@@ -73,3 +73,9 @@ select:not([multiple]) legend,select:not([multiple]) optgroup::label{padding:8px
 .seg--tight{display:flex}
 .seg--tight .seg__i{flex:1;justify-content:center;min-height:30px;padding:0 8px}
 .dd__item kbd{margin-left:auto}
+/* Fase AX: sombra en el borde de las tablas con columnas ocultas (la clase la pone panel.js) e impresión */
+.x-r,.x-l{position:relative}.x-r::after,.x-l::before{content:"";position:absolute;top:0;bottom:0;width:20px;pointer-events:none;z-index:5}
+.x-r::after{right:0;box-shadow:inset -14px 0 12px -12px var(--scrim);border-radius:0 var(--r-card) var(--r-card) 0}.x-l::before{left:0;box-shadow:inset 14px 0 12px -12px var(--scrim);border-radius:var(--r-card) 0 0 var(--r-card)}
+@media print{
+.side,.top,.tabbar,.leadbar,.bulk{display:none}
+}

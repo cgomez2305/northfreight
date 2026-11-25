@@ -75,7 +75,7 @@
 /* Cola de llamadas (rediseño de Prospectos): una fila por prospecto; al abrirla, panel de llamada a la izquierda y datos a la derecha */
 .perpage{display:flex;align-items:center;gap:8px;font-size:var(--fs-sm);color:var(--ink-3)}
 .perpage select{min-height:40px;width:auto;padding:0 30px 0 8px;border:1px solid var(--field);border-radius:var(--r-ctl);background-color:var(--surface)}
-.pr-head,.pr__s{display:grid;grid-template-columns:148px minmax(0,2fr) minmax(0,1.6fr) 88px 104px 132px 20px;gap:14px;align-items:center}
+.pr-head,.pr__s{display:grid;grid-template-columns:148px minmax(0,1.8fr) minmax(0,1.6fr) 88px 104px 156px 20px;gap:14px;align-items:center}
 .pr-head{padding:0 16px;margin-bottom:-8px;font-size:var(--fs-xs);color:var(--ink-3)}
 .plist{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-card);overflow:hidden}
 .pc+.pc{border-top:1px solid var(--line)}
@@ -92,7 +92,7 @@
 .pr__tz{display:flex;align-items:center;gap:6px;font-size:var(--fs-xs);color:var(--ink-3)}
 .pr__tz.is-ok{color:var(--ok)}
 .pr__fl,.pr__age,.pr__att{font-size:var(--fs-sm);color:var(--ink-2);font-variant-numeric:tabular-nums}
-.pr__att small{font-size:var(--fs-xs);color:var(--ink-3);white-space:nowrap}
+.pr__att small{font-size:var(--fs-xs);color:var(--ink-3);line-height:1.3}
 .pr__k{display:none}
 .pr__chev{color:var(--ink-3);display:grid;place-items:center}
 .pr__chev .ic{width:16px;height:16px;transition:transform .15s}

@@ -399,7 +399,7 @@ return static function (array $ctx): void {
     foreach (['/calendario?vm=mes&d=2026-10-15', '/calendario?vm=semana&d=2026-10-22', '/calendario?vm=dia&d=2026-10-20', '/tabla', '/cronologia'] as $path) {
         $r = $s->get($path);
         preg_match_all('#<link rel="stylesheet" href="/assets/([a-z0-9-]+)\.css\?v=#', $r['body'], $mm);
-        $def = $cssDefs(array_merge($mm[1], ['ux', 'peek', 'etiquetas']));
+        $def = $cssDefs(array_merge($mm[1], ['ux', 'peek', 'etiquetas', 'ctl']));   // fase AX: ctl.css (diferida) lleva los menús desplegables
         preg_match_all('/\sclass="([^"]*)"/', $r['body'], $cm);
         $used = array_unique(array_merge(...array_map(static fn($a) => preg_split('/\s+/', trim($a)) ?: [], $cm[1])));
         $miss = array_values(array_filter($used, static fn($c) => $c !== '' && !isset($def[$c]) && !in_array($c, ['app', 'js', 'btn__t', 'srch', 'dlg--confirm', 'chart', 'donut', 'tc', 'bulk__n', 'feed__g', 'fe--slate'], true) && preg_match('/^tc-[a-z]+$/', $c) !== 1));   // ganchos sin estilo: columnas (tc, tc-<clave>), contador, grupo de día y tono neutro

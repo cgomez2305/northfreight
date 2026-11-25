@@ -26,6 +26,7 @@ $filtered = count($f) > 0;
 
 <?php $screen = 'pipeline'; $prefs = $prefs ?? []; require __DIR__ . '/_viewbar.php'; ?>
 
+<div class="kq-row">
 <div class="ptabs" role="group" aria-label="Pipeline">
   <?php foreach ($labels as $k => $label): ?>
     <a class="ptab<?= $pl === $k ? ' is-on' : '' ?>" href="/pipeline<?= $e(Ui::qs(array_merge(['pl' => $k === 'A' ? null : $k], $f))) ?>"<?= $pl === $k ? ' aria-current="page"' : '' ?>><?= $e($k) ?> · <?= $e($label) ?><span class="ptab__n"><?= $e($totals[$k]) ?></span></a>
@@ -54,6 +55,7 @@ $filtered = count($f) > 0;
   <button class="btn btn--secondary btn--sm kq__go" type="submit">Filtrar</button>
   <?php if ($filtered): ?><a class="btn btn--ghost btn--sm" href="/pipeline<?= $pl === 'B' ? '?pl=B' : '' ?>"><?= Ui::icon('x') ?>Quitar filtros</a><?php endif; ?>
 </form>
+</div>
 <?php
 $chipLabels = [
     't' => static fn($v) => 'Temperatura: ' . Catalog::label(Catalog::TEMPS, $v), 'pf' => static fn($v) => 'Perfil: ' . Catalog::label(Catalog::PROFILES, $v), 'src' => static fn($v) => 'Fuente: ' . Catalog::source($v),

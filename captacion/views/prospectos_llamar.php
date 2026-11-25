@@ -7,7 +7,7 @@ use Captacion\Services\Prospects;
  * Fase AU: Modo llamada (/prospectos/llamar). Un prospecto a la vez: el siguiente de la «Lista de hoy» que se puede llamar ahora, por prioridad.
  * Variables: $row (o null), $left, $skip, $now, $back, $history, $mailed, $autoMails, $stats, $script, $agent, $counts, $csrf
  */
-$dayFmt = static fn(?string $utc): string => $utc === null ? '—' : Fmt::et($utc)->format('j M, g:i') . ' ' . (Fmt::et($utc)->format('A') === 'AM' ? 'a. m.' : 'p. m.');
+$dayFmt = static fn(?string $utc): string => $utc === null ? '—' : Fmt::et($utc)->format('j') . ' ' . Fmt::monthLabel((int) Fmt::et($utc)->format('n')) . ', ' . Fmt::et($utc)->format('g:i') . ' ' . (Fmt::et($utc)->format('A') === 'AM' ? 'a. m.' : 'p. m.');
 $todayEt = Prospects::etDay($now);
 $resultIcon = Prospects::RESULT_ICONS;
 $skipHref = static fn(array $ids): string => '/prospectos/llamar' . ($ids ? '?skip=' . implode(',', $ids) : '');

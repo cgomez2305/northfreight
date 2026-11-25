@@ -8,7 +8,7 @@
 .pri--1{background:var(--hot-dot)}
 .pri--2{background:var(--accent)}
 .pri--3{background:var(--dq-dot)}
-.ptab--late .ptab__n,.ptab--late.is-on .ptab__n{color:var(--bad);font-weight:600}
+.ptab--late .ptab__n{color:var(--bad);font-weight:600}.ptab--late.is-on .ptab__n{color:var(--pop-ink);font-weight:600}
 .trow__t small a{color:var(--ink-2);text-decoration:none}.trow__t small a:hover{color:var(--accent-ink);text-decoration:underline}
 .tgroups{display:flex;flex-direction:column;gap:14px}
 .tgroup .card__h{padding-bottom:6px}

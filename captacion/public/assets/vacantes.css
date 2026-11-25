@@ -12,7 +12,7 @@
 .vrow__w{display:flex;flex-direction:column;gap:3px;min-width:0}
 .vrow__w small{color:var(--ink-3);overflow-wrap:anywhere}
 .vrow__t{font:600 var(--fs-lg)/1.2 var(--f-sans);color:var(--ink)}
-.vrow__a{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;align-items:center}
+.vrow__a{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-start;align-items:center}
 .vform{padding:22px;display:flex;flex-direction:column;gap:22px}
 .vform__g{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;border:0;padding:0;margin:0;min-width:0}
 .vform__g--1{grid-template-columns:minmax(0,1fr)}

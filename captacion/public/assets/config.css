@@ -55,10 +55,11 @@
 .stat--bad::before{background:var(--bad-dot)}
 .stat--off{background:var(--sunk);color:var(--ink-2)}
 .intg__h2{font-size:var(--fs-sm);color:var(--ink-2);padding:10px 12px;border-radius:var(--r-in);background:var(--sunk);line-height:1.45}
-@media (max-width:1023px){
+@media (max-width:1499px){
   .cfg-unlock{grid-template-columns:auto minmax(0,1fr)}
-  .cfg-unlock__f{grid-column:1/-1}
+  .cfg-unlock__f{grid-column:2/-1}
 }
+@media (max-width:1279px){.cfg-tabs{flex-wrap:wrap;overflow:visible;row-gap:0}}
 @media (max-width:760px){
   .cfg-unlock{padding:16px}
   .cfg-unlock__f .field{width:100%}

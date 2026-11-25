@@ -1178,3 +1178,85 @@ Entre dos correos de la cadencia pasan al menos 2 días (`MIN_GAP`: si toca ante
 Migración `022_captacion_aw.sql` (`prospects_fmcsa.lang`, `prospect_campaigns.lang`, `prospect_auto_mails.kind` con clave única por prospecto y tipo). Prueba `55_fase_aw` (60 comprobaciones); `49` y `53` ajustadas al segmento con idioma y al nuevo nombre de la tarjeta. Sin crons ni variables nuevas.
 
 **Decisiones tomadas sin consultar:** los valores por defecto no cambian el comportamiento actual (antigüedad mínima 0, 3 intentos, siguiente día hábil, correos apagados); el espaciado «2, 3 y 5 días» se marca como recomendado pero no se activa solo. **NO se hizo, a propósito:** extraer datos de Facebook, LinkedIn, DAT o Truckstop (va contra sus condiciones de uso y pone en riesgo la cuenta de DAT que NorthStar usa), y enviar la presentación a listas CSV.
+
+## 37. Nuevo lenguaje visual «Rumbo NorthStar» (fase AX, 2026-11-25)
+
+Carlos: «me preocupa mucho todo el UI del CRM, lo veo demasiado pobre, mal espaciado, tamaños, textos montados desbordados… que sea muy propia, algo único y moderno». Eligió la dirección **Rumbo NorthStar** entre tres propuestas. Sustituye la paleta cálida de R1/R2 (el resto de reglas de R2 sigue: sin degradados, sin glassmorphism, sin mayúsculas forzadas, un primario por vista).
+
+**Identidad:**
+- **Riel navy de marca** (`--rail` `#0A1B2E` y sus pares `--rail-2`, `--rail-on`, `--rail-line`, `--rail-ink*`, `--rail-acc` `#5ED2EE`), igual en claro y oscuro, con el isotipo blanco.
+- **La estrella de NorthStar** (`--star`, máscara SVG de 4 puntas) marca el apartado activo, en cian sobre el navy.
+- **Hoja de trabajo flotante:** en escritorio, `.col` es una hoja con radio `--r-sheet` 18 px, separada `--inset` 10 px del riel. Tiene desplazamiento propio y la barra superior queda fija dentro de ella. En móvil todo sigue como antes (ventana que se desplaza y cajón navy).
+- **Neutros fríos que combinan con el navy:**
+  - Claro: `--bg` `#F5F6F8`, `--sunk` `#EEF1F4`, `--line` `#E2E7EC`, `--ink` `#0D1B2A`, `--ink-3` `#56636F`.
+  - Oscuro: `--bg` `#0E141B`, `--surface` `#141B23`.
+  - Un solo acento cian, como antes.
+- **Pestañas de filtro activas en navy relleno** (`--pop`).
+
+**Escala única:**
+- Botones de 38 px (32 los `--sm`; 44 en táctil) y campos de 38 px.
+- Radios de control de 10 px; tarjetas de 14 px con relleno 18/22 y pie sobre `--bg`.
+- Títulos de tarjeta de 15/600 (`--fs-title`) y H1 hasta 32 px.
+- Contenido con 32/36 px de margen y 24 px entre bloques.
+- Cabecera de tabla en banda `--bg` y filas de 52 px.
+- Los controles segmentados quedan en dos alturas: 32 normal y 30 pequeño.
+
+**Contrastes medidos (WCAG):**
+
+| Pares | Claro | Oscuro |
+|---|---|---|
+| `--ink` sobre surface / bg | 17,4 / 16,1 | 15,4 / 16,5 |
+| `--ink-2` sobre surface | 9,8 | 10,7 |
+| `--ink-3` sobre surface / bg / sunk | 6,2 / 5,7 / 5,4 | 6,6 / 7,0 / 6,1 |
+| `--accent-ink` sobre surface / bg / tinte | 5,7 / 5,3 / 5,0 | 9,4 / 10,0 / 8,1 |
+| `--field` (componente) sobre surface / bg | 3,5 / 3,2 | 4,1 / 4,3 |
+| Pestaña activa (`--pop-ink` / `--pop-ink-2` sobre `--pop`) | 15,5 / 9,5 | 11,6 / 8,0 |
+
+En el riel, `--rail-ink` / `--rail-ink-2` / `--rail-ink-3` dan 15,4 / 9,5 / 5,8, y 5,0 sobre el hover. El cian da 9,9 sobre el navy y 7,3 sobre el activo. El navy sobre el contador cian da 9,9. Blanco sobre el primario: 5,7.
+
+**Correcciones de la auditoría:** 36 pantallas × 4 tamaños más el tema oscuro, con mediciones de desborde, solape, tamaños y contraste.
+- **Barra superior:** ya no se aplasta en páginas largas (`.top{flex:none}`).
+- **Esquinas de la hoja:** sin artefactos (`clip-path` + `isolation`).
+- **Prospectos:**
+  - El estado no se monta sobre el transportista.
+  - «Próximo: …» no se sale de su columna.
+  - Fechas en español («22 nov»).
+- **Tablas anchas:** Tabla, Reportes y campañas muestran una sombra en el borde con columnas ocultas (`panel.js` pone `x-r`/`x-l` en el contenedor; la regla vive en `ctl.css`). Son alcanzables con el teclado (`tabindex`, `aria-label`).
+- **Reportes:**
+  - Las tablas de media anchura caben (relleno ajustado, cabeceras en dos líneas).
+  - El eje X tiene columnas `minmax(0,1fr)` y oculta etiquetas por container query según el ancho.
+  - Lista de definición válida.
+- **Dashboard:**
+  - Las etiquetas de mes del mapa de actividad nunca quedan a menos de 3 columnas (antes se montaban).
+  - Las fuentes ya no se cortan.
+  - `text-wrap: pretty` evita palabras sueltas en párrafos.
+- **Configuración:**
+  - «Edición bloqueada» deja los campos debajo hasta 1500 px.
+  - Las pestañas se reparten en filas por debajo de 1280 px en lugar de cortarse.
+  - Integraciones con filas clave/valor en rejilla y «Probar» al pie.
+- **Pipeline:**
+  - Las pestañas A/B y los filtros van en una sola fila; el tablero empieza antes.
+  - En móvil, los selects ocupan todo el ancho.
+- **Ficha del lead:** el último dato ya no queda huérfano a media anchura, y las URL no se parten a mitad de palabra.
+- **Nueva campaña:**
+  - La leyenda ya no pisa el borde del grupo.
+  - Los textos de partida van como píldoras.
+  - Los bloques plegables llevan chevron.
+- **Otras pantallas:**
+  - Inscripciones: la cuarta tarjeta ocupa la fila.
+  - Vacantes: las acciones van alineadas.
+  - Tareas: abre en «Vencidas» si hoy no hay nada y sí hay vencidas.
+  - Estados vacíos con más aire.
+  - Contadores del riel plegado sin tapar el icono.
+  - Objetivos táctiles de 44 px en más controles.
+- **Presupuesto de CSS:** los menús desplegables, el velo del cajón móvil, la sombra de tablas y la impresión pasan a `ctl.css` (diferida, la pide `ctl.js` en todas las pantallas con sesión), para que la primera pantalla siga ≤ 45.000 B: dashboard 44.478, Reportes 44.080, Prospectos 43.834.
+
+**Pruebas:**
+- `36_css_classes`, `35`, `43`: cuentan `ctl.css` como hoja diferida.
+- `40_r2_estilo`: admite el aviso de columnas ocultas (`inset ±14px 0 12px -12px var(--scrim)`).
+- `46_revision_visual`: ficha de reportes a 460 px.
+
+**Verificación:**
+- axe-core (WCAG 2.1 AA) sin violaciones y sin desborde horizontal en 21 pantallas, en claro y oscuro a 1440 px y a 390 px.
+- Capturas revisadas a 1440, 1280, 1024 y 390.
+- Pendiente: Safari y Firefox (la máscara de la estrella y `text-wrap` degradan sin romper).

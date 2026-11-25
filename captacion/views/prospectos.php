@@ -29,7 +29,7 @@ $ageLabel = static function (?string $granted) use ($now): string {
     $m = (int) floor($days / 30.4);
     return 'Hace ' . $m . ($m === 1 ? ' mes' : ' meses');
 };
-$dayFmt = static fn(?string $utc): string => $utc === null ? '—' : Fmt::et($utc)->format('j M, g:i') . ' ' . (Fmt::et($utc)->format('A') === 'AM' ? 'a. m.' : 'p. m.');
+$dayFmt = static fn(?string $utc): string => $utc === null ? '—' : Fmt::et($utc)->format('j') . ' ' . Fmt::monthLabel((int) Fmt::et($utc)->format('n')) . ', ' . Fmt::et($utc)->format('g:i') . ' ' . (Fmt::et($utc)->format('A') === 'AM' ? 'a. m.' : 'p. m.');
 $resultIcon = Prospects::RESULT_ICONS;
 $runAt = is_array($run) ? ($run['finished_at'] ?? $run['updated_at'] ?? null) : null;
 $cronAt = is_array($cron) ? ($cron['at'] ?? null) : null;

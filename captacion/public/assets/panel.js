@@ -20,6 +20,14 @@
  function more() { nav.classList.toggle('has-more', nav.scrollHeight - nav.clientHeight - nav.scrollTop > 4); nav.classList.toggle('has-less', nav.scrollTop > 4); }
  more(); nav.addEventListener('scroll', more, { passive: true }); window.addEventListener('resize', more);
  });
+ /* fase AX: tablas con desplazamiento horizontal: una sombra suave en el borde donde quedan columnas ocultas (clase en el contenedor padre) */
+ function edges(sc) {
+  var host = sc.parentElement; if (!host) return;
+  var f = function () { var m = sc.scrollWidth - sc.clientWidth; host.classList.toggle('x-r', m > 2 && sc.scrollLeft < m - 2); host.classList.toggle('x-l', m > 2 && sc.scrollLeft > 2);
+   if (m > 2 && !sc.hasAttribute('tabindex')) { sc.tabIndex = 0; if (!sc.hasAttribute('aria-label')) { var cap = sc.querySelector('caption'); sc.setAttribute('aria-label', (cap ? cap.textContent.trim() + ' · ' : '') + 'desplázate para ver más columnas'); } } };
+  f(); sc.addEventListener('scroll', f, { passive: true }); window.addEventListener('resize', f);
+ }
+ $$('.tw,.pm-tw').forEach(edges);
  var openDd = null;
  function closeDd(focus) { if (!openDd) return; var b = $('button[aria-expanded]', openDd); b.setAttribute('aria-expanded', 'false'); $('.dd__panel', openDd).hidden = true; if (focus) b.focus(); openDd = null; }
  $$('[data-dd]').forEach(function (dd) {

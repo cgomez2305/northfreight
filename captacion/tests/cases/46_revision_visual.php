@@ -56,7 +56,7 @@ return static function (array $ctx): void {
     T::ok(str_contains($view('config/_usuarios'), "['Activa', 'ok']"), 'usuarios: «Activa» con punto verde');
     T::ok(str_contains($css('cfg-integraciones'), 'background:var(--sunk)') && str_contains($css('cfg-integraciones'), 'text-overflow:ellipsis'), 'integraciones: la URL del webhook como campo de solo lectura');
     T::ok(!str_contains($view('config/_correo'), "'warn' : 'ok')"), 'correo: el aviso del dia 7 usa la variante neutra');
-    T::ok(str_contains($css('reportes'), '.rk{display:flex;flex-wrap:wrap') && str_contains($css('reportes'), '@container (max-width:520px)'), 'reportes: KPI que reparten el ancho y ficha movil solo en contenedores estrechos');
+    T::ok(str_contains($css('reportes'), '.rk{display:flex;flex-wrap:wrap') && str_contains($css('reportes'), '@container (max-width:460px)'), 'reportes: KPI que reparten el ancho y ficha movil solo en contenedores estrechos');
     T::ok(str_contains($panel, '.seg__i{display:inline-flex;align-items:center;gap:6px;white-space:nowrap'), 'segmentados: el texto de una opcion no se parte');
     T::ok(str_contains($css('calendario'), '@media (pointer:coarse){.cal__help{display:none}}'), 'calendario: sin ayuda de teclado en tactil');
     // /reportes sin $cnote: sin avisos de variable indefinida

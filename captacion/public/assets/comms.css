@@ -9,7 +9,8 @@
 .cm-subj{font-size:14px;overflow-wrap:anywhere}
 .cm-body{border:1px solid var(--line);border-radius:var(--r-in);background:var(--sunk);padding:14px 16px;font-size:14px;line-height:1.55;overflow-wrap:anywhere}
 .mk{background:var(--warn-bg);color:var(--warn);border-radius:4px;padding:0 3px;font-weight:600}
-.cm-seqs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.cm-seqs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.cm-seqs>:last-child:nth-child(3n+1){grid-column:1/-1}
 .cm-steps{display:grid;gap:8px;margin-bottom:10px;list-style:decimal;padding-left:20px}
 .cm-steps small{display:block}
 .cm-filter{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
