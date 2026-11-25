@@ -11,6 +11,8 @@ $rows = $list['rows'];
 $nFilters = (int) ($f['q'] !== '') + (int) ($f['us'] !== '') + (int) ($f['fl'] !== '') + (int) ($f['ag'] > 0) + (int) ($f['ph'] !== '');
 $qsBase = array_filter(['tab' => $f['tab'] !== 'today' ? $f['tab'] : null, 'q' => $f['q'] ?: null, 'us' => $f['us'] ?: null, 'fl' => $f['fl'] ?: null, 'ag' => $f['ag'] ?: null, 'ph' => $f['ph'] ?: null, 'now' => $f['now'] ?: null, 'per' => $per !== 25 ? $per : null], static fn($v) => $v !== null);
 $tabHref = static fn(string $tab): string => '/prospectos' . Ui::qs(array_merge(array_diff_key($qsBase, ['tab' => 1]), $tab !== 'today' ? ['tab' => $tab] : []));
+// «Quitar filtros» (fase AT, corrección): solo conserva la pestaña, «Por página» y «Solo llamables ahora». Antes usaba $tabHref, que conserva los filtros (es para cambiar de pestaña) y no quitaba nada.
+$clearHref = '/prospectos' . Ui::qs(array_filter(['tab' => $f['tab'] !== 'today' ? $f['tab'] : null, 'now' => $f['now'] ?: null, 'per' => $per !== 25 ? $per : null], static fn($v) => $v !== null));
 $tabHint = ['today' => 'Por llamar, reintentos y seguimientos que tocan hoy', 'to_call' => 'Nunca llamados', 'no_answer' => 'Hasta 3 intentos sin respuesta', 'talked' => 'Hubo conversación', 'interested' => 'Quieren seguir; conviértelos en lead', 'not_interested' => 'Dijeron que no', 'dnc' => 'Permanente: nunca se vuelven a listar'];
 $todayEt = \Captacion\Services\Prospects::etDay($now);   // el dia de las llamadas es por ET, no por la zona de visualizacion
 $ageLabel = static function (?string $granted) use ($now): string {
@@ -113,7 +115,7 @@ $drop = static fn(string $k): string => '/prospectos' . Ui::qs(array_diff_key($q
       <label class="field"><span>Flota</span><select name="fl"><option value="">Cualquiera</option><?php foreach (Prospects::FLEETS as $k => $l): ?><option value="<?= $e($k) ?>"<?= $f['fl'] === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
       <label class="field"><span>Autoridad</span><select name="ag"><option value="">Cualquier antigüedad</option><?php foreach (Prospects::AGES as $k => $l): ?><option value="<?= $e($k) ?>"<?= $f['ag'] === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
       <label class="check"><input type="checkbox" name="ph" value="mail"<?= $f['ph'] === 'mail' ? ' checked' : '' ?>><span>Solo con correo</span></label>
-      <div class="filters__a"><button class="btn btn--secondary btn--sm" type="submit" data-apply><span class="btn__t">Aplicar</span></button><?php if ($nFilters > 0): ?><a class="btn btn--ghost btn--sm" href="<?= $e($tabHref($f['tab'])) ?>">Quitar filtros</a><?php endif; ?></div>
+      <div class="filters__a"><button class="btn btn--secondary btn--sm" type="submit" data-apply><span class="btn__t">Aplicar</span></button><?php if ($nFilters > 0): ?><a class="btn btn--ghost btn--sm" href="<?= $e($clearHref) ?>">Quitar filtros</a><?php endif; ?></div>
     </div>
   </div>
   <?php if ($callable !== null && $rows): ?><a class="seg__i pbar__now<?= $f['now'] === '1' ? ' is-on' : '' ?>" href="<?= $e('/prospectos' . Ui::qs(array_merge(array_diff_key($qsBase, ['now' => 1, 'page' => 1]), $f['now'] === '1' ? [] : ['now' => '1']))) ?>" title="Solo quienes están en horario permitido (8 a. m. a 9 p. m. hora local) y tienen teléfono"<?= $f['now'] === '1' ? ' aria-current="page"' : '' ?>>Solo llamables ahora<span class="ptab__n"><?= $e(Fmt::num($callable)) ?></span></a><?php endif; ?>
@@ -122,7 +124,7 @@ $drop = static fn(string $k): string => '/prospectos' . Ui::qs(array_diff_key($q
 <?php if ($chips): ?>
 <ul class="fchips" aria-label="Filtros activos">
   <?php foreach ($chips as [$label, $k]): ?><li><a class="fchip" href="<?= $e($drop($k)) ?>" aria-label="Quitar filtro <?= $e($label) ?>"><?= $e($label) ?><?= Ui::icon('x') ?></a></li><?php endforeach; ?>
-  <?php if (count($chips) > 1): ?><li><a class="link" href="<?= $e($tabHref($f['tab'])) ?>">Quitar todos</a></li><?php endif; ?>
+  <?php if (count($chips) > 1): ?><li><a class="link" href="<?= $e($clearHref) ?>">Quitar todos</a></li><?php endif; ?>
 </ul>
 <?php endif; ?>
 
@@ -130,7 +132,7 @@ $drop = static fn(string $k): string => '/prospectos' . Ui::qs(array_diff_key($q
 <section class="card empty">
   <svg class="empty__star" aria-hidden="true"><use href="#i-star"/></svg>
   <?php if ($nFilters > 0): ?>
-    <h3>Ningún prospecto coincide con estos filtros</h3><p>Prueba quitando algún filtro o buscando por otro dato.</p><a class="btn btn--secondary" href="<?= $e($tabHref($f['tab'])) ?>">Quitar filtros</a>
+    <h3>Ningún prospecto coincide con estos filtros</h3><p>Prueba quitando algún filtro o buscando por otro dato.</p><a class="btn btn--secondary" href="<?= $e($clearHref) ?>">Quitar filtros</a>
   <?php elseif ($f['tab'] === 'today'): ?>
     <h3>La lista de hoy está vacía</h3><p>Ya atendiste a todos los que tocaban. Los reintentos vuelven a la lista en su fecha y mañana a las 6:00 a. m. (Nueva York) llegan prospectos nuevos.</p>
   <?php else: ?>

@@ -1068,6 +1068,7 @@ Pruebas: `50_fase_ar` (y ajustes en `17_pulido`, `30_ux_q5a`, `38_resultados_q6i
 - **«Lista de hoy» de Prospectos** (fallo de lógica): solo traía «Por llamar» y los reintentos «Sin respuesta»; los «Conversó» e «Interesado» con fecha de seguimiento NUNCA entraban en la lista (solo los contaba la campana «Seguimientos de hoy»), así que las devoluciones de llamada prometidas se perdían. Ahora entran los seguimientos que tocan hoy (día ET, el mismo corte que la campana), primero los que tienen fecha (por hora) y después los nunca llamados; los ya convertidos en lead no entran.
 - **Filtro de estado**: solo los estados que tienen prospectos, con su conteo («TX · Texas (34)»), en lugar de los 51.
 - **«Solo con correo»** (`ph=mail`): el filtro existía en el código pero solo por URL, sin control ni chip (un filtro invisible). Ahora está en el panel «Filtros», con chip y en el contador del botón. Sirve para preparar los correos en lote.
+- **«Quitar filtros» y «Quitar todos» no hacían nada en Prospectos** (corregido después de la fase AT): usaban el enlace de las pestañas, que conserva los filtros. Ahora solo conservan la pestaña, «Por página» y «Solo llamables ahora».
 
 Prueba: `51_fase_as`.
 

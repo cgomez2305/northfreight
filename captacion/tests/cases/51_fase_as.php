@@ -74,4 +74,6 @@ return static function (array $ctx): void {
     T::ok(str_contains($pm, 'Solo con correo<svg') && preg_match('#fpop has-on.*?<b class="badge">1</b>#s', $pm) === 1, '  con su chip y contado en el botón «Filtros»');
     T::ok(stripos($pm, 'Hoy 3 LLC') !== false && stripos($pm, 'Hoy 1 LLC') === false, '  y filtra: solo el que tiene correo');
     T::ok(str_contains($p, 'seguimientos que tocan hoy'), 'la pestaña explica qué entra en la Lista de hoy');
+    $qf = $s->get('/prospectos?tab=to_call&us=TX&ph=mail&q=hoy')['body'];
+    T::ok(str_contains($qf, 'href="/prospectos?tab=to_call">Quitar filtros') && str_contains($qf, 'href="/prospectos?tab=to_call">Quitar todos') && !str_contains($qf, 'us=TX&amp;ph=mail&amp;q=hoy&amp;tab=to_call">Quitar'), '«Quitar filtros» y «Quitar todos» quitan los filtros y conservan la pestaña (antes recargaban con los mismos filtros)');
 };
