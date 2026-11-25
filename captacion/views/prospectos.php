@@ -6,7 +6,7 @@ use Captacion\Services\Prospects;
 use Captacion\Services\UsStates;
 use Captacion\Services\UsTimeZones;
 
-/** Variables: $f, $per, $list, $counts, $callable, $history, $now, $summary, $cfg, $run, $cron, $totalAll, $back, $csrf */
+/** Variables: $f, $per, $list, $counts, $callable, $history, $mailed, $now, $summary, $cfg, $run, $cron, $totalAll, $back, $csrf */
 $rows = $list['rows'];
 $nFilters = (int) ($f['q'] !== '') + (int) ($f['us'] !== '') + (int) ($f['fl'] !== '') + (int) ($f['ag'] > 0) + (int) ($f['ph'] !== '');
 $qsBase = array_filter(['tab' => $f['tab'] !== 'today' ? $f['tab'] : null, 'q' => $f['q'] ?: null, 'us' => $f['us'] ?: null, 'fl' => $f['fl'] ?: null, 'ag' => $f['ag'] ?: null, 'ph' => $f['ph'] ?: null, 'now' => $f['now'] ?: null, 'per' => $per !== 25 ? $per : null], static fn($v) => $v !== null);
@@ -53,7 +53,7 @@ $cronAt = is_array($cron) ? ($cron['at'] ?? null) : null;
       <div class="rules__p">
         <p class="rules__s">Solo a mano · 8 a. m. a 9 p. m. hora local · lista de no llamar</p>
         <ul>
-          <li><b>Solo llamadas manuales.</b> Nada de marcadores automáticos, SMS ni correos en frío desde esta pantalla.</li>
+          <li><b>Solo llamadas manuales.</b> Nada de marcadores automáticos ni SMS. Los correos en lote van por «Correos a prospectos», con dirección física y baja de un clic.</li>
           <li><b>Horario permitido: 8 a. m. a 9 p. m. hora local del prospecto.</b> Fuera de ese horario el botón Llamar se bloquea; en estados con dos zonas horarias se exige que sea hora válida en ambas.</li>
           <li><b>Lista interna de no llamar.</b> Quien diga que no, o pida que no lo llamen, se marca «No llamar más»: es permanente y su teléfono no vuelve a entrar aunque FMCSA lo entregue de nuevo.</li>
           <li class="rules__todo"><b>Pendiente:</b> confirma con tu abogado el cumplimiento de las llamadas en frío (TCPA y listas estatales de no llamar) antes de operarlas.</li>
@@ -61,6 +61,7 @@ $cronAt = is_array($cron) ? ($cron['at'] ?? null) : null;
       </div>
     </details>
     <?php if ($totalAll > 0): ?>
+    <a class="btn btn--secondary" href="/prospectos/correos"><?= Ui::icon('send') ?><span class="btn__t">Correos en lote</span></a>
     <form method="post" action="/prospectos/export">
       <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="qs" value="<?= $e(ltrim(Ui::qs($qsBase), '?')) ?>">
       <button class="btn btn--secondary" type="submit"><?= Ui::icon('download') ?><span class="btn__t">Exportar CSV</span></button>
@@ -208,6 +209,8 @@ $drop = static fn(string $k): string => '/prospectos' . Ui::qs(array_diff_key($q
             <div><dt>Conductores</dt><dd><?= $r['drivers'] !== null && (int) $r['drivers'] > 0 && (int) $r['drivers'] < 500 ? $e($r['drivers']) : '—' ?></dd></div>
             <div><dt>Carga declarada</dt><dd><?= $cats ? $e(implode(' · ', array_map(static fn($c) => ProspectConfig::CARGO[$c][0], array_slice($cats, 0, 3)))) : '—' ?></dd></div>
             <?php if ($r['email']): ?><div class="pc__mail"><dt>Correo en FMCSA</dt><dd class="mono"><?= $e($r['email']) ?></dd></div><?php endif; ?>
+            <?php if (!empty($r['email_opt_out_at'])): ?><div class="pc__mail"><dt>Correos en lote</dt><dd>Se dio de baja el <?= $e(Fmt::date((string) $r['email_opt_out_at'])) ?></dd></div>
+            <?php elseif (isset($mailed[$id])): ?><div class="pc__mail"><dt>Último correo en lote</dt><dd><?= $e(Fmt::date($mailed[$id]['sent_at'])) ?> · <?= $e($mailed[$id]['name']) ?><small><?= $mailed[$id]['opened'] ? 'Lo abrió' : 'Sin abrir todavía' ?></small></dd></div><?php endif; ?>
           </dl>
           <?php if (!$dnc): ?>
           <div class="pc__f">

@@ -99,15 +99,15 @@ final class Templates
     }
 
     /** @return array{text:string,html:string} */
-    public static function footer(string $lang, string $unsubUrl): array
+    public static function footer(string $lang, string $unsubUrl, ?string $why = null): array
     {
         $addr = self::address();
         $e = static fn($v) => htmlspecialchars((string) $v, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         if ($lang === 'es') {
-            $why = 'Recibes este correo porque pediste información sobre dispatch con NorthStar.';
+            $why ??= 'Recibes este correo porque pediste información sobre dispatch con NorthStar.';
             $un = 'Darte de baja con un clic';
         } else {
-            $why = 'You are receiving this because you asked about dispatch with NorthStar.';
+            $why ??= 'You are receiving this because you asked about dispatch with NorthStar.';
             $un = 'Unsubscribe in one click';
         }
         $addrTxt = $addr !== '' ? $addr : ($lang === 'es' ? '[dirección física sin configurar]' : '[physical address not configured]');
@@ -122,8 +122,9 @@ final class Templates
      * Genera asunto, texto y HTML de una plantilla para un lead (o un lead de muestra).
      * @return array{subject:string,text:string,html:string,unresolved:list<string>}
      */
-    public static function render(array $tpl, array $lead, string $lang, string $unsubUrl, array $extra = []): array
+    public static function render(array $tpl, array $lead, string $lang, string $unsubUrl, array $extra = [], array $opts = []): array
     {
+        // $opts (fase AQ, correos a prospectos): 'why' = motivo del pie; 'pixel' = URL del píxel de apertura (1×1, al final del HTML)
         $vars = $extra + self::vars($lead, $lang, $unsubUrl);
         if (str_contains((string) $tpl['subject'] . "\n" . (string) $tpl['body'], '{link_referido}')) {
             $vars['{link_referido}'] = Referrals::linkForLead($lead);   // crea el codigo del lead si no tiene (A12)
@@ -131,13 +132,14 @@ final class Templates
         $subject = (string) preg_replace('/\s+/', ' ', self::interpolate((string) $tpl['subject'], $vars));
         $body = self::interpolate((string) $tpl['body'], $vars);
         $unres = self::unresolved($subject . "\n" . $body);
-        $f = self::footer($lang, $unsubUrl);
+        $f = self::footer($lang, $unsubUrl, isset($opts['why']) ? (string) $opts['why'] : null);
         $e = static fn($v) => htmlspecialchars((string) $v, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $pixel = !empty($opts['pixel']) ? '<img src="' . $e($opts['pixel']) . '" width="1" height="1" alt="" style="display:block;width:1px;height:1px;border:0">' : '';
         $paras = array_map(static fn($p) => '<p style="margin:0 0 14px;font-size:15px;line-height:1.6;color:#0A1B2E">' . nl2br($e(trim($p))) . '</p>', array_filter(preg_split('/\n{2,}/', trim($body)) ?: [], static fn($p) => trim($p) !== ''));
         $html = '<!doctype html><html lang="' . $e($lang) . '"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>' . $e($subject) . '</title></head>'
             . '<body style="margin:0;background:#F1F4F8;font-family:Arial,Helvetica,sans-serif"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="padding:24px 12px">'
             . '<table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;width:100%;background:#FFFFFF;border:1px solid #E1E7EF;border-radius:14px"><tr><td style="padding:28px">'
-            . implode('', $paras) . $f['html'] . '</td></tr></table></td></tr></table></body></html>';
+            . implode('', $paras) . $f['html'] . '</td></tr></table>' . $pixel . '</td></tr></table></body></html>';
         return ['subject' => $subject, 'text' => trim($body) . "\n" . $f['text'], 'html' => $html, 'unresolved' => $unres];
     }
 

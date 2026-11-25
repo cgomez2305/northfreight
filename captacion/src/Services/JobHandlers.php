@@ -42,6 +42,7 @@ final class JobHandlers
             // Fase AM · automatizacion
             'rules_time'              => [RuleAutomation::class, 'jobTick'],
             'outbound_webhook'        => [OutboundWebhooks::class, 'deliver'],
+            'prospect_mail_tick'      => [ProspectMail::class, 'tick'],   // fase AQ: correos en lote a prospectos
         ];
     }
 

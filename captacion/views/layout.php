@@ -71,6 +71,7 @@ $ni = static function (string $href, string $icon, string $label, string $key, a
       <?php if ($isAdmin): ?>
       <p class="side__group">Captación saliente</p>
       <?= $ni('/prospectos', 'phone', 'Prospectos', 'prospectos', ['badge' => (int) ($followBadge ?? 0), 'title' => 'Seguimientos de hoy', 'sr' => 'seguimientos de hoy']) ?>
+      <?= $ni('/prospectos/correos', 'send', 'Correos a prospectos', 'pmail') ?>
       <?= $ni('/referidos', 'user-plus', 'Referidos', 'referidos', ['badge' => (int) ($bonusBadge ?? 0), 'cls' => 'hot', 'title' => 'Bonos por aprobar', 'sr' => 'bonos por aprobar']) ?>
       <?= $ni('/vacantes', 'file', 'Vacantes', 'vacantes') ?>
       <p class="side__group">Reportes y correo</p>

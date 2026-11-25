@@ -70,6 +70,12 @@ final class Prospects
         return ["(p.status = 'to_call' OR (p.status = 'no_answer' AND (p.next_call_at IS NULL OR p.next_call_at <= ?)))", [Clock::at($now)]];
     }
 
+    /** WHERE de la lista (alias p) para otros servicios: los correos en lote a prospectos usan los mismos filtros. @return array{0:string,1:list<mixed>} */
+    public static function whereFor(array $f, int $now, bool $withTab = true): array
+    {
+        return self::where($f, $now, $withTab);
+    }
+
     /** @return array{0:string,1:list<mixed>} */
     private static function where(array $f, int $now, bool $withTab = true): array
     {

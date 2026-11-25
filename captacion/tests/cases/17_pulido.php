@@ -23,6 +23,8 @@ return static function (array $ctx): void {
         // Q4a
         '/prospectos' => ['prospectos'], '/referidos' => ['referidos'], '/vacantes' => ['vacantes'], '/vacantes/new' => ['vacantes'], '/config?tab=prospectos' => ['config', 'cfg-prospectos'],
         '/reportes' => ['charts', 'viz', 'reportes'], '/resultados' => ['charts', 'viz', 'reportes'], '/informes' => ['reportes'], '/comunicaciones' => ['comms'], '/comunicaciones/inscripciones' => ['comms'], '/comunicaciones/envios' => ['comms'],
+        // AQ · correos en lote a prospectos
+        '/prospectos/correos' => ['comms', 'pmail'], '/prospectos/correos/nueva' => ['comms', 'pmail'],
         // Fase AM
         '/importar' => ['datos'],
     ];

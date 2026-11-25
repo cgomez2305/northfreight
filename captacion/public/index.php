@@ -23,6 +23,7 @@ use Captacion\Controllers\LeadActionsController;
 use Captacion\Controllers\LeadsController;
 use Captacion\Controllers\ModosController;
 use Captacion\Controllers\PipelineController;
+use Captacion\Controllers\ProspectMailController;
 use Captacion\Controllers\ProspectosController;
 use Captacion\Controllers\ReferidosController;
 use Captacion\Controllers\VacantesController;
@@ -144,6 +145,8 @@ switch (true) {
         ConfigController::route($m[1] ?? null, $m[2] ?? null);
     case preg_match('#^/actividad(?:/([a-z]{3,12}))?$#', $path, $m) === 1:
         ActividadController::route($m[1] ?? null);
+    case preg_match('#^/prospectos/correos(?:/(nueva|ajustes|\d{1,12})(?:/([a-z]{4,10}))?)?$#', $path, $m) === 1:   // fase AQ: correos en lote a prospectos
+        ProspectMailController::route(($m[1] ?? '') !== '' ? $m[1] : null, ($m[2] ?? '') !== '' ? $m[2] : null);
     case preg_match('#^/prospectos(?:/(export|\d{1,12})(?:/(result|convert|reopen))?)?$#', $path, $m) === 1:
         ProspectosController::route(($m[1] ?? '') !== '' ? $m[1] : null, ($m[2] ?? '') !== '' ? $m[2] : null);
     case preg_match('#^/referidos(?:/(new|confirm|\d{1,12})(?:/([a-z]{3,10}))?)?$#', $path, $m) === 1:
@@ -164,6 +167,8 @@ switch (true) {
         InviteController::handle($m[1]);
     case preg_match('#^/u/([A-Za-z0-9_-]{20,100})$#', $path, $m) === 1:
         PublicController::unsubscribe($m[1]);
+    case preg_match('#^/o/([A-Za-z0-9_-]{20,100})$#', $path, $m) === 1:
+        PublicController::open($m[1]);
     case $path === '/login':
         AuthController::login();
     case $path === '/login/2fa':

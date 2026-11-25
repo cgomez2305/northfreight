@@ -85,9 +85,20 @@ final class PublicController
         // La firma se comprueba PRIMERO (es solo un HMAC). Un token válido solo sale de un correo nuestro y su baja es idempotente: no puede quedar bloqueada por un límite
         // por IP compartido (Gmail, pasarelas corporativas y escáneres de enlaces salen de pocas IP y la baja es una obligación legal). Los tokens inválidos sí tienen límite estricto.
         $id = Unsub::verify($token);
-        if (self::limited($id === null ? 'pub_unsub' : 'pub_unsub_ok', $id === null ? self::LIMIT : self::LIMIT_VALID)) {
+        $pid = $id === null ? Unsub::verifyProspect($token) : null;   // fase AQ: baja de un prospecto FMCSA (correos en lote), mismo enlace /u/{token} con otro prefijo firmado
+        if (self::limited($id === null && $pid === null ? 'pub_unsub' : 'pub_unsub_ok', $id === null && $pid === null ? self::LIMIT : self::LIMIT_VALID)) {
             header('Retry-After: 3600');
             self::page('unsub', ['state' => 'limited', 'lang' => 'en'], 429);
+        }
+        if ($pid !== null) {
+            if (strtoupper((string) ($_SERVER['REQUEST_METHOD'] ?? 'GET')) !== 'POST') {
+                self::page('unsub', ['state' => 'confirm', 'lang' => 'en', 'token' => $token]);
+            }
+            $r = \Captacion\Services\ProspectMail::unsubscribe($pid, 'unsubscribe_link');
+            if (!$r['ok']) {
+                self::page('unsub', ['state' => 'invalid', 'lang' => 'en'], 404);
+            }
+            self::page('unsub', ['state' => 'done', 'lang' => 'en', 'first_name' => '', 'already' => $r['already']]);
         }
         if ($id === null) {
             self::page('unsub', ['state' => 'invalid', 'lang' => 'en'], 404);
@@ -107,5 +118,26 @@ final class PublicController
             self::page('unsub', ['state' => 'invalid', 'lang' => 'en'], 404);
         }
         self::page('unsub', ['state' => 'done', 'lang' => $r['lang'], 'first_name' => $r['first_name'], 'already' => $r['already']]);
+    }
+
+    // --- /o/{token}: píxel de apertura de los correos a prospectos (fase AQ) ----------------------------------------------------------
+
+    public static function open(string $token): never
+    {
+        $rid = Unsub::verifyOpen($token);
+        if ($rid !== null && !self::limited('pub_open', self::LIMIT_VALID)) {
+            try {
+                \Captacion\Services\ProspectMail::recordOpen($rid);
+            } catch (\Throwable) {
+                // nunca rompe la imagen
+            }
+        }
+        http_response_code(200);
+        header('Content-Type: image/gif');
+        header('Cache-Control: no-store, max-age=0');
+        header('Referrer-Policy: no-referrer');
+        header('X-Robots-Tag: noindex');
+        echo base64_decode('R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7');
+        exit;
     }
 }

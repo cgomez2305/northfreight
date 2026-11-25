@@ -22,6 +22,8 @@ final class Suppression
 {
     public const SMS_STOP = 'sms_stop';
     public const ERASURE = 'erasure';
+    /** Baja de un clic de los correos en lote a prospectos (fase AQ). Solo frena correos a prospectos; un lead que después da su consentimiento en el formulario no se ve afectado. */
+    public const EMAIL_UNSUB = 'email_unsub';
 
     /** Valor normalizado o null si no hay nada que guardar. */
     public static function normalize(string $kind, ?string $value): ?string
@@ -47,7 +49,7 @@ final class Suppression
     public static function add(string $kind, ?string $value, string $reason, ?int $leadId = null, ?int $userId = null): bool
     {
         $n = self::normalize($kind, $value);
-        if ($n === null || !in_array($reason, [self::SMS_STOP, self::ERASURE], true)) {
+        if ($n === null || !in_array($reason, [self::SMS_STOP, self::ERASURE, self::EMAIL_UNSUB], true)) {
             return false;
         }
         Db::run(

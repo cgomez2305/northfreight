@@ -41,6 +41,8 @@ return static function (array $ctx): void {
         '/importar', '/importar/1', '/importar/1/simular', '/leads/1/anonimizar', '/leads/1/fusionar', '/leads/1/enviar',
         // Fase AM · automatizacion
         '/ajax/config/recalc', '/config/webhooks/save', '/config/webhooks/test',
+        // Fase AQ · correos en lote a prospectos (y el píxel público de apertura)
+        '/prospectos/correos', '/prospectos/correos/nueva', '/prospectos/correos/ajustes', '/prospectos/correos/1', '/prospectos/correos/1/lanzar', '/o/' . $tok20,
     ];
     $uncovered = [];
     foreach ($m1[1] as $p) {
@@ -63,7 +65,7 @@ return static function (array $ctx): void {
     T::ok(count($m1[1]) + count($m2[1]) > 40 && !$uncovered, 'cada ruta de public/index.php (' . (count($m1[1]) + count($m2[1])) . ') tiene una ruta de muestra en la matriz' . ($uncovered ? ': sin muestra ' . implode(', ', $uncovered) : ''));
 
     // ------------------------------------------------------------------ Matriz: anonimo
-    $publicAnon = ['/login', '/login/2fa', '/logout', '/c/' . $token40, '/invite/' . $hex64, '/u/' . $tok20];
+    $publicAnon = ['/login', '/login/2fa', '/logout', '/c/' . $token40, '/invite/' . $hex64, '/u/' . $tok20, '/o/' . $tok20];
     $badA = [];
     $badAP = [];
     foreach ($samples as $path) {
@@ -96,7 +98,7 @@ return static function (array $ctx): void {
     $vUser = Panel::user('viewer');
     $viewer = $panel->another();
     T::ok($viewer->login($vUser['email']), 'login del lector');
-    $viewerOk = ['/resultados', '/informes', '/informes/1', '/login', '/logout', '/c/' . $token40, '/invite/' . $hex64, '/u/' . $tok20];
+    $viewerOk = ['/resultados', '/informes', '/informes/1', '/login', '/logout', '/c/' . $token40, '/invite/' . $hex64, '/u/' . $tok20, '/o/' . $tok20];
     $badV = [];
     $badVP = [];
     foreach ($samples as $path) {

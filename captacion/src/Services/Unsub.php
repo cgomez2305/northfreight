@@ -46,6 +46,50 @@ final class Unsub
         return $ok && $raw !== false && preg_match('/^u\.(\d{1,12})$/', $raw, $p) === 1 ? (int) $p[1] : null;
     }
 
+    // --- Prospectos FMCSA (fase AQ): mismo formato de token con prefijo «p.» (baja) y «o.» (píxel de apertura de un destinatario) --------------------
+
+    private static function signed(string $kind, int $id, string $label): string
+    {
+        $p = self::b64($kind . '.' . $id);
+        return $p . self::b64(hash_hmac('sha256', $label . '|' . $p, Crypto::key(), true));
+    }
+
+    private static function check(string $token, string $kind, string $label): ?int
+    {
+        if (preg_match('/^([A-Za-z0-9_-]{4,40})([A-Za-z0-9_-]{43})$/', $token, $m) !== 1) {
+            return null;
+        }
+        try {
+            $ok = hash_equals(self::b64(hash_hmac('sha256', $label . '|' . $m[1], Crypto::key(), true)), $m[2]);
+        } catch (\Throwable) {
+            return null;
+        }
+        $raw = base64_decode(strtr($m[1], '-_', '+/'), true);
+        return $ok && $raw !== false && preg_match('/^' . $kind . '\.(\d{1,12})$/', $raw, $p) === 1 ? (int) $p[1] : null;
+    }
+
+    public static function prospectUrl(int $prospectId): string
+    {
+        return Url::base() . '/u/' . self::signed('p', $prospectId, 'unsub');
+    }
+
+    /** @return ?int id del prospecto si el token de baja es autentico */
+    public static function verifyProspect(string $token): ?int
+    {
+        return self::check($token, 'p', 'unsub');
+    }
+
+    public static function openUrl(int $recipientId): string
+    {
+        return Url::base() . '/o/' . self::signed('o', $recipientId, 'open');
+    }
+
+    /** @return ?int id del destinatario si el token del píxel es autentico */
+    public static function verifyOpen(string $token): ?int
+    {
+        return self::check($token, 'o', 'open');
+    }
+
     /** Aplica la baja. @return array{ok:bool,lang:string,first_name:string,already:bool} */
     public static function apply(int $leadId, string $via): array
     {

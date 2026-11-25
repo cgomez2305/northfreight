@@ -56,7 +56,7 @@ return static function (array $ctx): void {
     $routes = ['/', '/?p=week', '/leads', '/leads?q=zzzz', '/pipeline', '/pipeline?pl=B', '/tabla', '/calendario', '/calendario?vm=semana', '/calendario?vm=dia', '/calendario?nueva=2026-11-10', '/cronologia', '/cronologia?tp=calls',
         '/tareas', '/tareas?tab=overdue', '/tareas?tab=upcoming', '/tareas?tab=done', '/tareas?tab=week', '/actividad', '/config?tab=puntuacion', '/config?tab=alertas', '/config?tab=costos', '/config?tab=integraciones', '/config?tab=horario',
         '/config?tab=copias', '/config?tab=entrega', '/config?tab=correo', '/config?tab=usuarios', '/config?tab=prospectos', '/config?tab=canales', '/config?tab=reglas', '/prospectos', '/referidos', '/vacantes', '/vacantes/new', '/reportes',
-        '/informes', '/comunicaciones', '/comunicaciones/inscripciones', '/comunicaciones/envios', '/comunicaciones/reactivacion', '/importar', '/nope'];
+        '/informes', '/comunicaciones', '/comunicaciones/inscripciones', '/comunicaciones/envios', '/comunicaciones/reactivacion', '/importar', '/prospectos/correos', '/prospectos/correos/nueva', '/prospectos/correos/nueva?inicio=fleet', '/nope'];
     $fail = [];
     $checked = 0;
     foreach ($routes as $route) {
