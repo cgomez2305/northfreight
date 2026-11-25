@@ -1,0 +1,56 @@
+/* NorthStar Captación · controles con estilo propio (fase AR). Hoja DIFERIDA (la pide ctl.js), fuera del presupuesto de la primera pantalla.
+   1) Selects: en Chrome/Edge 135+ la lista desplegable es propia (appearance: base-select; teclado, formularios y eventos siguen siendo los nativos).
+      En Safari y Firefox queda el select cerrado de panel.css con la lista del sistema.
+   2) Calendario (ctl.js): botón que sustituye a la fecha nativa y panel con el mes, en español y con teclado. Sin JS queda el campo nativo. */
+
+@supports (appearance:base-select){
+select:not([multiple]):not([size]),select[size="1"]{appearance:base-select;display:inline-flex;align-items:center}
+.field select:not([multiple]):not([size]){display:flex}
+select:not([multiple])::picker-icon{display:none}
+select:not([multiple]):open{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+select:not([multiple])::picker(select){appearance:base-select;margin:4px 0;padding:4px;min-width:anchor-size(width);max-height:min(340px,60vh);overflow:auto;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:var(--r-card);box-shadow:var(--shadow-pop);scrollbar-width:thin}
+select:not([multiple]) option{display:flex;align-items:center;gap:10px;min-height:34px;padding:6px 10px;border-radius:var(--r-in);font-size:var(--fs-md);color:var(--ink);white-space:nowrap;cursor:pointer}
+select:not([multiple]) option:hover,select:not([multiple]) option:focus-visible{background:var(--sunk);outline:0}
+select:not([multiple]) option:checked{background:var(--accent-tint);color:var(--accent-ink);font-weight:500}
+select:not([multiple]) option::checkmark{order:1;margin-left:auto;color:var(--accent-ink)}
+select:not([multiple]) option:disabled{color:var(--ink-4);cursor:default;background:none}
+select:not([multiple]) optgroup{padding:0}
+select:not([multiple]) legend,select:not([multiple]) optgroup::label{padding:8px 10px 4px;font-size:var(--fs-xs);font-weight:500;color:var(--ink-3)}
+}
+
+/* ---------- Calendario ---------- */
+.dp-w{position:relative;display:block;min-width:0}
+.dp-n{position:absolute;inset:0;width:100%;height:100%;opacity:0;pointer-events:none}
+.dp{display:flex;align-items:center;gap:8px;width:100%;min-height:40px;padding:8px 12px;background:var(--surface);border:1px solid var(--field);border-radius:var(--r-in);color:var(--ink);font:inherit;text-align:left;cursor:pointer;white-space:nowrap}
+.dp .ic{width:16px;height:16px;color:var(--ink-3);flex:none}
+.dp__v{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.dp.is-empty .dp__v{color:var(--ink-3)}
+.dp:hover{border-color:var(--ink-4)}
+.dp:focus-visible,.dp[aria-expanded="true"]{outline:0;border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.dp:disabled{opacity:.6;cursor:not-allowed}
+.dp[aria-invalid="true"]{border-color:var(--bad);box-shadow:0 0 0 1px var(--bad)}
+.dp-err{display:block;margin-top:4px;font-size:var(--fs-sm);color:var(--bad)}
+.dpk{position:fixed;inset:auto;margin:0;width:288px;max-width:calc(100vw - 16px);padding:12px;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:var(--r-card);box-shadow:var(--shadow-pop);font-size:var(--fs-md)}
+.dpk__h{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.dpk__t{font-weight:600}
+.dpk__nav{display:flex;gap:2px}
+.dpk__nb{width:32px;height:32px;display:grid;place-items:center;border:0;background:none;border-radius:var(--r-ctl);color:var(--ink-2);cursor:pointer}
+.dpk__nb:hover{background:var(--sunk);color:var(--ink)}
+.dpk__nb:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.dpk__nb .ic{width:16px;height:16px}
+.dpk table{width:100%;border-collapse:collapse;table-layout:fixed}
+.dpk th{padding:4px 0;font-size:var(--fs-xs);font-weight:500;color:var(--ink-3);text-align:center}
+.dpk td{padding:1px;text-align:center}
+.dpk__d{width:100%;aspect-ratio:1;max-height:36px;display:grid;place-items:center;border:0;background:none;border-radius:var(--r-ctl);color:var(--ink);font:inherit;font-variant-numeric:tabular-nums;cursor:pointer}
+.dpk__d:hover{background:var(--sunk)}
+.dpk__d:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.dpk__d.is-out{color:var(--ink-4)}
+.dpk__d.is-today{box-shadow:inset 0 0 0 1px var(--accent-line);color:var(--accent-ink);font-weight:600}
+.dpk__d[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);font-weight:600;box-shadow:none}
+.dpk__d:disabled{color:var(--ink-4);opacity:.45;cursor:not-allowed;background:none}
+.dpk__time{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+.dpk__time span{color:var(--ink-2);font-size:var(--fs-sm)}
+.dpk__time select{flex:1;min-height:36px;padding:6px 34px 6px 10px;background-color:var(--surface);border:1px solid var(--field);border-radius:var(--r-in)}
+.dpk__f{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px}
+.dpk__f .btn{min-height:32px}
+@media (pointer:coarse){.dpk__d{max-height:44px}.dpk__nb{width:44px;height:44px}}

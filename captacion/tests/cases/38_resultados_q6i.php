@@ -167,7 +167,7 @@ return static function (array $ctx): void {
     T::ok($okJson, '  el JSON del gráfico solo trae etiquetas de periodo y conteos enteros (ningún dato personal)');
     T::ok(!preg_match('/\sstyle="/i', $b) && !preg_match('/\son[a-z]+="/i', $b) && preg_match('/<script(?![^>]*\bnonce=")/i', $b) === 0, '  sin estilos ni handlers en línea; todos los scripts con nonce');
     preg_match_all('#<script nonce="[^"]+" src="/assets/([a-z0-9-]+)\.js\?v=#', $b, $sm);
-    T::eq(array_values(array_diff($sm[1], ['panel'])), ['dashfx', 'resultados'], '  carga dashfx.js y resultados.js (en ese orden) y NO ux.js ni dashboard.js');
+    T::eq(array_values(array_diff($sm[1], ['panel', 'ctl'])), ['dashfx', 'resultados'], '  carga dashfx.js y resultados.js (en ese orden) y NO ux.js ni dashboard.js');
     preg_match_all('#<link rel="stylesheet" href="/assets/([a-z0-9-]+)\.css\?v=#', $b, $lm);
     T::eq($lm[1], ['fonts', 'panel', 'charts', 'viz', 'reportes'], '  hojas: fonts + panel + charts + viz + reportes (el movimiento va en la hoja diferida dashlive.css)');
     $size = static fn(string $f): int => (int) @filesize($ctx['root'] . '/public/assets/' . $f . '.css');

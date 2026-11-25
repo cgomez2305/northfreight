@@ -240,7 +240,7 @@ return static function (array $ctx): void {
     T::eq($anon->ajax('/ajax/counters', [], 'x')['status'], 401, 'sin sesión: contadores 401');
     $pgx = $s->get('/');
     preg_match_all('/data-key="([^"]+)"/', $pgx['body'], $km);
-    T::ok(count($km[1]) >= 1 && str_contains($pgx['body'], 'data-nf="unread"') && str_contains($pgx['body'], 'data-nf="leads"') && str_contains($pgx['body'], 'data-note-toggle') && str_contains($pgx['body'], 'data-inbox'), 'bandeja: lista completa con filtro por tipo, marcar uno y botón «Bandeja» en la barra lateral');
+    T::ok(count($km[1]) >= 1 && str_contains($pgx['body'], 'data-nf="unread"') && str_contains($pgx['body'], 'data-nf="leads"') && str_contains($pgx['body'], 'data-note-toggle') && !str_contains($pgx['body'], 'data-inbox'), 'bandeja: lista completa con filtro por tipo y marcar uno (fase AR: sin botón «Bandeja» en la barra lateral, la campana ya lo es)');
     $key = $km[1][0];
     T::eq($s->json($s->ajax('/ajax/notifications/read', ['keys' => [$key]]))['marked'] ?? 0, 1, 'bandeja: marcar un aviso como leído');
     T::ok(str_contains($s->get('/')['body'], 'data-read="1"') && !str_contains($o->get('/')['body'], 'data-read="1"'), '  queda leído solo para ese usuario');

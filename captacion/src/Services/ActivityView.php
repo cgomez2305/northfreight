@@ -39,6 +39,24 @@ final class ActivityView
         'note_delete' => 'Nota eliminada', 'task_delete' => 'Tarea eliminada', 'cost_delete' => 'Costo eliminado', 'backup_purge' => 'Copias antiguas borradas', 'activity_purge' => 'Registro purgado',
         'note_add' => 'Nota añadida', 'note_edit' => 'Nota editada', 'task_add' => 'Tarea creada', 'task_done' => 'Tarea completada', 'task_reopen' => 'Tarea reabierta', 'task_edit' => 'Tarea editada', 'task_snooze' => 'Tarea pospuesta', 'task_resched' => 'Tarea movida de día',
         'call_log' => 'Llamada registrada', 'consent_revoke' => 'Consentimiento revocado',
+        // fase AR: acciones de las fases Q3 a AQ que salían en inglés («Prospect campaign launch»)
+        'daily_digest' => 'Resumen diario enviado', 'handoff' => 'Entrega a NorthStar', 'handoff_sent' => 'Entrega enviada', 'handoff_failed' => 'Entrega fallida', 'handoff_rejected' => 'NorthStar rechazó',
+        'handoff_signed' => 'NorthStar confirmó la firma', 'handoff_resend' => 'Entrega reenviada', 'handoff_test' => 'Prueba de entrega', 'handoff_retry_pending' => 'Reintento de entregas', 'handoff_secret_changed' => 'Secreto de entrega cambiado',
+        'invite_accepted' => 'Invitación aceptada', 'user_invite' => 'Usuario invitado', 'user_activate' => 'Usuario activado', 'user_relink' => 'Enlace de acceso renovado', 'user_reset_2fa' => '2FA restablecido',
+        'job_create' => 'Vacante creada', 'job_update' => 'Vacante editada', 'job_delete' => 'Vacante borrada', 'internal_patch' => 'Cambio por la API interna',
+        'lead_assign' => 'Responsable asignado', 'leads_bulk_assign' => 'Asignación en lote', 'leads_assign_undo' => 'Asignación deshecha', 'lead_create_manual' => 'Lead creado a mano', 'lead_anonymize' => 'Lead anonimizado',
+        'lead_merge' => 'Leads fusionados', 'lead_merged_into' => 'Fusionado en otro lead', 'lead_responded' => 'Primera respuesta', 'lead_stage_undo' => 'Cambio de etapa deshecho', 'lead_template_sent' => 'Plantilla enviada', 'lead_whatsapp_opened' => 'WhatsApp abierto',
+        'lead_import_upload' => 'Importación: archivo subido', 'lead_import_start' => 'Importación iniciada', 'lead_import_done' => 'Importación terminada', 'lead_import_discard' => 'Importación descartada', 'note_restore' => 'Nota restaurada',
+        'prospect_call' => 'Llamada a prospecto', 'prospect_convert' => 'Prospecto convertido en lead', 'prospect_reopen' => 'Prospecto reabierto', 'prospect_unsubscribe' => 'Baja de correo de un prospecto', 'prospects_export' => 'Exportación de prospectos', 'prospects_window_reset' => 'Ventana de llamadas reiniciada',
+        'prospect_campaign_create' => 'Campaña creada', 'prospect_campaign_update' => 'Campaña editada', 'prospect_campaign_test' => 'Prueba de campaña enviada', 'prospect_campaign_launch' => 'Campaña lanzada', 'prospect_campaign_pause' => 'Campaña pausada',
+        'prospect_campaign_autopause' => 'Campaña pausada sola', 'prospect_campaign_resume' => 'Campaña reanudada', 'prospect_campaign_cancel' => 'Campaña cancelada', 'prospect_campaign_done' => 'Campaña terminada', 'prospect_campaign_delete' => 'Campaña borrada', 'prospect_mail_settings' => 'Ajustes de correos a prospectos',
+        'referral_code_create' => 'Código de referido creado', 'referral_code_enable' => 'Código de referido activado', 'referral_code_amount' => 'Monto del bono cambiado', 'referral_signed' => 'Referido firmado',
+        'report_generate' => 'Informe generado', 'report_publish' => 'Informe publicado', 'report_send' => 'Informe enviado', 'report_actions' => 'Acciones del informe editadas', 'report_export' => 'Exportación de reporte', 'report_weekly_sent' => 'Resumen semanal enviado',
+        'rules_draft_save' => 'Borrador de reglas guardado', 'rules_draft_discard' => 'Borrador de reglas descartado', 'rules_publish' => 'Reglas publicadas', 'rules_unpublish' => 'Reglas retiradas', 'rules_revert' => 'Reglas revertidas', 'rules_reset_all' => 'Reglas restablecidas',
+        'rules_set_create' => 'Conjunto de reglas creado', 'rules_set_delete' => 'Conjunto de reglas borrado', 'rules_sim_start' => 'Simulación de reglas', 'rules_sim_export' => 'Simulación exportada',
+        'sequence_pause' => 'Secuencia pausada', 'sequence_resume' => 'Secuencia reanudada', 'sequence_remove' => 'Secuencia quitada', 'unsubscribe' => 'Baja de correo',
+        'template_create' => 'Plantilla creada', 'template_update' => 'Plantilla editada', 'template_delete' => 'Plantilla borrada', 'template_restore' => 'Plantilla restaurada', 'template_test' => 'Prueba de plantilla',
+        'view_create' => 'Vista creada', 'view_update' => 'Vista actualizada', 'view_rename' => 'Vista renombrada', 'view_delete' => 'Vista borrada', 'webhooks_out_test' => 'Prueba de webhooks', 'webhooks_out_secret_changed' => 'Secreto de webhooks cambiado',
     ];
 
     public static function groupOf(string $action): string
@@ -162,6 +180,20 @@ final class ActivityView
                 return Catalog::source((string) ($c['source'] ?? '')) . ' ' . ($c['period'] ?? '') . ': ' . self::val($c['before'] ?? null) . ' → ' . self::val($c['after'] ?? null);
             case 'integration_test':
                 return $r['entity_id'] . ': ' . (!empty($c['ok']) ? 'correcto' : 'falló');
+            case 'prospect_campaign_launch':
+                return 'Campaña #' . $r['entity_id'] . ' · ' . (int) ($c['recipients'] ?? 0) . ' destinatarios';
+            case 'prospect_campaign_done':
+                return 'Campaña #' . $r['entity_id'] . ' · ' . (int) ($c['sent'] ?? 0) . ' enviados, ' . (int) ($c['skipped'] ?? 0) . ' omitidos, ' . (int) ($c['failed'] ?? 0) . ' fallidos';
+            case 'prospect_campaign_create':
+            case 'prospect_campaign_update':
+            case 'prospect_campaign_test':
+            case 'prospect_campaign_pause':
+            case 'prospect_campaign_resume':
+            case 'prospect_campaign_cancel':
+            case 'prospect_campaign_delete':
+                return 'Campaña #' . $r['entity_id'] . (!empty($c['reason']) ? ' · ' . self::val($c['reason']) : '');
+            case 'prospect_unsubscribe':
+                return 'Prospecto #' . $r['entity_id'] . (($c['via'] ?? '') === 'unsubscribe_link' ? ' · desde el enlace del correo' : '');
             case 'backup_download':
                 return 'Copia ' . ($c['file'] ?? '#' . $r['entity_id']);
             case 'backup_run':

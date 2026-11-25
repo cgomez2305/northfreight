@@ -55,15 +55,17 @@ return static function (array $ctx): void {
     T::ok($size('panel') < 35000, 'panel.css (base) mide menos de 35 KB: ' . $size('panel') . ' bytes (antes de Q2b-F: 51.353)');
     // ------------------------------------------------------------------ Barra lateral y migas por rol
     $r = $s->get('/');
-    T::ok(str_contains($r['body'], 'href="/pipeline"') && str_contains($r['body'], 'href="/tareas"') && str_contains($r['body'], 'href="/config"') && str_contains($r['body'], 'href="/actividad"') && str_contains($r['body'], 'Administración'), 'administrador: la barra lateral trae Pipeline, Tareas, Configuración y Actividad');
-    T::ok(str_contains($r['body'], 'href="/reportes"') && str_contains($r['body'], 'href="/informes"') && str_contains($r['body'], 'href="/comunicaciones"'), 'administrador: la barra lateral trae Reportes, Informes y Comunicaciones (Q3)');
+    T::ok(str_contains($r['body'], 'data-tip="Leads"') && str_contains($r['body'], 'href="/tareas"') && str_contains($r['body'], 'href="/config"') && str_contains($r['body'], 'href="/actividad"') && str_contains($r['body'], 'Administración'), 'administrador: la barra lateral trae Leads, Tareas, Configuración y Actividad');
+    T::ok(str_contains($r['body'], 'href="/reportes"') && str_contains($r['body'], 'href="/comunicaciones"') && str_contains($r['body'], 'href="/prospectos"'), 'administrador: la barra lateral trae Prospectos, Reportes y Comunicaciones (Q3)');
+    $side = (string) preg_replace('#^.*?<aside class="side"(.*?)</aside>.*$#s', '$1', $r['body']);
+    T::ok(!str_contains($side, 'data-tip="Pipeline"') && !str_contains($side, 'data-tip="Bandeja"') && !str_contains($side, 'data-tip="Informes"') && !str_contains($side, 'Correos a prospectos'), 'fase AR: el menú no repite accesos (Pipeline = Leads › Tablero, Bandeja = campana, Informes y Correos son pestañas de su sección)');
     $v = $s->another();
     T::ok($v->login($viewer['email']), 'login del lector');
     $r = $v->get('/');
     T::eq([$r['status'], Infra::header($r, 'location')], [303, '/resultados'], 'lector: / lo lleva a /resultados');
     $r = $v->get('/resultados');
     T::ok($r['status'] === 200 && str_contains($r['body'], 'href="/resultados"') && str_contains($r['body'], 'href="/informes"') && !str_contains($r['body'], 'href="/pipeline"') && !str_contains($r['body'], 'href="/tareas"') && !str_contains($r['body'], 'href="/leads') && !str_contains($r['body'], 'href="/config"') && !str_contains($r['body'], 'href="/actividad"') && !str_contains($r['body'], 'data-search') && !str_contains($r['body'], 'data-notes'), 'lector: la barra lateral trae solo Resultados e Informes (sin Pipeline, Tareas, Leads, buscador ni campana)');
-    $crumbs = ['/pipeline' => 'Tablero', '/tareas' => 'Tareas', '/actividad' => 'Actividad', '/config?tab=copias' => 'Copias de seguridad', '/config?tab=alertas' => 'Alertas', '/reportes' => 'Últimos 30 días', '/informes' => 'Informes', '/comunicaciones' => 'Plantillas', '/config?tab=entrega' => 'Entrega a NorthStar', '/config?tab=usuarios' => 'Usuarios', '/prospectos' => 'Prospectos', '/referidos' => 'Referidos', '/vacantes' => 'Vacantes', '/config?tab=prospectos' => 'Prospectos'];
+    $crumbs = ['/pipeline' => 'Tablero', '/tareas' => 'Tareas', '/actividad' => 'Actividad', '/config?tab=copias' => 'Copias de seguridad', '/config?tab=alertas' => 'Alertas', '/reportes' => 'Últimos 30 días', '/informes' => 'Informes mensuales', '/comunicaciones' => 'Plantillas', '/config?tab=entrega' => 'Entrega a NorthStar', '/config?tab=usuarios' => 'Usuarios', '/prospectos' => 'Prospectos', '/referidos' => 'Referidos', '/vacantes' => 'Vacantes', '/config?tab=prospectos' => 'Prospectos'];
     foreach ($crumbs as $route => $last) {
         $r = $s->get($route);
         T::ok(preg_match('#<li aria-current="page">' . preg_quote($last, '#') . '</li>#', $r['body']) === 1 && str_contains($r['body'], '<title>'), "migas de {$route}: termina en «{$last}»");

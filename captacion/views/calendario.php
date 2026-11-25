@@ -14,7 +14,7 @@ $backUrl = $q();
 $nFilters = count($f);
 $tz = Fmt::zone();
 $weekdays = ['lun', 'mar', 'mié', 'jue', 'vie', 'sáb', 'dom'];
-$fa = ['path' => '/calendario', 'keep' => ['vm' => $mode, 'd' => $anchor, 'ev' => $allTypes ? null : implode(',', $types)], 'temp' => true, 'fold' => true];
+$fa = ['path' => '/calendario', 'keep' => ['vm' => $mode, 'd' => $anchor, 'ev' => $allTypes ? null : implode(',', $types)], 'temp' => true];
 $lbl = static fn(array $ev): string => $ev['title'] . ($ev['lead'] !== null ? ' · ' . $ev['lead'] : '');
 $href = static fn(array $ev): string => $ev['lead_id'] !== null ? '/leads/' . $ev['lead_id'] : ($ev['kind'] === 'task' ? '/tareas?tab=week&w=' . substr((string) Fmt::et((string) $ev['at'])->format('Y-m-d'), 0, 10) : '/leads');
 $hm = static fn(array $ev): string => Fmt::et((string) $ev['at'])->format('H:i');
@@ -63,7 +63,6 @@ $addHref = static fn(string $ymd): string => $q(['nueva' => $ymd]) . '#nueva';
     <p class="sub">Calendario de seguimiento · horas en <?= $e($tz) ?><?= $cal !== null ? ' · ' . $e(Fmt::num($cal['total'])) . ($cal['total'] === 1 ? ' evento' : ' eventos') . ' en esta ' . ($mode === 'mes' ? 'vista del mes' : ($mode === 'semana' ? 'semana' : 'jornada')) : '' ?></p>
   </div>
   <div class="page-head__a">
-    <button class="btn btn--secondary filters-toggle filters-toggle--on" type="button" data-toggle="#filters" aria-expanded="<?= $nFilters > 0 ? 'true' : 'false' ?>" aria-controls="filters"><?= Ui::icon('filter') ?>Filtros<?= $nFilters > 0 ? ' <b class="badge">' . $e($nFilters) . '</b>' : '' ?></button>
     <?php if ($canWrite): ?>
       <a class="btn btn--primary" href="<?= $e($addHref($sel)) ?>" data-cal-new="<?= $e($sel) ?>"><span class="btn__t">Nueva tarea</span></a>
     <?php endif; ?>

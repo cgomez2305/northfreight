@@ -61,7 +61,8 @@ return static function (array $ctx): void {
     T::ok(preg_match('/fpop has-on.*?<b class="badge">2<\/b>/s', $p) === 1, '  y el botón «Filtros» cuenta los filtros del panel activos');
 
     $js = (string) file_get_contents($assets . '/prospectos.js');
-    T::ok(str_contains($js, 'requestSubmit') && str_contains($js, "e.key === 'Escape'") && str_contains($js, ".pbar [data-per]") && str_contains($js, "el.value === '') el.disabled = true"), 'prospectos.js: los filtros se aplican al elegirlos, Esc cierra, «Por página» funciona y no viajan parámetros vacíos');
+    $pj = (string) file_get_contents($assets . '/panel.js');   // fase AR: el panel «Filtros» es común (panel.js)
+    T::ok(str_contains($pj, 'requestSubmit') && str_contains($pj, "e.key === 'Escape'") && str_contains($js, ".pbar [data-per]") && str_contains($pj, "el.value === ''") && str_contains($p, 'data-fclean'), 'panel.js + prospectos.js: los filtros se aplican al elegirlos, Esc cierra, «Por página» funciona y no viajan parámetros vacíos');
     $css = (string) file_get_contents($assets . '/panel.css');
     T::ok(str_contains($css, '@media (min-width:761px) and (max-height:820px){.side{'), 'barra lateral compacta en pantallas bajas (portátiles de 690 a 820 px de alto)');
 

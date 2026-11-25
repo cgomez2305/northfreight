@@ -59,24 +59,20 @@ $ni = static function (string $href, string $icon, string $label, string $key, a
       <?= $ni('/informes', 'file', 'Informes', 'informes') ?>
 <?php else: ?>
       <p class="side__group">Principal</p>
-      <button class="nav-i nav-i--btn" type="button" data-inbox data-tip="Bandeja" aria-haspopup="dialog"><?= Ui::icon('inbox') ?><span class="nav-i__t">Bandeja</span><span class="badge badge--late" data-inbox-n<?= ($unread + $overdueBadge) > 0 ? '' : ' hidden' ?>><?= $e($unread + $overdueBadge) ?></span></button>
       <?= $ni('/', 'dashboard', 'Dashboard', 'dashboard') ?>
-      <?= $ni(\Captacion\Services\Prefs::home((string) ($prefs['lmode'] ?? 'lista')), 'users', 'Leads', 'leads') ?>
-      <?= $ni('/pipeline', 'columns', 'Pipeline', 'pipeline') ?>
+      <?= $ni(\Captacion\Services\Prefs::home((string) ($prefs['lmode'] ?? 'lista')), 'users', 'Leads', in_array($active, ['leads', 'pipeline'], true) && ($_GET['v'] ?? '') === '' ? $active : 'leads') ?>
       <?= $ni('/tareas', 'list-check', 'Tareas', 'tareas', ['badge' => $overdueBadge, 'title' => 'Tareas vencidas', 'sr' => 'vencidas']) ?>
-      <p class="side__group">Vistas</p>
+      <?php if ($navViews): ?><p class="side__group">Vistas</p><?php endif; ?>
       <?php foreach ($navViews as $v): $vOn = ($_GET['v'] ?? '') === $v['id'] && in_array($active, ['leads', 'pipeline'], true); ?>
         <a class="nav-i nav-i--view<?= $vOn ? ' is-on' : '' ?>" href="<?= $e($v['href']) ?>" data-tip="<?= $e($v['name']) ?>"<?= $vOn ? ' aria-current="page"' : '' ?>><?= Ui::icon($v['icon']) ?><span class="nav-i__t"><?= $e($v['name']) ?></span><span class="nav-i__n" data-view-count="<?= $e($v['id']) ?>"><?= $e($v['count']) ?></span></a>
       <?php endforeach; ?>
       <?php if ($isAdmin): ?>
-      <p class="side__group">Captación saliente</p>
-      <?= $ni('/prospectos', 'phone', 'Prospectos', 'prospectos', ['badge' => (int) ($followBadge ?? 0), 'title' => 'Seguimientos de hoy', 'sr' => 'seguimientos de hoy']) ?>
-      <?= $ni('/prospectos/correos', 'send', 'Correos a prospectos', 'pmail') ?>
+      <p class="side__group">Captación</p>
+      <?= $ni('/prospectos', 'phone', 'Prospectos', in_array($active, ['prospectos', 'pmail'], true) ? $active : 'prospectos', ['badge' => (int) ($followBadge ?? 0), 'title' => 'Seguimientos de hoy', 'sr' => 'seguimientos de hoy']) ?>
       <?= $ni('/referidos', 'user-plus', 'Referidos', 'referidos', ['badge' => (int) ($bonusBadge ?? 0), 'cls' => 'hot', 'title' => 'Bonos por aprobar', 'sr' => 'bonos por aprobar']) ?>
       <?= $ni('/vacantes', 'file', 'Vacantes', 'vacantes') ?>
-      <p class="side__group">Reportes y correo</p>
-      <?= $ni('/reportes', 'bar-chart', 'Reportes', 'reportes') ?>
-      <?= $ni('/informes', 'file', 'Informes', 'informes') ?>
+      <p class="side__group">Seguimiento</p>
+      <?= $ni('/reportes', 'bar-chart', 'Reportes', in_array($active, ['reportes', 'informes'], true) ? $active : 'reportes') ?>
       <?= $ni('/comunicaciones', 'mail', 'Comunicaciones', 'comunicaciones') ?>
       <p class="side__group">Administración</p>
       <?= $ni('/config', 'gear', 'Configuración', 'config') ?>
@@ -158,8 +154,8 @@ $ni = static function (string $href, string $icon, string $label, string $key, a
   <a class="tab<?= $active === 'informes' ? ' is-on' : '' ?>" href="/informes"><?= Ui::icon('file') ?><span>Informes</span></a>
 <?php else: ?>
   <a class="tab<?= $active === 'dashboard' ? ' is-on' : '' ?>" href="/"><?= Ui::icon('dashboard') ?><span>Inicio</span></a>
-  <a class="tab<?= $active === 'leads' ? ' is-on' : '' ?>" href="<?= $e(\Captacion\Services\Prefs::home((string) ($prefs['lmode'] ?? 'lista'))) ?>"><?= Ui::icon('users') ?><span>Leads</span></a>
-  <a class="tab<?= $active === 'pipeline' ? ' is-on' : '' ?>" href="/pipeline"><?= Ui::icon('columns') ?><span>Pipeline</span></a>
+  <a class="tab<?= in_array($active, ['leads', 'pipeline'], true) ? ' is-on' : '' ?>" href="<?= $e(\Captacion\Services\Prefs::home((string) ($prefs['lmode'] ?? 'lista'))) ?>"><?= Ui::icon('users') ?><span>Leads</span></a>
+  <?php if ($isAdmin): ?><a class="tab<?= in_array($active, ['prospectos', 'pmail'], true) ? ' is-on' : '' ?>" href="/prospectos"><?= Ui::icon('phone') ?><span>Prospectos</span></a><?php endif; ?>
   <a class="tab<?= $active === 'tareas' ? ' is-on' : '' ?>" href="/tareas"><?= Ui::icon('list-check') ?><span>Tareas</span><?php if ($overdueBadge > 0): ?><i class="tab__n"><?= $e($overdueBadge) ?></i><?php endif; ?></a>
 <?php endif; ?>
   <button class="tab" type="button" data-nav-open aria-controls="side"><?= Ui::icon('menu') ?><span>Menú</span></button>
@@ -224,6 +220,7 @@ $ni = static function (string $href, string $icon, string $label, string $key, a
   </form>
 </dialog>
 <script nonce="<?= $e($nonce) ?>" src="/assets/panel.js?v=<?= $e($assetV('panel.js')) ?>" defer data-csrf="<?= $e($csrf) ?>"></script>
+<script nonce="<?= $e($nonce) ?>" src="/assets/ctl.js?v=<?= $e($assetV('ctl.js')) ?>" defer data-css-v="<?= $e($assetV('ctl.css')) ?>"></script>
 <?php if (empty($isViewer)): ?><script nonce="<?= $e($nonce) ?>" src="/assets/ux.js?v=<?= $e($assetV('ux.js')) ?>" defer data-csrf="<?= $e($csrf) ?>" data-css-v="<?= $e($assetV('ux.css')) ?>"></script><?php endif; ?>
 <?php foreach (($js ?? []) as $script): if (preg_match('/^[a-z0-9-]{2,24}$/', (string) $script) !== 1) { continue; } ?>
 <script nonce="<?= $e($nonce) ?>" src="/assets/<?= $e($script) ?>.js?v=<?= $e($assetV($script . '.js')) ?>" defer data-csrf="<?= $e($csrf) ?>"></script>

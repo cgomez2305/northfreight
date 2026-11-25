@@ -46,7 +46,7 @@ $mineAv = $av !== null && !$av['sys'];
 $density = $prefs['density'] ?? 'comfortable';
 $hidden = array_values(array_diff(array_keys(Prefs::COLUMNS), $cols ?? array_keys(Prefs::COLUMNS)));
 $hid = static fn(): string => '<input type="hidden" name="_csrf" value="' . $e($csrf) . '"><input type="hidden" name="back" value="' . $e($here) . '"><input type="hidden" name="screen" value="' . $e($screen) . '"><input type="hidden" name="qs" value="' . $e($qsSave) . '">';
-$hasFilters = count($f) > 0 || $sortQ || $plQ;
+$hasFilters = count($f) > 0 || array_filter($sortQ, static fn($v) => $v !== null) || $plQ;   // «Guardar vista» solo cuando hay algo que guardar
 ?>
 <div class="vbar" data-vbar>
   <nav class="vtabs" aria-label="Vista de los leads">
@@ -84,20 +84,21 @@ $hasFilters = count($f) > 0 || $sortQ || $plQ;
     <?php if ($hasFilters && (!$av || $dirty || !$mineAv)): ?>
       <button class="btn btn--secondary btn--sm" type="button" data-open="#view-dlg"><?= Ui::icon('plus') ?>Guardar vista</button>
     <?php endif; ?>
-    <div class="seg seg--tight vdens" role="group" aria-label="Densidad">
-      <button class="seg__i<?= $density === 'comfortable' ? ' is-on' : '' ?>" type="button" data-density-set="comfortable" aria-pressed="<?= $density === 'comfortable' ? 'true' : 'false' ?>" title="Cómoda"><?= Ui::icon('list') ?><span class="sr">Densidad cómoda</span></button>
-      <button class="seg__i<?= $density === 'compact' ? ' is-on' : '' ?>" type="button" data-density-set="compact" aria-pressed="<?= $density === 'compact' ? 'true' : 'false' ?>" title="Compacta"><?= Ui::icon('sliders') ?><span class="sr">Densidad compacta</span></button>
-    </div>
     <?php if ($isTable): require __DIR__ . '/_tcols.php'; endif; ?>
-    <?php if ($isList): ?>
     <div class="dd" data-dd>
-      <button class="btn btn--secondary btn--sm" type="button" aria-expanded="false" aria-haspopup="true" aria-controls="cmenu"><?= Ui::icon('columns') ?>Columnas</button>
+      <button class="btn btn--secondary btn--sm" type="button" aria-expanded="false" aria-haspopup="true" aria-controls="cmenu"><?= Ui::icon('sliders') ?>Mostrar</button>
       <div class="dd__panel vmenu vmenu--c" id="cmenu" hidden>
+        <p class="label vmenu__h">Densidad</p>
+        <div class="seg seg--tight vdens" role="group" aria-label="Densidad">
+          <button class="seg__i<?= $density === 'comfortable' ? ' is-on' : '' ?>" type="button" data-density-set="comfortable" aria-pressed="<?= $density === 'comfortable' ? 'true' : 'false' ?>">Cómoda</button>
+          <button class="seg__i<?= $density === 'compact' ? ' is-on' : '' ?>" type="button" data-density-set="compact" aria-pressed="<?= $density === 'compact' ? 'true' : 'false' ?>">Compacta</button>
+        </div>
+        <?php if ($isList): ?>
         <p class="label vmenu__h">Columnas visibles</p>
         <?php foreach (Prefs::COLUMNS as $k => $l): ?><label class="check check--c"><input type="checkbox" data-col-toggle="<?= $e($k) ?>"<?= in_array($k, $cols, true) ? ' checked' : '' ?>><span><?= $e($l) ?></span></label><?php endforeach; ?>
+        <?php endif; ?>
       </div>
     </div>
-    <?php endif; ?>
   </div>
 </div>
 

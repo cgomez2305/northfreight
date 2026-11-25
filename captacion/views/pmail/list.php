@@ -12,10 +12,11 @@ $chip = ['draft' => 'plain', 'sending' => 'ok', 'paused' => 'warm', 'done' => 'p
     <p class="sub">Correos en lote a transportistas de FMCSA, por segmentos de flota, estado y antigüedad de la autoridad. Cada correo lleva la dirección física y una baja de un clic.</p>
   </div>
   <div class="page-head__a">
-    <a class="btn btn--secondary" href="/prospectos"><?= Ui::icon('phone') ?><span class="btn__t">Lista de llamadas</span></a>
     <a class="btn btn--primary" href="/prospectos/correos/nueva"><span class="btn__t">Nueva campaña</span></a>
   </div>
 </div>
+
+<?php $stabs = [['/prospectos', 'Llamadas', false], ['/prospectos/correos', 'Correos en lote', true]]; $stabsLabel = 'Secciones de prospectos'; require __DIR__ . '/../_stabs.php'; ?>
 
 <?php foreach ($blockers as $b): ?><p class="flash flash--warn" role="status"><?= Ui::icon('alert') ?><span><?= $e($b) ?></span></p><?php endforeach; ?>
 

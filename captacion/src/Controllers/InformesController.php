@@ -46,7 +46,7 @@ final class InformesController extends Responder
     {
         $monthly = Db::all("SELECT id, period, ident, status, published_at, sent_at, notified_at, created_at FROM reports WHERE kind = 'monthly'" . ($admin ? '' : " AND status = 'published'") . ' ORDER BY period DESC LIMIT 60');
         $weekly = $admin ? Db::all("SELECT id, period, ident, notified_at, created_at FROM reports WHERE kind = 'weekly' ORDER BY period DESC LIMIT 12") : [];
-        self::page('informes', $user, 'informes', [['Informes', null]], [
+        self::page('informes', $user, 'informes', $admin ? [['Reportes', '/reportes'], ['Informes mensuales', null]] : [['Informes', null]], [
             'title' => 'Informes', 'css' => ['reportes'], 'monthly' => $monthly, 'weekly' => $weekly, 'isAdminView' => $admin,
             'genDefault' => ReportJobs::previousMonth(\Captacion\Clock::time()),
         ]);

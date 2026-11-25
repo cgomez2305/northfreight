@@ -53,7 +53,7 @@ $cronAt = is_array($cron) ? ($cron['at'] ?? null) : null;
       <div class="rules__p">
         <p class="rules__s">Solo a mano · 8 a. m. a 9 p. m. hora local · lista de no llamar</p>
         <ul>
-          <li><b>Solo llamadas manuales.</b> Nada de marcadores automáticos ni SMS. Los correos en lote van por «Correos a prospectos», con dirección física y baja de un clic.</li>
+          <li><b>Solo llamadas manuales.</b> Nada de marcadores automáticos ni SMS. Los correos en lote van por la pestaña «Correos en lote», con dirección física y baja de un clic.</li>
           <li><b>Horario permitido: 8 a. m. a 9 p. m. hora local del prospecto.</b> Fuera de ese horario el botón Llamar se bloquea; en estados con dos zonas horarias se exige que sea hora válida en ambas.</li>
           <li><b>Lista interna de no llamar.</b> Quien diga que no, o pida que no lo llamen, se marca «No llamar más»: es permanente y su teléfono no vuelve a entrar aunque FMCSA lo entregue de nuevo.</li>
           <li class="rules__todo"><b>Pendiente:</b> confirma con tu abogado el cumplimiento de las llamadas en frío (TCPA y listas estatales de no llamar) antes de operarlas.</li>
@@ -61,7 +61,6 @@ $cronAt = is_array($cron) ? ($cron['at'] ?? null) : null;
       </div>
     </details>
     <?php if ($totalAll > 0): ?>
-    <a class="btn btn--secondary" href="/prospectos/correos"><?= Ui::icon('send') ?><span class="btn__t">Correos en lote</span></a>
     <form method="post" action="/prospectos/export">
       <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="qs" value="<?= $e(ltrim(Ui::qs($qsBase), '?')) ?>">
       <button class="btn btn--secondary" type="submit"><?= Ui::icon('download') ?><span class="btn__t">Exportar CSV</span></button>
@@ -69,6 +68,8 @@ $cronAt = is_array($cron) ? ($cron['at'] ?? null) : null;
     <?php endif; ?>
   </div>
 </div>
+
+<?php $stabs = [['/prospectos', 'Llamadas', true], ['/prospectos/correos', 'Correos en lote', false]]; $stabsLabel = 'Secciones de prospectos'; require __DIR__ . '/_stabs.php'; ?>
 
 <?php if ($totalAll === 0): ?>
 <section class="card empty empty--lg">
@@ -99,7 +100,7 @@ if ($f['q'] !== '') { $chips[] = ['Búsqueda: «' . $f['q'] . '»', 'q']; }
 $nPanel = (int) ($f['us'] !== '') + (int) ($f['fl'] !== '') + (int) ($f['ag'] > 0);
 $drop = static fn(string $k): string => '/prospectos' . Ui::qs(array_diff_key($qsBase, [$k => 1, 'page' => 1]));
 ?>
-<form class="pbar" id="filters" method="get" action="/prospectos" aria-label="Buscar y filtrar prospectos">
+<form class="pbar" id="filters" method="get" action="/prospectos" aria-label="Buscar y filtrar prospectos" data-fclean>
   <?php if ($f['tab'] !== 'today'): ?><input type="hidden" name="tab" value="<?= $e($f['tab']) ?>"><?php endif; ?>
   <?php if ($f['now'] === '1'): ?><input type="hidden" name="now" value="1"><?php endif; ?>
   <?php if ($per !== 25): ?><input type="hidden" name="per" value="<?= $e($per) ?>"><?php endif; ?>
@@ -110,7 +111,7 @@ $drop = static fn(string $k): string => '/prospectos' . Ui::qs(array_diff_key($q
       <label class="field"><span>Estado (EE. UU.)</span><select name="us"><option value="">Todos</option><?php foreach (UsStates::NAMES as $k => $l): ?><option value="<?= $e($k) ?>"<?= $f['us'] === $k ? ' selected' : '' ?>><?= $e($k) ?> · <?= $e($l) ?></option><?php endforeach; ?></select></label>
       <label class="field"><span>Flota</span><select name="fl"><option value="">Cualquiera</option><?php foreach (Prospects::FLEETS as $k => $l): ?><option value="<?= $e($k) ?>"<?= $f['fl'] === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
       <label class="field"><span>Autoridad</span><select name="ag"><option value="">Cualquier antigüedad</option><?php foreach (Prospects::AGES as $k => $l): ?><option value="<?= $e($k) ?>"<?= $f['ag'] === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
-      <div class="filters__a"><button class="btn btn--secondary btn--sm" type="submit"><span class="btn__t">Aplicar</span></button><?php if ($nFilters > 0): ?><a class="btn btn--ghost btn--sm" href="<?= $e($tabHref($f['tab'])) ?>">Quitar filtros</a><?php endif; ?></div>
+      <div class="filters__a"><button class="btn btn--secondary btn--sm" type="submit" data-apply><span class="btn__t">Aplicar</span></button><?php if ($nFilters > 0): ?><a class="btn btn--ghost btn--sm" href="<?= $e($tabHref($f['tab'])) ?>">Quitar filtros</a><?php endif; ?></div>
     </div>
   </div>
   <?php if ($callable !== null && $rows): ?><a class="seg__i pbar__now<?= $f['now'] === '1' ? ' is-on' : '' ?>" href="<?= $e('/prospectos' . Ui::qs(array_merge(array_diff_key($qsBase, ['now' => 1, 'page' => 1]), $f['now'] === '1' ? [] : ['now' => '1']))) ?>" title="Solo quienes están en horario permitido (8 a. m. a 9 p. m. hora local) y tienen teléfono"<?= $f['now'] === '1' ? ' aria-current="page"' : '' ?>>Solo llamables ahora<span class="ptab__n"><?= $e(Fmt::num($callable)) ?></span></a><?php endif; ?>

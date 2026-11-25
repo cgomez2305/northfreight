@@ -13,6 +13,8 @@ use Captacion\Ui;
   <?php if ($isAdminView): ?><div class="page-head__a"><a class="btn btn--secondary" href="/resultados"><?= Ui::icon('bar-chart') ?>Ver como NorthStar</a></div><?php endif; ?>
 </div>
 
+<?php if ($isAdminView): $stabs = [['/reportes', 'Métricas', false], ['/informes', 'Informes mensuales', true]]; $stabsLabel = 'Secciones de reportes'; require __DIR__ . '/_stabs.php'; endif; ?>
+
 <section class="card card--table" aria-labelledby="inf-m">
   <header class="card__h"><h2 class="label" id="inf-m">Informes mensuales</h2><span class="muted"><?= $e(count($monthly)) ?></span></header>
   <?php if (!$monthly): ?>

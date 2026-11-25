@@ -9,16 +9,13 @@ use Captacion\Ui;
  */
 $q = static fn(array $over = []): string => '/cronologia' . Ui::qs(array_merge($f, ['tp' => $allTypes ? null : implode(',', $types), 'ld' => $ld], $over));
 $nFilters = count($f);
-$fa = ['path' => '/cronologia', 'keep' => ['tp' => $allTypes ? null : implode(',', $types), 'ld' => $ld], 'temp' => true, 'fold' => true];
+$fa = ['path' => '/cronologia', 'keep' => ['tp' => $allTypes ? null : implode(',', $types), 'ld' => $ld], 'temp' => true];
 $qsNext = ltrim(Ui::qs(array_merge($f, ['tp' => $allTypes ? null : implode(',', $types), 'ld' => $ld])), '?');
 ?>
 <div class="page-head">
   <div>
     <h1 class="h1">Leads</h1>
     <p class="sub">Cronología · lo último que pasó con tus leads · horas en <?= $e(Fmt::zone()) ?></p>
-  </div>
-  <div class="page-head__a">
-    <button class="btn btn--secondary filters-toggle filters-toggle--on" type="button" data-toggle="#filters" aria-expanded="<?= $nFilters > 0 ? 'true' : 'false' ?>" aria-controls="filters"><?= Ui::icon('filter') ?>Filtros<?= $nFilters > 0 ? ' <b class="badge">' . $e($nFilters) . '</b>' : '' ?></button>
   </div>
 </div>
 

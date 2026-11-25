@@ -1,6 +1,4 @@
 /* NorthStar Captación · registro de actividad (/actividad). Se carga solo en esa pantalla, encima de panel.css. Sin estilos en línea (CSP): clases y variables. */
-.act-f{display:grid;grid-template-columns:repeat(4,minmax(0,1fr)) minmax(0,1.4fr) auto;gap:12px;padding:16px;align-items:end}
-.act-f__a{display:flex;gap:8px}.act-f__q .inp{min-height:44px}
 .tbl--act .c-when{white-space:nowrap;font-weight:500}.tbl--act .c-when small,.tbl--act .c-ip small{display:block;color:var(--ink-3);font-size:var(--fs-xs);font-weight:400}
 .tbl--act .c-det{white-space:normal;min-width:220px;max-width:460px;overflow-wrap:anywhere;color:var(--ink-2);font-size:var(--fs-sm)}
 .tbl--act .c-ip{white-space:nowrap}.tbl--act .c-who b{font-weight:500}
@@ -15,9 +13,5 @@
   .tbl--act .c-who{grid-column:1/-1;order:1}.tbl--act .c-det{grid-column:1/-1;order:2;max-width:none;min-width:0}
   .tbl--act .c-ip{display:block;grid-column:1/-1;order:3;font-size:var(--fs-xs);color:var(--ink-3)}
 }
-@media (max-width:1180px){.act-f{grid-template-columns:repeat(2,minmax(0,1fr))}.act-f__q,.act-f__a{grid-column:1/-1}}
-@media (max-width:760px){.act-f{grid-template-columns:1fr}.act-f__a .btn{flex:1}.act-ret .field,.act-ret .btn{width:100%}}
-.chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.fchip{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 8px 0 10px;border-radius:var(--r-ctl);background:var(--surface);border:1px solid var(--line-2);color:var(--ink);font-size:var(--fs-sm);font-weight:500;text-decoration:none!important}
-.fchip .ic{width:14px;height:14px}
-.fchip:hover{background:var(--sunk)}
+@media (max-width:760px){.act-ret .field,.act-ret .btn{width:100%}}
+.act-chips{margin-top:-6px}

@@ -30,13 +30,17 @@ $grp = static function (array $rows, string $first, callable $name): string {
     <div class="seg seg--wrap" role="group" aria-label="Rango">
       <?php foreach ($presets as $k => $label): ?><a class="seg__i<?= $range['key'] === $k ? ' is-on' : '' ?>" href="/reportes<?= $e(Ui::qs(['r' => $k === '30d' ? null : $k])) ?>"<?= $range['key'] === $k ? ' aria-current="true"' : '' ?>><?= $e($label) ?></a><?php endforeach; ?>
     </div>
+    <div class="fpop<?= $range['key'] === 'custom' ? ' has-on' : '' ?>" data-fpop data-right data-manual>
+      <button class="btn btn--secondary fpop__b" type="button" aria-expanded="false" aria-controls="rng-p"><?= Ui::icon('calendar') ?><span class="btn__t"><?= $range['key'] === 'custom' ? $e(Fmt::dayLabel(Fmt::et($range['from'])) . ' a ' . Fmt::dayLabel(Fmt::et($range['to'] - 1))) : 'Otras fechas' ?></span></button>
+      <form class="fpop__p" id="rng-p" method="get" action="/reportes" novalidate aria-label="Rango de fechas propio">
+        <label class="field"><span>Desde</span><input type="date" lang="es" name="from" value="<?= $e($range['from_in']) ?>" required></label>
+        <label class="field"><span>Hasta</span><input type="date" lang="es" name="to" value="<?= $e($range['to_in']) ?>" required></label>
+        <div class="filters__a"><button class="btn btn--primary btn--sm" type="submit"><span class="btn__t">Ver ese rango</span></button></div>
+      </form>
+    </div>
   </div>
 </div>
-<form class="rep-range" method="get" action="/reportes" novalidate>
-  <label class="field"><span>Desde</span><input type="date" lang="es" name="from" value="<?= $e($range['from_in']) ?>" required></label>
-  <label class="field"><span>Hasta</span><input type="date" lang="es" name="to" value="<?= $e($range['to_in']) ?>" required></label>
-  <button class="btn btn--secondary" type="submit"><?= Ui::icon('calendar') ?>Aplicar rango</button>
-</form>
+<?php $stabs = [['/reportes', 'Métricas', true], ['/informes', 'Informes mensuales', false]]; $stabsLabel = 'Secciones de reportes'; require __DIR__ . '/_stabs.php'; ?>
 <?php if ($range['error']): ?><p class="flash flash--warn" role="status"><?= Ui::icon('alert') ?><?= $e($range['error']) ?></p><?php endif; ?>
 
 <?php require __DIR__ . '/rep/_kpis.php'; ?>

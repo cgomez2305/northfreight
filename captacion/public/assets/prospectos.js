@@ -29,23 +29,6 @@
     if (d) { d.open = true; var s = d.querySelector('summary'); if (s) { s.focus({ preventScroll: true }); s.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' }); } }
   }
 
-  // Panel «Filtros»
-  var pop = document.querySelector('[data-fpop]');
-  if (pop) {
-    var btn = pop.querySelector('.fpop__b'), form = pop.closest('form');
-    var set = function (open, focusBtn) {
-      pop.classList.toggle('is-open', open); btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-      if (open) { var first = pop.querySelector('select'); if (first) first.focus(); } else if (focusBtn) btn.focus();
-    };
-    btn.addEventListener('click', function () { set(!pop.classList.contains('is-open')); });
-    pop.addEventListener('keydown', function (e) { if (e.key === 'Escape' && pop.classList.contains('is-open')) { e.stopPropagation(); set(false, true); } });
-    document.addEventListener('click', function (e) { if (pop.classList.contains('is-open') && !pop.contains(e.target)) set(false); });
-    // elegir un filtro lo aplica (Aplicar queda para teclado y sin JS)
-    pop.querySelectorAll('select').forEach(function (sel) { sel.addEventListener('change', function () { if (form.requestSubmit) form.requestSubmit(); else form.submit(); }); });
-    // sin parámetros vacíos en la URL (?q=&us=…): se desactivan antes de enviar
-    if (form) form.addEventListener('submit', function () { form.querySelectorAll('input[name],select[name]').forEach(function (el) { if (el.value === '') el.disabled = true; }); });
-  }
-
   // Por página
   var per = document.querySelector('.pbar [data-per]');
   if (per) per.addEventListener('change', function () { var u = new URL(location.href); u.searchParams.set('per', per.value); u.searchParams.delete('page'); location.href = u.toString(); });

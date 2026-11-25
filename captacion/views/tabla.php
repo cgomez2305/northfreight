@@ -74,12 +74,16 @@ $numCols = ['trucks' => 1, 'exp' => 1, 'pts' => 1];
   </div>
   <?php if (!$isEmptyDb): ?>
   <div class="page-head__a">
-    <button class="btn btn--secondary filters-toggle" type="button" data-toggle="#filters" aria-expanded="<?= $nFilters > 0 ? 'true' : 'false' ?>" aria-controls="filters"><?= Ui::icon('filter') ?>Filtros<?= $nFilters > 0 ? ' <b class="badge">' . $e($nFilters) . '</b>' : '' ?></button>
-    <form method="post" action="/tabla/export">
-      <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="scope" value="filters"><input type="hidden" name="qs" value="<?= $e(ltrim($qsAll(), '?')) ?>">
-      <button class="btn btn--secondary" type="submit"><span class="btn__t">Exportar CSV</span></button>
-    </form>
-    <?php if (!empty($isAdmin)): ?><a class="btn btn--secondary" href="/importar"><?= Ui::icon('inbox') ?>Importar CSV</a><?php endif; ?>
+    <div class="dd" data-dd>
+      <button class="btn btn--secondary btn--more" type="button" aria-expanded="false" aria-haspopup="true" aria-controls="lmore" aria-label="Más acciones"><?= Ui::icon('dots') ?></button>
+      <div class="dd__panel" id="lmore" hidden>
+        <form method="post" action="/tabla/export">
+          <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="scope" value="filters"><input type="hidden" name="qs" value="<?= $e(ltrim($qsAll(), '?')) ?>">
+          <button class="dd__item" type="submit"><?= Ui::icon('download') ?>Exportar CSV<?= $nFilters + (isset($f['t']) ? 1 : 0) > 0 ? ' (lo filtrado)' : '' ?></button>
+        </form>
+        <?php if (!empty($isAdmin)): ?><a class="dd__item" href="/importar"><?= Ui::icon('upload') ?>Importar CSV</a><?php endif; ?>
+      </div>
+    </div>
     <button class="btn btn--primary" type="button" data-new-lead>Nuevo lead</button>
   </div>
   <?php endif; ?>
@@ -97,6 +101,7 @@ $numCols = ['trucks' => 1, 'exp' => 1, 'pts' => 1];
 
 <?php $screen = 'tabla'; require __DIR__ . '/_viewbar.php'; ?>
 
+<div class="lrow">
 <nav class="ptabs" aria-label="Temperatura">
   <?php foreach ($tabs as $k => $label): $on = ($f['t'] ?? '') === $k; $n = $k === '' ? $counts['all'] : $counts[$k]; ?>
     <a class="ptab<?= $on ? ' is-on' : '' ?><?= $k !== '' ? ' ptab--' . ($k === 'disqualified' ? 'dq' : $k) : '' ?>" href="/tabla<?= $e(Ui::qs(array_merge(array_diff_key($base, ['t' => 1]), $sortBase, $k !== '' ? ['t' => $k] : []))) ?>"<?= $on ? ' aria-current="page"' : '' ?>><?= $k !== '' ? '<i class="dot"></i>' : '' ?><?= $e($label) ?><span class="ptab__n"><?= $e(Fmt::num($n)) ?></span></a>
@@ -104,6 +109,7 @@ $numCols = ['trucks' => 1, 'exp' => 1, 'pts' => 1];
 </nav>
 
 <?php $fa = ['path' => '/tabla', 'keep' => array_filter($sortBase, static fn($v) => $v !== null), 'temp' => false]; require __DIR__ . '/_lfilters.php'; ?>
+</div>
 
 <form method="post" action="/leads/bulk" class="card card--table" id="bulk" data-bulk>
   <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>"><input type="hidden" name="back" value="/tabla<?= $e($qsAll(['page' => $list['page'] > 1 ? $list['page'] : null])) ?>">

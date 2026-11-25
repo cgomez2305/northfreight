@@ -80,11 +80,11 @@ $assigneeName = $assignedTo > 0 ? ($users[$assignedTo] ?? null) : null;
     <div><dt>Prefiere</dt><dd><?= $e(['call' => 'Llamada', 'whatsapp' => 'WhatsApp', 'text' => 'Texto', 'email' => 'Correo'][$lead['contact_pref'] ?? ''] ?? '—') ?><?= $lead['best_time'] ? ' · ' . $e(['morning' => 'mañana', 'afternoon' => 'tarde', 'evening' => 'noche', 'any' => 'cualquier hora'][$lead['best_time']] ?? $lead['best_time']) : '' ?></dd></div>
     <div><dt>Primer contacto</dt><dd><?= $lead['first_contact_at'] ? $e(Fmt::dateTime($lead['first_contact_at'])) . ' <small class="muted">(' . $e(Fmt::dur(Fmt::secondsBetween($lead['created_at'], $lead['first_contact_at']))) . ' tras llegar)</small>' : '<span class="late">Sin contactar</span>' . ($sla !== null ? ' · ' . Ui::sla($sla) : '') ?></dd></div>
     <div><dt>Responsable</dt><dd id="responsable">
-      <form class="asg" method="post" action="/leads/<?= $e($id) ?>/assign">
+      <form class="asg" method="post" action="/leads/<?= $e($id) ?>/assign" data-autosubmit>
         <input type="hidden" name="_csrf" value="<?= $e($csrf) ?>">
         <label class="field"><span class="sr">Responsable de este lead</span>
           <select name="to"><option value="">Sin asignar</option><?php foreach ($admins as $aid => $aname): ?><option value="<?= $e($aid) ?>"<?= $assignedTo === $aid ? ' selected' : '' ?>><?= $e($aname) ?></option><?php endforeach; ?><?php if ($assignedTo > 0 && !isset($admins[$assignedTo])): ?><option value="<?= $e($assignedTo) ?>" selected><?= $e($assigneeName ?? 'Usuario anterior') ?> (ya no disponible)</option><?php endif; ?></select></label>
-        <button class="btn btn--secondary btn--sm" type="submit">Asignar</button>
+        <button class="btn btn--secondary btn--sm" type="submit" data-apply>Asignar</button>
       </form></dd></div>
   </dl>
 </header>

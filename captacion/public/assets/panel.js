@@ -130,4 +130,28 @@
  });
  var ck = $('[data-clock]');
  if (ck && window.Intl) { var f = new Intl.DateTimeFormat('en-GB', { timeZone: ck.getAttribute('data-tz') || 'America/New_York', hour: '2-digit', minute: '2-digit', hour12: false }); var tick = function () { ck.textContent = f.format(new Date()); }; tick(); setInterval(tick, 20000); }
+ /* Panel «Filtros» (fase AR, compartido por Leads, Tabla, Calendario, Cronología, Prospectos, Actividad y Reportes): botón que abre un panel con los controles; elegir un valor lo aplica; Esc o clic fuera lo cierra */
+ $$('[data-fpop]').forEach(function (pop) {
+  var btn = $('.fpop__b', pop), form = pop.closest('form') || $('form', pop);
+  if (!btn) return;
+  var set = function (open, focusBtn) {
+   if (open) $$('[data-fpop].is-open').forEach(function (o) { if (o !== pop) { o.classList.remove('is-open'); $('.fpop__b', o).setAttribute('aria-expanded', 'false'); } });
+   pop.classList.toggle('is-open', open); btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+   if (open) { var first = $('select,input:not([type=hidden]),button.dp', $('.fpop__p', pop)); if (first) first.focus(); } else if (focusBtn) btn.focus();
+  };
+  btn.addEventListener('click', function () { set(!pop.classList.contains('is-open')); });
+  pop.addEventListener('keydown', function (e) { if (e.key === 'Escape' && pop.classList.contains('is-open') && !e.defaultPrevented) { e.stopPropagation(); set(false, true); } });
+  D.addEventListener('click', function (e) { if (pop.classList.contains('is-open') && !pop.contains(e.target) && !(e.target.closest && e.target.closest('.dpk'))) set(false); });
+  if (!form || pop.hasAttribute('data-manual')) return;
+  var go = function () { if (form.requestSubmit) form.requestSubmit(); else form.submit(); };
+  $$('select,input[type=checkbox],input[type=date]', $('.fpop__p', pop)).forEach(function (c) { c.addEventListener('change', go); });
+  $$('[data-apply]', pop).forEach(function (b) { b.hidden = true; });
+ });
+ /* formularios de un solo control (p. ej. Responsable de la ficha): elegir ya guarda; el botón queda para quien no tiene JS */
+ $$('form[data-autosubmit]').forEach(function (form) {
+  $$('[data-apply]', form).forEach(function (b) { b.hidden = true; });
+  $$('select', form).forEach(function (c) { c.addEventListener('change', function () { if (form.requestSubmit) form.requestSubmit(); else form.submit(); }); });
+ });
+ /* sin parámetros vacíos en la URL (?q=&us=…) en los formularios de filtros GET */
+ $$('form[data-fclean]').forEach(function (form) { form.addEventListener('submit', function () { $$('input[name],select[name]', form).forEach(function (el) { if (el.value === '' || (el.type === 'checkbox' && !el.checked)) el.disabled = true; }); }); });
 })();

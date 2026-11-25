@@ -1,4 +1,4 @@
-/* NorthStar Captación · dashboard (/): tras panel, charts y viz. Lo que solo anima o decora vive en dashlive.css (diferida). */
+/* NorthStar Captación · dashboard */
 .live{display:flex;align-items:center;gap:8px;margin-top:8px;color:var(--ink-3);font-size:var(--fs-xs)}
 .live__dot{width:6px;height:6px;border-radius:50%;background:var(--ok-dot);flex:none}
 .strip,.duo{display:grid;margin-top:16px;border-top:1px solid var(--line);padding-top:16px;gap:16px}

@@ -20,15 +20,21 @@ $chips = ['ty' => static fn($v) => 'Tipo: ' . ActivityView::GROUPS[$v][0], 'us' 
   </div>
 </div>
 
-<form class="act-f card" method="get" action="/actividad">
-  <label class="field"><span>Tipo</span><select name="ty"><option value="">Todos</option><?php foreach (ActivityView::GROUPS as $k => [$l]): ?><option value="<?= $e($k) ?>"<?= ($f['ty'] ?? '') === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
-  <label class="field"><span>Usuario</span><select name="us"><option value="">Todos</option><?php foreach ($users as $u): ?><option value="<?= $e($u['id']) ?>"<?= ($f['us'] ?? '') === (string) $u['id'] ? ' selected' : '' ?>><?= $e($u['name']) ?></option><?php endforeach; ?></select></label>
-  <label class="field"><span>Desde (<?= $e(Fmt::zone()) ?>)</span><input type="date" lang="es" name="from" value="<?= $e($f['from'] ?? '') ?>"></label>
-  <label class="field"><span>Hasta (<?= $e(Fmt::zone()) ?>)</span><input type="date" lang="es" name="to" value="<?= $e($f['to'] ?? '') ?>"></label>
-  <label class="field act-f__q"><span>Buscar</span><span class="inp"><?= Ui::icon('search') ?><input type="search" name="q" value="<?= $e($f['q'] ?? '') ?>" placeholder="Acción, IP, lead #, usuario…" maxlength="100"></span></label>
-  <div class="act-f__a"><button class="btn btn--secondary" type="submit"><?= Ui::icon('filter') ?>Filtrar</button><?php if ($nFilters): ?><a class="btn btn--ghost" href="/actividad"><?= Ui::icon('x') ?>Quitar</a><?php endif; ?></div>
+<?php $nPanel = count(array_diff_key($f, ['q' => 1])); ?>
+<form class="fbar" method="get" action="/actividad" aria-label="Buscar y filtrar la actividad" data-fclean>
+  <label class="fbar__q"><span class="sr">Buscar en la actividad</span><span class="inp"><?= Ui::icon('search') ?><input type="search" name="q" value="<?= $e($f['q'] ?? '') ?>" placeholder="Buscar por acción, IP, lead # o usuario" maxlength="100"></span></label>
+  <div class="fpop fpop--wide<?= $nPanel > 0 ? ' has-on' : '' ?>" data-fpop data-right>
+    <button class="btn btn--secondary fpop__b" type="button" aria-expanded="false" aria-controls="act-p"><?= Ui::icon('filter') ?><span class="btn__t">Filtros</span><?= $nPanel > 0 ? '<b class="badge">' . $e($nPanel) . '</b>' : '' ?></button>
+    <div class="fpop__p" id="act-p" role="group" aria-label="Filtros de la actividad">
+      <label class="field"><span>Tipo</span><select name="ty"><option value="">Todos</option><?php foreach (ActivityView::GROUPS as $k => [$l]): ?><option value="<?= $e($k) ?>"<?= ($f['ty'] ?? '') === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
+      <label class="field"><span>Usuario</span><select name="us"><option value="">Todos</option><?php foreach ($users as $u): ?><option value="<?= $e($u['id']) ?>"<?= ($f['us'] ?? '') === (string) $u['id'] ? ' selected' : '' ?>><?= $e($u['name']) ?></option><?php endforeach; ?></select></label>
+      <label class="field"><span>Desde (<?= $e(Fmt::zone()) ?>)</span><input type="date" lang="es" name="from" value="<?= $e($f['from'] ?? '') ?>"></label>
+      <label class="field"><span>Hasta (<?= $e(Fmt::zone()) ?>)</span><input type="date" lang="es" name="to" value="<?= $e($f['to'] ?? '') ?>"></label>
+      <div class="filters__a"><button class="btn btn--secondary btn--sm" type="submit" data-apply><span class="btn__t">Filtrar</span></button><?php if ($nFilters): ?><a class="btn btn--ghost btn--sm" href="/actividad">Quitar filtros</a><?php endif; ?></div>
+    </div>
+  </div>
 </form>
-<?php if ($nFilters): ?><div class="chips" aria-label="Filtros activos"><?php foreach ($f as $k => $v): ?><a class="fchip" href="/actividad<?= $e(Ui::qs(array_diff_key($f, [$k => 1]))) ?>" aria-label="Quitar filtro: <?= $e($chips[$k]($v)) ?>"><?= $e($chips[$k]($v)) ?><?= Ui::icon('x') ?></a><?php endforeach; ?></div><?php endif; ?>
+<?php if ($nFilters): ?><div class="chips act-chips" aria-label="Filtros activos"><?php foreach ($f as $k => $v): ?><a class="fchip" href="/actividad<?= $e(Ui::qs(array_diff_key($f, [$k => 1]))) ?>" aria-label="Quitar filtro: <?= $e($chips[$k]($v)) ?>"><?= $e($chips[$k]($v)) ?><?= Ui::icon('x') ?></a><?php endforeach; ?></div><?php endif; ?>
 
 <section class="card card--table" aria-label="Registro de actividad">
   <header class="card__h card__h--row"><h2 class="label">Registro</h2><span class="muted"><?= $e(Fmt::num($res['total'])) ?> evento<?= $res['total'] === 1 ? '' : 's' ?><?= $nFilters ? ' con estos filtros' : '' ?></span></header>
