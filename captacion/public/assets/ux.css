@@ -146,7 +146,7 @@ body.is-dragging *{cursor:grabbing!important}
 /* Fase AM: objetivos táctiles de 44 px en pantallas táctiles de cualquier ancho (con puntero fino no cambia nada) */
 @media (pointer:coarse){
   .icon-btn,.icon-btn--sm{width:44px;height:44px}
-  .btn--sm,.seg__i,.nav-i,.dd__item,.ptab,.vtab{min-height:44px}
+  .btn--sm,.seg__i,.nav-i,.dd__panel .dd__item,.ptab,.vtab{min-height:44px}
   .tick{position:relative}
   .tick::after{content:"";position:absolute;inset:-8px}
   .tbl .btn--sm,.tbl .icon-btn{min-height:44px}

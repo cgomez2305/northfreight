@@ -7,7 +7,7 @@ use CaptacionTests\T;
 
 /**
  * Q5c-E2: cada clase que usa una pantalla (renderizada con la base VACÍA, solo el administrador) tiene que estar definida en las hojas que esa pantalla carga: fonts + panel + las de la pantalla
- * y las diferidas que su JS pide (ux.css en todas las de administración; peek.css y etiquetas.css donde hay vistazo rápido). Una clase sin regla es un botón sin estilo, un icono sin tamaño
+ * y las diferidas que su JS pide (ux.css en todas las de administración; ctl.css donde carga ctl.js; peek.css y etiquetas.css donde hay vistazo rápido). Una clase sin regla es un botón sin estilo, un icono sin tamaño
  * o un relleno que falta: justo lo que se escapaba al revisar a ojo. Falla y dice qué clase falta en qué pantalla.
  *
  * Sin regla A PROPÓSITO (ganchos de JS, de pruebas o semánticos; no necesitan estilo): están en $hooks con su motivo.
@@ -69,6 +69,9 @@ return static function (array $ctx): void {
         $sheets = $m[1];
         if (str_contains($r['body'], 'src="/assets/ux.js')) {
             $sheets[] = 'ux';
+        }
+        if (str_contains($r['body'], 'src="/assets/ctl.js')) {
+            $sheets[] = 'ctl';   // ctl.js pide ctl.css (diferida): selects, calendario y, desde la fase AX, los menús desplegables
         }
         if (str_contains($r['body'], 'data-live-v=')) {
             $sheets[] = 'dashlive';   // dashboard.js la pide tras la primera pintura (hoja diferida)

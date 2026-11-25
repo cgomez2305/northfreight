@@ -1,5 +1,5 @@
 /* NorthStar Captación · pantallas de acceso (login, 2FA, alta, mensajes): una tarjeta centrada sobre el lienzo. Se carga solo en esa pantalla, encima de panel.css. Sin estilos en línea (CSP). */
-.bare{background:var(--canvas)}
+.bare{background:var(--rail)}
 .btn--lg{min-height:44px;font-size:var(--fs-md)}
 .btn--block{width:100%}
 .input--code{font:500 24px/1 var(--f-mono)!important;letter-spacing:.3em;text-align:center}

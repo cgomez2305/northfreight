@@ -168,11 +168,13 @@
  var drag = null, raf = 0, justDragged = false;
  function colAt(x, y) { var el = D.elementFromPoint(x, y); return el ? el.closest('.kcol') : null; }
  function setOver(col) { if (drag.over === col) return; if (drag.over) drag.over.classList.remove('is-over'); drag.over = col; if (col && col.getAttribute('data-col') !== drag.from) col.classList.add('is-over'); }
+ /* fase AX: en escritorio la hoja de trabajo (.col) tiene su propio desplazamiento; en móvil se desplaza la ventana */
+ function vscroll(dy) { var c = D.querySelector('.col'); if (c && c.scrollHeight > c.clientHeight && getComputedStyle(c).overflowY !== 'visible') c.scrollTop += dy; else window.scrollBy(0, dy); }
  function autoscroll() {
   if (!drag || !drag.started) return;
   var r = scroller.getBoundingClientRect(), x = drag.x, y = drag.y;
   if (x < r.left + 70) scroller.scrollLeft -= 16; else if (x > r.right - 70) scroller.scrollLeft += 16;
-  if (y < 110) window.scrollBy(0, -14); else if (y > window.innerHeight - 70) window.scrollBy(0, 14);
+  if (y < 110) vscroll(-14); else if (y > window.innerHeight - 70) vscroll(14);
   setOver(colAt(x, y)); raf = requestAnimationFrame(autoscroll);
  }
  function endDrag() {
