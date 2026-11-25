@@ -599,9 +599,13 @@ final class ProspectMail
             return [];
         }
         $out = [];
-        foreach (Db::all("SELECT r.prospect_id, r.sent_at, r.opened_at, c.name FROM prospect_campaign_recipients r JOIN prospect_campaigns c ON c.id = r.campaign_id
-                           WHERE r.status = 'sent' AND r.prospect_id IN (" . implode(',', $ids) . ') ORDER BY r.sent_at') as $r) {
-            $out[(int) $r['prospect_id']] = ['name' => (string) $r['name'], 'sent_at' => (string) $r['sent_at'], 'opened' => $r['opened_at'] !== null];
+        try {   // la lista de Prospectos nunca debe romperse por esto (p. ej. en el minuto entre el despliegue y la migración 018)
+            foreach (Db::all("SELECT r.prospect_id, r.sent_at, r.opened_at, c.name FROM prospect_campaign_recipients r JOIN prospect_campaigns c ON c.id = r.campaign_id
+                               WHERE r.status = 'sent' AND r.prospect_id IN (" . implode(',', $ids) . ') ORDER BY r.sent_at') as $r) {
+                $out[(int) $r['prospect_id']] = ['name' => (string) $r['name'], 'sent_at' => (string) $r['sent_at'], 'opened' => $r['opened_at'] !== null];
+            }
+        } catch (\Throwable) {
+            return [];
         }
         return $out;
     }
