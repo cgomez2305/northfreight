@@ -65,7 +65,7 @@ final class Sequences
         $lead = (int) ($m['cap_lead'] ?? self::DEFAULT_CAP_LEAD);
         return [
             'enabled'      => (bool) ($m['enabled'] ?? false),
-            'address'      => trim(is_string($m['address'] ?? null) ? $m['address'] : ''),
+            'address'      => Templates::address(),   // con la dirección por defecto si no hay otra escrita (fase AS)
             'from_name'    => is_string($m['from_name'] ?? null) && trim($m['from_name']) !== '' ? trim($m['from_name']) : 'NorthStar Freight Solutions',
             'reply_to'     => is_string($m['reply_to'] ?? null) && filter_var($m['reply_to'], FILTER_VALIDATE_EMAIL) ? $m['reply_to'] : '',
             'weekly_to'    => is_string($m['weekly_to'] ?? null) && filter_var($m['weekly_to'], FILTER_VALIDATE_EMAIL) ? $m['weekly_to'] : '',

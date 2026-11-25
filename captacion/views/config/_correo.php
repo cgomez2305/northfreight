@@ -16,7 +16,7 @@ $monthly = is_array($mail['monthly_to']) ? implode("\n", $mail['monthly_to']) : 
       <div class="card__b co-list">
         <label class="tgl"><input type="checkbox" name="enabled" value="1"<?= $mail['enabled'] ? ' checked' : '' ?>><span class="tgl__t"><b>Secuencias encendidas</b><small>Si están apagadas (o falta la dirección) no se inscribe a nadie ni sale ningún correo de secuencia.</small></span></label>
         <label class="field<?= isset($errors['address']) ? ' has-err' : '' ?>"><span>Dirección física del remitente (va en el pie de cada correo)</span><textarea name="address" rows="3" maxlength="300" placeholder="NorthStar Freight Solutions LLC, calle, ciudad, estado y código postal"<?= $fe('address') ?>><?= $e($mail['address']) ?></textarea><?= $em('address') ?>
-          <small>Debe ser la misma que declare el sitio. Sin ella el envío de secuencias queda deshabilitado.</small></label>
+          <small>Por defecto es la del sitio (30 N Gould St, Ste N, Sheridan, WY 82801). Si la borras se vuelve a usar esa; cámbiala solo si NorthStar declara otra.</small></label>
         <div class="co-two">
           <label class="field"><span>Nombre del remitente</span><input type="text" name="from_name" value="<?= $e($mail['from_name']) ?>" maxlength="80" autocomplete="off"></label>
           <label class="field<?= isset($errors['reply_to']) ? ' has-err' : '' ?>"><span>Responder a (opcional)</span><input type="email" name="reply_to" value="<?= $e($mail['reply_to']) ?>" maxlength="190" autocomplete="off"<?= $fe('reply_to') ?>><?= $em('reply_to') ?></label>

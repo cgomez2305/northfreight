@@ -11,7 +11,7 @@ $rows = $list['rows'];
 $nFilters = (int) ($f['q'] !== '') + (int) ($f['us'] !== '') + (int) ($f['fl'] !== '') + (int) ($f['ag'] > 0) + (int) ($f['ph'] !== '');
 $qsBase = array_filter(['tab' => $f['tab'] !== 'today' ? $f['tab'] : null, 'q' => $f['q'] ?: null, 'us' => $f['us'] ?: null, 'fl' => $f['fl'] ?: null, 'ag' => $f['ag'] ?: null, 'ph' => $f['ph'] ?: null, 'now' => $f['now'] ?: null, 'per' => $per !== 25 ? $per : null], static fn($v) => $v !== null);
 $tabHref = static fn(string $tab): string => '/prospectos' . Ui::qs(array_merge(array_diff_key($qsBase, ['tab' => 1]), $tab !== 'today' ? ['tab' => $tab] : []));
-$tabHint = ['today' => 'Por llamar y reintentos que ya tocan', 'to_call' => 'Nunca llamados', 'no_answer' => 'Hasta 3 intentos sin respuesta', 'talked' => 'Hubo conversación', 'interested' => 'Quieren seguir; conviértelos en lead', 'not_interested' => 'Dijeron que no', 'dnc' => 'Permanente: nunca se vuelven a listar'];
+$tabHint = ['today' => 'Por llamar, reintentos y seguimientos que tocan hoy', 'to_call' => 'Nunca llamados', 'no_answer' => 'Hasta 3 intentos sin respuesta', 'talked' => 'Hubo conversación', 'interested' => 'Quieren seguir; conviértelos en lead', 'not_interested' => 'Dijeron que no', 'dnc' => 'Permanente: nunca se vuelven a listar'];
 $todayEt = \Captacion\Services\Prospects::etDay($now);   // el dia de las llamadas es por ET, no por la zona de visualizacion
 $ageLabel = static function (?string $granted) use ($now): string {
     if ($granted === null) {
@@ -96,8 +96,9 @@ $chips = [];
 if ($f['us'] !== '') { $chips[] = ['Estado: ' . $f['us'] . ' · ' . (UsStates::NAMES[$f['us']] ?? ''), 'us']; }
 if ($f['fl'] !== '') { $chips[] = ['Flota: ' . (Prospects::FLEETS[$f['fl']] ?? $f['fl']), 'fl']; }
 if ($f['ag'] > 0) { $chips[] = ['Autoridad: ' . (Prospects::AGES[$f['ag']] ?? $f['ag']), 'ag']; }
+if ($f['ph'] === 'mail') { $chips[] = ['Solo con correo', 'ph']; }
 if ($f['q'] !== '') { $chips[] = ['Búsqueda: «' . $f['q'] . '»', 'q']; }
-$nPanel = (int) ($f['us'] !== '') + (int) ($f['fl'] !== '') + (int) ($f['ag'] > 0);
+$nPanel = (int) ($f['us'] !== '') + (int) ($f['fl'] !== '') + (int) ($f['ag'] > 0) + (int) ($f['ph'] === 'mail');
 $drop = static fn(string $k): string => '/prospectos' . Ui::qs(array_diff_key($qsBase, [$k => 1, 'page' => 1]));
 ?>
 <form class="pbar" id="filters" method="get" action="/prospectos" aria-label="Buscar y filtrar prospectos" data-fclean>
@@ -108,9 +109,10 @@ $drop = static fn(string $k): string => '/prospectos' . Ui::qs(array_diff_key($q
   <div class="fpop<?= $nPanel > 0 ? ' has-on' : '' ?>" data-fpop>
     <button class="btn btn--secondary fpop__b" type="button" aria-expanded="false" aria-controls="fpop-p"><?= Ui::icon('filter') ?><span class="btn__t">Filtros</span><?= $nPanel > 0 ? '<b class="badge">' . $e($nPanel) . '</b>' : '' ?></button>
     <div class="fpop__p" id="fpop-p" role="group" aria-label="Filtros de la lista">
-      <label class="field"><span>Estado (EE. UU.)</span><select name="us"><option value="">Todos</option><?php foreach (UsStates::NAMES as $k => $l): ?><option value="<?= $e($k) ?>"<?= $f['us'] === $k ? ' selected' : '' ?>><?= $e($k) ?> · <?= $e($l) ?></option><?php endforeach; ?></select></label>
+      <label class="field"><span>Estado (EE. UU.)</span><select name="us"><option value="">Todos</option><?php foreach (($f['us'] !== '' && !isset($stateFacets[$f['us']]) ? [$f['us'] => 0] : []) + $stateFacets as $k => $n): ?><option value="<?= $e($k) ?>"<?= $f['us'] === $k ? ' selected' : '' ?>><?= $e($k) ?> · <?= $e(UsStates::NAMES[$k] ?? $k) ?> (<?= $e(Fmt::num($n)) ?>)</option><?php endforeach; ?></select></label>
       <label class="field"><span>Flota</span><select name="fl"><option value="">Cualquiera</option><?php foreach (Prospects::FLEETS as $k => $l): ?><option value="<?= $e($k) ?>"<?= $f['fl'] === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
       <label class="field"><span>Autoridad</span><select name="ag"><option value="">Cualquier antigüedad</option><?php foreach (Prospects::AGES as $k => $l): ?><option value="<?= $e($k) ?>"<?= $f['ag'] === $k ? ' selected' : '' ?>><?= $e($l) ?></option><?php endforeach; ?></select></label>
+      <label class="check"><input type="checkbox" name="ph" value="mail"<?= $f['ph'] === 'mail' ? ' checked' : '' ?>><span>Solo con correo</span></label>
       <div class="filters__a"><button class="btn btn--secondary btn--sm" type="submit" data-apply><span class="btn__t">Aplicar</span></button><?php if ($nFilters > 0): ?><a class="btn btn--ghost btn--sm" href="<?= $e($tabHref($f['tab'])) ?>">Quitar filtros</a><?php endif; ?></div>
     </div>
   </div>

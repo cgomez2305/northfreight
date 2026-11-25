@@ -64,10 +64,25 @@ final class Prospects
         ];
     }
 
-    /** Condicion de la «Lista de hoy»: por llamar + sin respuesta cuyo siguiente intento ya llego. Nunca prospectos de «no llamar». */
+    /**
+     * Condicion de la «Lista de hoy»: por llamar + seguimientos que tocan HOY (día ET, el mismo corte que la campana «Seguimientos de hoy»): reintentos sin respuesta y,
+     * desde la fase AS, también «Conversó» e «Interesado» con fecha de seguimiento (antes solo los avisaba la campana y nunca aparecían en la lista).
+     * Nunca prospectos de «no llamar» ni los ya convertidos en lead.
+     */
     private static function todayClause(int $now): array
     {
-        return ["(p.status = 'to_call' OR (p.status = 'no_answer' AND (p.next_call_at IS NULL OR p.next_call_at <= ?)))", [Clock::at($now)]];
+        $end = self::etToUtc(self::etDay($now), true) ?? Clock::at($now);
+        return ["(p.status = 'to_call' OR (p.status = 'no_answer' AND (p.next_call_at IS NULL OR p.next_call_at <= ?)) OR (p.status IN ('talked', 'interested') AND p.next_call_at IS NOT NULL AND p.next_call_at <= ?)) AND p.converted_lead_id IS NULL", [$end, $end]];
+    }
+
+    /** Estados (EE. UU.) con prospectos y cuántos hay en cada uno, para el filtro (antes la lista traía los 51 aunque no hubiera nadie). @return array<string,int> */
+    public static function stateFacets(): array
+    {
+        $out = [];
+        foreach (Db::all("SELECT state, COUNT(*) AS n FROM prospects_fmcsa WHERE deleted_at IS NULL AND state IS NOT NULL AND state <> '' GROUP BY state ORDER BY state") as $r) {
+            $out[(string) $r['state']] = (int) $r['n'];
+        }
+        return $out;
     }
 
     /** WHERE de la lista (alias p) para otros servicios: los correos en lote a prospectos usan los mismos filtros. @return array{0:string,1:list<mixed>} */
@@ -159,7 +174,7 @@ final class Prospects
         $total = (int) Db::value("SELECT COUNT(*) FROM prospects_fmcsa p WHERE $sql", $p);
         $pages = max(1, (int) ceil($total / $per));
         $page = max(1, min($page, $pages));
-        $order = $f['tab'] === 'today' ? "(p.status = 'no_answer') DESC, p.authority_granted_at DESC, p.completeness DESC, p.id ASC" : 'p.authority_granted_at DESC, p.completeness DESC, p.id ASC';
+        $order = $f['tab'] === 'today' ? "(p.status <> 'to_call') DESC, p.next_call_at ASC, p.authority_granted_at DESC, p.completeness DESC, p.id ASC" : 'p.authority_granted_at DESC, p.completeness DESC, p.id ASC';
         $op = [];
         if (in_array($f['tab'], ['talked', 'interested'], true)) {
             $order = 'p.last_call_at DESC, p.id DESC';

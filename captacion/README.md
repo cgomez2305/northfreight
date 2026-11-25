@@ -1061,3 +1061,12 @@ Pedido de Carlos: «que cada clic tenga un propósito, el menú bien óptimo, se
 - **Presupuesto de CSS**: para que el panel de filtros sea común sin pasar de 45.000 B en el dashboard se acortaron comentarios y sangrías de `panel.css`, `fonts.css`, `dashboard.css` y `viz.css`, y se quitaron tres copias de `.fchip`/`.chips` (views, actividad y prospectos).
 
 Pruebas: `50_fase_ar` (y ajustes en `17_pulido`, `30_ux_q5a`, `38_resultados_q6i` y `48_usabilidad_grabacion`). Probado solo en Chromium 157: la lista propia de los selects no existe en Safari ni Firefox (allí se ve la del sistema) y el calendario no se ha probado con lector de pantalla real.
+
+## 32. Dirección postal por defecto y lógica de los filtros de Prospectos (fase AS, 2026-11-25)
+
+- **Dirección postal por defecto** (Carlos: «pon la dirección postal por defecto en el CRM»): `Templates::DEFAULT_ADDRESS` = «NorthStar Freight Solutions LLC / 30 N Gould St, Ste N / Sheridan, WY 82801» (la del sitio, `ADDRESS` en `app/config.php`; es la de un agente registrado). `Templates::address()` y `Sequences::mailSettings()` la usan mientras Configuración > Correo no tenga otra escrita; si se borra, vuelve la de por defecto (un correo comercial nunca sale sin dirección). Con esto dejan de bloquearse las secuencias y las campañas a prospectos por «falta la dirección» (siguen exigiendo SMTP, el interruptor de secuencias y la prueba de cada campaña). Sin migración. `MAIL_DEFAULT_ADDRESS=-` en el `.env` la desactiva (lo usa el runner de pruebas).
+- **«Lista de hoy» de Prospectos** (fallo de lógica): solo traía «Por llamar» y los reintentos «Sin respuesta»; los «Conversó» e «Interesado» con fecha de seguimiento NUNCA entraban en la lista (solo los contaba la campana «Seguimientos de hoy»), así que las devoluciones de llamada prometidas se perdían. Ahora entran los seguimientos que tocan hoy (día ET, el mismo corte que la campana), primero los que tienen fecha (por hora) y después los nunca llamados; los ya convertidos en lead no entran.
+- **Filtro de estado**: solo los estados que tienen prospectos, con su conteo («TX · Texas (34)»), en lugar de los 51.
+- **«Solo con correo»** (`ph=mail`): el filtro existía en el código pero solo por URL, sin control ni chip (un filtro invisible). Ahora está en el panel «Filtros», con chip y en el contador del botón. Sirve para preparar los correos en lote.
+
+Prueba: `51_fase_as`.

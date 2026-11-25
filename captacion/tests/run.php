@@ -68,7 +68,7 @@ $ctx = [
     'env' => [
         'APP_ENV' => 'local', 'APP_KEY' => str_repeat('ab12', 16), 'APP_URL' => 'http://panel.test', 'DB_HOST' => '127.0.0.1', 'DB_PORT' => (string) Infra::$dbPort, 'DB_NAME' => 'cap_test',
         'DB_USER' => 'captest', 'DB_PASS' => 'captest-pass', 'SETUP_TOKEN' => bin2hex(str_repeat('s', 32)), 'INTERNAL_API_TOKEN' => 'tok_' . bin2hex(str_repeat('a', 20)),
-        'STORAGE_DIR' => "$work/storage", 'MAIL_TO' => 'carlos@example.com',
+        'STORAGE_DIR' => "$work/storage", 'MAIL_TO' => 'carlos@example.com', 'MAIL_DEFAULT_ADDRESS' => '-',   // fase AS: sin la dirección por defecto, para probar el bloqueo «sin dirección»; 51_fase_as la prueba encendida
     ],
 ];
 foreach ($ctx['env'] as $k => $v) {

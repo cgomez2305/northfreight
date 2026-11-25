@@ -45,7 +45,7 @@ final class ProspectosController extends Responder
         $run = ProspectImport::state();
         $cron = Settings::get('cron.prospects');
         self::page('prospectos', $user, 'prospectos', [['Prospectos', null]], [
-            'title' => 'Prospectos', 'css' => ['prospectos'], 'js' => ['prospectos'], 'f' => $f, 'per' => $per, 'list' => $page, 'counts' => Prospects::counts($f, $now),
+            'title' => 'Prospectos', 'css' => ['prospectos'], 'js' => ['prospectos'], 'f' => $f, 'per' => $per, 'list' => $page, 'counts' => Prospects::counts($f, $now), 'stateFacets' => Prospects::stateFacets(),
             'callable' => in_array($f['tab'], ['today', 'to_call', 'no_answer'], true) ? Prospects::callableCount($f, $now) : null, 'history' => Prospects::historyFor(array_column($page['rows'], 'id')), 'mailed' => \Captacion\Services\ProspectMail::lastFor(array_column($page['rows'], 'id')), 'now' => $now, 'summary' => Prospects::summary($now), 'cfg' => $cfg, 'run' => $run,
             'cron' => is_array($cron) ? $cron : null, 'totalAll' => (int) \Captacion\Db::value('SELECT COUNT(*) FROM prospects_fmcsa WHERE deleted_at IS NULL'),
             'back' => '/prospectos' . self::qs($f, $per, $page['page']),

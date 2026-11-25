@@ -12,6 +12,8 @@ declare(strict_types=1);
 
 namespace Captacion\Services;
 
+use Captacion\Env;
+
 use Captacion\Db;
 
 final class Templates
@@ -91,11 +93,25 @@ final class Templates
 
     // --- Pie obligatorio ----------------------------------------------------------------------------------------------------
 
+    /**
+     * Dirección física del remitente por defecto (Carlos, 2026-11-25: «pon la dirección postal por defecto en el CRM»): la misma del sitio (ADDRESS en app/config.php,
+     * agente registrado en Sheridan, WY; el cliente: «sí utilizamos esa para todo»). Se usa mientras Configuración > Correo no tenga otra escrita.
+     * MAIL_DEFAULT_ADDRESS=- en el .env la desactiva (las pruebas la apagan para probar el bloqueo «sin dirección»).
+     */
+    public const DEFAULT_ADDRESS = "NorthStar Freight Solutions LLC\n30 N Gould St, Ste N\nSheridan, WY 82801";
+
+    public static function defaultAddress(): string
+    {
+        return Env::get('MAIL_DEFAULT_ADDRESS') === '-' ? '' : self::DEFAULT_ADDRESS;
+    }
+
+    /** La escrita en Configuración > Correo o, si está vacía, la de por defecto. */
     public static function address(): string
     {
         $a = Settings::get('mail', []);
         $a = is_array($a) ? $a : [];
-        return trim(is_string($a['address'] ?? null) ? $a['address'] : '');
+        $v = trim(is_string($a['address'] ?? null) ? $a['address'] : '');
+        return $v !== '' ? $v : self::defaultAddress();
     }
 
     /** @return array{text:string,html:string} */
