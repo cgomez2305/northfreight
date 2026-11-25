@@ -1133,3 +1133,24 @@ Carlos: «al momento desactiva el módulo de referidos, y enfoquémonos en optim
 **Más fuentes** (`ProspectSources`): «Añadir por USDOT» (censo + última concesión de Socrata, `source = manual`, origen en el historial) e «Importar CSV» (encabezados reconocidos: usdot/dot/dot_number, mc, name/company, dba, phone, email, state, city, fleet/power_units, authority_date; hasta 2.000 filas y 2 MB; `source = csv`). Ambos rechazan USDOT repetidos o que ya son lead y teléfonos de «No llamar más», borrados a petición o ya listados.
 
 Migración `020_prospeccion.sql` (`qual`, `callback_exact`, `prospect_auto_mails`). Prueba `53_fase_au` (77 comprobaciones); `24_referrals_jobs` enciende el módulo al empezar. NO se hizo, a propósito: marcador automático, llamadas con IA, SMS y WhatsApp en frío (necesitan consentimiento previo por escrito y abogado).
+
+## 35. Llamadas a prospectos desde el navegador con Vonage (fase AV, 2026-11-25)
+
+Carlos: «podemos conectarnos por API a Vonage para manejar las llamadas»; eligió que los agentes (en Venezuela) hablen **desde el navegador** y que se construya **apagado** hasta tener la cuenta. Pasos para conectarlo en `docs/setup-guide.md` §7.
+
+**Por qué:** el botón «Llamar» abría el teléfono del agente, así que el prospecto veía un número extranjero (parece spam y es caro). Con Vonage siempre ve el número de EE. UU. de NorthStar, y cada llamada queda registrada sola.
+
+**Cómo funciona** (`Services\Vonage`, `Controllers\VonageController`, migración `021_vonage.sql`, tabla `prospect_voice_calls`):
+1. «Llamar con Vonage» (en la fila y en el Modo llamada; solo si está configurado y el prospecto se puede llamar ya). `POST /ajax/vonage/start` (admin + CSRF, 60 por hora por agente) vuelve a comprobar en el servidor horario permitido, «No llamar más», lista de no llamar y supresión, y que el teléfono sea de EE. UU.; crea la fila `requested` con un **ticket de un solo uso (5 min)**; da de alta una vez el usuario de Vonage del agente (`ns-agent-{id}`) y devuelve su JWT (RS256, ACL mínima de la documentación, 1 hora). Una llamada a la vez por agente.
+2. El navegador descarga el SDK SOLO al pulsar (`@vonage/client-sdk` **2.11.2** desde jsDelivr con **SRI**; la CSP de las pantallas de Prospectos admite jsDelivr, `*.nexmo.com` y `*.vonage.com`, y `Permissions-Policy` el micrófono propio; el resto del panel no cambia), abre sesión y hace `serverCall({ticket})`.
+3. Webhook **answer** (`/api/webhooks/vonage-answer.php`, firmado): vuelve a comprobar todo y responde el NCCO `connect` al teléfono del prospecto desde `VONAGE_NUMBER` (45 s de timbre, tope de 30 min). El número sale del ticket, nunca del navegador. Ticket vencido, repetido o de otro agente: un aviso hablado al agente y no se llama a nadie.
+4. Webhook de **eventos** (`/api/webhooks/vonage-event.php`, firmado): sonando, contestó, duración, precio, quién colgó, sin respuesta, ocupado, fallo; nunca retrocede un estado final; si el agente cuelga antes de que contesten, la llamada queda cancelada.
+5. Al colgar, la pantalla muestra «Terminada · contestó · N min» y **sugiere** el resultado («Conversó» o «Sin respuesta»); el agente lo confirma con los botones de siempre. Silenciar, colgar y cronómetro. La meta del día muestra llamadas por Vonage y minutos hablados.
+
+**Firma de los webhooks:** `Authorization: Bearer <JWT HS256>` con `VONAGE_SIGNATURE_SECRET`, `iat` de menos de 10 min y `payload_hash` = SHA-256 del cuerpo; método, configurado (503), límite por IP y tamaño antes que nada. **Integraciones:** tarjeta «Vonage» con las URL y «Probar» (GET firmado a la API de usuarios).
+
+**Variables:** `VONAGE_APPLICATION_ID`, `VONAGE_PRIVATE_KEY` (archivo en `config/`, excluido de git), `VONAGE_NUMBER`, `VONAGE_SIGNATURE_SECRET`; opcionales `VONAGE_RING_SECONDS`, `VONAGE_MAX_CALL_SECONDS`, `VONAGE_API_BASE` (pruebas).
+
+**Supuestos a confirmar con la cuenta real:** la API de usuarios (`POST /v1/users`, 409 si ya existe) y que el tramo al teléfono llega a los eventos con su propio `uuid` y el mismo `conversation_uuid` (así se distingue del tramo del navegador). Lo demás sale de la documentación de Vonage leída el 2026-11-25. Probado con una API simulada (prueba `54_vonage`, 50 comprobaciones) y en la demo local: el SDK carga con su SRI bajo la CSP y, con credenciales falsas, Vonage responde 401 y el panel lo explica. **Sin probar:** una llamada real, audio y calidad desde Venezuela, Safari/Firefox.
+
+**NO se hizo, a propósito:** marcador automático o predictivo, detección de contestador (`machineDetection`/`advancedMachineDetection`), mensajes grabados en el buzón, voces de IA y grabación (necesitan consentimiento previo por escrito o aviso a las dos partes; ver `docs/prospeccion-en-frio.md`).

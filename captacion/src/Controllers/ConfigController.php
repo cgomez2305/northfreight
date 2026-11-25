@@ -434,7 +434,7 @@ final class ConfigController extends Responder
     {
         $name = is_string($_POST['name'] ?? null) ? $_POST['name'] : '';
         $back = self::guardPost('integraciones', false, '#int-' . preg_replace('/[^a-z]/', '', $name));
-        if (!in_array($name, ['telegram', 'fmcsa', 'smtp', 'socrata', 'meta', 'calcom', 'twilio', 'n8n'], true)) {
+        if (!in_array($name, ['telegram', 'fmcsa', 'smtp', 'socrata', 'meta', 'calcom', 'twilio', 'n8n', 'vonage'], true)) {
             self::notFound();
         }
         $key = 'u' . (int) $user['id'];

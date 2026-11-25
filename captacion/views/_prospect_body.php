@@ -33,6 +33,16 @@ ob_start();
               <p class="pc__note"><?= Ui::icon('shield') ?>Marcado «No llamar más»: permanente. No volverá a listarse.</p>
             <?php elseif ($r['phone'] === null): ?>
               <span class="btn btn--secondary is-off" aria-disabled="true"><span class="btn__t">Llamar</span></span><span class="pc__local pc__local--off">Sin teléfono en FMCSA</span>
+            <?php elseif ($tz['allowed'] && !empty($voice) && str_starts_with((string) $r['phone'], '+1')): ?>
+              <button class="btn btn--primary" type="button" data-vcall="<?= $e($id) ?>" data-sdk="<?= $e(\Captacion\Services\Vonage::SDK_URL) ?>" data-sri="<?= $e(\Captacion\Services\Vonage::SDK_SRI) ?>" aria-label="Llamar con Vonage a <?= $e($name) ?>, <?= $e(Fmt::phone($r['phone'])) ?>"><?= Ui::icon('phone') ?><span class="btn__t">Llamar con Vonage</span></button>
+              <span class="pc__num mono"><?= $e(Fmt::phone($r['phone'])) ?></span>
+              <span class="pc__local">Allá son las <?= $e($tz['local_hm']) ?> <?= $e($tz['zone_label']) ?><?= $tz['multi'] ? ' · dos zonas horarias' : '' ?></span>
+              <a class="link pc__tel" href="tel:<?= $e($r['phone']) ?>">Desde mi teléfono</a>
+              <div class="vcall" data-vcall-box hidden>
+                <span class="vcall__st" data-vcall-status role="status" aria-live="polite"></span><span class="vcall__t mono" data-vcall-timer></span>
+                <button class="btn btn--secondary btn--sm" type="button" data-vcall-mute aria-pressed="false">Silenciar</button>
+                <button class="btn btn--danger btn--sm" type="button" data-vcall-hang>Colgar</button>
+              </div>
             <?php elseif ($tz['allowed']): ?>
               <a class="btn btn--primary" href="tel:<?= $e($r['phone']) ?>" aria-label="Llamar a <?= $e($name) ?>, <?= $e(Fmt::phone($r['phone'])) ?>"><?= Ui::icon('phone') ?><span class="btn__t">Llamar</span></a>
               <span class="pc__num mono"><?= $e(Fmt::phone($r['phone'])) ?></span>
@@ -95,6 +105,7 @@ ob_start();
             <?php if ($r['email']): ?><div class="pc__mail"><dt>Correo en FMCSA</dt><dd class="mono"><?= $e($r['email']) ?></dd></div><?php endif; ?>
             <?php if (!empty($r['email_opt_out_at'])): ?><div class="pc__mail"><dt>Correos</dt><dd>Se dio de baja el <?= $e(Fmt::date((string) $r['email_opt_out_at'])) ?></dd></div>
             <?php elseif (isset($mailed[$id])): ?><div class="pc__mail"><dt>Último correo en lote</dt><dd><?= $e(Fmt::date($mailed[$id]['sent_at'])) ?> · <?= $e($mailed[$id]['name']) ?><small><?= !empty($mailed[$id]['replied']) ? 'Respondió' : (!empty($mailed[$id]['clicked']) ? 'Hizo clic en un enlace' : ($mailed[$id]['opened'] ? 'Lo abrió' : 'Sin abrir todavía')) ?></small></dd></div><?php endif; ?>
+            <?php if (isset($vlast[$id])): $vl = $vlast[$id]; ?><div><dt>Última llamada por Vonage</dt><dd><?= $e(Fmt::date((string) $vl['created_at'])) ?> · <?= $vl['answered_at'] !== null ? 'contestó' . ((int) $vl['duration'] > 0 ? ' · ' . $e(Fmt::dur((int) $vl['duration'])) : '') : $e(mb_strtolower(\Captacion\Services\Vonage::STATUS_LABELS[$vl['status']] ?? $vl['status'])) ?></dd></div><?php endif; ?>
             <?php if ($am !== null): ?><div class="pc__mail"><dt>Correo tras no contestar</dt><dd><?= $am['status'] === 'sent' ? 'Enviado el ' . $e(Fmt::date((string) $am['sent_at'])) : ($am['status'] === 'queued' ? 'Sale en unos minutos' : ($am['status'] === 'failed' ? 'Falló el envío' : 'No se envió: ' . $e((string) $am['skip_reason']))) ?></dd></div><?php endif; ?>
           </dl>
           <?php if (!$dnc): ?>

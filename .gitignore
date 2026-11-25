@@ -29,3 +29,5 @@ node_modules/
 # Buzón de correo (contraseña SMTP): solo en el servidor
 /app/config.mail.php
 /captacion/config/mail.env
+/captacion/config/*.key
+/captacion/config/*.pem

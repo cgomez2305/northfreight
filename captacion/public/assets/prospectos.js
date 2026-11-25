@@ -45,6 +45,82 @@
     seg.querySelectorAll('button').forEach(function (b) { b.addEventListener('click', function () { var l = b.getAttribute('data-lang'); show(l); try { localStorage.setItem(LK, l); } catch (e) {} }); });
   });
 
+  // Fase AV: llamadas por Vonage desde el navegador. El SDK (versión fija, con SRI) se descarga SOLO al pulsar «Llamar con Vonage». El servidor comprueba horario,
+  // «No llamar más» y teléfono, y entrega un ticket de un solo uso: el navegador nunca decide a qué número se llama. Una llamada a la vez.
+  var V = { client: null, session: false, callId: null, rowId: null, btn: null, box: null, t0: 0, timer: null, muted: false };
+  var vbox = function () { return V.btn ? V.btn.parentNode.querySelector('[data-vcall-box]') : null; };
+  var vsay = function (txt) { var b = vbox(); if (!b) return; b.hidden = false; var s = b.querySelector('[data-vcall-status]'); if (s) s.textContent = txt; };
+  var vtick = function () { var b = vbox(); if (!b || !V.t0) return; var s = Math.floor((Date.now() - V.t0) / 1000); b.querySelector('[data-vcall-timer]').textContent = Math.floor(s / 60) + ':' + ('0' + (s % 60)).slice(-2); };
+  var loadSdk = function (btn) {
+    if (window.vonageClientSDK) return Promise.resolve();
+    return new Promise(function (ok, ko) {
+      var sc = document.createElement('script');
+      sc.src = btn.getAttribute('data-sdk'); sc.integrity = btn.getAttribute('data-sri'); sc.crossOrigin = 'anonymous'; sc.async = true;
+      sc.onload = function () { window.vonageClientSDK ? ok() : ko(new Error('sdk')); }; sc.onerror = function () { ko(new Error('sdk')); };
+      document.head.appendChild(sc);
+    });
+  };
+  var vend = function (msg) {
+    clearInterval(V.timer); V.timer = null;
+    var b = vbox(), done = V.rowId, btn = V.btn;
+    if (b) { b.querySelector('[data-vcall-mute]').hidden = true; b.querySelector('[data-vcall-hang]').hidden = true; }
+    if (msg) vsay(msg);
+    if (btn) btn.disabled = false;
+    V.callId = null; V.t0 = 0; V.muted = false;
+    if (!done || !window.NS || !NS.post) return;
+    setTimeout(function () {   // el estado final lo dan los webhooks de Vonage: se pregunta al servidor y se sugiere el resultado
+      NS.post('/ajax/vonage/call', { id: done }).then(function (r) {
+        if (!r || !r.ok) return;
+        vsay(r.answered ? 'Terminada · contestó' + (r.duration ? ' · ' + Math.floor(r.duration / 60) + ' min ' + (r.duration % 60) + ' s' : '') : r.label + (r.reason ? ': ' + r.reason : ''));
+        var form = btn && btn.closest('.pr__main') ? btn.closest('.pr__main').querySelector('[data-pr-form]') : null;
+        if (form && r.suggest) {
+          form.querySelectorAll('.rbtn').forEach(function (x) { x.classList.toggle('is-suggested', x.value === r.suggest); });
+          var sb = form.querySelector('.rbtn[value="' + r.suggest + '"]'); if (sb) sb.focus({ preventScroll: true });
+        }
+      });
+    }, 2500);
+  };
+  document.querySelectorAll('[data-vcall]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      if (V.callId) { vsay('Ya hay una llamada en curso.'); return; }
+      V.btn = btn; btn.disabled = true; vsay('Conectando…');
+      var b = vbox(); if (b) { b.querySelector('[data-vcall-mute]').hidden = false; b.querySelector('[data-vcall-hang]').hidden = false; b.querySelector('[data-vcall-timer]').textContent = ''; }
+      var start;
+      loadSdk(btn).then(function () {
+        return NS.post('/ajax/vonage/start', { prospect_id: parseInt(btn.getAttribute('data-vcall'), 10) });
+      }).then(function (r) {
+        if (!r || !r.ok) throw new Error((r && r.msg) || 'No se pudo iniciar la llamada.');
+        start = r; V.rowId = r.call_id;
+        if (!V.client) {
+          V.client = new window.vonageClientSDK.VonageClient();
+          V.client.on('legStatusUpdate', function (callId, legId, st) {
+            if (callId !== V.callId || legId === callId) return;   // solo el tramo al teléfono del prospecto (el del navegador se contesta solo)
+            if (st === 'RINGING' || st === 'ringing') vsay('Sonando…');
+            if (st === 'ANSWERED' || st === 'answered') { vsay('En llamada'); V.t0 = Date.now(); clearInterval(V.timer); V.timer = setInterval(vtick, 1000); }
+          });
+          V.client.on('callHangup', function (callId) { if (callId === V.callId) vend('Llamada terminada'); });
+          V.client.on('sessionError', function () { V.session = false; });
+        }
+        return V.client.createSession(start.jwt).then(function () { V.session = true; });
+      }).then(function () {
+        vsay('Llamando…');
+        return V.client.serverCall({ ticket: start.ticket });
+      }).then(function (callId) { V.callId = callId; }).catch(function (e) {
+        var m = e && e.message && e.message !== 'sdk' ? e.message : 'No se pudo conectar con Vonage. Revisa el permiso del micrófono e inténtalo de nuevo.';
+        V.rowId = null; vend(m);
+      });
+    });
+  });
+  document.addEventListener('click', function (e) {
+    var h = e.target.closest('[data-vcall-hang]'), m = e.target.closest('[data-vcall-mute]');
+    if (h && V.client && V.callId) V.client.hangup(V.callId).catch(function () {});
+    if (m && V.client && V.callId) {
+      var p = V.muted ? V.client.unmute(V.callId) : V.client.mute(V.callId);
+      p.then(function () { V.muted = !V.muted; m.setAttribute('aria-pressed', V.muted ? 'true' : 'false'); m.textContent = V.muted ? 'Activar micrófono' : 'Silenciar'; }).catch(function () {});
+    }
+  });
+  window.addEventListener('beforeunload', function (e) { if (V.callId) { e.preventDefault(); e.returnValue = ''; } });
+
   // Por página
   var per = document.querySelector('.pbar [data-per]');
   if (per) per.addEventListener('change', function () { var u = new URL(location.href); u.searchParams.set('per', per.value); u.searchParams.delete('page'); location.href = u.toString(); });

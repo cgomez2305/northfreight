@@ -99,6 +99,10 @@ switch (true) {
         ModosController::cronoMore();
     case $path === '/leads/export':
         LeadsController::export();
+    case $path === '/ajax/vonage/start':   // fase AV: llamadas por Vonage desde el navegador
+        \Captacion\Controllers\VonageController::start();
+    case $path === '/ajax/vonage/call':
+        \Captacion\Controllers\VonageController::call();
     case $path === '/ajax/dashboard':
         DashboardController::pulse();
     case $path === '/ajax/search':

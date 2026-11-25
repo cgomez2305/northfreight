@@ -59,7 +59,7 @@ final class T
     {
         $pdo = Db::pdo();
         $pdo->exec('SET FOREIGN_KEY_CHECKS = 0');
-        foreach (['lead_events', 'consents', 'leads', 'jobs', 'activity_log', 'login_attempts', 'recovery_codes', 'lead_notes', 'notification_reads', 'tasks', 'appointments', 'messages', 'sequence_enrollments', 'referrals', 'referral_codes', 'prospect_calls', 'dnc_numbers', 'prospects_fmcsa', 'job_postings', 'backups', 'handoff_deliveries', 'handoffs', 'user_invites', 'reports', 'webhook_events', 'user_prefs', 'saved_views', 'rule_simulation_rows', 'rule_simulations', 'rule_applications', 'rule_versions', 'rule_sets', 'suppression', 'lead_imports', 'prospect_campaign_recipients', 'prospect_campaigns', 'prospect_auto_mails'] as $t) {
+        foreach (['lead_events', 'consents', 'leads', 'jobs', 'activity_log', 'login_attempts', 'recovery_codes', 'lead_notes', 'notification_reads', 'tasks', 'appointments', 'messages', 'sequence_enrollments', 'referrals', 'referral_codes', 'prospect_calls', 'dnc_numbers', 'prospects_fmcsa', 'job_postings', 'backups', 'handoff_deliveries', 'handoffs', 'user_invites', 'reports', 'webhook_events', 'user_prefs', 'saved_views', 'rule_simulation_rows', 'rule_simulations', 'rule_applications', 'rule_versions', 'rule_sets', 'suppression', 'lead_imports', 'prospect_campaign_recipients', 'prospect_campaigns', 'prospect_auto_mails', 'prospect_voice_calls'] as $t) {
             $pdo->exec("TRUNCATE TABLE `$t`");
         }
         if ($withUsers) {

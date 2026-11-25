@@ -65,11 +65,13 @@ final class ProspectosController extends Responder
         $cfg = ProspectConfig::get();
         $run = ProspectImport::state();
         $cron = Settings::get('cron.prospects');
+        \Captacion\Middleware\SecurityHeaders::$voice = \Captacion\Services\Vonage::configured();
         self::page('prospectos', $user, 'prospectos', [['Prospectos', null]], [
             'title' => 'Prospectos', 'css' => ['prospectos'], 'js' => ['prospectos'], 'f' => $f, 'per' => $per, 'list' => $page, 'counts' => Prospects::counts($f, $now), 'stateFacets' => Prospects::stateFacets(),
             'callable' => in_array($f['tab'], ['today', 'to_call', 'no_answer'], true) ? Prospects::callableCount($f, $now) : null, 'history' => Prospects::historyFor(array_column($page['rows'], 'id')), 'mailed' => \Captacion\Services\ProspectMail::lastFor(array_column($page['rows'], 'id')), 'autoMails' => ProspectAutoMail::lastFor(array_column($page['rows'], 'id')), 'now' => $now,
             'stats' => Prospects::todayStats($now, (int) $user['id']), 'script' => ProspectScript::get(), 'agent' => self::agent($user), 'summary' => Prospects::summary($now), 'cfg' => $cfg, 'run' => $run,
             'cron' => is_array($cron) ? $cron : null, 'totalAll' => (int) \Captacion\Db::value('SELECT COUNT(*) FROM prospects_fmcsa WHERE deleted_at IS NULL'),
+            'voice' => \Captacion\Services\Vonage::configured(), 'vstats' => \Captacion\Services\Vonage::todayStats($now), 'vlast' => \Captacion\Services\Vonage::lastFor(array_column($page['rows'], 'id')),
             'back' => '/prospectos' . self::qs($f, $per, $page['page']),
         ]);
     }
@@ -89,12 +91,14 @@ final class ProspectosController extends Responder
         $now = Clock::time();
         $skip = array_slice(array_values(array_filter(array_map('intval', explode(',', is_string($_GET['skip'] ?? null) ? $_GET['skip'] : '')))), 0, 100);
         $n = Prospects::nextForCall($now, $skip);
+        \Captacion\Middleware\SecurityHeaders::$voice = \Captacion\Services\Vonage::configured();
         $row = $n['row'];
         $back = '/prospectos/llamar' . ($skip ? '?skip=' . implode(',', $skip) : '');
         self::page('prospectos_llamar', $user, 'prospectos', [['Prospectos', '/prospectos'], ['Modo llamada', null]], [
             'title' => 'Modo llamada', 'css' => ['prospectos'], 'js' => ['prospectos'], 'row' => $row, 'left' => $n['left'], 'skip' => $skip, 'now' => $now, 'back' => $back,
             'history' => $row !== null ? Prospects::historyFor([(int) $row['id']]) : [], 'mailed' => $row !== null ? \Captacion\Services\ProspectMail::lastFor([(int) $row['id']]) : [],
             'autoMails' => $row !== null ? ProspectAutoMail::lastFor([(int) $row['id']]) : [], 'stats' => Prospects::todayStats($now, (int) $user['id']), 'script' => ProspectScript::get(), 'agent' => self::agent($user),
+            'voice' => \Captacion\Services\Vonage::configured(), 'vstats' => \Captacion\Services\Vonage::todayStats($now), 'vlast' => $row !== null ? \Captacion\Services\Vonage::lastFor([(int) $row['id']]) : [],
             'counts' => Prospects::counts(Prospects::filters([]), $now),
         ]);
     }

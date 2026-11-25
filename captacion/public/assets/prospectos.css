@@ -163,3 +163,9 @@
 @media (min-width:1000px){.pcall__b{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:760px){.pr__st{align-items:flex-end}}
 .pcall .pc__qg{grid-template-columns:repeat(2,minmax(0,1fr))}
+/* Fase AV: llamada por Vonage en curso y resultado sugerido */
+.pc__tel{font-size:var(--fs-sm)}
+.vcall{display:flex;align-items:center;flex-wrap:wrap;gap:8px 10px;flex-basis:100%;padding-top:6px}
+.vcall__st{font-weight:500;color:var(--ink)}
+.vcall__t{color:var(--ink-3);font-variant-numeric:tabular-nums}
+.rbtn.is-suggested{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}

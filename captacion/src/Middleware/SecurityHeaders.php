@@ -8,6 +8,8 @@ namespace Captacion\Middleware;
 final class SecurityHeaders
 {
     private static string $nonce = '';
+    /** Fase AV: pantallas de Prospectos con Vonage configurado: SDK de Vonage desde jsDelivr (versión fija con SRI), conexiones a Vonage y micrófono propio. */
+    public static bool $voice = false;
 
     public static function nonce(): string
     {
@@ -26,14 +28,16 @@ final class SecurityHeaders
         header('X-Content-Type-Options: nosniff');
         header('X-Frame-Options: DENY');
         header('Referrer-Policy: no-referrer');
-        header('Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()');
+        header('Permissions-Policy: camera=(), microphone=' . (self::$voice ? '(self)' : '()') . ', geolocation=(), payment=()');
         header('Cross-Origin-Opener-Policy: same-origin');
         header('Cross-Origin-Resource-Policy: same-origin');
         if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https')) {
             header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
         }
         if ($html) {
-            header("Content-Security-Policy: default-src 'none'; style-src 'self'; script-src 'self' 'nonce-" . self::nonce() . "'; img-src 'self' data:; font-src 'self'; connect-src 'self'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'");
+            $v = self::$voice;
+            header("Content-Security-Policy: default-src 'none'; style-src 'self'; script-src 'self' 'nonce-" . self::nonce() . "'" . ($v ? ' https://cdn.jsdelivr.net' : '') . "; img-src 'self' data:; font-src 'self'; connect-src 'self'"
+                . ($v ? ' https://*.nexmo.com wss://*.nexmo.com https://*.vonage.com wss://*.vonage.com; media-src \'self\' blob: data:; worker-src \'self\' blob:' : '') . "; form-action 'self'; base-uri 'none'; frame-ancestors 'none'");
         } else {
             header("Content-Security-Policy: default-src 'none'; frame-ancestors 'none'");
         }

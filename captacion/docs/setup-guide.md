@@ -109,6 +109,33 @@ También aparecen listas para copiar en cada tarjeta de **Configuración > Integ
 
 ---
 
+## 7. Vonage: llamadas a prospectos desde el navegador (fase AV)
+
+Sin esto el botón «Llamar» de Prospectos sigue abriendo el teléfono del agente. Con esto aparece **«Llamar con Vonage»**: el agente habla desde el CRM con auriculares y el prospecto ve el número de EE. UU. de NorthStar.
+
+1. Abre una cuenta en **Vonage Communications APIs** (vonage.com, «Communications APIs»; NO es Vonage Business Communications) y carga saldo.
+2. Compra un **número local de EE. UU.** con voz (Numbers > Buy numbers). Mejor un código de área de un estado con muchos prospectos (Texas o Florida).
+3. Crea una **aplicación** (Applications > Create a new application): pon un nombre, pulsa «Generate public and private key» (se descarga `private.key`) y activa **Voice**:
+   - Answer URL: `https://captacion.northstarfreightsolutions.us/api/webhooks/vonage-answer.php` con método **HTTP POST**.
+   - Event URL: `https://captacion.northstarfreightsolutions.us/api/webhooks/vonage-event.php` con método **HTTP POST**.
+   - Deja **activada** la firma de los webhooks («Signed webhooks»/«signed callbacks»).
+   Enlaza el número comprado a esa aplicación.
+4. Busca el **signature secret** de la cuenta (Settings, en el panel de Vonage).
+5. Sube `private.key` al servidor como `captacion/config/vonage.key` (permisos 600; NUNCA en `public/` ni en git: `.gitignore` ya lo excluye) y añade a `config/.env`:
+   ```
+   VONAGE_APPLICATION_ID=<id de la aplicación>
+   VONAGE_PRIVATE_KEY=vonage.key
+   VONAGE_NUMBER=+1XXXXXXXXXX
+   VONAGE_SIGNATURE_SECRET=<signature secret>
+   ```
+6. En el CRM: Configuración > Integraciones > tarjeta **Vonage** > «Probar» (comprueba que Vonage acepta las credenciales).
+7. Primera llamada real: en Prospectos, a un número de prueba propio en EE. UU. El navegador pedirá permiso para el micrófono. Comprueba que suena, que se oye en los dos sentidos, que al colgar aparece «Terminada · contestó · N min» y que el resultado sugerido es el correcto.
+8. Registra el número en el **Free Caller Registry** (freecallerregistry.com) para que no salga como «Spam Likely».
+
+**Costo:** Vonage cobra por segundo y en estas llamadas se pagan los dos tramos (navegador y teléfono del prospecto), más el alquiler del número. Revisa la tarifa vigente en el panel de Vonage.
+
+**Lo que NO se activa a propósito:** marcador automático o predictivo, detección de contestador con mensaje grabado, voces de IA y grabación de llamadas (ver `docs/prospeccion-en-frio.md`).
+
 ## Cómo probar sin esperar a los servicios (solo en tu equipo)
 
 `php captacion/tests/run.php --only=25_`, `--only=26_`, `--only=27_`, `--only=28_` corre las pruebas de cada canal con servidores simulados (Graph API, SMTP, Telegram). Sirven para ver los formatos exactos de las peticiones, que además están en `captacion/README.md` §20.

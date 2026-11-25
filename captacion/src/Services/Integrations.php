@@ -198,6 +198,22 @@ final class Integrations
             'last' => $sok > 0 ? 'Última consulta correcta ' . Fmt::ago((string) $so['ok_at']) : 'Sin consultas todavía', 'error' => $sbad ? (string) ($so['err'] ?? '') : '',
             'help' => 'Es de solo lectura y no necesita llave. Con SOCRATA_APP_TOKEN (gratis en data.transportation.gov) sube el límite de consultas.',
         ];
+        // Fase AV: llamadas por Vonage (navegador)
+        $vm = Vonage::missing();
+        $vl = self::last('vonage');
+        $vbad = ($vl['last'] ?? '') === 'err';
+        $vsig = self::sigFails('vonage');
+        $cards[] = [
+            'key' => 'vonage', 'title' => 'Vonage (llamadas desde el navegador)', 'testable' => $vm === [], 'webhook' => true, 'url' => Vonage::url('answer'),
+            'level' => $vm !== [] ? 'off' : ($vbad ? 'bad' : ($vsig >= 3 ? 'warn' : 'ok')),
+            'headline' => $vm !== [] ? 'Sin configurar: las llamadas siguen saliendo del teléfono del agente' : ($vbad ? 'El último evento falló' : ($vsig >= 3 ? 'Firma rechazada ' . $vsig . ' veces en la última hora' : 'Configurado')),
+            'details' => [['Variables', $vm === [] ? 'completas' : 'faltan: ' . implode(', ', $vm)], ['Número de NorthStar', Vonage::number() !== null ? '+' . Vonage::number() : 'sin configurar'],
+                ['Webhook answer (POST)', Vonage::url('answer')], ['Webhook de eventos (POST)', Vonage::url('event')], ['SDK del navegador', '@vonage/client-sdk ' . Vonage::SDK_VERSION . ' (jsDelivr, con SRI)']],
+            'last' => isset($vl['ok_at']) ? 'Último evento correcto ' . Fmt::ago((string) $vl['ok_at']) : 'Sin llamadas todavía',
+            'error' => $vbad ? (string) ($vl['err'] ?? '') : '',
+            'help' => $vm !== [] ? 'Crea en Vonage una aplicación con Voice, compra un número de EE. UU., pon las 4 variables en config/.env (la clave privada como archivo en config/) y pega estas dos URL en la aplicación, con método POST. Guía: captacion/docs/setup-guide.md, sección Vonage.' : '',
+            'link' => '/prospectos',
+        ];
         // Canales externos (Q4b): webhooks entrantes
         foreach (Webhook::visible() as $src) {
             $cards[] = self::webhookCard($src);
@@ -319,6 +335,7 @@ final class Integrations
                 'fmcsa'    => self::testFmcsa($usdot),
                 'smtp'     => self::testSmtp(),
                 'socrata'  => self::testSocrata(),
+                'vonage'   => Vonage::test(),
                 'meta', 'calcom', 'twilio', 'n8n' => self::probe($name),
                 default    => ['ok' => false, 'level' => 'bad', 'msg' => 'Integración desconocida.'],
             };

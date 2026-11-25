@@ -96,6 +96,10 @@ Además:
 
 **Lo que NO se hizo, a propósito:** marcador automático, llamadas con IA, SMS y WhatsApp en frío. Cualquiera de ellos necesita primero consentimiento previo por escrito y la revisión del abogado.
 
+### Llamadas por Vonage (fase AV)
+
+El CRM puede llamar por la Voice API de Vonage desde el navegador («clic para llamar»: un clic, una llamada, un número, una persona al teléfono). Para la ley sigue siendo una llamada manual: no hay marcador, ni detección de contestador, ni mensaje grabado. El prospecto ve el número de EE. UU. de NorthStar en lugar de uno extranjero, y el servidor vuelve a comprobar el horario y la lista de no llamar justo antes de marcar. No se graba.
+
 ## 6. Ideas para más adelante
 
 - Cruzar la lista nacional DNC (con suscripción SAN) antes de que un prospecto entre a la lista.
